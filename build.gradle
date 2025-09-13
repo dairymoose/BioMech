@@ -124,8 +124,11 @@ repositories {
     //     dir 'libs'
     // }
     maven {
-		name = "AzureDoom Mods"
-		url = "https://maven.azuredoom.com/mods"
+    	url "https://cursemaven.com"
+    	maven {
+			name = "AzureDoom Mods"
+			url = "https://maven.azuredoom.com/mods"
+		}
 	}
 }
 
@@ -149,6 +152,17 @@ dependencies {
     // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
 
 	compileOnly "mod.azure.azurelib:azurelib-common-1.20.1:3.0.15"
+	implementation fg.deobf("curse.maven:azurelib-817423:6849107")
+
+	implementation fg.deobf("curse.maven:jei-238222:6075247")
+	implementation fg.deobf("curse.maven:configured-457570:5180900")
+	implementation fg.deobf("curse.maven:optiscale-581183:5193019")
+	implementation fg.deobf("curse.maven:xaeros-minimap-263420:5262365")
+	implementation fg.deobf("curse.maven:xaeros-world-map-317780:5262424")
+	//implementation fg.deobf("curse.maven:create-328085:4835191")
+	
+	implementation fg.deobf("curse.maven:spark-361579:4738952")
+	implementation fg.deobf("curse.maven:canary-665658:5089991")
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

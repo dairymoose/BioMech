@@ -1,20 +1,38 @@
 package com.dairymoose.biomech;
 
+import java.lang.reflect.Field;
+
+import org.slf4j.Logger;
+
+import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
+import com.dairymoose.biomech.renderer.HovertechArmorRenderer;
 import com.mojang.logging.LogUtils;
 
+import mod.azure.azurelib.AzureLib;
+import mod.azure.azurelib.rewrite.render.armor.AzArmorModel;
+import mod.azure.azurelib.rewrite.render.armor.AzArmorModelRenderer;
+import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
-import net.minecraft.client.Minecraft;
+import mod.azure.azurelib.rewrite.render.layer.AzArmorLayer;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -28,16 +46,15 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
-@Mod(BioMechMod.MODID)
-public class BioMechMod
+@Mod(BioMech.MODID)
+public class BioMech
 {
     // Define mod id in a common place for everything to reference
     public static final String MODID = "biomech";
     // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
     // Create a Deferred Register to hold Blocks which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     // Create a Deferred Register to hold Items which will all be registered under the "examplemod" namespace
@@ -62,12 +79,18 @@ public class BioMechMod
                 output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
             }).build());
 
-    public BioMechMod(FMLJavaModLoadingContext context)
+    public BioMech(FMLJavaModLoadingContext context)
     {
+    	AzureLib.initialize();
+
+		LOGGER.debug(BioMechRegistry.TAB_BIOMECH_CREATIVE.toString());
+		
         IEventBus modEventBus = context.getModEventBus();
 
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
+        
+        modEventBus.addListener(this::addItemsToCreativeTab);
 
         // Register the Deferred Register to the mod event bus so blocks get registered
         BLOCKS.register(modEventBus);
@@ -85,6 +108,27 @@ public class BioMechMod
         // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
+    
+    private void addItemsToCreativeTab(BuildCreativeModeTabContentsEvent event) {
+		if (event.getTab() == BioMechRegistry.TAB_BIOMECH_CREATIVE.get()) {
+			Field[] allFields = BioMechRegistry.class.getDeclaredFields();
+			for (Field f : allFields) {
+				if (f.getType() == RegistryObject.class) {
+					try {
+						RegistryObject value = (RegistryObject) f.get(null);
+						if (value != null) {
+							if (value.get() instanceof Item) {
+								LOGGER.debug("Value is: " + value.get());
+								event.accept(value);
+							}
+						}
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						LOGGER.error("Error registering items with creative tab", e);
+					}
+				}
+			}
+		}
+	}
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
@@ -113,6 +157,69 @@ public class BioMechMod
         // Do something when the server starts
         LOGGER.info("HELLO from server starting");
     }
+    
+    ItemStack priorItem = null;
+    ItemStack itemToRender;
+    @SubscribeEvent
+    public void onRenderPlayer(RenderPlayerEvent.Pre event) {
+    	if (itemToRender == null) {
+    		itemToRender = new ItemStack(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
+    	}
+    	Player renderEntity = event.getEntity();
+    	AzArmorLayer<Player> layer = new AzArmorLayer();
+    	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
+    	priorItem = null;
+    	if (armorRenderer != null && renderEntity != null) {
+    		PlayerModel playerModel = event.getRenderer().getModel();
+    		armorRenderer.prepForRender(renderEntity, itemToRender, itemToRender.getEquipmentSlot(), playerModel);
+        	//AzArmorModelRenderer renderer = new AzArmorModelRenderer(armorRenderer.rendererPipeline());
+    		RenderType renderType = armorRenderer.rendererPipeline().config().getRenderType(itemToRender);
+    		AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
+    		playerModel.copyPropertiesTo(armorModel);
+    		try {
+    			//layer.render(armorRenderer.rendererPipeline().context());
+    			//armorModel.renderToBuffer(event.getPoseStack(), null, event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+    			priorItem = event.getEntity().getItemBySlot(EquipmentSlot.LEGS);
+    			event.getEntity().setItemSlot(EquipmentSlot.LEGS, itemToRender);
+    		} catch (Exception e) {
+    			LOGGER.error("render error", e);
+    		}
+//        	armorRenderer.rendererPipeline().armorModel().renderToBuffer(event.getPoseStack(), 
+//        			event.getMultiBufferSource().getBuffer(armorRenderer.rendererPipeline().config().getRenderType(itemToRender)), 
+//        			event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+    	}
+    }
+    
+    @SubscribeEvent
+    public void onPostRenderPlayer(RenderPlayerEvent.Post event) {
+    	if (itemToRender == null) {
+    		itemToRender = new ItemStack(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
+    	}
+    	Player renderEntity = event.getEntity();
+    	AzArmorLayer<Player> layer = new AzArmorLayer();
+    	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
+    	if (armorRenderer != null && renderEntity != null) {
+    		PlayerModel playerModel = event.getRenderer().getModel();
+    		armorRenderer.prepForRender(renderEntity, itemToRender, itemToRender.getEquipmentSlot(), playerModel);
+        	//AzArmorModelRenderer renderer = new AzArmorModelRenderer(armorRenderer.rendererPipeline());
+    		RenderType renderType = armorRenderer.rendererPipeline().config().getRenderType(itemToRender);
+    		AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
+    		playerModel.copyPropertiesTo(armorModel);
+    		try {
+    			if (priorItem != null) {
+    				event.getEntity().setItemSlot(EquipmentSlot.LEGS, priorItem);
+    			}
+    			//layer.render(armorRenderer.rendererPipeline().context());
+    			//armorModel.renderToBuffer(event.getPoseStack(), null, event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+    			
+    		} catch (Exception e) {
+    			LOGGER.error("render error", e);
+    		}
+//        	armorRenderer.rendererPipeline().armorModel().renderToBuffer(event.getPoseStack(), 
+//        			event.getMultiBufferSource().getBuffer(armorRenderer.rendererPipeline().config().getRenderType(itemToRender)), 
+//        			event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+    	}
+    }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -121,10 +228,7 @@ public class BioMechMod
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-//        	AzArmorRendererRegistry.register(HovertechArmorRenderer::new, YourItemRegistry.YOUR_ARMOR_HELMET,
-//                    YourItemRegistry.YOUR_ARMOR_CHESTPLATE,
-//                    YourItemRegistry.YOUR_ARMOR_LEGGINGS,
-//                    YourItemRegistry.YOUR_ARMOR_BOOTS);
+        	AzArmorRendererRegistry.register(HovertechArmorRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
         }
     }
 }
