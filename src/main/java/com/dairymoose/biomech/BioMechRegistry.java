@@ -1,6 +1,8 @@
 package com.dairymoose.biomech;
 
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
+import com.dairymoose.biomech.item.armor.LavastrideLeggingsArmor;
+import com.dairymoose.biomech.item.armor.PowerLeggingsArmor;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ArmorItem.Type;
@@ -20,6 +22,10 @@ public class BioMechRegistry {
 	
 	//public static RegistryObject<Item> ITEM_BUBBLE = AwakenedEvil.ITEMS.register("bubble", () -> new BubbleItem(new Item.Properties()));
 	public static RegistryObject<Item> ITEM_HOVERTECH_LEGGINGS = BioMech.ITEMS.register("hovertech_leggings", () -> new HovertechLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_POWER_LEGGINGS = BioMech.ITEMS.register("power_leggings", () -> new PowerLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_LAVASTRIDE_LEGGINGS = BioMech.ITEMS.register("lavastride_leggings", () -> new LavastrideLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 
 	//public static RegistryObject<SoundEvent> SOUND_STALKER_AMBIENT = AwakenedEvil.SOUNDS.register("stalker_ambient", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(AwakenedEvil.MODID, "stalker_ambient")));
 	

@@ -1,0 +1,11 @@
+{
+  "item.biomech.generic.tooltip": "§4Requires BioMech Suit§0",
+  "item.biomech.power_leggings": "§5Power Leggings§0",
+  "item.biomech.power_leggings.tooltip": "Crouch to store kinetic power. After a half-second, you gain increased jump height. Afterwards, each half-second crouched increases jump height even further.",
+  "item.biomech.hovertech_leggings": "§5Hovertech Leggings§0",
+  "item.biomech.hovertech_leggings.tooltip": "Causes the user to hover above the ground, rendering ground effects harmless and increasing jump height by 1 block.  Also grants the wearer slowfall during falls.  Crouch to temporarily disable the hover technology.",
+  "item.biomech.lavastride_leggings": "§5Lavastride Leggings§0",
+  "item.biomech.lavastride_leggings.tooltip": "Allows the user to walk on the surface of lava.",
+  
+  "biomech.finished": "Finished"
+}

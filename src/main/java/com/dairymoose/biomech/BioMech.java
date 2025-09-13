@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import org.slf4j.Logger;
 
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
-import com.dairymoose.biomech.renderer.HovertechArmorRenderer;
+import com.dairymoose.biomech.renderer.HovertechLeggingsArmorRenderer;
+import com.dairymoose.biomech.renderer.LavastrideLeggingsArmorRenderer;
+import com.dairymoose.biomech.renderer.PowerLeggingsArmorRenderer;
 import com.mojang.logging.LogUtils;
 
 import mod.azure.azurelib.AzureLib;
@@ -158,6 +160,7 @@ public class BioMech
         LOGGER.info("HELLO from server starting");
     }
     
+    private boolean doArmorOverride = false;
     ItemStack priorItem = null;
     ItemStack itemToRender;
     @SubscribeEvent
@@ -175,12 +178,19 @@ public class BioMech
         	//AzArmorModelRenderer renderer = new AzArmorModelRenderer(armorRenderer.rendererPipeline());
     		RenderType renderType = armorRenderer.rendererPipeline().config().getRenderType(itemToRender);
     		AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
-    		playerModel.copyPropertiesTo(armorModel);
+    		//playerModel.copyPropertiesTo(armorModel);
+    		
+    		playerModel.leftLeg.visible = false;
+    		//playerModel.leftPants.visible = false;
+    		playerModel.rightLeg.visible = false;
+    		//playerModel.rightPants.visible = false;
     		try {
     			//layer.render(armorRenderer.rendererPipeline().context());
     			//armorModel.renderToBuffer(event.getPoseStack(), null, event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
-    			priorItem = event.getEntity().getItemBySlot(EquipmentSlot.LEGS);
-    			event.getEntity().setItemSlot(EquipmentSlot.LEGS, itemToRender);
+    			if (doArmorOverride) {
+    				priorItem = event.getEntity().getItemBySlot(EquipmentSlot.LEGS);
+        			event.getEntity().setItemSlot(EquipmentSlot.LEGS, itemToRender);
+    			}
     		} catch (Exception e) {
     			LOGGER.error("render error", e);
     		}
@@ -206,8 +216,10 @@ public class BioMech
     		AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
     		playerModel.copyPropertiesTo(armorModel);
     		try {
-    			if (priorItem != null) {
-    				event.getEntity().setItemSlot(EquipmentSlot.LEGS, priorItem);
+    			if (doArmorOverride) {
+    				if (priorItem != null) {
+        				event.getEntity().setItemSlot(EquipmentSlot.LEGS, priorItem);
+        			}
     			}
     			//layer.render(armorRenderer.rendererPipeline().context());
     			//armorModel.renderToBuffer(event.getPoseStack(), null, event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -228,7 +240,9 @@ public class BioMech
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-        	AzArmorRendererRegistry.register(HovertechArmorRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(HovertechLeggingsArmorRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(PowerLeggingsArmorRenderer::new, BioMechRegistry.ITEM_POWER_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(LavastrideLeggingsArmorRenderer::new, BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get());
         }
     }
 }

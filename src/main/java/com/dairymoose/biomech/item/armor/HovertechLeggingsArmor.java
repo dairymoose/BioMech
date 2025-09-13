@@ -3,24 +3,19 @@ package com.dairymoose.biomech.item.armor;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.levelgen.Heightmap;
 
 public class HovertechLeggingsArmor extends ArmorBase {
 
@@ -36,25 +31,25 @@ public class HovertechLeggingsArmor extends ArmorBase {
 	@Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         if (entity instanceof Player player ) {
-            //player.getArmorSlots().forEach(wornArmor -> {
-                //if (wornArmor != null && wornArmor.is(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get())) {
+            player.getArmorSlots().forEach(wornArmor -> {
+                if (wornArmor != null && wornArmor.is(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get())) {
                 	if (entity instanceof LivingEntity living && !living.isSpectator()) {
                 		BlockPos overheadBlock = entity.blockPosition().above().above();
                 		if (!level.getBlockState(overheadBlock).isFaceSturdy(level, overheadBlock, Direction.DOWN)) {
                 			double floatAmount = living.getY() - (entity.blockPosition().below().getY() + level.getBlockFloorHeight(entity.blockPosition().below()));
                     		double targetY = floatBottom + floatMagnitude/2.0 + Math.sin(entity.tickCount*floatSpeed)*floatMagnitude/2.0;
                     		if (floatAmount <= floatTop * 1.5) {
-                    			if (!living.isCrouching() && !living.isFallFlying() && living.getDeltaMovement().y <= 0.20 && !living.isSwimming()) {
+                    			if (!living.isCrouching() && !living.isFallFlying() && living.getDeltaMovement().y <= 0.20 && !living.isSwimming() && !living.isInWaterOrBubble()) {
                     				if (floatAmount < floatBottom && floatAmount >= 0.0) {
                             			living.setDeltaMovement(living.getDeltaMovement().with(Axis.Y, 0.25));
                                 	} else {
                                 		double distToTargetY = targetY - floatAmount;
 
                             			living.setDeltaMovement(living.getDeltaMovement().with(Axis.Y, distToTargetY));
-                            			if (entity.tickCount % 5 == 0) {
-                            				int pCount = (int)(Math.random() * 4.0);
+                            			if (entity.tickCount % 4 == 0) {
+                            				int pCount = (int)(Math.random() * 5.0);
                             				for (int i=0; i<pCount; ++i) {
-                            					level.addParticle(ParticleTypes.ELECTRIC_SPARK, player.getX() + (Math.random()-.5) * 0.4, player.getY() - 0.1, player.getZ() + (Math.random()-.5) * 0.4, 0.0, -0.2, 0.0);
+                            					level.addParticle(ParticleTypes.ASH, player.getX() + (Math.random()-.5) * 0.6, player.getY() - 0.1, player.getZ() + (Math.random()-.5) * 0.6, 0.0, -1.2, 0.0);
                             				}
                             			}
                                 		if (level.isClientSide) {
@@ -73,8 +68,8 @@ public class HovertechLeggingsArmor extends ArmorBase {
                     		}
                 		}
                 	}
-                //}
-            //});
+                }
+            });
         }
     }
 	
