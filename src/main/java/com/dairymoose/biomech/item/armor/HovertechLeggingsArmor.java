@@ -8,6 +8,7 @@ import net.minecraft.client.player.KeyboardInput;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -50,6 +51,12 @@ public class HovertechLeggingsArmor extends ArmorBase {
                                 		double distToTargetY = targetY - floatAmount;
 
                             			living.setDeltaMovement(living.getDeltaMovement().with(Axis.Y, distToTargetY));
+                            			if (entity.tickCount % 5 == 0) {
+                            				int pCount = (int)(Math.random() * 4.0);
+                            				for (int i=0; i<pCount; ++i) {
+                            					level.addParticle(ParticleTypes.ELECTRIC_SPARK, player.getX() + (Math.random()-.5) * 0.4, player.getY() - 0.1, player.getZ() + (Math.random()-.5) * 0.4, 0.0, -0.2, 0.0);
+                            				}
+                            			}
                                 		if (level.isClientSide) {
                             				BioMech.LOGGER.debug("floatAmount=" + floatAmount + " for targetY=" + targetY + " and tickCount=" + entity.tickCount);
                             			}
