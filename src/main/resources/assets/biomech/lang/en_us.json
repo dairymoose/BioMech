@@ -1,11 +1,31 @@
 {
   "item.biomech.generic.tooltip": "§4Requires BioMech Suit§0",
+  "tooltip.biomech.suitenergy": "Suit Energy",
+  
   "item.biomech.power_leggings": "§5Power Leggings§0",
-  "item.biomech.power_leggings.tooltip": "Crouch to store kinetic power. After a half-second, you gain increased jump height. Afterwards, each half-second crouched increases jump height even further.",
+  "item.biomech.power_leggings.tooltip1": "Crouch to store kinetic power.",
+  "item.biomech.power_leggings.tooltip2": "After a half-second, you gain increased jump height.",
+  "item.biomech.power_leggings.tooltip3": "Afterwards, each half-second crouched increases jump height even further.",
+  
   "item.biomech.hovertech_leggings": "§5Hovertech Leggings§0",
-  "item.biomech.hovertech_leggings.tooltip": "Causes the user to hover above the ground, rendering ground effects harmless and increasing jump height by 1 block.  Also grants the wearer slowfall during falls.  Crouch to temporarily disable the hover technology.",
+  "item.biomech.hovertech_leggings.tooltip1": "Causes the user to hover above the ground, rendering ground effects harmless and increasing jump height by 1 block.",
+  "item.biomech.hovertech_leggings.tooltip2": "Also grants the wearer slowfall during falls.",
+  "item.biomech.hovertech_leggings.tooltip3": "Crouch to temporarily disable the hover technology.",
+  
+  "item.biomech.right_power_arm": "§5Right Power Arm§0",
+  "item.biomech.right_power_arm.tooltip1": "Increases attack damage by 2.",
+  
+  "item.biomech.right_power_arm": "§5Left Power Arm§0",
+  "item.biomech.right_power_arm.tooltip1": "Increases attack damage by 2.",
+  
   "item.biomech.lavastride_leggings": "§5Lavastride Leggings§0",
-  "item.biomech.lavastride_leggings.tooltip": "Allows the user to walk on the surface of lava.",
+  "item.biomech.lavastride_leggings.tooltip1": "Allows the user to walk on the surface of lava.",
+  
+  "item.biomech.power_chest": "§5Power Chest§0",
+  "item.biomech.power_chest.tooltip1": "Once a minute, reduces the damage of the next incoming direct damage attack by 50%.",
+  
+  "item.biomech.power_helmet": "§5Power Helmet§0",
+  "item.biomech.power_helmet.tooltip1": "Non-critical attacks have a 33% chance to instead be a critical strike.",
   
   "biomech.finished": "Finished"
 }

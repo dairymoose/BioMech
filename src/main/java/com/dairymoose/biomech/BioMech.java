@@ -1,27 +1,40 @@
 package com.dairymoose.biomech;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import org.slf4j.Logger;
 
-import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
-import com.dairymoose.biomech.renderer.HovertechLeggingsArmorRenderer;
-import com.dairymoose.biomech.renderer.LavastrideLeggingsArmorRenderer;
-import com.dairymoose.biomech.renderer.PowerLeggingsArmorRenderer;
+import com.dairymoose.biomech.item.armor.ArmorBase;
+import com.dairymoose.biomech.item.armor.MechPart;
+import com.dairymoose.biomech.item.armor.MechPartUtil;
+import com.dairymoose.biomech.renderer.HovertechLeggingsRenderer;
+import com.dairymoose.biomech.renderer.LavastrideLeggingsRenderer;
+import com.dairymoose.biomech.renderer.PowerChestRenderer;
+import com.dairymoose.biomech.renderer.PowerHelmetRenderer;
+import com.dairymoose.biomech.renderer.PowerLeftArmRenderer;
+import com.dairymoose.biomech.renderer.PowerLeggingsRenderer;
+import com.dairymoose.biomech.renderer.PowerRightArmRenderer;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
+import com.mojang.math.Axis;
 
 import mod.azure.azurelib.AzureLib;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorModel;
-import mod.azure.azurelib.rewrite.render.armor.AzArmorModelRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
 import mod.azure.azurelib.rewrite.render.layer.AzArmorLayer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
@@ -166,9 +179,11 @@ public class BioMech
     @SubscribeEvent
     public void onRenderPlayer(RenderPlayerEvent.Pre event) {
     	if (itemToRender == null) {
-    		itemToRender = new ItemStack(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
+    		itemToRender = new ItemStack(BioMechRegistry.ITEM_POWER_RIGHT_ARM.get());
     	}
     	Player renderEntity = event.getEntity();
+    	if (renderEntity.isSpectator())
+    		return;
     	AzArmorLayer<Player> layer = new AzArmorLayer();
     	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
     	priorItem = null;
@@ -180,10 +195,6 @@ public class BioMech
     		AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
     		//playerModel.copyPropertiesTo(armorModel);
     		
-    		playerModel.leftLeg.visible = false;
-    		//playerModel.leftPants.visible = false;
-    		playerModel.rightLeg.visible = false;
-    		//playerModel.rightPants.visible = false;
     		try {
     			//layer.render(armorRenderer.rendererPipeline().context());
     			//armorModel.renderToBuffer(event.getPoseStack(), null, event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -191,14 +202,100 @@ public class BioMech
     				priorItem = event.getEntity().getItemBySlot(EquipmentSlot.LEGS);
         			event.getEntity().setItemSlot(EquipmentSlot.LEGS, itemToRender);
     			}
+    			priorItem = event.getEntity().getItemBySlot(EquipmentSlot.CHEST);
+    			event.getEntity().setItemSlot(EquipmentSlot.CHEST, itemToRender);
+    			HumanoidArmorLayer hal = new HumanoidArmorLayer(event.getRenderer(), playerModel, armorModel, Minecraft.getInstance().getModelManager());
+    			PoseStack poseStack = event.getPoseStack();
+    			poseStack.pushPose();
+    			//reproduce rotations and scale from LivingEntityRenderer
+    			boolean shouldSit = renderEntity.isPassenger() && (renderEntity.getVehicle() != null && renderEntity.getVehicle().shouldRiderSit());
+				float f = Mth.rotLerp(event.getPartialTick(), renderEntity.yBodyRotO, renderEntity.yBodyRot);
+				float f1 = Mth.rotLerp(event.getPartialTick(), renderEntity.yHeadRotO, renderEntity.yHeadRot);
+				float f2 = f1 - f;
+				if (shouldSit && renderEntity.getVehicle() instanceof LivingEntity) {
+					LivingEntity livingentity = (LivingEntity) renderEntity.getVehicle();
+					f = Mth.rotLerp(event.getPartialTick(), livingentity.yBodyRotO, livingentity.yBodyRot);
+					f2 = f1 - f;
+					float f3 = Mth.wrapDegrees(f2);
+					if (f3 < -85.0F) {
+						f3 = -85.0F;
+					}
+
+					if (f3 >= 85.0F) {
+						f3 = 85.0F;
+					}
+
+					f = f1 - f3;
+					if (f3 * f3 > 2500.0F) {
+						f += f3 * 0.2F;
+					}
+
+					f2 = f1 - f;
+				}
+    			
+    			this.setupRotations((AbstractClientPlayer)renderEntity, poseStack, 0.0f, f, event.getPartialTick());
+    			poseStack.scale(-1.0F, -1.0F, 1.0F);
+    		    this.scale((AbstractClientPlayer)renderEntity, poseStack, event.getPartialTick());
+    		    poseStack.translate(0.0F, -1.501F, 0.0F);
+    		    
+    			hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, EquipmentSlot.CHEST, event.getPackedLight(), armorModel);
+    			event.getEntity().setItemSlot(EquipmentSlot.CHEST, new ItemStack(BioMechRegistry.ITEM_POWER_LEFT_ARM.get()));
+    			hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, EquipmentSlot.CHEST, event.getPackedLight(), armorModel);
+    			event.getEntity().setItemSlot(EquipmentSlot.CHEST, priorItem);
+    			poseStack.popPose();
     		} catch (Exception e) {
     			LOGGER.error("render error", e);
     		}
+    		
+    		Iterable<ItemStack> armorSlots = event.getEntity().getArmorSlots();
+    		for (ItemStack itemStack : armorSlots) {
+    			if (itemStack.getItem() instanceof ArmorBase armorBase) {
+    				MechPart mechPart = armorBase.getMechPart();
+    				if (mechPart != null) {
+    					List<ModelPart> parts = MechPartUtil.getCorrespondingModelParts(playerModel, mechPart);
+    					if (armorBase.shouldHidePlayerModel()) {
+    						for (ModelPart part : parts) {
+    							part.visible = false;
+    						}
+    					} else {
+//    						for (ModelPart part : parts) {
+//    							part.visible = true;
+//    						}
+    					}
+    				}
+    			}
+    		}
+//    		playerModel.leftLeg.visible = false;
+//    		playerModel.leftPants.visible = false;
+//    		
+//    		playerModel.rightLeg.visible = false;
+//    		playerModel.rightPants.visible = false;
+//    		
+//    		playerModel.leftArm.visible = false;
+//    		playerModel.leftSleeve.visible = false;
+//    		
+//    		playerModel.rightArm.visible = false;
+//    		playerModel.rightSleeve.visible = false;
+//    		
+//    		playerModel.body.visible = false;
+    		
+    		//playerModel.leftSleeve.visible = false;
 //        	armorRenderer.rendererPipeline().armorModel().renderToBuffer(event.getPoseStack(), 
 //        			event.getMultiBufferSource().getBuffer(armorRenderer.rendererPipeline().config().getRenderType(itemToRender)), 
 //        			event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
     	}
     }
+    
+    protected void setupRotations(AbstractClientPlayer player, PoseStack poseStack, float bob, float yaw, float partialTick) {
+    	if (!player.hasPose(Pose.SLEEPING)) {
+    		poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yaw));
+         }
+     }
+    
+    protected void scale(AbstractClientPlayer player, PoseStack poseStack, float partialTick) {
+        float f = 0.9375F;
+        poseStack.scale(0.9375F, 0.9375F, 0.9375F);
+     }
     
     @SubscribeEvent
     public void onPostRenderPlayer(RenderPlayerEvent.Post event) {
@@ -240,9 +337,13 @@ public class BioMech
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-        	AzArmorRendererRegistry.register(HovertechLeggingsArmorRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
-        	AzArmorRendererRegistry.register(PowerLeggingsArmorRenderer::new, BioMechRegistry.ITEM_POWER_LEGGINGS.get());
-        	AzArmorRendererRegistry.register(LavastrideLeggingsArmorRenderer::new, BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(HovertechLeggingsRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(PowerLeggingsRenderer::new, BioMechRegistry.ITEM_POWER_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(LavastrideLeggingsRenderer::new, BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(PowerChestRenderer::new, BioMechRegistry.ITEM_POWER_CHEST.get());
+        	AzArmorRendererRegistry.register(PowerRightArmRenderer::new, BioMechRegistry.ITEM_POWER_RIGHT_ARM.get());
+        	AzArmorRendererRegistry.register(PowerLeftArmRenderer::new, BioMechRegistry.ITEM_POWER_LEFT_ARM.get());
+        	AzArmorRendererRegistry.register(PowerHelmetRenderer::new, BioMechRegistry.ITEM_POWER_HELMET.get());
         }
     }
 }

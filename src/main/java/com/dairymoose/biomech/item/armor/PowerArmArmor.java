@@ -9,24 +9,21 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public class LavastrideLeggingsArmor extends ArmorBase {
+public class PowerArmArmor extends ArmorBase {
 
-	public LavastrideLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public PowerArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
-		this.suitEnergy = 4;
+		this.suitEnergy = 2;
 		this.hidePlayerModel = true;
-		this.mechPart = MechPart.LEGGINGS;
 	}
-	
+
 	@Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-        if (entity instanceof Player player ) {
+        if (entity instanceof Player player) {
             player.getArmorSlots().forEach(wornArmor -> {
-                if (wornArmor != null && wornArmor.is(BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get())) {
+                if (wornArmor != null && wornArmor.is(BioMechRegistry.ITEM_POWER_CHEST.get())) {
                 	if (entity instanceof LivingEntity living && !living.isSpectator()) {
-                		if (!level.isClientSide) {
-                			//living.addEffect(new MobEffectInstance(MobEffects.l, 30, newJumpBoost));
-                		}
+                		;
                 	}
                 }
             });

@@ -26,6 +26,9 @@ public class PowerLeggingsArmor extends ArmorBase {
 	
 	public PowerLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
+		this.suitEnergy = 10;
+		this.hidePlayerModel = true;
+		this.mechPart = MechPart.LEGGINGS;
 	}
 
 	public int jumpBoost() {

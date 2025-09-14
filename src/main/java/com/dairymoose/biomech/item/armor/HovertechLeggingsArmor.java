@@ -26,6 +26,9 @@ public class HovertechLeggingsArmor extends ArmorBase {
 	
 	public HovertechLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
+		this.suitEnergy = 4;
+		this.hidePlayerModel = true;
+		this.mechPart = MechPart.LEGGINGS;
 	}
 	
 	@Override
@@ -60,7 +63,7 @@ public class HovertechLeggingsArmor extends ArmorBase {
                     			}
                     		} else {
                     			if (!level.isClientSide) {
-                    				if (!living.isFallFlying() && living.fallDistance >= 4.0 && floatAmount >= 4.0) {
+                    				if (!living.isFallFlying() && living.fallDistance >= 3.0 && floatAmount >= 3.0) {
                     					BioMech.LOGGER.debug("slowfall floatAmount=" + floatAmount);
                             			living.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 10, 1));
                     				}
