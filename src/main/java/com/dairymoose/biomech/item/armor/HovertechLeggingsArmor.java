@@ -19,9 +19,10 @@ import net.minecraft.world.level.Level;
 
 public class HovertechLeggingsArmor extends ArmorBase {
 
-	float floatMagnitude = 0.16f; 
-	float floatBottom = 1.05f;
+	float floatMagnitude = 0.15f; 
+	float floatBottom = 1.10f;
 	float floatSpeed = 0.092f;
+	float maxFloatDeltaAdjustment = 0.08f;
 	float floatTop = floatBottom + 1.0f*floatMagnitude;
 	
 	public HovertechLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
@@ -42,13 +43,18 @@ public class HovertechLeggingsArmor extends ArmorBase {
                 			double floatAmount = living.getY() - (entity.blockPosition().below().getY() + level.getBlockFloorHeight(entity.blockPosition().below()));
                     		double targetY = floatBottom + floatMagnitude/2.0 + Math.sin(entity.tickCount*floatSpeed)*floatMagnitude/2.0;
                     		if (floatAmount <= floatTop * 1.5) {
+                    			living.fallDistance = 0;
                     			if (!living.isCrouching() && !living.isFallFlying() && living.getDeltaMovement().y <= 0.20 && !living.isSwimming() && !living.isInWaterOrBubble()) {
                     				if (floatAmount < floatBottom && floatAmount >= 0.0) {
-                            			living.setDeltaMovement(living.getDeltaMovement().with(Axis.Y, 0.25));
+                            			living.setDeltaMovement(living.getDeltaMovement().with(Axis.Y, 0.26));
                                 	} else {
                                 		double distToTargetY = targetY - floatAmount;
 
-                            			living.setDeltaMovement(living.getDeltaMovement().with(Axis.Y, distToTargetY));
+                                		if (distToTargetY > 0.0) {
+                                			living.setDeltaMovement(living.getDeltaMovement().with(Axis.Y, Math.min(maxFloatDeltaAdjustment, distToTargetY)));
+                                		} else {
+                                			living.setDeltaMovement(living.getDeltaMovement().with(Axis.Y, Math.max(-maxFloatDeltaAdjustment, distToTargetY)));
+                                		}
                             			if (entity.tickCount % 4 == 0) {
                             				int pCount = (int)(Math.random() * 5.0);
                             				for (int i=0; i<pCount; ++i) {
@@ -63,9 +69,9 @@ public class HovertechLeggingsArmor extends ArmorBase {
                     			}
                     		} else {
                     			if (!level.isClientSide) {
-                    				if (!living.isFallFlying() && living.fallDistance >= 3.0 && floatAmount >= 3.0) {
+                    				if (!living.isFallFlying() && living.fallDistance >= 3.0) {
                     					BioMech.LOGGER.debug("slowfall floatAmount=" + floatAmount);
-                            			living.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 10, 1));
+                            			living.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 20, 1));
                     				}
                     			}
                     		}

@@ -15,8 +15,8 @@
   "item.biomech.right_power_arm": "§5Right Power Arm§0",
   "item.biomech.right_power_arm.tooltip1": "Increases attack damage by 2.",
   
-  "item.biomech.right_power_arm": "§5Left Power Arm§0",
-  "item.biomech.right_power_arm.tooltip1": "Increases attack damage by 2.",
+  "item.biomech.left_power_arm": "§5Left Power Arm§0",
+  "item.biomech.left_power_arm.tooltip1": "Increases attack damage by 2.",
   
   "item.biomech.lavastride_leggings": "§5Lavastride Leggings§0",
   "item.biomech.lavastride_leggings.tooltip1": "Allows the user to walk on the surface of lava.",
