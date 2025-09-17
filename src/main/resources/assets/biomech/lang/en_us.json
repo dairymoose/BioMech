@@ -1,5 +1,5 @@
 {
-	"block.biomech.biomech_station": "Biomech Station",
+	"block.biomech.biomech_station": "BioMech Station",
 	
 	"item.biomech.generic.tooltip": "§4Requires BioMech Suit§0",
 	"tooltip.biomech.suitenergy": "Suit Energy",

@@ -3,7 +3,7 @@ package com.dairymoose.biomech.block_entity.anim;
 import org.jetbrains.annotations.NotNull;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.block_entity.BiomechStationBlockEntity;
+import com.dairymoose.biomech.block_entity.BioMechStationBlockEntity;
 
 import mod.azure.azurelib.rewrite.animation.AzAnimatorConfig;
 import mod.azure.azurelib.rewrite.animation.controller.AzAnimationController;
@@ -11,8 +11,8 @@ import mod.azure.azurelib.rewrite.animation.controller.AzAnimationControllerCont
 import mod.azure.azurelib.rewrite.animation.impl.AzBlockAnimator;
 import net.minecraft.resources.ResourceLocation;
 
-public class BiomechStationAnimator extends AzBlockAnimator<BiomechStationBlockEntity> {
-    public BiomechStationAnimator() {
+public class BioMechStationAnimator extends AzBlockAnimator<BioMechStationBlockEntity> {
+    public BioMechStationAnimator() {
 		super(AzAnimatorConfig.defaultConfig());
 	}
 
@@ -22,7 +22,7 @@ public class BiomechStationAnimator extends AzBlockAnimator<BiomechStationBlockE
     );
 
     @Override
-    public void registerControllers(AzAnimationControllerContainer<BiomechStationBlockEntity> animationControllerContainer) {
+    public void registerControllers(AzAnimationControllerContainer<BioMechStationBlockEntity> animationControllerContainer) {
         animationControllerContainer.add(
             AzAnimationController.builder(this, "base_controller")
                 .build()
@@ -30,7 +30,7 @@ public class BiomechStationAnimator extends AzBlockAnimator<BiomechStationBlockE
     }
 
     @Override
-    public @NotNull ResourceLocation getAnimationLocation(BiomechStationBlockEntity animatable) {
+    public @NotNull ResourceLocation getAnimationLocation(BioMechStationBlockEntity animatable) {
         return ANIMATIONS;
     }
 }

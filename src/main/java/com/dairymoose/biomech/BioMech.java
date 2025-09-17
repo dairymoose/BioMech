@@ -5,7 +5,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 
-import com.dairymoose.biomech.block_entity.renderer.BiomechStationRenderer;
+import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
+import com.dairymoose.biomech.item.anim.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
@@ -24,6 +25,7 @@ import mod.azure.azurelib.AzureLib;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorModel;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
+import mod.azure.azurelib.rewrite.render.item.AzItemRendererRegistry;
 import mod.azure.azurelib.rewrite.render.layer.AzArmorLayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.PlayerModel;
@@ -342,11 +344,13 @@ public class BioMech
         	AzArmorRendererRegistry.register(PowerRightArmRenderer::new, BioMechRegistry.ITEM_POWER_RIGHT_ARM.get());
         	AzArmorRendererRegistry.register(PowerLeftArmRenderer::new, BioMechRegistry.ITEM_POWER_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(PowerHelmetRenderer::new, BioMechRegistry.ITEM_POWER_HELMET.get());
+        	
+        	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
         }
         
         @SubscribeEvent
 		public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
-			event.registerBlockEntityRenderer(BioMechRegistry.BLOCK_ENTITY_BIOMECH_STATION.get(), context -> new BiomechStationRenderer());
+			event.registerBlockEntityRenderer(BioMechRegistry.BLOCK_ENTITY_BIOMECH_STATION.get(), context -> new BioMechStationRenderer());
 		}
     }
 }

@@ -1,7 +1,7 @@
 package com.dairymoose.biomech;
 
-import com.dairymoose.biomech.block.BiomechStationBlock;
-import com.dairymoose.biomech.block_entity.BiomechStationBlockEntity;
+import com.dairymoose.biomech.block.BioMechStationBlock;
+import com.dairymoose.biomech.block_entity.BioMechStationBlockEntity;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.LavastrideLeggingsArmor;
 import com.dairymoose.biomech.item.armor.PowerChestArmor;
@@ -27,11 +27,9 @@ public class BioMechRegistry {
 
 	public static RegistryObject<CreativeModeTab> TAB_BIOMECH_CREATIVE = BioMech.CREATIVE_MODE_TABS.register("biomech_creative", () -> CreativeModeTab.builder().icon(() -> (new ItemStack(BioMechRegistry.ITEM_BIOMECH_STATION.get()))).title(Component.literal("BioMech")).build());
 	
-	//public static RegistryObject<Block> BLOCK_CORRUPTED_IRON_ORE = AwakenedEvil.BLOCKS.register("corrupted_iron_ore", () -> new CorruptedOreBlock(Blocks.IRON_ORE, BlockBehaviour.Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().strength(3.0F, 3.0F)));
+	public static RegistryObject<Block> BLOCK_BIOMECH_STATION = BioMech.BLOCKS.register("biomech_station", () -> new BioMechStationBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(1.5f)));
 	
-	public static RegistryObject<Block> BLOCK_BIOMECH_STATION = BioMech.BLOCKS.register("biomech_station", () -> new BiomechStationBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(1.5f)));
-	
-	public static RegistryObject<BlockEntityType<BiomechStationBlockEntity>> BLOCK_ENTITY_BIOMECH_STATION = BioMech.BLOCK_ENTITY_TYPES.register("biomech_station", () -> BiomechStationBlockEntity.BIOMECH_STATION_BLOCK_ENTITY);
+	public static RegistryObject<BlockEntityType<BioMechStationBlockEntity>> BLOCK_ENTITY_BIOMECH_STATION = BioMech.BLOCK_ENTITY_TYPES.register("biomech_station", () -> BioMechStationBlockEntity.BIOMECH_STATION_BLOCK_ENTITY);
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_STATION = BioMech.ITEMS.register("biomech_station", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_STATION.get(), new Item.Properties()));
 	
