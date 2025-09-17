@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "I I",
+    "#y#",
+    "I I"
+  ],
+  "key": {
+    "#": {
+      "tag": "forge:ingots/iron"
+    },
+	"I": {
+      "item": "minecraft:iron_nugget"
+    },
+	"y": {
+	  "item": "minecraft:orange_dye"
+	}
+  },
+  "result": {
+    "item": "biomech:biomech_station",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableBioMechStation"
+    }
+  ]
+} 

@@ -43,7 +43,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -55,6 +54,7 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -89,6 +89,8 @@ public class BioMech
 //                output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
 //            }).build());
 
+    private static BioMechCraftingFlags craftingFlags;
+    
     public BioMech(FMLJavaModLoadingContext context)
     {
     	AzureLib.initialize();
@@ -116,8 +118,11 @@ public class BioMech
         // Register the item to a creative tab
         //modEventBus.addListener(this::addCreative);
 
-        // Register our mod's ForgeConfigSpec so that Forge can create and load the config file for us
-        context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        craftingFlags = new BioMechCraftingFlags();
+        
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BioMechConfig.commonSpec);
+	    ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, BioMechConfig.clientSpec);
+	    ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, BioMechConfig.serverSpec);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -147,15 +152,7 @@ public class BioMech
 
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-        // Some common setup code
-        LOGGER.info("HELLO FROM COMMON SETUP");
-
-        if (Config.logDirtBlock)
-            LOGGER.info("DIRT BLOCK >> {}", ForgeRegistries.BLOCKS.getKey(Blocks.DIRT));
-
-        LOGGER.info(Config.magicNumberIntroduction + Config.magicNumber);
-
-        Config.items.forEach((item) -> LOGGER.info("ITEM >> {}", item.toString()));
+        BioMechConfig.reinit();
     }
 
 //    // Add the example block item to the building blocks tab

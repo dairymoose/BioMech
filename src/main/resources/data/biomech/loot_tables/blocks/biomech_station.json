@@ -1,0 +1,19 @@
+{
+    "pools": [
+        {
+            "conditions": [
+                {
+                    "condition": "minecraft:survives_explosion"
+                }
+            ],
+            "entries": [
+                {
+                    "name": "biomech:biomech_station",
+                    "type": "minecraft:item"
+                }
+            ],
+            "rolls": 1
+        }
+    ],
+    "type": "minecraft:block"
+}
