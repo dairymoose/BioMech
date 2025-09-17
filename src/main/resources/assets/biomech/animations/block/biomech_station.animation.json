@@ -1,0 +1,118 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.biomech_station.deploy": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 1.25,
+			"bones": {
+				"connector": {
+					"position": {
+						"0.0": {
+							"vector": [0, -5, -5]
+						},
+						"0.875": {
+							"vector": [0, 0, 0],
+							"easing": "linear"
+						}
+					}
+				},
+				"top": {
+					"rotation": {
+						"0.0": {
+							"vector": [-80, 0, 0]
+						},
+						"0.875": {
+							"vector": [0, 0, 0],
+							"easing": "linear"
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, -15, -10]
+						},
+						"0.875": {
+							"vector": [0, 0, 0],
+							"easing": "linear"
+						}
+					}
+				},
+				"vertical_studs": {
+					"rotation": {
+						"0.0": {
+							"vector": [62.5, 0, 0]
+						},
+						"0.875": {
+							"vector": [0, 0, 0],
+							"easing": "linear"
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [1, 0.75, 1]
+						},
+						"0.875": {
+							"vector": [1, 1, 1],
+							"easing": "linear"
+						}
+					}
+				},
+				"upper_supports": {
+					"rotation": {
+						"0.0": {
+							"vector": [27.5, 0, 0]
+						},
+						"0.875": {
+							"vector": [0, 0, 0],
+							"easing": "linear"
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, -12, -9]
+						},
+						"0.875": {
+							"vector": [0, 0, 0],
+							"easing": "linear"
+						}
+					}
+				},
+				"lower_supports": {
+					"rotation": {
+						"0.0": {
+							"vector": [97.5, 0, 0]
+						},
+						"0.875": {
+							"vector": [0, 0, 0],
+							"easing": "linear"
+						}
+					}
+				},
+				"metal_end": {
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 2.49]
+						},
+						"0.875": {
+							"vector": [0, 0, 2.49]
+						},
+						"1.25": {
+							"vector": [0, 0, 0]
+						}
+					},
+					"scale": {
+						"0.0": {
+							"vector": [1, 1, 0]
+						},
+						"0.875": {
+							"vector": [1, 1, 0.1]
+						},
+						"1.25": {
+							"vector": [1, 1, 1]
+						}
+					}
+				}
+			}
+		}
+	},
+	"azurelib_format_version": 2
+}

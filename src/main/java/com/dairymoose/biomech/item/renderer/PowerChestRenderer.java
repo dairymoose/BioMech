@@ -1,4 +1,4 @@
-package com.dairymoose.biomech.renderer;
+package com.dairymoose.biomech.item.renderer;
 
 import com.dairymoose.biomech.BioMech;
 
@@ -6,18 +6,18 @@ import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererConfig;
 import net.minecraft.resources.ResourceLocation;
 
-public class LavastrideLeggingsRenderer extends AzArmorRenderer {
+public class PowerChestRenderer extends AzArmorRenderer {
     private static final ResourceLocation GEO = ResourceLocation.fromNamespaceAndPath(
         BioMech.MODID,
-        "geo/item/lavastride_leggings.geo.json"
+        "geo/item/power_chest.geo.json"
     );
 
     private static final ResourceLocation TEX = ResourceLocation.fromNamespaceAndPath(
     	BioMech.MODID,
-        "textures/item/lavastride_leggings.png"
+        "textures/item/power_chest.png"
     );
 
-    public LavastrideLeggingsRenderer() {
+    public PowerChestRenderer() {
         super(AzArmorRendererConfig.builder(GEO, TEX).build());
     }
 }
