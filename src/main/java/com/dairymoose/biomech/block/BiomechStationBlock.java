@@ -39,7 +39,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BioMechStationBlock extends HorizontalDirectionalBlock implements EntityBlock {
 
-	public static final DirectionProperty FACING = BlockStateProperties.FACING;
+	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final BooleanProperty MULTIBLOCK = BooleanProperty.create("multiblock");
 	private static boolean instantTeleportToStation = false;
 	public static boolean configWalkToBioMechStation = true;

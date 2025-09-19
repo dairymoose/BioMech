@@ -6,10 +6,7 @@ public class BioMechServerConfig {
 	
 
 	public BioMechServerConfig(ForgeConfigSpec.Builder builder) {
-		builder.push("server");
-		
-		
-		builder.pop();
+		;
 	}
 	
 }

@@ -1,19 +1,19 @@
 {
   "variants": {
     "facing=east": {
-      "model": "azurelib:block/lightblock",
+      "model": "minecraft:block/air",
       "y": 90
     },
     "facing=north": {
-      "model": "azurelib:block/lightblock",
+      "model": "minecraft:block/air",
 	  "y": 0
     },
     "facing=south": {
-      "model": "azurelib:block/lightblock",
+      "model": "minecraft:block/air",
       "y": 180
     },
     "facing=west": {
-      "model": "azurelib:block/lightblock",
+      "model": "minecraft:block/air",
       "y": 270
     }
   }

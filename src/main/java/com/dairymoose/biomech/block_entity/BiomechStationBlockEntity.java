@@ -57,9 +57,8 @@ public class BioMechStationBlockEntity extends RandomizableContainerBlockEntity 
 			double d1 = Mth.lerp(tickPct, blockEntity.playerStartLoc.y, finalLoc.y);
 			double d2 = Mth.lerp(tickPct, blockEntity.playerStartLoc.z, finalLoc.z);
 			player.setPos(new Vec3(d0, d1, d2));
-			//player.setYRot(blockState.getValue(FACING).toYRot());
-			//player.setXRot(22.0f);
-			
+			player.fallDistance = 0.0f;
+
 			--blockEntity.walkToStationTicks;
 		} else {
 			Player player = blockEntity.walkToStationPlayer;
@@ -72,11 +71,6 @@ public class BioMechStationBlockEntity extends RandomizableContainerBlockEntity 
 				player.setYBodyRot(yRot);
 				player.setXRot(22.0f);
 				
-//				if (blockEntity.turnAroundTicks == 0) {
-//					player.setYRot(finalYRot);
-//					player.setYHeadRot(finalYRot);
-//					blockEntity.walkToStationPlayer = null;
-//				}
 				if (blockEntity.turnAroundTicks == 0) {
 					blockEntity.walkToStationPlayer = null;
 				}

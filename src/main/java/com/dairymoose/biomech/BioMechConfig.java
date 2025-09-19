@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.dairymoose.biomech.block.BioMechStationBlock;
+
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
@@ -57,6 +59,8 @@ public class BioMechConfig {
 		
 		try {
 			addConfigElement(BioMechConfig.COMMON.enableBioMechStation);
+			
+			BioMechStationBlock.configWalkToBioMechStation = BioMechConfig.COMMON.walkToBioMechStation.get().booleanValue();
 
 			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
 				@Override
