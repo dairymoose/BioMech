@@ -8,6 +8,15 @@
             ],
             "entries": [
                 {
+                    "conditions": [
+                        {
+                            "block": "biomech:biomech_station",
+                            "condition": "minecraft:block_state_property",
+                            "properties": {
+                                "multiblock": "false"
+                            }
+                        }
+                    ],
                     "name": "biomech:biomech_station",
                     "type": "minecraft:item"
                 }

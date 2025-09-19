@@ -167,7 +167,6 @@ dependencies {
 	//implementation fg.deobf("curse.maven:create-328085:4835191")
 	
 	implementation fg.deobf("curse.maven:spark-361579:4738952")
-	implementation fg.deobf("curse.maven:canary-665658:5089991")
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

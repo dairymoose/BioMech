@@ -1,7 +1,20 @@
 {
   "variants": {
-    "": {
-      "model": "azurelib:block/lightblock"
+    "facing=east": {
+      "model": "azurelib:block/lightblock",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "azurelib:block/lightblock",
+	  "y": 0
+    },
+    "facing=south": {
+      "model": "azurelib:block/lightblock",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "azurelib:block/lightblock",
+      "y": 270
     }
   }
 }
