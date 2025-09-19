@@ -9,8 +9,11 @@ import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.armor.PowerLeftArmArmor;
 import com.dairymoose.biomech.item.armor.PowerLeggingsArmor;
 import com.dairymoose.biomech.item.armor.PowerRightArmArmor;
+import com.dairymoose.biomech.menu.BioMechArmorMenu;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ArmorItem.Type;
 import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.BlockItem;
@@ -30,6 +33,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Block> BLOCK_BIOMECH_STATION = BioMech.BLOCKS.register("biomech_station", () -> new BioMechStationBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(1.5f)));
 	
 	public static RegistryObject<BlockEntityType<BioMechStationBlockEntity>> BLOCK_ENTITY_BIOMECH_STATION = BioMech.BLOCK_ENTITY_TYPES.register("biomech_station", () -> BioMechStationBlockEntity.BIOMECH_STATION_BLOCK_ENTITY);
+	
+	public static RegistryObject<MenuType> MENU_TYPE_BIOMECH_STATION = BioMech.MENUS.register("biomech_station_menu", () -> new MenuType(BioMechArmorMenu::new, FeatureFlags.DEFAULT_FLAGS));
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_STATION = BioMech.ITEMS.register("biomech_station", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_STATION.get(), new Item.Properties()));
 	
