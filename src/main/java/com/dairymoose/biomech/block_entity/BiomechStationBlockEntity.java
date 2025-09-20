@@ -102,7 +102,7 @@ public class BioMechStationBlockEntity extends RandomizableContainerBlockEntity 
 	
 	@Override
 	public int getContainerSize() {
-		return 5;
+		return 6;
 	}
 
 	@Override
