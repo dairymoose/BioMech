@@ -50,22 +50,28 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 			this(p_39640_, p_39641_, new SimpleContainer(6));
 		}
 	   
-	   public BioMechStationMenu(int p_39640_, Inventory p_39641_, final Container stationContainer) {
+	   public BioMechStationMenu(int p_39640_, Inventory inventory, final Container stationContainer) {
 	      super(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), p_39640_);
 	      //this.active = p_39641_;
 	      //this.owner = p_39708_;
 	      //this.addSlot(new ResultSlot(p_39640_.player, this.craftSlots, this.resultSlots, 0, 154, 28));
-	      stationContainer.startOpen(p_39641_.player);
+	      stationContainer.startOpen(inventory.player);
 	      this.container = stationContainer;
+	      
+	      BioMechPlayerData playerData = BioMech.globalPlayerData.computeIfAbsent(inventory.player.getUUID(), (uuid) -> new BioMechPlayerData());
+	      
+	      this.container.clearContent();
 	      
 	      MechPart[] mechPartsBySlot = {MechPart.Back, MechPart.Head, MechPart.RightArm, MechPart.Chest, MechPart.LeftArm, MechPart.Leggings};
 	      int[] xCoordinatesBySlot = {31, 68, 50, 68, 86, 68};
 	      int[] yCoordinatesBySlot = {13, 16, 29, 34, 29, 52};
-	      int counter = 0;
+	      int slotIdCounter = 0;
 	      for (MechPart mechPart : mechPartsBySlot) {
-	    	  this.addSlot(new Slot(stationContainer, counter, xCoordinatesBySlot[counter], yCoordinatesBySlot[counter]) {
+	    	  this.container.setItem(slotIdCounter, playerData.getForSlot(mechPart).itemStack);
+	    	  
+	    	  this.addSlot(new Slot(stationContainer, slotIdCounter, xCoordinatesBySlot[slotIdCounter], yCoordinatesBySlot[slotIdCounter]) {
 		    	  public void setByPlayer(ItemStack p_270969_) {
-		               BioMechStationMenu.onEquipItem(p_39641_.player, mechPart, p_270969_, this.getItem());
+		               BioMechStationMenu.onEquipItem(inventory.player, mechPart, p_270969_, this.getItem());
 		               super.setByPlayer(p_270969_);
 		            }
 
@@ -89,7 +95,7 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 		            }
 		      });
 	    	  
-	    	  ++counter;
+	    	  ++slotIdCounter;
 	      }
 //	      this.addSlot(new Slot(stationContainer, 0, 31, 13) {
 //	    	  public void setByPlayer(ItemStack p_270969_) {
@@ -122,12 +128,12 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 
 	      for(int l = 0; l < 3; ++l) {
 	         for(int j1 = 0; j1 < 9; ++j1) {
-	            this.addSlot(new Slot(p_39641_, j1 + (l + 1) * 9, 8 + j1 * 18, 84 + l * 18));
+	            this.addSlot(new Slot(inventory, j1 + (l + 1) * 9, 8 + j1 * 18, 84 + l * 18));
 	         }
 	      }
 
 	      for(int i1 = 0; i1 < 9; ++i1) {
-	         this.addSlot(new Slot(p_39641_, i1, 8 + i1 * 18, 142));
+	         this.addSlot(new Slot(inventory, i1, 8 + i1 * 18, 142));
 	      }
 	   }
 
@@ -144,6 +150,7 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 	   public void removed(Player p_39721_) {
 	      super.removed(p_39721_);
 	      if (this.container != null) {
+	    	  this.container.clearContent();
 	    	  this.container.stopOpen(p_39721_);
 	      }
 	   }

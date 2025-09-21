@@ -94,7 +94,6 @@ public class BioMechPlayerData {
 				if (slotted != null) {
 					CompoundTag itemTag = new CompoundTag(); 
 					slotted.itemStack.save(itemTag);
-					BioMech.LOGGER.info("Save itemTag: " + itemTag.toString());
 					items.put(slotted.mechPart.name() + "Slot", itemTag);
 				}
 			}
