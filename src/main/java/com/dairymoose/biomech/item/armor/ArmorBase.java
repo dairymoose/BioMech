@@ -3,7 +3,6 @@ package com.dairymoose.biomech.item.armor;
 import java.util.List;
 
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
-import com.dairymoose.biomech.menu.BioMechStationMenu;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;

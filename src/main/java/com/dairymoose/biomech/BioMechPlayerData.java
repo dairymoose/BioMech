@@ -7,6 +7,7 @@ import java.util.List;
 import com.dairymoose.biomech.item.armor.MechPart;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -27,6 +28,7 @@ public class BioMechPlayerData {
 			this.mechPart = mechPart;
 		}
 		
+		public boolean visible = true;
 		public ItemStack itemStack;
 		public MechPart mechPart;
 	}
@@ -64,7 +66,7 @@ public class BioMechPlayerData {
 					//ensure allSlots list has the correct size
 					for (Field field : fields) {
 						if (field.getType() == SlottedItem.class) {
-							allSlots.add(new SlottedItem(MechPart.Chest));
+							allSlots.add(null);
 						}
 					}
 					
@@ -92,15 +94,36 @@ public class BioMechPlayerData {
 		data.getAllSlots().forEach((slotted) ->
 			{
 				if (slotted != null) {
+					CompoundTag slotTag = new CompoundTag();
 					CompoundTag itemTag = new CompoundTag(); 
 					slotted.itemStack.save(itemTag);
-					items.put(slotted.mechPart.name() + "Slot", itemTag);
+					slotTag.put("Item", itemTag);
+					slotTag.putBoolean("Visible", slotted.visible);
+					items.put(slotted.mechPart.name() + "Slot", slotTag);
 				}
 			}
 		);
 		
 		result.put("Items", items);
 		return result;
+	}
+	
+	public static void setFieldByMechPart(BioMechPlayerData playerData, MechPart part, SlottedItem newData) {
+		Field[] fields = BioMechPlayerData.class.getDeclaredFields();
+		
+		//ensure allSlots list has the correct size
+		for (Field field : fields) {
+			if (field.getType() == SlottedItem.class) {
+				try {
+					SlottedItem slottedItem = (SlottedItem) field.get(playerData);
+					if (slottedItem.mechPart == part) {
+						field.set(playerData, newData);
+					}
+				} catch (Exception e) {
+					BioMech.LOGGER.error("Error assigning value to slotted item", e);
+				}
+			}
+		}
 	}
 	
 	public static BioMechPlayerData deserialize(CompoundTag tag) {
@@ -114,13 +137,26 @@ public class BioMechPlayerData {
 					CompoundTag slottedItemTag = items.getCompound(part.name() + "Slot");
 					if (slottedItemTag != null) {
 						SlottedItem slottedItem = new SlottedItem(part);
-						slottedItem.itemStack = ItemStack.of(slottedItemTag);
+						
+						CompoundTag itemStackTag = slottedItemTag.getCompound("Item");
+						slottedItem.itemStack = ItemStack.of(itemStackTag);
+						
+						boolean visible = slottedItemTag.getBoolean("Visible");
+						slottedItem.visible = visible;
+						
 						data.getAllSlots().set(part.ordinal(), slottedItem);
+						setFieldByMechPart(data, part, slottedItem);
 					}
 				}
 			}
 		}
 		
 		return data;
+	}
+	
+	@Override
+	public String toString() {
+		CompoundTag compound = BioMechPlayerData.serialize(this);
+		return NbtUtils.prettyPrint(compound);
 	}
 }

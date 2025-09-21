@@ -204,12 +204,16 @@ public class BioMech
     {
         File modDataFile = event.getPlayerFile("biomech");
 
-        try {
-            CompoundTag compound = NbtIo.read(modDataFile);
-            globalPlayerData.put(event.getEntity().getUUID(), BioMechPlayerData.deserialize(compound));
-            LOGGER.info("Load custom player data for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath() + ": " + compound.getAsString());
-        } catch (Exception e) {
-            LOGGER.error("Error loading player data for " + event.getEntity().getDisplayName().getString() + ": " + e.getMessage(), e);
+        if (modDataFile.exists()) {
+        	try {
+                CompoundTag compound = NbtIo.read(modDataFile);
+                globalPlayerData.put(event.getEntity().getUUID(), BioMechPlayerData.deserialize(compound));
+                LOGGER.info("Load custom player data for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath() + ": " + compound.getAsString());
+            } catch (Exception e) {
+                LOGGER.error("Error loading player data for " + event.getEntity().getDisplayName().getString() + ": " + e.getMessage(), e);
+            }
+        } else {
+        	LOGGER.info("BioMech file does not exist for player " + event.getEntity().getDisplayName().getString());
         }
     }
     
@@ -341,7 +345,7 @@ public class BioMech
         		    BioMechPlayerData playerData = BioMech.globalPlayerData.get(renderEntity.getUUID());
         		    if (playerData != null) {
         		    	playerData.getAllSlots().forEach((slottedItem) -> {
-        		    		if (!slottedItem.itemStack.isEmpty()) {
+        		    		if (!slottedItem.itemStack.isEmpty() && slottedItem.visible) {
         		    			ItemStack itemStackToRender = slottedItem.itemStack;
         		    			EquipmentSlot equipmentSlot = LivingEntity.getEquipmentSlotForItem(itemStackToRender);
         		    			if (equipmentSlot != null) {
@@ -356,11 +360,24 @@ public class BioMech
                             		    }
         		    				}
         		    				
+        		    				ItemStack priorFeetItem = null;
         		    				event.getEntity().setItemSlot(equipmentSlot, itemStackToRender);
+        		    				if (slottedItem.mechPart == MechPart.Leggings) {
+        		    					priorFeetItem = event.getEntity().getItemBySlot(EquipmentSlot.FEET);
+        		    					event.getEntity().setItemSlot(EquipmentSlot.FEET, ItemStack.EMPTY);
+        		    				}
             		    			
                         		    hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, equipmentSlot, event.getPackedLight(), armorModel);
-                        		    priorItems.putIfAbsent(equipmentSlot, priorItem);
-                        		    //event.getEntity().setItemSlot(equipmentSlot, priorItem);
+                        		    if (slottedItem.mechPart == MechPart.LeftArm || slottedItem.mechPart == MechPart.RightArm || slottedItem.mechPart == MechPart.Back) {
+                        		    	event.getEntity().setItemSlot(equipmentSlot, priorItem);
+                        		    } else {
+                        		    	priorItems.putIfAbsent(equipmentSlot, priorItem);
+                        		    	
+                        		    	if (slottedItem.mechPart == MechPart.Leggings) {
+                        		    		if (priorFeetItem != null)
+                        		    			priorItems.putIfAbsent(EquipmentSlot.FEET, priorFeetItem);
+            		    				}
+                        		    }
                         		    
                         		    if (itemStackToRender.getItem() instanceof ArmorBase base) {
                         		    	if (base.shouldHidePlayerModel()) {
