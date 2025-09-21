@@ -1,6 +1,11 @@
 package com.dairymoose.biomech.menu;
 
+import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
+import com.dairymoose.biomech.item.armor.ArmorBase;
+import com.dairymoose.biomech.item.armor.MechPart;
+import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -10,10 +15,13 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
-public class BioMechArmorMenu extends AbstractContainerMenu {
+public class BioMechStationMenu extends AbstractContainerMenu {
 
 	public static final int CONTAINER_ID = 0;
 	   public static final int RESULT_SLOT = 0;
@@ -38,24 +46,79 @@ public class BioMechArmorMenu extends AbstractContainerMenu {
 	   private Player owner;
 	   private Container container = null;
 
-		public BioMechArmorMenu(int p_39640_, Inventory p_39641_) {
+		public BioMechStationMenu(int p_39640_, Inventory p_39641_) {
 			this(p_39640_, p_39641_, new SimpleContainer(6));
 		}
 	   
-	   public BioMechArmorMenu(int p_39640_, Inventory p_39641_, final Container p_39708_) {
+	   public BioMechStationMenu(int p_39640_, Inventory p_39641_, final Container stationContainer) {
 	      super(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), p_39640_);
 	      //this.active = p_39641_;
 	      //this.owner = p_39708_;
 	      //this.addSlot(new ResultSlot(p_39640_.player, this.craftSlots, this.resultSlots, 0, 154, 28));
-	      p_39708_.startOpen(p_39641_.player);
-	      this.container = p_39708_;
+	      stationContainer.startOpen(p_39641_.player);
+	      this.container = stationContainer;
 	      
-	      this.addSlot(new Slot(p_39708_, 0, 31, 13));
-	      this.addSlot(new Slot(p_39708_, 1, 68, 16));
-	      this.addSlot(new Slot(p_39708_, 2, 50, 29));
-	      this.addSlot(new Slot(p_39708_, 3, 68, 34));
-	      this.addSlot(new Slot(p_39708_, 4, 86, 29));
-	      this.addSlot(new Slot(p_39708_, 5, 68, 52));
+	      MechPart[] mechPartsBySlot = {MechPart.Back, MechPart.Head, MechPart.RightArm, MechPart.Chest, MechPart.LeftArm, MechPart.Leggings};
+	      int[] xCoordinatesBySlot = {31, 68, 50, 68, 86, 68};
+	      int[] yCoordinatesBySlot = {13, 16, 29, 34, 29, 52};
+	      int counter = 0;
+	      for (MechPart mechPart : mechPartsBySlot) {
+	    	  this.addSlot(new Slot(stationContainer, counter, xCoordinatesBySlot[counter], yCoordinatesBySlot[counter]) {
+		    	  public void setByPlayer(ItemStack p_270969_) {
+		               BioMechStationMenu.onEquipItem(p_39641_.player, mechPart, p_270969_, this.getItem());
+		               super.setByPlayer(p_270969_);
+		            }
+
+		            public int getMaxStackSize() {
+		               return 1;
+		            }
+
+		            public boolean mayPlace(ItemStack p_39746_) {
+		               return (p_39746_.getItem() instanceof ArmorBase && ((ArmorBase) p_39746_.getItem()).getMechPart() == mechPart) ||
+		            		   (mechPart == MechPart.LeftArm && (p_39746_.getItem() instanceof ArmorBase && ((ArmorBase) p_39746_.getItem()).getMechPart() == MechPart.RightArm));
+		            }
+
+		            public boolean mayPickup(Player p_39744_) {
+		               ItemStack itemstack = this.getItem();
+		               return !itemstack.isEmpty() && !p_39744_.isCreative() && EnchantmentHelper.hasBindingCurse(itemstack) ? false : super.mayPickup(p_39744_);
+		            }
+		            
+		            @Override
+		            public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
+		            	return super.getNoItemIcon();
+		            }
+		      });
+	    	  
+	    	  ++counter;
+	      }
+//	      this.addSlot(new Slot(stationContainer, 0, 31, 13) {
+//	    	  public void setByPlayer(ItemStack p_270969_) {
+//	               BioMechStationMenu.onEquipItem(p_39641_.player, MechPart.Back, p_270969_, this.getItem());
+//	               super.setByPlayer(p_270969_);
+//	            }
+//
+//	            public int getMaxStackSize() {
+//	               return 1;
+//	            }
+//
+//	            public boolean mayPlace(ItemStack p_39746_) {
+//	               return p_39746_.getItem() instanceof ArmorBase && ((ArmorBase) p_39746_.getItem()).getMechPart() == MechPart.Back;
+//	            }
+//
+//	            public boolean mayPickup(Player p_39744_) {
+//	               ItemStack itemstack = this.getItem();
+//	               return !itemstack.isEmpty() && !p_39744_.isCreative() && EnchantmentHelper.hasBindingCurse(itemstack) ? false : super.mayPickup(p_39744_);
+//	            }
+//
+//	            public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
+//	               return Pair.of(InventoryMenu.BLOCK_ATLAS, InventoryMenu.TEXTURE_EMPTY_SLOTS[equipmentslot.getIndex()]);
+//	            }
+//	      });
+//	      this.addSlot(new Slot(stationContainer, 1, 68, 16));
+//	      this.addSlot(new Slot(stationContainer, 2, 50, 29));
+//	      this.addSlot(new Slot(stationContainer, 3, 68, 34));
+//	      this.addSlot(new Slot(stationContainer, 4, 86, 29));
+//	      this.addSlot(new Slot(stationContainer, 5, 68, 52));
 
 	      for(int l = 0; l < 3; ++l) {
 	         for(int j1 = 0; j1 < 9; ++j1) {
@@ -68,6 +131,16 @@ public class BioMechArmorMenu extends AbstractContainerMenu {
 	      }
 	   }
 
+		static void onEquipItem(Player player, MechPart mechPart, ItemStack newItem, ItemStack oldItem) {
+			BioMechPlayerData playerData = BioMech.globalPlayerData.computeIfAbsent(player.getUUID(), (uuid) -> new BioMechPlayerData());
+			if (playerData != null) {
+				BioMech.LOGGER.debug("onEquipItem: " + mechPart + " with " + newItem);
+				playerData.setForSlot(mechPart, newItem);
+			}
+			if (!player.level().isClientSide)
+				BioMech.sendUpdateForPlayer(player);
+		}
+	   
 	   public void removed(Player p_39721_) {
 	      super.removed(p_39721_);
 	      if (this.container != null) {

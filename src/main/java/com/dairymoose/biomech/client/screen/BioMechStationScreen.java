@@ -1,7 +1,7 @@
 package com.dairymoose.biomech.client.screen;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.menu.BioMechArmorMenu;
+import com.dairymoose.biomech.menu.BioMechStationMenu;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -13,12 +13,12 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class BioMechArmorScreen extends AbstractContainerScreen<BioMechArmorMenu> {
+public class BioMechStationScreen extends AbstractContainerScreen<BioMechStationMenu> {
    private static final ResourceLocation HOPPER_LOCATION = ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "textures/gui/biomech_station.png");
    private float xMouse;
    private float yMouse;
    
-   public BioMechArmorScreen(BioMechArmorMenu p_98798_, Inventory p_98799_, Component p_98800_) {
+   public BioMechStationScreen(BioMechStationMenu p_98798_, Inventory p_98799_, Component p_98800_) {
       super(p_98798_, p_98799_, Component.empty());
       this.imageHeight = 166;
       this.inventoryLabelY = this.imageHeight - 94;

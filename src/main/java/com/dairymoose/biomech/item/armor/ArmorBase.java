@@ -2,8 +2,8 @@ package com.dairymoose.biomech.item.armor;
 
 import java.util.List;
 
-import com.dairymoose.biomech.client.screen.BioMechArmorScreen;
-import com.dairymoose.biomech.menu.BioMechArmorMenu;
+import com.dairymoose.biomech.client.screen.BioMechStationScreen;
+import com.dairymoose.biomech.menu.BioMechStationMenu;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -12,6 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -26,6 +27,10 @@ public class ArmorBase extends ArmorItem {
 	
 	public ArmorBase(ArmorMaterial material, Type type, Properties props) {
 		super(NOTHING_MATERIAL, type, props);
+	}
+	
+	public Item getLeftArmItem() {
+		return null;
 	}
 
 	public boolean shouldHidePlayerModel() {
@@ -44,7 +49,7 @@ public class ArmorBase extends ArmorItem {
 	@Override
 	public void appendHoverText(ItemStack stack, Level level, List<Component> comp, TooltipFlag flags) {
 		super.appendHoverText(stack, level, comp, flags);
-		if (level.isClientSide && Minecraft.getInstance().screen instanceof BioMechArmorScreen) {
+		if (level.isClientSide && Minecraft.getInstance().screen instanceof BioMechStationScreen) {
 			comp.add(Component.translatable("item.biomech.generic.tooltip2"));
 		}
 		else {

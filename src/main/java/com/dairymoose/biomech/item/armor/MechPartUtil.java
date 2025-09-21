@@ -11,21 +11,21 @@ public class MechPartUtil {
 		List<ModelPart> list = new ArrayList<>();
 		if (mechPart != null) {
 			switch (mechPart) {
-			case HELMET:
+			case Head:
 				list.add(playerModel.head);
 				break;
-			case LEFT_ARM:
+			case LeftArm:
 				list.add(playerModel.leftArm);
 				list.add(playerModel.leftSleeve);
 				break;
-			case RIGHT_ARM:
+			case RightArm:
 				list.add(playerModel.rightArm);
 				list.add(playerModel.rightSleeve);
 				break;
-			case CHEST:
+			case Chest:
 				list.add(playerModel.body);
 				break;
-			case LEGGINGS:
+			case Leggings:
 				list.add(playerModel.leftLeg);
 				list.add(playerModel.leftPants);
 				list.add(playerModel.rightLeg);

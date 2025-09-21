@@ -3,7 +3,7 @@ package com.dairymoose.biomech.block_entity;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.block_entity.anim.BioMechStationDispatcher;
-import com.dairymoose.biomech.menu.BioMechArmorMenu;
+import com.dairymoose.biomech.menu.BioMechStationMenu;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
@@ -144,7 +144,7 @@ public class BioMechStationBlockEntity extends RandomizableContainerBlockEntity 
 
 	@Override
 	protected AbstractContainerMenu createMenu(int p_58627_, Inventory p_58628_) {
-		return new BioMechArmorMenu(p_58627_, p_58628_, this);
+		return new BioMechStationMenu(p_58627_, p_58628_, this);
 	}
 
 }

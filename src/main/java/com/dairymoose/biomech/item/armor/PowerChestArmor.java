@@ -21,7 +21,7 @@ public class PowerChestArmor extends ArmorBase {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 100;
 		this.hidePlayerModel = true;
-		this.mechPart = MechPart.CHEST;
+		this.mechPart = MechPart.Chest;
 	}
 
 	@Override
