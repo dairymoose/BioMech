@@ -144,7 +144,7 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 				playerData.setForSlot(mechPart, newItem);
 			}
 			if (!player.level().isClientSide)
-				BioMech.sendUpdateForPlayer(player);
+				BioMech.sendItemSlotUpdateForPlayer(player);
 		}
 	   
 	   public void removed(Player p_39721_) {

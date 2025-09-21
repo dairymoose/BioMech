@@ -178,7 +178,7 @@ public class BioMech
     public static Map<UUID, BioMechPlayerData> globalPlayerData = new HashMap<>();
     public static Set<UUID> pendingCleanupPlayers = new HashSet<>();
    
-    public static void sendUpdateForPlayer(Player player) {
+    public static void sendItemSlotUpdateForPlayer(Player player) {
     	BioMechPlayerData playerData = globalPlayerData.computeIfAbsent(player.getUUID(), (uuid) -> new BioMechPlayerData());
 		CompoundTag playerDataTag = BioMechPlayerData.serialize(playerData);
 		ClientboundUpdateSlottedItemPacket slottedItemPacket = new ClientboundUpdateSlottedItemPacket(player.getUUID(), playerDataTag);
@@ -189,7 +189,7 @@ public class BioMech
     public void onPlayerJoinServerEvent(final PlayerEvent.PlayerLoggedInEvent event) {
     	LOGGER.info("Player " + event.getEntity().getDisplayName().getString() + " joined the server!");
     	if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) {
-    		BioMech.sendUpdateForPlayer(sp);
+    		BioMech.sendItemSlotUpdateForPlayer(sp);
     	}
     }
     
