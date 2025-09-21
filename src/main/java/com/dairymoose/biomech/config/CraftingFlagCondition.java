@@ -1,7 +1,9 @@
-package com.dairymoose.biomech;
+package com.dairymoose.biomech.config;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.dairymoose.biomech.BioMech;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.conditions.ICondition;

@@ -1,9 +1,10 @@
-package com.dairymoose.biomech;
+package com.dairymoose.biomech.config;
 
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 
 import net.minecraftforge.api.distmarker.Dist;

@@ -2,6 +2,10 @@ package com.dairymoose.biomech.item.armor;
 
 import java.util.List;
 
+import com.dairymoose.biomech.client.screen.BioMechArmorScreen;
+import com.dairymoose.biomech.menu.BioMechArmorMenu;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.Entity;
@@ -40,7 +44,12 @@ public class ArmorBase extends ArmorItem {
 	@Override
 	public void appendHoverText(ItemStack stack, Level level, List<Component> comp, TooltipFlag flags) {
 		super.appendHoverText(stack, level, comp, flags);
-		comp.add(Component.translatable("item.biomech.generic.tooltip"));
+		if (level.isClientSide && Minecraft.getInstance().screen instanceof BioMechArmorScreen) {
+			comp.add(Component.translatable("item.biomech.generic.tooltip2"));
+		}
+		else {
+			comp.add(Component.translatable("item.biomech.generic.tooltip"));
+		}
 		if (suitEnergy > 0) {
 			MutableComponent suitEnergyTt = Component.translatable("tooltip.biomech.suitenergy");
 			comp.add(Component.literal("§2+" + suitEnergy + " " + suitEnergyTt.getString() + "§0"));

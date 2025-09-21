@@ -1,4 +1,4 @@
-package com.dairymoose.biomech;
+package com.dairymoose.biomech.config;
 
 import java.util.HashMap;
 import java.util.Map;

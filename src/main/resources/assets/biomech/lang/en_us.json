@@ -2,6 +2,7 @@
 	"block.biomech.biomech_station": "BioMech Station",
 	
 	"item.biomech.generic.tooltip": "§4Requires BioMech Suit§0",
+	"item.biomech.generic.tooltip2": "§aRequires BioMech Suit§0",
 	"tooltip.biomech.suitenergy": "Suit Energy",
 
 	"item.biomech.power_leggings": "§5Power Leggings§0",
@@ -14,10 +15,10 @@
 	"item.biomech.hovertech_leggings.tooltip2": "Also grants the wearer slowfall during falls.",
 	"item.biomech.hovertech_leggings.tooltip3": "Crouch to temporarily disable the hover technology.",
 
-	"item.biomech.right_power_arm": "§5Right Power Arm§0",
-	"item.biomech.right_power_arm.tooltip1": "Increases attack damage by 2.",
-
-	"item.biomech.left_power_arm": "§5Left Power Arm§0",
+	"item.biomech.power_arm": "§5Power Arm§0",
+	"item.biomech.power_arm.tooltip1": "Increases attack damage by 2.",
+	
+	"item.biomech.left_power_arm": "§7Left Power Arm§0",
 	"item.biomech.left_power_arm.tooltip1": "Increases attack damage by 2.",
 
 	"item.biomech.lavastride_leggings": "§5Lavastride Leggings§0",

@@ -39,8 +39,30 @@ public class BioMechStationBlockEntity extends RandomizableContainerBlockEntity 
 	
 	public final BioMechStationDispatcher dispatcher;
 	
+	public boolean currentlyOpened = false;
+	
 	public static final BlockEntityType<BioMechStationBlockEntity> BIOMECH_STATION_BLOCK_ENTITY = BlockEntityType.Builder.of(BioMechStationBlockEntity::new, BioMechRegistry.BLOCK_BIOMECH_STATION.get()).build(null);
 
+	@Override
+	public void startOpen(Player p_18955_) {
+		super.startOpen(p_18955_);
+		currentlyOpened = true;
+	}
+	
+	@Override
+	public void stopOpen(Player p_18954_) {
+		super.stopOpen(p_18954_);
+		currentlyOpened = false;
+	}
+	
+	@Override
+	public boolean canOpen(Player p_59643_) {
+		if (this.currentlyOpened) {
+			return false;
+		}
+		return true;
+	}
+	
 	public static void tick(Level level, BlockPos blockPos, BlockState blockState, BioMechStationBlockEntity blockEntity) {
 		if (blockEntity.level != null && level.isClientSide()) {
             blockEntity.dispatcher.deploy();

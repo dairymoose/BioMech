@@ -147,6 +147,12 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 	
 	private InteractionResult useBlock(BlockState blockState, Level level, BlockPos blockPos, Player player,
 			InteractionHand hand, BlockHitResult hitResult) {
+		BlockEntity blockEntity = level.getBlockEntity(blockPos);
+		if (blockEntity instanceof BioMechStationBlockEntity be) {
+			if (!be.canOpen(player)) {
+				return InteractionResult.SUCCESS;
+			}
+		}
 		if (configWalkToBioMechStation) {
 			if (instantTeleportToStation) {
 				player.setPos(blockPos.getCenter().with(Axis.Y, blockPos.getY()));
@@ -155,13 +161,13 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 				player.setYHeadRot(finalYRot);
 				player.setXRot(22.0f);
 			} else {
-				BlockEntity blockentity = level.getBlockEntity(blockPos);
-				if (blockentity instanceof BioMechStationBlockEntity be) {
+				if (blockEntity instanceof BioMechStationBlockEntity be) {
+					if (be.canOpen(player))
 					if (be.walkToStationTicks == -1 && be.walkToStationPlayer == null) {
 						be.playerStartLoc = player.getPosition(1.0f);
 						be.playerStartYRot = player.getYRot();
 						be.walkToStationPlayer = player;
-						Vec3 blockEntityPos = blockentity.getBlockPos().getCenter().with(Axis.Y, blockentity.getBlockPos().getY());
+						Vec3 blockEntityPos = blockEntity.getBlockPos().getCenter().with(Axis.Y, blockEntity.getBlockPos().getY());
 						double dist = blockEntityPos.distanceTo(be.playerStartLoc);
 						be.walkToStationTicksMax = Math.min((int)(dist/3.0 * be.WALK_TO_STATION_TICKS_MAX_DIST), be.WALK_TO_STATION_TICKS_MAX_DIST);
 						if (be.walkToStationTicksMax <= 0) {
@@ -176,8 +182,7 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 		if (level.isClientSide) {
 			return InteractionResult.SUCCESS;
 		} else {
-			BlockEntity blockentity = level.getBlockEntity(blockPos);
-			if (blockentity instanceof BioMechStationBlockEntity be) {
+			if (blockEntity instanceof BioMechStationBlockEntity be) {
 				player.openMenu(be);
 			}
 

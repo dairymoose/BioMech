@@ -1,12 +1,23 @@
 package com.dairymoose.biomech;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 
 import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechArmorScreen;
+import com.dairymoose.biomech.config.BioMechConfig;
+import com.dairymoose.biomech.config.BioMechCraftingFlags;
 import com.dairymoose.biomech.item.anim.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
@@ -36,6 +47,11 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -54,7 +70,7 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -159,176 +175,65 @@ public class BioMech
     {
         BioMechConfig.reinit();
     }
-
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
+    
+    Map<UUID, BioMechPlayerData> serverPlayerData = new HashMap<>();
+    Set<UUID> pendingCleanupPlayers = new HashSet<>();
+   
     @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event)
+    public void onPlayerLeaveServerEvent(final PlayerEvent.PlayerLoggedOutEvent event) {
+    	LOGGER.info("Player " + event.getEntity().getDisplayName().getString() + " left the server!");
+    	pendingCleanupPlayers.add(event.getEntity().getUUID());
+    }
+    
+    @SubscribeEvent
+    public void onLoadPlayerEvent(final PlayerEvent.LoadFromFile event)
     {
-        // Do something when the server starts
-        LOGGER.info("HELLO from server starting");
+        File modDataFile = event.getPlayerFile("biomech");
+
+        try {
+            CompoundTag compound = NbtIo.read(modDataFile);
+            serverPlayerData.put(event.getEntity().getUUID(), BioMechPlayerData.deserialize(compound));
+            LOGGER.info("Load custom player data for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath() + ": " + compound.getAsString());
+        } catch (Exception e) {
+            LOGGER.error("Error loading player data for " + event.getEntity().getDisplayName().getString() + ": " + e.getMessage(), e);
+        }
     }
     
-    private boolean doArmorOverride = false;
-    ItemStack priorItem = null;
-    ItemStack itemToRender;
     @SubscribeEvent
-    public void onRenderPlayer(RenderPlayerEvent.Pre event) {
-    	if (itemToRender == null) {
-    		itemToRender = new ItemStack(BioMechRegistry.ITEM_POWER_RIGHT_ARM.get());
-    	}
-    	Player renderEntity = event.getEntity();
-    	if (renderEntity.isSpectator())
-    		return;
-    	AzArmorLayer<Player> layer = new AzArmorLayer();
-    	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
-    	priorItem = null;
-    	if (armorRenderer != null && renderEntity != null) {
-    		PlayerModel playerModel = event.getRenderer().getModel();
-    		armorRenderer.prepForRender(renderEntity, itemToRender, itemToRender.getEquipmentSlot(), playerModel);
-        	//AzArmorModelRenderer renderer = new AzArmorModelRenderer(armorRenderer.rendererPipeline());
-    		RenderType renderType = armorRenderer.rendererPipeline().config().getRenderType(itemToRender);
-    		AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
-    		//playerModel.copyPropertiesTo(armorModel);
-    		
-    		try {
-    			//layer.render(armorRenderer.rendererPipeline().context());
-    			//armorModel.renderToBuffer(event.getPoseStack(), null, event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
-    			if (doArmorOverride) {
-    				priorItem = event.getEntity().getItemBySlot(EquipmentSlot.LEGS);
-        			event.getEntity().setItemSlot(EquipmentSlot.LEGS, itemToRender);
-    			}
-    			priorItem = event.getEntity().getItemBySlot(EquipmentSlot.CHEST);
-    			event.getEntity().setItemSlot(EquipmentSlot.CHEST, itemToRender);
-    			HumanoidArmorLayer hal = new HumanoidArmorLayer(event.getRenderer(), playerModel, armorModel, Minecraft.getInstance().getModelManager());
-    			PoseStack poseStack = event.getPoseStack();
-    			poseStack.pushPose();
-    			//reproduce rotations and scale from LivingEntityRenderer
-    			boolean shouldSit = renderEntity.isPassenger() && (renderEntity.getVehicle() != null && renderEntity.getVehicle().shouldRiderSit());
-				float f = Mth.rotLerp(event.getPartialTick(), renderEntity.yBodyRotO, renderEntity.yBodyRot);
-				float f1 = Mth.rotLerp(event.getPartialTick(), renderEntity.yHeadRotO, renderEntity.yHeadRot);
-				float f2 = f1 - f;
-				if (shouldSit && renderEntity.getVehicle() instanceof LivingEntity) {
-					LivingEntity livingentity = (LivingEntity) renderEntity.getVehicle();
-					f = Mth.rotLerp(event.getPartialTick(), livingentity.yBodyRotO, livingentity.yBodyRot);
-					f2 = f1 - f;
-					float f3 = Mth.wrapDegrees(f2);
-					if (f3 < -85.0F) {
-						f3 = -85.0F;
-					}
+    public void onSavePlayerEvent(final PlayerEvent.SaveToFile event)
+    {
+        File modDataFile = event.getPlayerFile("biomech");
 
-					if (f3 >= 85.0F) {
-						f3 = 85.0F;
-					}
-
-					f = f1 - f3;
-					if (f3 * f3 > 2500.0F) {
-						f += f3 * 0.2F;
-					}
-
-					f2 = f1 - f;
-				}
-    			
-    			this.setupRotations((AbstractClientPlayer)renderEntity, poseStack, 0.0f, f, event.getPartialTick());
-    			poseStack.scale(-1.0F, -1.0F, 1.0F);
-    		    this.scale((AbstractClientPlayer)renderEntity, poseStack, event.getPartialTick());
-    		    poseStack.translate(0.0F, -1.501F, 0.0F);
-    		    
-    			hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, EquipmentSlot.CHEST, event.getPackedLight(), armorModel);
-    			event.getEntity().setItemSlot(EquipmentSlot.CHEST, new ItemStack(BioMechRegistry.ITEM_POWER_LEFT_ARM.get()));
-    			hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, EquipmentSlot.CHEST, event.getPackedLight(), armorModel);
-    			event.getEntity().setItemSlot(EquipmentSlot.CHEST, priorItem);
-    			poseStack.popPose();
-    		} catch (Exception e) {
-    			LOGGER.error("render error", e);
-    		}
-    		
-    		Iterable<ItemStack> armorSlots = event.getEntity().getArmorSlots();
-    		for (ItemStack itemStack : armorSlots) {
-    			if (itemStack.getItem() instanceof ArmorBase armorBase) {
-    				MechPart mechPart = armorBase.getMechPart();
-    				if (mechPart != null) {
-    					List<ModelPart> parts = MechPartUtil.getCorrespondingModelParts(playerModel, mechPart);
-    					if (armorBase.shouldHidePlayerModel()) {
-    						for (ModelPart part : parts) {
-    							part.visible = false;
-    						}
-    					} else {
-//    						for (ModelPart part : parts) {
-//    							part.visible = true;
-//    						}
-    					}
-    				}
-    			}
-    		}
-//    		playerModel.leftLeg.visible = false;
-//    		playerModel.leftPants.visible = false;
-//    		
-//    		playerModel.rightLeg.visible = false;
-//    		playerModel.rightPants.visible = false;
-//    		
-//    		playerModel.leftArm.visible = false;
-//    		playerModel.leftSleeve.visible = false;
-//    		
-//    		playerModel.rightArm.visible = false;
-//    		playerModel.rightSleeve.visible = false;
-//    		
-//    		playerModel.body.visible = false;
-    		
-    		//playerModel.leftSleeve.visible = false;
-//        	armorRenderer.rendererPipeline().armorModel().renderToBuffer(event.getPoseStack(), 
-//        			event.getMultiBufferSource().getBuffer(armorRenderer.rendererPipeline().config().getRenderType(itemToRender)), 
-//        			event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
-    	}
-    }
-    
-    protected void setupRotations(AbstractClientPlayer player, PoseStack poseStack, float bob, float yaw, float partialTick) {
-    	if (!player.hasPose(Pose.SLEEPING)) {
-    		poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yaw));
-         }
-     }
-    
-    protected void scale(AbstractClientPlayer player, PoseStack poseStack, float partialTick) {
-        float f = 0.9375F;
-        poseStack.scale(0.9375F, 0.9375F, 0.9375F);
-     }
-    
-    @SubscribeEvent
-    public void onPostRenderPlayer(RenderPlayerEvent.Post event) {
-    	if (itemToRender == null) {
-    		itemToRender = new ItemStack(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
-    	}
-    	Player renderEntity = event.getEntity();
-    	AzArmorLayer<Player> layer = new AzArmorLayer();
-    	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
-    	if (armorRenderer != null && renderEntity != null) {
-    		PlayerModel playerModel = event.getRenderer().getModel();
-    		armorRenderer.prepForRender(renderEntity, itemToRender, itemToRender.getEquipmentSlot(), playerModel);
-        	//AzArmorModelRenderer renderer = new AzArmorModelRenderer(armorRenderer.rendererPipeline());
-    		RenderType renderType = armorRenderer.rendererPipeline().config().getRenderType(itemToRender);
-    		AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
-    		playerModel.copyPropertiesTo(armorModel);
-    		try {
-    			if (doArmorOverride) {
-    				if (priorItem != null) {
-        				event.getEntity().setItemSlot(EquipmentSlot.LEGS, priorItem);
-        			}
-    			}
-    			//layer.render(armorRenderer.rendererPipeline().context());
-    			//armorModel.renderToBuffer(event.getPoseStack(), null, event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
-    			
-    		} catch (Exception e) {
-    			LOGGER.error("render error", e);
-    		}
-//        	armorRenderer.rendererPipeline().armorModel().renderToBuffer(event.getPoseStack(), 
-//        			event.getMultiBufferSource().getBuffer(armorRenderer.rendererPipeline().config().getRenderType(itemToRender)), 
-//        			event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
-    	}
+        try {
+        	BioMechPlayerData playerData = null;
+        	playerData = serverPlayerData.get(event.getEntity().getUUID());
+        	if (playerData != null) {
+        		CompoundTag root = BioMechPlayerData.serialize(playerData);
+        	    NbtIo.write(root, modDataFile);
+        		LOGGER.info("Saved custom player data for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath());
+        	} else {
+        		LOGGER.info("Player data was null while saving for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath());
+        	}
+        } catch (Exception e) {
+            LOGGER.error("Error saving player data for " + event.getEntity().getDisplayName().getString() + ": " + e.getMessage(), e);
+        }
+        
+        if (pendingCleanupPlayers.contains(event.getEntity().getUUID())) {
+        	serverPlayerData.remove(event.getEntity().getUUID());
+        	pendingCleanupPlayers.remove(event.getEntity().getUUID());
+        }
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents
     {
+    	static ClientModEvents inst = new ClientModEvents();
+
+    	public ClientModEvents() {
+    		MinecraftForge.EVENT_BUS.register(this);
+		}
+    	
         @SuppressWarnings("unchecked")
 		@SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
@@ -337,7 +242,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(PowerLeggingsRenderer::new, BioMechRegistry.ITEM_POWER_LEGGINGS.get());
         	AzArmorRendererRegistry.register(LavastrideLeggingsRenderer::new, BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get());
         	AzArmorRendererRegistry.register(PowerChestRenderer::new, BioMechRegistry.ITEM_POWER_CHEST.get());
-        	AzArmorRendererRegistry.register(PowerRightArmRenderer::new, BioMechRegistry.ITEM_POWER_RIGHT_ARM.get());
+        	AzArmorRendererRegistry.register(PowerRightArmRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
         	AzArmorRendererRegistry.register(PowerLeftArmRenderer::new, BioMechRegistry.ITEM_POWER_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(PowerHelmetRenderer::new, BioMechRegistry.ITEM_POWER_HELMET.get());
         	
@@ -350,5 +255,163 @@ public class BioMech
 		public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
 			event.registerBlockEntityRenderer(BioMechRegistry.BLOCK_ENTITY_BIOMECH_STATION.get(), context -> new BioMechStationRenderer());
 		}
+        
+        private boolean doArmorOverride = false;
+        ItemStack priorItem = null;
+        ItemStack itemToRender;
+        @SuppressWarnings("unchecked")
+		@SubscribeEvent
+        public void onRenderPlayer(RenderPlayerEvent.Pre event) {
+        	if (itemToRender == null) {
+        		itemToRender = new ItemStack(BioMechRegistry.ITEM_POWER_ARM.get());
+        	}
+        	Player renderEntity = event.getEntity();
+        	if (renderEntity.isSpectator())
+        		return;
+        	AzArmorLayer<Player> layer = new AzArmorLayer();
+        	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
+        	priorItem = null;
+        	if (armorRenderer != null && renderEntity != null) {
+        		PlayerModel playerModel = event.getRenderer().getModel();
+        		armorRenderer.prepForRender(renderEntity, itemToRender, itemToRender.getEquipmentSlot(), playerModel);
+            	//AzArmorModelRenderer renderer = new AzArmorModelRenderer(armorRenderer.rendererPipeline());
+        		RenderType renderType = armorRenderer.rendererPipeline().config().getRenderType(itemToRender);
+        		AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
+        		//playerModel.copyPropertiesTo(armorModel);
+        		
+        		try {
+        			//layer.render(armorRenderer.rendererPipeline().context());
+        			//armorModel.renderToBuffer(event.getPoseStack(), null, event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+        			if (doArmorOverride) {
+        				priorItem = event.getEntity().getItemBySlot(EquipmentSlot.LEGS);
+            			event.getEntity().setItemSlot(EquipmentSlot.LEGS, itemToRender);
+        			}
+        			priorItem = event.getEntity().getItemBySlot(EquipmentSlot.CHEST);
+        			event.getEntity().setItemSlot(EquipmentSlot.CHEST, itemToRender);
+        			HumanoidArmorLayer hal = new HumanoidArmorLayer(event.getRenderer(), playerModel, armorModel, Minecraft.getInstance().getModelManager());
+        			PoseStack poseStack = event.getPoseStack();
+        			poseStack.pushPose();
+        			//reproduce rotations and scale from LivingEntityRenderer
+        			boolean shouldSit = renderEntity.isPassenger() && (renderEntity.getVehicle() != null && renderEntity.getVehicle().shouldRiderSit());
+    				float f = Mth.rotLerp(event.getPartialTick(), renderEntity.yBodyRotO, renderEntity.yBodyRot);
+    				float f1 = Mth.rotLerp(event.getPartialTick(), renderEntity.yHeadRotO, renderEntity.yHeadRot);
+    				float f2 = f1 - f;
+    				if (shouldSit && renderEntity.getVehicle() instanceof LivingEntity) {
+    					LivingEntity livingentity = (LivingEntity) renderEntity.getVehicle();
+    					f = Mth.rotLerp(event.getPartialTick(), livingentity.yBodyRotO, livingentity.yBodyRot);
+    					f2 = f1 - f;
+    					float f3 = Mth.wrapDegrees(f2);
+    					if (f3 < -85.0F) {
+    						f3 = -85.0F;
+    					}
+
+    					if (f3 >= 85.0F) {
+    						f3 = 85.0F;
+    					}
+
+    					f = f1 - f3;
+    					if (f3 * f3 > 2500.0F) {
+    						f += f3 * 0.2F;
+    					}
+
+    					f2 = f1 - f;
+    				}
+        			
+        			this.setupRotations((AbstractClientPlayer)renderEntity, poseStack, 0.0f, f, event.getPartialTick());
+        			poseStack.scale(-1.0F, -1.0F, 1.0F);
+        		    this.scale((AbstractClientPlayer)renderEntity, poseStack, event.getPartialTick());
+        		    poseStack.translate(0.0F, -1.501F, 0.0F);
+        		    
+        			hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, EquipmentSlot.CHEST, event.getPackedLight(), armorModel);
+        			event.getEntity().setItemSlot(EquipmentSlot.CHEST, new ItemStack(BioMechRegistry.ITEM_POWER_LEFT_ARM.get()));
+        			hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, EquipmentSlot.CHEST, event.getPackedLight(), armorModel);
+        			event.getEntity().setItemSlot(EquipmentSlot.CHEST, priorItem);
+        			poseStack.popPose();
+        		} catch (Exception e) {
+        			LOGGER.error("render error", e);
+        		}
+        		
+        		Iterable<ItemStack> armorSlots = event.getEntity().getArmorSlots();
+        		for (ItemStack itemStack : armorSlots) {
+        			if (itemStack.getItem() instanceof ArmorBase armorBase) {
+        				MechPart mechPart = armorBase.getMechPart();
+        				if (mechPart != null) {
+        					List<ModelPart> parts = MechPartUtil.getCorrespondingModelParts(playerModel, mechPart);
+        					if (armorBase.shouldHidePlayerModel()) {
+        						for (ModelPart part : parts) {
+        							part.visible = false;
+        						}
+        					} else {
+//        						for (ModelPart part : parts) {
+//        							part.visible = true;
+//        						}
+        					}
+        				}
+        			}
+        		}
+//        		playerModel.leftLeg.visible = false;
+//        		playerModel.leftPants.visible = false;
+//        		
+//        		playerModel.rightLeg.visible = false;
+//        		playerModel.rightPants.visible = false;
+//        		
+//        		playerModel.leftArm.visible = false;
+//        		playerModel.leftSleeve.visible = false;
+//        		
+//        		playerModel.rightArm.visible = false;
+//        		playerModel.rightSleeve.visible = false;
+//        		
+//        		playerModel.body.visible = false;
+        		
+        		//playerModel.leftSleeve.visible = false;
+//            	armorRenderer.rendererPipeline().armorModel().renderToBuffer(event.getPoseStack(), 
+//            			event.getMultiBufferSource().getBuffer(armorRenderer.rendererPipeline().config().getRenderType(itemToRender)), 
+//            			event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+        	}
+        }
+        
+        protected void setupRotations(AbstractClientPlayer player, PoseStack poseStack, float bob, float yaw, float partialTick) {
+        	if (!player.hasPose(Pose.SLEEPING)) {
+        		poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yaw));
+             }
+         }
+        
+        protected void scale(AbstractClientPlayer player, PoseStack poseStack, float partialTick) {
+            float f = 0.9375F;
+            poseStack.scale(0.9375F, 0.9375F, 0.9375F);
+         }
+        
+        @SubscribeEvent
+        public void onPostRenderPlayer(RenderPlayerEvent.Post event) {
+        	if (itemToRender == null) {
+        		itemToRender = new ItemStack(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
+        	}
+        	Player renderEntity = event.getEntity();
+        	AzArmorLayer<Player> layer = new AzArmorLayer();
+        	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
+        	if (armorRenderer != null && renderEntity != null) {
+        		PlayerModel playerModel = event.getRenderer().getModel();
+        		armorRenderer.prepForRender(renderEntity, itemToRender, itemToRender.getEquipmentSlot(), playerModel);
+            	//AzArmorModelRenderer renderer = new AzArmorModelRenderer(armorRenderer.rendererPipeline());
+        		RenderType renderType = armorRenderer.rendererPipeline().config().getRenderType(itemToRender);
+        		AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
+        		playerModel.copyPropertiesTo(armorModel);
+        		try {
+        			if (doArmorOverride) {
+        				if (priorItem != null) {
+            				event.getEntity().setItemSlot(EquipmentSlot.LEGS, priorItem);
+            			}
+        			}
+        			//layer.render(armorRenderer.rendererPipeline().context());
+        			//armorModel.renderToBuffer(event.getPoseStack(), null, event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+        			
+        		} catch (Exception e) {
+        			LOGGER.error("render error", e);
+        		}
+//            	armorRenderer.rendererPipeline().armorModel().renderToBuffer(event.getPoseStack(), 
+//            			event.getMultiBufferSource().getBuffer(armorRenderer.rendererPipeline().config().getRenderType(itemToRender)), 
+//            			event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
+        	}
+        }
     }
 }
