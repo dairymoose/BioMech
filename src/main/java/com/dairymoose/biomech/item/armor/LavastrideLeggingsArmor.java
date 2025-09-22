@@ -1,11 +1,15 @@
 package com.dairymoose.biomech.item.armor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.dairymoose.biomech.BioMechRegistry;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -21,15 +25,15 @@ public class LavastrideLeggingsArmor extends ArmorBase {
 	@Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         if (entity instanceof Player player ) {
-            player.getArmorSlots().forEach(wornArmor -> {
-                if (wornArmor != null && wornArmor.is(BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get())) {
-                	if (entity instanceof LivingEntity living && !living.isSpectator()) {
-                		if (!level.isClientSide) {
-                			//living.addEffect(new MobEffectInstance(MobEffects.l, 30, newJumpBoost));
-                		}
-                	}
-                }
-            });
+        	List<Item> armorItems = new ArrayList<Item>();
+			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			if (armorItems.contains(BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get()) || slotId == -1) {
+            	if (entity instanceof LivingEntity living && !living.isSpectator()) {
+            		if (!level.isClientSide) {
+            			//living.addEffect(new MobEffectInstance(MobEffects.l, 30, newJumpBoost));
+            		}
+            	}
+			}
         }
     }
 	

@@ -42,7 +42,7 @@ public class ArmorBase extends ArmorItem {
 	
 	@Override
 	public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
-		return true;
+		return false;
 	}
 	
 	@Override

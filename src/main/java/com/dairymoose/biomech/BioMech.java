@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.slf4j.Logger;
 
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.config.BioMechConfig;
@@ -65,6 +66,8 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -183,6 +186,21 @@ public class BioMech
 		CompoundTag playerDataTag = BioMechPlayerData.serialize(playerData);
 		ClientboundUpdateSlottedItemPacket slottedItemPacket = new ClientboundUpdateSlottedItemPacket(player.getUUID(), playerDataTag);
 		BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), slottedItemPacket);
+    }
+    
+    @SubscribeEvent
+    public void onPlayerTick(final PlayerTickEvent event) {
+    	if (event.phase == TickEvent.Phase.START) {
+    		BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
+    		if (playerData != null) {
+    			List<SlottedItem> slottedItems = playerData.getAllSlots();
+    			for (SlottedItem slotted : slottedItems) {
+    				if (!slotted.itemStack.isEmpty()) {
+    					slotted.itemStack.inventoryTick(event.player.level(), event.player, -1, false);
+    				}
+    			}
+    		}
+    	}
     }
     
     @SubscribeEvent
