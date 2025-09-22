@@ -17,11 +17,15 @@ import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
 import com.dairymoose.biomech.item.anim.BioMechStationItemRenderer;
+import com.dairymoose.biomech.item.anim.MiningLaserItemRenderer;
+import com.dairymoose.biomech.item.anim.PowerArmItemRenderer;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
 import com.dairymoose.biomech.item.renderer.HovertechLeggingsRenderer;
 import com.dairymoose.biomech.item.renderer.LavastrideLeggingsRenderer;
+import com.dairymoose.biomech.item.renderer.MiningLaserLeftArmRenderer;
+import com.dairymoose.biomech.item.renderer.MiningLaserRightArmRenderer;
 import com.dairymoose.biomech.item.renderer.PowerChestRenderer;
 import com.dairymoose.biomech.item.renderer.PowerHelmetRenderer;
 import com.dairymoose.biomech.item.renderer.PowerLeftArmRenderer;
@@ -43,12 +47,14 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -63,6 +69,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -274,6 +281,7 @@ public class BioMech
 		@SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
+        	//"bone" is null error?  The .geo file is missing from geo.item package
         	AzArmorRendererRegistry.register(HovertechLeggingsRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
         	AzArmorRendererRegistry.register(PowerLeggingsRenderer::new, BioMechRegistry.ITEM_POWER_LEGGINGS.get());
         	AzArmorRendererRegistry.register(LavastrideLeggingsRenderer::new, BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get());
@@ -281,8 +289,12 @@ public class BioMech
         	AzArmorRendererRegistry.register(PowerRightArmRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
         	AzArmorRendererRegistry.register(PowerLeftArmRenderer::new, BioMechRegistry.ITEM_POWER_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(PowerHelmetRenderer::new, BioMechRegistry.ITEM_POWER_HELMET.get());
+        	AzArmorRendererRegistry.register(MiningLaserRightArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
+        	AzArmorRendererRegistry.register(MiningLaserLeftArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
         	
         	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
+        	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
+        	AzItemRendererRegistry.register(PowerArmItemRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
         	
         	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
         }
@@ -291,6 +303,41 @@ public class BioMech
 		public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
 			event.registerBlockEntityRenderer(BioMechRegistry.BLOCK_ENTITY_BIOMECH_STATION.get(), context -> new BioMechStationRenderer());
 		}
+        
+        public BioMechPlayerData getDataForLocalPlayer() {
+        	BioMechPlayerData playerData = null;
+        	playerData = BioMech.globalPlayerData.get(Minecraft.getInstance().player.getUUID());
+        	return playerData;
+        }
+        
+        boolean didRenderMainHand = false;
+        @SubscribeEvent
+        public void onRenderFirstPersonHand(RenderHandEvent event) {
+        	BioMechPlayerData playerData = this.getDataForLocalPlayer();
+        	
+        	EquipmentSlot equipSlot = null;
+        	MechPart handPart = null;
+        	//if (event.getArm() == HumanoidArm.RIGHT) {
+        	if (event.getHand() == InteractionHand.MAIN_HAND) {
+        		handPart = MechPart.RightArm;
+        		equipSlot = EquipmentSlot.MAINHAND;
+        	//} else if (event.getArm() == HumanoidArm.LEFT) {
+        	} else if (event.getHand() == InteractionHand.OFF_HAND) {
+        		handPart = MechPart.LeftArm;
+        		equipSlot = EquipmentSlot.OFFHAND;
+        	}
+        	didRenderMainHand = false;
+        	if (playerData != null && handPart != null && equipSlot != null) {
+        		if (Minecraft.getInstance().player.getItemBySlot(equipSlot).isEmpty() && !playerData.getForSlot(handPart).itemStack.isEmpty() && playerData.getForSlot(handPart).visible) {
+        			ItemInHandRenderer iihr = new ItemInHandRenderer(Minecraft.getInstance(), Minecraft.getInstance().getEntityRenderDispatcher(), Minecraft.getInstance().getItemRenderer());
+        	
+        			event.setCanceled(true);
+        			
+        			iihr.renderArmWithItem(Minecraft.getInstance().player, event.getPartialTick(), event.getInterpolatedPitch(), event.getHand(), 
+        					event.getSwingProgress(), playerData.getForSlot(handPart).itemStack, event.getEquipProgress(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
+        		}
+        	}
+        }
         
         Map<EquipmentSlot, ItemStack> priorItems = new HashMap<>();
         private boolean doArmorOverride = false;
@@ -429,32 +476,10 @@ public class BioMech
         						for (ModelPart part : parts) {
         							part.visible = false;
         						}
-        					} else {
-//        						for (ModelPart part : parts) {
-//        							part.visible = true;
-//        						}
         					}
         				}
         			}
         		}
-//        		playerModel.leftLeg.visible = false;
-//        		playerModel.leftPants.visible = false;
-//        		
-//        		playerModel.rightLeg.visible = false;
-//        		playerModel.rightPants.visible = false;
-//        		
-//        		playerModel.leftArm.visible = false;
-//        		playerModel.leftSleeve.visible = false;
-//        		
-//        		playerModel.rightArm.visible = false;
-//        		playerModel.rightSleeve.visible = false;
-//        		
-//        		playerModel.body.visible = false;
-        		
-        		//playerModel.leftSleeve.visible = false;
-//            	armorRenderer.rendererPipeline().armorModel().renderToBuffer(event.getPoseStack(), 
-//            			event.getMultiBufferSource().getBuffer(armorRenderer.rendererPipeline().config().getRenderType(itemToRender)), 
-//            			event.getPackedLight(), OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
         	}
         }
         
@@ -487,3 +512,4 @@ public class BioMech
         }
     }
 }
+

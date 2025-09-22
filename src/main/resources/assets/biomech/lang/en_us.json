@@ -19,8 +19,14 @@
 	"item.biomech.power_arm.tooltip1": "Increases attack damage by 2.",
 	
 	"item.biomech.left_power_arm": "§7Left Power Arm§0",
-	"item.biomech.left_power_arm.tooltip1": "Increases attack damage by 2.",
 
+	"item.biomech.mining_laser_arm": "§5Mining Laser Arm§0",
+	"item.biomech.mining_laser_arm.tooltip1": "Hold mouse click to activate.",
+	"item.biomech.mining_laser_arm.tooltip2": "Hold to mine any pickaxe-mineable block.",
+	"item.biomech.mining_laser_arm.tooltip3": "The longer you hold the beam, the stronger it becomes.  Max 10 seconds.",
+		
+	"item.biomech.mining_laser_left_arm": "§7Left Mining Laser Arm§0",
+	
 	"item.biomech.lavastride_leggings": "§5Lavastride Leggings§0",
 	"item.biomech.lavastride_leggings.tooltip1": "Allows the user to walk on the surface of lava.",
 

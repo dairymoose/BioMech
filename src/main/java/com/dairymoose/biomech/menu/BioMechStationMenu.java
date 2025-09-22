@@ -97,34 +97,6 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 	    	  
 	    	  ++slotIdCounter;
 	      }
-//	      this.addSlot(new Slot(stationContainer, 0, 31, 13) {
-//	    	  public void setByPlayer(ItemStack p_270969_) {
-//	               BioMechStationMenu.onEquipItem(p_39641_.player, MechPart.Back, p_270969_, this.getItem());
-//	               super.setByPlayer(p_270969_);
-//	            }
-//
-//	            public int getMaxStackSize() {
-//	               return 1;
-//	            }
-//
-//	            public boolean mayPlace(ItemStack p_39746_) {
-//	               return p_39746_.getItem() instanceof ArmorBase && ((ArmorBase) p_39746_.getItem()).getMechPart() == MechPart.Back;
-//	            }
-//
-//	            public boolean mayPickup(Player p_39744_) {
-//	               ItemStack itemstack = this.getItem();
-//	               return !itemstack.isEmpty() && !p_39744_.isCreative() && EnchantmentHelper.hasBindingCurse(itemstack) ? false : super.mayPickup(p_39744_);
-//	            }
-//
-//	            public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-//	               return Pair.of(InventoryMenu.BLOCK_ATLAS, InventoryMenu.TEXTURE_EMPTY_SLOTS[equipmentslot.getIndex()]);
-//	            }
-//	      });
-//	      this.addSlot(new Slot(stationContainer, 1, 68, 16));
-//	      this.addSlot(new Slot(stationContainer, 2, 50, 29));
-//	      this.addSlot(new Slot(stationContainer, 3, 68, 34));
-//	      this.addSlot(new Slot(stationContainer, 4, 86, 29));
-//	      this.addSlot(new Slot(stationContainer, 5, 68, 52));
 
 	      for(int l = 0; l < 3; ++l) {
 	         for(int j1 = 0; j1 < 9; ++j1) {

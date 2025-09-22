@@ -52,8 +52,7 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 		int leggingsButtonX = this.leftPos + 68;
 		int leggingsButtonY = this.topPos + 70;
 
-		MechPart[] mechParts = { MechPart.Back, MechPart.Head, MechPart.LeftArm, MechPart.Chest, MechPart.RightArm,
-				MechPart.Leggings };
+		MechPart[] mechParts = { MechPart.Back, MechPart.Head, MechPart.RightArm, MechPart.Chest, MechPart.LeftArm, MechPart.Leggings };
 		int[] buttonStartX = { backButtonX, headButtonX, leftHandButtonX, chestButtonX, rightHandButtonX,
 				leggingsButtonX };
 		int[] buttonStartY = { backButtonY, headButtonY, leftHandButtonY, chestButtonY, rightHandButtonY,

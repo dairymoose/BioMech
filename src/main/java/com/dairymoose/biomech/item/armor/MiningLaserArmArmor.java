@@ -13,17 +13,17 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public abstract class PowerArmArmor extends ArmorBase {
+public abstract class MiningLaserArmArmor extends ArmorBase {
 
-	public PowerArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public MiningLaserArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
-		this.suitEnergy = 2;
+		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
 	}
 
 	@Override
 	public Item getLeftArmItem() {
-		return BioMechRegistry.ITEM_POWER_LEFT_ARM.get();
+		return BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get();
 	}
 	
 	@Override
@@ -31,7 +31,7 @@ public abstract class PowerArmArmor extends ArmorBase {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
 			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
-			if (armorItems.contains(BioMechRegistry.ITEM_POWER_ARM.get()) || slotId == -1) {
+			if (armorItems.contains(BioMechRegistry.ITEM_MINING_LASER_ARM.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
 					;
 				}
