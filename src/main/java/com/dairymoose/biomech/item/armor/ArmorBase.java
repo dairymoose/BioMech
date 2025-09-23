@@ -56,7 +56,7 @@ public class ArmorBase extends ArmorItem {
 	@Override
 	public void appendHoverText(ItemStack stack, Level level, List<Component> comp, TooltipFlag flags) {
 		super.appendHoverText(stack, level, comp, flags);
-		if (level.isClientSide && Minecraft.getInstance().screen instanceof BioMechStationScreen) {
+		if (level != null && level.isClientSide && Minecraft.getInstance().screen instanceof BioMechStationScreen) {
 			comp.add(Component.translatable("item.biomech.generic.tooltip2"));
 		}
 		else {
