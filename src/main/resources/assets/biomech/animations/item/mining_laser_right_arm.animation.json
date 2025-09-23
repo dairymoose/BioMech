@@ -24,6 +24,16 @@
 							"vector": [50, 0, 0]
 						}
 					}
+				},
+				"drillhead": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, "query.anim_time*20", 0]
+						},
+						"0.25": {
+							"vector": [0, "query.anim_time*900", 0]
+						}
+					}
 				}
 			}
 		},
