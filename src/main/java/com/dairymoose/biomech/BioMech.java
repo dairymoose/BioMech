@@ -25,6 +25,8 @@ import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
+import com.dairymoose.biomech.item.anim.MiningLaserAnimator;
+import com.dairymoose.biomech.item.anim.MiningLaserDispatcher;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
@@ -38,7 +40,12 @@ import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 
 import mod.azure.azurelib.AzureLib;
+import mod.azure.azurelib.network.packet.AzItemStackDispatchCommandPacket;
+import mod.azure.azurelib.rewrite.animation.AzAnimatorAccessor;
+import mod.azure.azurelib.rewrite.animation.cache.AzIdentifiableItemStackAnimatorCache;
 import mod.azure.azurelib.rewrite.animation.cache.AzIdentityRegistry;
+import mod.azure.azurelib.rewrite.animation.dispatch.AzDispatchSide;
+import mod.azure.azurelib.rewrite.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorModel;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
@@ -295,6 +302,12 @@ public class BioMech
         	return playerData;
         }
         
+        //AzureLib bug: dispatcher doesn't work client side because it uses AzAnimatorAccessor instead of AzIdentifiableItemStackAnimatorCache
+        public void clientSideItemAnimation(ItemStack itemStack, AzCommand command) {
+        	AzItemStackDispatchCommandPacket packet = new AzItemStackDispatchCommandPacket(itemStack.getTag().getUUID("az_id"), command);
+			packet.handle();
+        }
+        
         boolean didRenderMainHand = false;
         ItemStack mainHandRenderStack = ItemStack.EMPTY;
         ItemStack offHandRenderStack = ItemStack.EMPTY;
@@ -320,8 +333,10 @@ public class BioMech
         	
         			if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
         				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+        				BioMech.LOGGER.info("new mainhand item: " + mainHandRenderStack);
         			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(offHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
         				offHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+        				BioMech.LOGGER.info("new offhand item: " + offHandRenderStack);
         			}
         			ItemStack newRenderItem = mainHandRenderStack;
         			if (handPart == MechPart.LeftArm) {
@@ -337,7 +352,8 @@ public class BioMech
         			
         			if (newRenderItem.getItem() instanceof ArmorBase base) {
         				if (base instanceof MiningLaserArmArmor laser) {
-        					laser.dispatcher.mining(Minecraft.getInstance().player, newRenderItem);
+        					//laser.dispatcher.mining(Minecraft.getInstance().player, newRenderItem);
+        					this.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.PASSIVE_COMMAND);
         				}
         			}
         			

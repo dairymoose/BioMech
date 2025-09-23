@@ -21,7 +21,7 @@
 							"vector": [0, 0, 0]
 						},
 						"0.25": {
-							"vector": [25, 0, 0]
+							"vector": [50, 0, 0]
 						}
 					}
 				}
@@ -32,7 +32,7 @@
 			"bones": {
 				"mech": {
 					"rotation": {
-						"vector": [25, 0, 0]
+						"vector": [50, 0, 0]
 					}
 				},
 				"drillhead": {
