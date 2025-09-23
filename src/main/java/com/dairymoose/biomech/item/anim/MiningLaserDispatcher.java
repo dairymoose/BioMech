@@ -6,10 +6,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 
 public class MiningLaserDispatcher {
-	public static final AzCommand PASSIVE_COMMAND = AzCommand.create("base_controller", "animation.mining_laser_right_arm.passive", AzPlayBehaviors.LOOP);
-	public static final AzCommand START_USING_COMMAND = AzCommand.create("base_controller", "animation.mining_laser_right_arm.start_using", AzPlayBehaviors.HOLD_ON_LAST_FRAME);
-	public static final AzCommand MINING_COMMAND = AzCommand.create("base_controller", "animation.mining_laser_right_arm.mining", AzPlayBehaviors.LOOP);
-	public static final AzCommand INERT_COMMAND = AzCommand.create("base_controller", "animation.mining_laser_right_arm.inert", AzPlayBehaviors.HOLD_ON_LAST_FRAME);
+	public static final AnimCommand PASSIVE_COMMAND = new AnimCommand("base_controller", "animation.mining_laser_right_arm.passive", AzPlayBehaviors.LOOP);
+	public static final AnimCommand START_USING_COMMAND = new AnimCommand("base_controller", "animation.mining_laser_right_arm.start_using", AzPlayBehaviors.HOLD_ON_LAST_FRAME);
+	public static final AnimCommand MINING_COMMAND = new AnimCommand("base_controller", "animation.mining_laser_right_arm.mining", AzPlayBehaviors.LOOP);
+	public static final AnimCommand INERT_COMMAND = new AnimCommand("base_controller", "animation.mining_laser_right_arm.inert", AzPlayBehaviors.HOLD_ON_LAST_FRAME);
 	
     public void passive(Entity entity, ItemStack itemStack) {
     	PASSIVE_COMMAND.sendForItem(entity, itemStack);

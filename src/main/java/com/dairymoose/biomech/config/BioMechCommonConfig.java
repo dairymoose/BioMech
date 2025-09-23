@@ -10,11 +10,11 @@ public class BioMechCommonConfig {
 	
 	public BioMechCommonConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("crafting");
-		this.enableBioMechStation = builder.comment("enableBioMechStation").translation("config.xenotech.enableBioMechStation").define("enableBioMechStation", true);
+		this.enableBioMechStation = builder.comment("enableBioMechStation").translation("config.biomech.enableBioMechStation").define("enableBioMechStation", true);
 		builder.pop();
 		
 		builder.push("biomech_station");
-		this.walkToBioMechStation = builder.comment("walkToBioMechStation").translation("config.xenotech.walkToBioMechStation").define("walkToBioMechStation", true);
+		this.walkToBioMechStation = builder.comment("walkToBioMechStation").translation("config.biomech.walkToBioMechStation").define("walkToBioMechStation", true);
 		builder.pop();
 	}
 	

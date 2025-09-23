@@ -50,7 +50,7 @@ public class ArmorBase extends ArmorItem {
 	
 	@Override
 	public InteractionResultHolder<ItemStack> use(Level p_40395_, Player p_40396_, InteractionHand p_40397_) {
-		return InteractionResultHolder.consume(p_40396_.getItemInHand(p_40397_));
+		return InteractionResultHolder.pass(p_40396_.getItemInHand(p_40397_));
 	}
 	
 	@Override

@@ -36,5 +36,10 @@
 	"item.biomech.power_helmet": "§5Power Helmet§0",
 	"item.biomech.power_helmet.tooltip1": "Non-critical attacks have a 33% chance to instead be a critical strike.",
 
+	"key.hold_to_enable": "Hold to Enable BioMech Arms",
+	"key.right_arm": "Use Right Arm",
+	"key.left_arm": "Use Left Arm",
+	"key.categories.biomech": "BioMech",
+	
 	"biomech.finished": "Finished"
 }

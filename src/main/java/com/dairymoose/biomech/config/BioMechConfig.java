@@ -66,7 +66,7 @@ public class BioMechConfig {
 			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
 				@Override
 				public void run() {
-					;
+					BioMech.hideOffHandWhileInactive = BioMechConfig.CLIENT.hideOffHandWhileNotInUse.get().booleanValue();
 				}
 				};});
 

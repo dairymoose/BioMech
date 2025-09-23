@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
@@ -35,23 +36,28 @@ import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 
 import mod.azure.azurelib.AzureLib;
 import mod.azure.azurelib.network.packet.AzItemStackDispatchCommandPacket;
+import mod.azure.azurelib.rewrite.animation.AzAnimator;
 import mod.azure.azurelib.rewrite.animation.AzAnimatorAccessor;
 import mod.azure.azurelib.rewrite.animation.cache.AzIdentifiableItemStackAnimatorCache;
 import mod.azure.azurelib.rewrite.animation.cache.AzIdentityRegistry;
 import mod.azure.azurelib.rewrite.animation.dispatch.AzDispatchSide;
 import mod.azure.azurelib.rewrite.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.rewrite.animation.primitive.AzBakedAnimation;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorModel;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
 import mod.azure.azurelib.rewrite.render.item.AzItemRendererRegistry;
 import mod.azure.azurelib.rewrite.render.layer.AzArmorLayer;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -78,17 +84,22 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -281,6 +292,7 @@ public class BioMech
         }
     }
 
+    public static boolean hideOffHandWhileInactive = false;
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents
@@ -289,26 +301,124 @@ public class BioMech
 
     	public ClientModEvents() {
     		MinecraftForge.EVENT_BUS.register(this);
+    		
+    		
 		}
-        
+
+    	public static final KeyMapping HOTKEY_ENABLE_ARM_FUNCTION = new KeyMapping("key.hold_to_enable", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_RIGHT_ARM = new KeyMapping("key.right_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_LEFT, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_LEFT_ARM = new KeyMapping("key.left_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_RIGHT, "key.categories.biomech");
+    	
+        public static final List<KeyMapping> allKeyMappings = List.of(HOTKEY_RIGHT_ARM, HOTKEY_LEFT_ARM);
+
+    	@SubscribeEvent
+        public static void registerBindings(RegisterKeyMappingsEvent event) {
+    		for (KeyMapping mapping : allKeyMappings) {
+				event.register(mapping);
+			}
+        }
+    	
+    	@SubscribeEvent
+    	public void onClickInput(InputEvent.InteractionKeyMappingTriggered event) {
+    		BioMech.LOGGER.info(event + ", right=" + rightArmActive + ", left=" + leftArmActive);
+    		if (rightArmActive && event.isAttack() && Minecraft.getInstance().options.keyAttack.getKey().equals(HOTKEY_RIGHT_ARM.getKey())) {
+    			event.setSwingHand(false);
+    			event.setCanceled(true);
+    		}
+    		
+    		if (leftArmActive && event.isUseItem() && Minecraft.getInstance().options.keyUse.getKey().equals(HOTKEY_LEFT_ARM.getKey())) {
+    			event.setSwingHand(false);
+    			event.setCanceled(true);
+    		}
+    	}
+
+    	public boolean isRightMechArmActive(BioMechPlayerData playerData) {
+    		return !playerData.getForSlot(MechPart.RightArm).itemStack.isEmpty() && Minecraft.getInstance().player.getMainHandItem().isEmpty();
+    	}
+    	
+    	public boolean isLeftMechArmActive(BioMechPlayerData playerData) {
+    		return !playerData.getForSlot(MechPart.LeftArm).itemStack.isEmpty() && Minecraft.getInstance().player.getOffhandItem().isEmpty();
+    	}
+    	
+    	public boolean isMechArmActive(BioMechPlayerData playerData, MechPart part) {
+    		if (part == MechPart.RightArm) {
+    			return this.isRightMechArmActive(playerData);
+    		}
+    		else if (part == MechPart.LeftArm) {
+    			return this.isLeftMechArmActive(playerData);
+    		}
+    		return false;
+    	}
+    	
+    	public static boolean requireModifierKeyForArmUsage = true;
+    	boolean rightArmActive = false;
+    	boolean leftArmActive = false;
+    	@SubscribeEvent
+        public void onClientTick(final ClientTickEvent event) {
+        	if (event.phase == TickEvent.Phase.START) {
+        		BioMechPlayerData playerData = this.getDataForLocalPlayer();
+        		if (playerData != null) {
+        			if (requireModifierKeyForArmUsage) {
+            			if (HOTKEY_ENABLE_ARM_FUNCTION.isDown()) {
+                			if (isRightMechArmActive(playerData) && HOTKEY_RIGHT_ARM.isDown()) {
+                				while (HOTKEY_RIGHT_ARM.consumeClick());
+                    			rightArmActive = true;
+                    		}
+                			
+                			if (isLeftMechArmActive(playerData) && HOTKEY_LEFT_ARM.isDown()) {
+                				while (HOTKEY_LEFT_ARM.consumeClick());
+                    			leftArmActive = true;
+                    		}
+                		}
+                		if (!HOTKEY_RIGHT_ARM.isDown()) {
+                			rightArmActive = false;
+                		}
+                		
+                		if (!HOTKEY_LEFT_ARM.isDown()) {
+                			leftArmActive = false;
+                		}
+            		} else {
+            			if (isRightMechArmActive(playerData) && HOTKEY_RIGHT_ARM.isDown()) {
+                			rightArmActive = true;
+                		} else {
+                			rightArmActive = false;
+                		}
+                		
+                		if (isLeftMechArmActive(playerData) && HOTKEY_LEFT_ARM.isDown()) {
+                			leftArmActive = true;
+                		} else {
+                			leftArmActive = false;
+                		}
+            		}
+        		}
+        	}
+        }
+    	
         @SubscribeEvent
 		public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
 			event.registerBlockEntityRenderer(BioMechRegistry.BLOCK_ENTITY_BIOMECH_STATION.get(), context -> new BioMechStationRenderer());
 		}
         
         public BioMechPlayerData getDataForLocalPlayer() {
-        	BioMechPlayerData playerData = null;
-        	playerData = BioMech.globalPlayerData.get(Minecraft.getInstance().player.getUUID());
-        	return playerData;
+        	if (Minecraft.getInstance().player != null) {
+        		BioMechPlayerData playerData = null;
+            	playerData = BioMech.globalPlayerData.get(Minecraft.getInstance().player.getUUID());
+            	return playerData;
+        	}
+        	
+        	return null;
         }
         
         //AzureLib bug: dispatcher doesn't work client side because it uses AzAnimatorAccessor instead of AzIdentifiableItemStackAnimatorCache
         public void clientSideItemAnimation(ItemStack itemStack, AzCommand command) {
-        	AzItemStackDispatchCommandPacket packet = new AzItemStackDispatchCommandPacket(itemStack.getTag().getUUID("az_id"), command);
-			packet.handle();
+        	AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
+        	if (anim != null) {
+        		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
+        	}
+        	//AzItemStackDispatchCommandPacket packet = new AzItemStackDispatchCommandPacket(itemStack.getTag().getUUID("az_id"), command);
+			//packet.handle();
         }
         
-        boolean didRenderMainHand = false;
         ItemStack mainHandRenderStack = ItemStack.EMPTY;
         ItemStack offHandRenderStack = ItemStack.EMPTY;
         @SubscribeEvent
@@ -326,17 +436,17 @@ public class BioMech
         		handPart = MechPart.LeftArm;
         		equipSlot = EquipmentSlot.OFFHAND;
         	}
-        	didRenderMainHand = false;
-        	if (playerData != null && handPart != null && equipSlot != null) {
-        		if (Minecraft.getInstance().player.getItemBySlot(equipSlot).isEmpty() && !playerData.getForSlot(handPart).itemStack.isEmpty() && playerData.getForSlot(handPart).visible) {
-        			ItemInHandRenderer iihr = new ItemInHandRenderer(Minecraft.getInstance(), Minecraft.getInstance().getEntityRenderDispatcher(), Minecraft.getInstance().getItemRenderer());
         	
+        	boolean currentArmActive = false;
+        	if (handPart == MechPart.RightArm && rightArmActive || handPart == MechPart.LeftArm && leftArmActive) {
+        		currentArmActive = true;
+        	}
+        	if (playerData != null && handPart != null && equipSlot != null) {
+        		if (isMechArmActive(playerData, handPart) && playerData.getForSlot(handPart).visible) {
         			if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
         				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
-        				BioMech.LOGGER.info("new mainhand item: " + mainHandRenderStack);
         			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(offHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
         				offHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
-        				BioMech.LOGGER.info("new offhand item: " + offHandRenderStack);
         			}
         			ItemStack newRenderItem = mainHandRenderStack;
         			if (handPart == MechPart.LeftArm) {
@@ -350,13 +460,40 @@ public class BioMech
         				}
         			}
         			
-        			if (newRenderItem.getItem() instanceof ArmorBase base) {
-        				if (base instanceof MiningLaserArmArmor laser) {
-        					//laser.dispatcher.mining(Minecraft.getInstance().player, newRenderItem);
-        					this.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.PASSIVE_COMMAND);
-        				}
+        			if (currentArmActive) {
+        				if (newRenderItem.getItem() instanceof ArmorBase base) {
+            				if (base instanceof MiningLaserArmArmor laser) {
+            					//laser.dispatcher.mining(Minecraft.getInstance().player, newRenderItem);
+            					
+            					AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(newRenderItem);
+            					if (anim != null) {
+            						AzBakedAnimation startUsing = anim.getAnimation(newRenderItem, MiningLaserDispatcher.START_USING_COMMAND.animationName);
+                					int useTicks = newRenderItem.getTag().getInt("useTicks");
+                					++useTicks;
+                					newRenderItem.getTag().putInt("useTicks", useTicks);
+                					if (useTicks <= (int)startUsing.length()) {
+                						this.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.START_USING_COMMAND.command);
+                						//send packet to server asking for start_using anim
+                					}
+                					else {
+                						this.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.MINING_COMMAND.command);
+                						//send packet to server asking for mining anim
+                					}
+            					} else {
+            						BioMech.LOGGER.error("Could not get animator for item: " + newRenderItem);
+            					}
+            				}
+            			}
+        			} else {
+        				newRenderItem.getTag().putInt("useTicks", 0);
+        				this.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.PASSIVE_COMMAND.command);
+        				//send packet to server asking for passive anim
         			}
         			
+        			if (handPart == MechPart.LeftArm && hideOffHandWhileInactive && !currentArmActive) {
+        				return;
+        			}
+        			ItemInHandRenderer iihr = new ItemInHandRenderer(Minecraft.getInstance(), Minecraft.getInstance().getEntityRenderDispatcher(), Minecraft.getInstance().getItemRenderer());
         			iihr.renderArmWithItem(Minecraft.getInstance().player, event.getPartialTick(), event.getInterpolatedPitch(), event.getHand(), 
         					event.getSwingProgress(), newRenderItem, event.getEquipProgress(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
         		}

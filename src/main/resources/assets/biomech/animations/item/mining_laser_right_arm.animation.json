@@ -13,7 +13,7 @@
 		},
 		"animation.mining_laser_right_arm.start_using": {
 			"loop": "hold_on_last_frame",
-			"animation_length": 0.25,
+			"animation_length": 0.5,
 			"bones": {
 				"mech": {
 					"rotation": {
@@ -30,7 +30,7 @@
 						"0.0": {
 							"vector": [0, "query.anim_time*20", 0]
 						},
-						"0.25": {
+						"0.5": {
 							"vector": [0, "query.anim_time*900", 0]
 						}
 					}
