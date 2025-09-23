@@ -45,11 +45,23 @@
 				{
 					"name": "armorLeftArm",
 					"parent": "bipedLeftArm",
-					"pivot": [-4, 22, 0],
+					"pivot": [4, 22, 0]
+				},
+				{
+					"name": "mech",
+					"parent": "armorLeftArm",
+					"pivot": [6, 14.24792, 0],
 					"cubes": [
 						{"origin": [3.25, 20, -2.75], "size": [5.5, 4.5, 5.5], "uv": [16, 42], "mirror": true},
+						{"origin": [4, 15.975, -2.25], "size": [4, 4.025, 4.5], "uv": [0, 48], "mirror": true}
+					]
+				},
+				{
+					"name": "drillhead",
+					"parent": "mech",
+					"pivot": [6, 11.3125, 0],
+					"cubes": [
 						{"origin": [2.5, 12.25, -3.5], "size": [7, 3.75, 7], "uv": [24, 16], "mirror": true},
-						{"origin": [4, 15.975, -2.25], "size": [4, 4.025, 4.5], "uv": [0, 48], "mirror": true},
 						{"origin": [3.5, 11, -2.5], "size": [5, 1.25, 5], "uv": [36, 42], "mirror": true},
 						{"origin": [4.25, 9.75, -1.75], "size": [3.5, 1.25, 3.5], "uv": [48, 0], "mirror": true},
 						{"origin": [5, 8.5, -1], "size": [2, 1.25, 2], "uv": [16, 32], "mirror": true}

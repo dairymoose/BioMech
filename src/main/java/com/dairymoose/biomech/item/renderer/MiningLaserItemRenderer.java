@@ -1,8 +1,9 @@
-package com.dairymoose.biomech.item.anim;
+package com.dairymoose.biomech.item.renderer;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.item.renderer.MiningLaserRightArmRenderer;
-import com.dairymoose.biomech.item.renderer.PowerRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.MiningLaserRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerRightArmRenderer;
+import com.dairymoose.biomech.item.anim.MiningLaserAnimator;
 
 import mod.azure.azurelib.rewrite.render.item.AzItemRenderer;
 import mod.azure.azurelib.rewrite.render.item.AzItemRendererConfig;
@@ -21,7 +22,9 @@ public class MiningLaserItemRenderer extends AzItemRenderer {
 
     public MiningLaserItemRenderer() {
 		super(
-			AzItemRendererConfig.builder(GEO, TEX).useNewOffset(true).build()
+			AzItemRendererConfig.builder(GEO, TEX)
+			.setAnimatorProvider(MiningLaserAnimator::new)
+			.useNewOffset(true).build()
         );
     }
 

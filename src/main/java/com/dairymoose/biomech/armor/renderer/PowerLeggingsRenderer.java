@@ -1,4 +1,4 @@
-package com.dairymoose.biomech.item.renderer;
+package com.dairymoose.biomech.armor.renderer;
 
 import com.dairymoose.biomech.BioMech;
 
@@ -6,18 +6,18 @@ import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererConfig;
 import net.minecraft.resources.ResourceLocation;
 
-public class PowerHelmetRenderer extends AzArmorRenderer {
+public class PowerLeggingsRenderer extends AzArmorRenderer {
     private static final ResourceLocation GEO = ResourceLocation.fromNamespaceAndPath(
         BioMech.MODID,
-        "geo/item/power_helmet.geo.json"
+        "geo/item/armor_power_leggings.geo.json"
     );
 
     private static final ResourceLocation TEX = ResourceLocation.fromNamespaceAndPath(
     	BioMech.MODID,
-        "textures/item/power_helmet.png"
+        "textures/item/texture_power_leggings.png"
     );
 
-    public PowerHelmetRenderer() {
+    public PowerLeggingsRenderer() {
         super(AzArmorRendererConfig.builder(GEO, TEX).build());
     }
 }

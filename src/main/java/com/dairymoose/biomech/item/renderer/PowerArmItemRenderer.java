@@ -1,7 +1,7 @@
-package com.dairymoose.biomech.item.anim;
+package com.dairymoose.biomech.item.renderer;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.item.renderer.PowerRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerRightArmRenderer;
 
 import mod.azure.azurelib.rewrite.render.item.AzItemRenderer;
 import mod.azure.azurelib.rewrite.render.item.AzItemRendererConfig;

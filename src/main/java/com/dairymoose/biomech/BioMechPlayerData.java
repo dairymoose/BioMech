@@ -25,11 +25,13 @@ public class BioMechPlayerData {
 	public static class SlottedItem {
 		public SlottedItem(MechPart mechPart) {
 			this.itemStack = ItemStack.EMPTY;
+			this.leftArmItemStack = ItemStack.EMPTY;
 			this.mechPart = mechPart;
 		}
 		
 		public boolean visible = true;
 		public ItemStack itemStack;
+		public ItemStack leftArmItemStack;
 		public MechPart mechPart;
 	}
 	

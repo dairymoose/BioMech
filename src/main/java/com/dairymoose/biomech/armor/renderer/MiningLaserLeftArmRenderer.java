@@ -1,6 +1,7 @@
-package com.dairymoose.biomech.item.renderer;
+package com.dairymoose.biomech.armor.renderer;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.item.anim.MiningLaserAnimator;
 
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererConfig;
 import net.minecraft.resources.ResourceLocation;
@@ -12,6 +13,8 @@ public class MiningLaserLeftArmRenderer extends MiningLaserRightArmRenderer {
     );
 
     public MiningLaserLeftArmRenderer() {
-        super(AzArmorRendererConfig.builder(GEO_LEFT, TEX).build());
+        super(AzArmorRendererConfig.builder(GEO_LEFT, TEX)
+        		.setAnimatorProvider(MiningLaserAnimator::new)
+        		.build());
     }
 }

@@ -1,4 +1,4 @@
-package com.dairymoose.biomech.item.renderer;
+package com.dairymoose.biomech.armor.renderer;
 
 import com.dairymoose.biomech.BioMech;
 

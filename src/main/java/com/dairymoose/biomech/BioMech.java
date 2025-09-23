@@ -12,31 +12,33 @@ import java.util.UUID;
 import org.slf4j.Logger;
 
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.LavastrideLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.MiningLaserLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.MiningLaserRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerChestRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerHelmetRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerRightArmRenderer;
 import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
-import com.dairymoose.biomech.item.anim.BioMechStationItemRenderer;
-import com.dairymoose.biomech.item.anim.MiningLaserItemRenderer;
-import com.dairymoose.biomech.item.anim.PowerArmItemRenderer;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
-import com.dairymoose.biomech.item.renderer.HovertechLeggingsRenderer;
-import com.dairymoose.biomech.item.renderer.LavastrideLeggingsRenderer;
-import com.dairymoose.biomech.item.renderer.MiningLaserLeftArmRenderer;
-import com.dairymoose.biomech.item.renderer.MiningLaserRightArmRenderer;
-import com.dairymoose.biomech.item.renderer.PowerChestRenderer;
-import com.dairymoose.biomech.item.renderer.PowerHelmetRenderer;
-import com.dairymoose.biomech.item.renderer.PowerLeftArmRenderer;
-import com.dairymoose.biomech.item.renderer.PowerLeggingsRenderer;
-import com.dairymoose.biomech.item.renderer.PowerRightArmRenderer;
+import com.dairymoose.biomech.item.armor.MiningLaserArmArmor;
+import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
+import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
+import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 
 import mod.azure.azurelib.AzureLib;
+import mod.azure.azurelib.rewrite.animation.cache.AzIdentityRegistry;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorModel;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
@@ -203,7 +205,12 @@ public class BioMech
     			List<SlottedItem> slottedItems = playerData.getAllSlots();
     			for (SlottedItem slotted : slottedItems) {
     				if (!slotted.itemStack.isEmpty()) {
-    					slotted.itemStack.inventoryTick(event.player.level(), event.player, -1, false);
+    					
+    					ItemStack tickingItem = slotted.itemStack;
+    					if (slotted.mechPart == MechPart.LeftArm && !slotted.leftArmItemStack.isEmpty()) {
+    						tickingItem = slotted.leftArmItemStack;
+    					}
+    					tickingItem.inventoryTick(event.player.level(), event.player, -1, slotted.mechPart == MechPart.LeftArm);
     				}
     			}
     		}
@@ -276,28 +283,6 @@ public class BioMech
     	public ClientModEvents() {
     		MinecraftForge.EVENT_BUS.register(this);
 		}
-    	
-        @SuppressWarnings("unchecked")
-		@SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
-        	//"bone" is null error?  The .geo file is missing from geo.item package
-        	AzArmorRendererRegistry.register(HovertechLeggingsRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
-        	AzArmorRendererRegistry.register(PowerLeggingsRenderer::new, BioMechRegistry.ITEM_POWER_LEGGINGS.get());
-        	AzArmorRendererRegistry.register(LavastrideLeggingsRenderer::new, BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get());
-        	AzArmorRendererRegistry.register(PowerChestRenderer::new, BioMechRegistry.ITEM_POWER_CHEST.get());
-        	AzArmorRendererRegistry.register(PowerRightArmRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
-        	AzArmorRendererRegistry.register(PowerLeftArmRenderer::new, BioMechRegistry.ITEM_POWER_LEFT_ARM.get());
-        	AzArmorRendererRegistry.register(PowerHelmetRenderer::new, BioMechRegistry.ITEM_POWER_HELMET.get());
-        	AzArmorRendererRegistry.register(MiningLaserRightArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
-        	AzArmorRendererRegistry.register(MiningLaserLeftArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
-        	
-        	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
-        	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
-        	AzItemRendererRegistry.register(PowerArmItemRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
-        	
-        	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
-        }
         
         @SubscribeEvent
 		public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
@@ -311,6 +296,8 @@ public class BioMech
         }
         
         boolean didRenderMainHand = false;
+        ItemStack mainHandRenderStack = ItemStack.EMPTY;
+        ItemStack offHandRenderStack = ItemStack.EMPTY;
         @SubscribeEvent
         public void onRenderFirstPersonHand(RenderHandEvent event) {
         	BioMechPlayerData playerData = this.getDataForLocalPlayer();
@@ -331,10 +318,31 @@ public class BioMech
         		if (Minecraft.getInstance().player.getItemBySlot(equipSlot).isEmpty() && !playerData.getForSlot(handPart).itemStack.isEmpty() && playerData.getForSlot(handPart).visible) {
         			ItemInHandRenderer iihr = new ItemInHandRenderer(Minecraft.getInstance(), Minecraft.getInstance().getEntityRenderDispatcher(), Minecraft.getInstance().getItemRenderer());
         	
+        			if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
+        				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+        			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(offHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
+        				offHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+        			}
+        			ItemStack newRenderItem = mainHandRenderStack;
+        			if (handPart == MechPart.LeftArm) {
+        				newRenderItem = offHandRenderStack;
+        			}
         			event.setCanceled(true);
         			
+        			if (playerData.getForSlot(handPart).itemStack.getItem() instanceof ArmorBase base) {
+        				if (base instanceof MiningLaserArmArmor laser) {
+        					//laser.dispatcher.mining(Minecraft.getInstance().player, playerData.getForSlot(handPart).itemStack);
+        				}
+        			}
+        			
+        			if (newRenderItem.getItem() instanceof ArmorBase base) {
+        				if (base instanceof MiningLaserArmArmor laser) {
+        					laser.dispatcher.mining(Minecraft.getInstance().player, newRenderItem);
+        				}
+        			}
+        			
         			iihr.renderArmWithItem(Minecraft.getInstance().player, event.getPartialTick(), event.getInterpolatedPitch(), event.getHand(), 
-        					event.getSwingProgress(), playerData.getForSlot(handPart).itemStack, event.getEquipProgress(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
+        					event.getSwingProgress(), newRenderItem, event.getEquipProgress(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
         		}
         	}
         }
@@ -420,7 +428,10 @@ public class BioMech
         		    					if (itemStackToRender.getItem() instanceof ArmorBase base) {
         		    						Item leftArmItem = base.getLeftArmItem();
         		    						if (leftArmItem != null) {
-        		    							itemStackToRender = new ItemStack(leftArmItem);
+        		    							if (slottedItem.leftArmItemStack.isEmpty()) {
+        		    								slottedItem.leftArmItemStack = new ItemStack(leftArmItem);
+        		    							}
+        		    							itemStackToRender = slottedItem.leftArmItemStack;
         		    						}
                             		    }
         		    				}
@@ -510,6 +521,31 @@ public class BioMech
         		}
         	}
         }
+        
+        @SuppressWarnings("unchecked")
+		@SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event)
+        {
+        	//"bone" is null error?  The .geo file is missing from geo.item package
+        	AzArmorRendererRegistry.register(HovertechLeggingsRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(PowerLeggingsRenderer::new, BioMechRegistry.ITEM_POWER_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(LavastrideLeggingsRenderer::new, BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(PowerChestRenderer::new, BioMechRegistry.ITEM_POWER_CHEST.get());
+        	AzArmorRendererRegistry.register(PowerRightArmRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
+        	AzArmorRendererRegistry.register(PowerLeftArmRenderer::new, BioMechRegistry.ITEM_POWER_LEFT_ARM.get());
+        	AzArmorRendererRegistry.register(PowerHelmetRenderer::new, BioMechRegistry.ITEM_POWER_HELMET.get());
+        	AzArmorRendererRegistry.register(MiningLaserRightArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
+        	AzArmorRendererRegistry.register(MiningLaserLeftArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
+        	
+        	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
+        	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
+        	AzItemRendererRegistry.register(PowerArmItemRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
+        	
+        	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
+        	
+        	AzIdentityRegistry.register(BioMechRegistry.ITEM_MINING_LASER_ARM.get(), BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
+        }
+        
     }
 }
 

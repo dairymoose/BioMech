@@ -7,8 +7,11 @@ import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
@@ -43,6 +46,11 @@ public class ArmorBase extends ArmorItem {
 	@Override
 	public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
 		return false;
+	}
+	
+	@Override
+	public InteractionResultHolder<ItemStack> use(Level p_40395_, Player p_40396_, InteractionHand p_40397_) {
+		return InteractionResultHolder.consume(p_40396_.getItemInHand(p_40397_));
 	}
 	
 	@Override
