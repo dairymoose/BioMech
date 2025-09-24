@@ -15,6 +15,8 @@ import com.dairymoose.biomech.item.armor.PowerLeggingsArmor;
 import com.dairymoose.biomech.item.armor.PowerRightArmArmor;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
 
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
@@ -39,6 +41,8 @@ public class BioMechRegistry {
 	public static RegistryObject<BlockEntityType<BioMechStationBlockEntity>> BLOCK_ENTITY_BIOMECH_STATION = BioMech.BLOCK_ENTITY_TYPES.register("biomech_station", () -> BioMechStationBlockEntity.BIOMECH_STATION_BLOCK_ENTITY);
 	
 	public static RegistryObject<MenuType> MENU_TYPE_BIOMECH_STATION = BioMech.MENUS.register("biomech_station_menu", () -> new MenuType(BioMechStationMenu::new, FeatureFlags.DEFAULT_FLAGS));
+	
+	public static RegistryObject<ParticleType> PARTICLE_TYPE_LASER = BioMech.PARTICLES.register("laser", () -> new SimpleParticleType(false));
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_STATION = BioMech.ITEMS.register("biomech_station", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_STATION.get(), new Item.Properties()));
 	

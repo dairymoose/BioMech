@@ -35,6 +35,7 @@ import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
+import com.dairymoose.biomech.particle.LaserParticle;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
@@ -51,43 +52,66 @@ import mod.azure.azurelib.rewrite.render.armor.AzArmorModel;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
 import mod.azure.azurelib.rewrite.render.item.AzItemRendererRegistry;
+import mod.azure.azurelib.util.AzureLibUtil;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.CommandEvent;
+import net.minecraftforge.event.ItemStackedOnOtherEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.entity.item.ItemEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.ItemPickupEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -96,6 +120,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -116,6 +141,7 @@ public class BioMech
     // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, MODID);
+    public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, MODID);
     
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
 
@@ -131,8 +157,6 @@ public class BioMech
     
     public BioMech(FMLJavaModLoadingContext context)
     {
-    	AzureLib.initialize();
-
 		LOGGER.debug(BioMechRegistry.TAB_BIOMECH_CREATIVE.toString());
 		
         IEventBus modEventBus = context.getModEventBus();
@@ -150,6 +174,7 @@ public class BioMech
         CREATIVE_MODE_TABS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
         MENUS.register(modEventBus);
+        PARTICLES.register(modEventBus);
         
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -195,6 +220,8 @@ public class BioMech
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         BioMechConfig.reinit();
+        
+        AzureLib.initialize();
     }
     
     public static Map<UUID, BioMechPlayerData> globalPlayerData = new HashMap<>();
@@ -284,6 +311,16 @@ public class BioMech
         }
     }
 
+    //AzureLib bug: dispatcher doesn't work client side because it uses AzAnimatorAccessor instead of AzIdentifiableItemStackAnimatorCache
+    public static void clientSideItemAnimation(ItemStack itemStack, AzCommand command) {
+    	AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
+    	if (anim != null) {
+    		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
+    	}
+    	//AzItemStackDispatchCommandPacket packet = new AzItemStackDispatchCommandPacket(itemStack.getTag().getUUID("az_id"), command);
+		//packet.handle();
+    }
+    
     public static boolean hideOffHandWhileInactive = false;
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -303,6 +340,12 @@ public class BioMech
     	
         public static final List<KeyMapping> allKeyMappings = List.of(HOTKEY_RIGHT_ARM, HOTKEY_LEFT_ARM);
 
+        @SubscribeEvent
+        public static void onRegisterParticle(RegisterParticleProvidersEvent event) {
+        	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_LASER.get(), LaserParticle.Provider::new);
+        	//event.registerSpecial(BioMechRegistry.PARTICLE_TYPE_LASER.get(), LaserParticle.Provider::createParticle);
+        }
+        
     	@SubscribeEvent
         public static void registerBindings(RegisterKeyMappingsEvent event) {
     		for (KeyMapping mapping : allKeyMappings) {
@@ -400,16 +443,6 @@ public class BioMech
         	return null;
         }
         
-        //AzureLib bug: dispatcher doesn't work client side because it uses AzAnimatorAccessor instead of AzIdentifiableItemStackAnimatorCache
-        public void clientSideItemAnimation(ItemStack itemStack, AzCommand command) {
-        	AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
-        	if (anim != null) {
-        		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
-        	}
-        	//AzItemStackDispatchCommandPacket packet = new AzItemStackDispatchCommandPacket(itemStack.getTag().getUUID("az_id"), command);
-			//packet.handle();
-        }
-        
         public static boolean disableAllRenderingLogic = false;
         
         ItemStack mainHandRenderStack = ItemStack.EMPTY;
@@ -469,12 +502,55 @@ public class BioMech
                     					++useTicks;
                     					newRenderItem.getTag().putInt("useTicks", useTicks);
                     					if (useTicks <= (int)startUsing.length()) {
-                    						this.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.START_USING_COMMAND.command);
+                    						BioMech.LOGGER.info("useTicks=" + useTicks);
+                    						BioMech.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.START_USING_COMMAND.command);
                     						//send packet to server asking for start_using anim
                     					}
                     					else {
-                    						this.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.MINING_COMMAND.command);
+                    						BioMech.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.MINING_COMMAND.command);
                     						//send packet to server asking for mining anim
+                    						
+                    						HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(Minecraft.getInstance().player, (e) -> true, Minecraft.getInstance().player.getBlockReach());
+                    						//BlockHitResult bhr = Minecraft.getInstance().player.level().clip(new ClipContext(Minecraft.getInstance().player.getEyePosition(), 
+                    						//		Minecraft.getInstance().player.getViewVector(event.getPartialTick()), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+                    						
+                    						double handMult = 1.0;
+                    						if (handPart == MechPart.RightArm)
+                    							handMult = -1.0;
+                    						Vec3 viewVec = Minecraft.getInstance().player.getViewVector(event.getPartialTick());
+                    						Vec3 perpendicular = new Vec3(viewVec.z, 0.0, -viewVec.x);
+                							Vec3 startLoc = Minecraft.getInstance().player.getEyePosition(event.getPartialTick()).add(0.0, -0.2, 0.0).add(perpendicular.scale(0.25f * handMult));
+                    						Vec3 endLoc = hitResult.getLocation();
+                    						if (hitResult instanceof EntityHitResult ehr) {
+                    							endLoc = ehr.getEntity().getPosition(1.0f).add(0.0, ehr.getEntity().getEyeHeight()/2.0, 0.0);
+                    						}
+                    						Vec3 endToStartVec = endLoc.subtract(startLoc);
+                    						int max = (int)(endToStartVec.length()*12);
+                    						for (int i=0; i<max; ++i) {
+                    							double vecScale = 0.08 + (i + 1)*1.0f/max;
+                    							Vec3 loc = startLoc.add(endToStartVec.scale(vecScale));
+                        						Minecraft.getInstance().level.addParticle((ParticleOptions) BioMechRegistry.PARTICLE_TYPE_LASER.get(), loc.x, loc.y, loc.z, viewVec.scale(vecScale).x, viewVec.scale(vecScale).y, viewVec.scale(vecScale).z);
+                    						}
+                    						
+                    						if (hitResult instanceof BlockHitResult bhr) {
+                    							BlockPos pos = bhr.getBlockPos();
+                        						BlockState state = Minecraft.getInstance().level.getBlockState(pos);
+                        						if (!state.isAir()) {
+                        							ParticleType particles = ForgeRegistries.PARTICLE_TYPES
+                        									.getValue(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.BLOCK));
+                        							if (particles != null) {
+                        								BlockParticleOption blockParticle = new BlockParticleOption(particles, state);
+                    									for (int i = 0; i < 10; ++i) {
+                    										Minecraft.getInstance().level.addParticle(blockParticle,
+                    												endLoc.x + (Math.random() * 1.0 - 0.5), 
+                    												endLoc.y + (Math.random() * 1.0 - 0.5),
+                    												endLoc.z + (Math.random() * 1.0 - 0.5), 
+                    												0.0D, 0.0D, 0.0D);
+                    									}
+                        							}
+                        							//this.mineIfPossible(player, world, pos, mInfo);
+                        						}
+                    						}
                     					}
                 					} else {
                 						BioMech.LOGGER.error("Could not get animator for item: " + newRenderItem);
@@ -483,7 +559,7 @@ public class BioMech
                 			}
             			} else {
             				newRenderItem.getTag().putInt("useTicks", 0);
-            				this.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.PASSIVE_COMMAND.command);
+            				BioMech.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.PASSIVE_COMMAND.command);
             				//send packet to server asking for passive anim
             			}
             			

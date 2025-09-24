@@ -1,9 +1,12 @@
 package com.dairymoose.biomech.item.armor;
 
 import java.util.List;
+import java.util.UUID;
 
+import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 
+import mod.azure.azurelib.AzureLib;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -18,6 +21,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ArmorBase extends ArmorItem {
@@ -41,6 +46,15 @@ public class ArmorBase extends ArmorItem {
 	
 	public MechPart getMechPart() {
 		return this.mechPart;
+	}
+	
+	@Override
+	public boolean isDamageable(ItemStack stack) {
+		if (FMLEnvironment.dist == Dist.CLIENT && !stack.getOrCreateTag().contains(AzureLib.ITEM_UUID_TAG)) {
+			//another AzureLib bug - items sometimes don't have a UUID and the library crashes
+			stack.getOrCreateTag().putUUID(AzureLib.ITEM_UUID_TAG, UUID.randomUUID());
+		}
+		return super.isDamageable(stack);
 	}
 	
 	@Override

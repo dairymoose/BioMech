@@ -39,14 +39,19 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
 			if (armorItems.contains(BioMechRegistry.ITEM_MINING_LASER_ARM.get()) || armorItems.contains(BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
-					if (player.getMainHandItem().isEmpty() && stack.getItem() instanceof MiningLaserRightArmArmor) {
-						this.dispatcher.passive(entity, stack);
-					}
-					else if (player.getOffhandItem().isEmpty() && stack.getItem() instanceof MiningLaserLeftArmArmor) {
-						this.dispatcher.passive(entity, stack);
-					}
-					else {
-						this.dispatcher.inert(entity, stack);
+					if (level.isClientSide) {
+						if (player.getMainHandItem().isEmpty() && stack.getItem() instanceof MiningLaserRightArmArmor) {
+							BioMech.clientSideItemAnimation(stack, MiningLaserDispatcher.PASSIVE_COMMAND.command);
+							//this.dispatcher.passive(entity, stack);
+						}
+						else if (player.getOffhandItem().isEmpty() && stack.getItem() instanceof MiningLaserLeftArmArmor) {
+							BioMech.clientSideItemAnimation(stack, MiningLaserDispatcher.PASSIVE_COMMAND.command);
+							//this.dispatcher.passive(entity, stack);
+						}
+						else {
+							BioMech.clientSideItemAnimation(stack, MiningLaserDispatcher.INERT_COMMAND.command);
+							//this.dispatcher.inert(entity, stack);
+						}
 					}
 				}
 			}
