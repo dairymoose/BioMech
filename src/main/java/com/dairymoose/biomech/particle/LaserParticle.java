@@ -1,10 +1,18 @@
 package com.dairymoose.biomech.particle;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -14,6 +22,7 @@ public class LaserParticle extends TextureSheetParticle {
       super(p_105773_, p_105774_, p_105775_, p_105776_);
       this.setSize(0.02F, 0.02F);
       this.quadSize *= this.random.nextFloat() * 0.12F + 0.05F;
+      this.quadSize *= 0.7f;
       this.xd = p_105777_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;
       this.yd = p_105778_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;
       this.zd = p_105779_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;
@@ -39,8 +48,26 @@ public class LaserParticle extends TextureSheetParticle {
       }
    }
 
+   public static ParticleRenderType PARTICLE_SHEET_LIT_TRANSLUCENT = new ParticleRenderType() {
+	      public void begin(BufferBuilder p_107462_, TextureManager p_107463_) {
+	         RenderSystem.depthMask(true);
+	         RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
+	         RenderSystem.enableBlend();
+	         p_107462_.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+	      }
+
+	      public void end(Tesselator p_107465_) {
+	         p_107465_.end();
+	      }
+
+	      public String toString() {
+	         return "PARTICLE_SHEET_LIT_TRANSLUCENT";
+	      }
+	   };
+   
    public ParticleRenderType getRenderType() {
-      return ParticleRenderType.PARTICLE_SHEET_LIT;
+      //return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+	   return PARTICLE_SHEET_LIT_TRANSLUCENT;
    }
 
    @OnlyIn(Dist.CLIENT)

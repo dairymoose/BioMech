@@ -7,13 +7,29 @@ import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.item.anim.MiningLaserDispatcher;
 
+import mod.azure.azurelib.rewrite.animation.AzAnimator;
+import mod.azure.azurelib.rewrite.animation.AzAnimatorAccessor;
+import mod.azure.azurelib.rewrite.animation.primitive.AzBakedAnimation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public abstract class MiningLaserArmArmor extends ArmorBase {
 
@@ -26,6 +42,84 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 		this.dispatcher = new MiningLaserDispatcher();
 	}
 
+	@Override
+	public void onHandTick(boolean active, ItemStack itemStack, MechPart handPart, float partialTick) {
+		if (active) {
+			// laser.dispatcher.mining(Minecraft.getInstance().player, itemStack);
+
+			AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
+			if (anim != null) {
+				AzBakedAnimation startUsing = anim.getAnimation(itemStack, MiningLaserDispatcher.START_USING_COMMAND.animationName);
+				int useTicks = itemStack.getTag().getInt("useTicks");
+				++useTicks;
+				itemStack.getTag().putInt("useTicks", useTicks);
+				if (useTicks <= (int) startUsing.length()) {
+					BioMech.LOGGER.info("useTicks=" + useTicks);
+					BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.START_USING_COMMAND.command);
+					// send packet to server asking for start_using anim
+				} else {
+					BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.MINING_COMMAND.command);
+					// send packet to server asking for mining anim
+
+					HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(Minecraft.getInstance().player,
+							(e) -> true, Minecraft.getInstance().player.getBlockReach() * 1.2);
+					// BlockHitResult bhr = Minecraft.getInstance().player.level().clip(new
+					// ClipContext(Minecraft.getInstance().player.getEyePosition(),
+					// Minecraft.getInstance().player.getViewVector(event.getPartialTick()),
+					// ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+
+					double handMult = 1.0;
+					if (handPart == MechPart.RightArm)
+						handMult = -1.0;
+					Vec3 viewVec = Minecraft.getInstance().player.getViewVector(partialTick);
+					Vec3 perpendicular = new Vec3(viewVec.z, 0.0, -viewVec.x);
+					Vec3 startLoc = Minecraft.getInstance().player.getEyePosition(partialTick).add(0.0, -0.2, 0.0)
+							.add(perpendicular.scale(0.22f * handMult));
+					Vec3 endLoc = hitResult.getLocation();
+					if (hitResult instanceof EntityHitResult ehr) {
+						endLoc = ehr.getEntity().getPosition(1.0f).add(0.0, ehr.getEntity().getEyeHeight() / 2.0, 0.0);
+					}
+					Vec3 endToStartVec = endLoc.subtract(startLoc);
+					int max = (int) (endToStartVec.length() * 16);
+					double startDist = 0.075;
+					for (int i = 0; i < max; ++i) {
+						double vecScale = startDist + (i + 1) * 1.0f / max;
+						Vec3 loc = startLoc.add(endToStartVec.scale(vecScale));
+						Minecraft.getInstance().level.addParticle(
+								(ParticleOptions) BioMechRegistry.PARTICLE_TYPE_LASER.get(), loc.x, loc.y, loc.z,
+								viewVec.scale(vecScale).x, viewVec.scale(vecScale).y, viewVec.scale(vecScale).z);
+					}
+
+					if (hitResult instanceof BlockHitResult bhr) {
+						BlockPos pos = bhr.getBlockPos();
+						BlockState state = Minecraft.getInstance().level.getBlockState(pos);
+						if (!state.isAir()) {
+							ParticleType particles = ForgeRegistries.PARTICLE_TYPES
+									.getValue(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.BLOCK));
+							if (particles != null) {
+								BlockParticleOption blockParticle = new BlockParticleOption(particles, state);
+								for (int i = 0; i < 10; ++i) {
+									Minecraft.getInstance().level.addParticle(blockParticle,
+											endLoc.x + (Math.random() * 1.0 - 0.5), endLoc.y + (Math.random() * 1.0 - 0.5),
+											endLoc.z + (Math.random() * 1.0 - 0.5), 0.0D, 0.0D, 0.0D);
+								}
+							}
+							// this.mineIfPossible(player, world, pos, mInfo);
+						}
+					}
+				}
+			} else {
+				BioMech.LOGGER.error("Could not get animator for item: " + itemStack);
+			}
+		} else {
+			if (itemStack.getTag() != null && itemStack.getTag().contains("useTicks")) {
+				itemStack.getTag().putInt("useTicks", 0);
+				BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.PASSIVE_COMMAND.command);
+				//send packet to server asking for passive anim
+			}
+		}
+	}
+	
 	@Override
 	public Item getLeftArmItem() {
 		return BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get();

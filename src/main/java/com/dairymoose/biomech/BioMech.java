@@ -384,6 +384,54 @@ public class BioMech
     		return false;
     	}
     	
+    	public void clientHandTick() {
+    		if (Minecraft.getInstance().player == null)
+    			return;
+			
+    		float partialTick = Minecraft.getInstance().getPartialTick();
+    		InteractionHand[] hands = { InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND };
+    		
+    		for (InteractionHand hand : hands) {
+    			
+    			EquipmentSlot equipSlot = null;
+            	MechPart handPart = null;
+            	//if (event.getArm() == HumanoidArm.RIGHT) {
+            	if (hand == InteractionHand.MAIN_HAND) {
+            		handPart = MechPart.RightArm;
+            		equipSlot = EquipmentSlot.MAINHAND;
+            	//} else if (event.getArm() == HumanoidArm.LEFT) {
+            	} else if (hand == InteractionHand.OFF_HAND) {
+            		handPart = MechPart.LeftArm;
+            		equipSlot = EquipmentSlot.OFFHAND;
+            	}
+            	
+            	boolean currentArmActive = false;
+            	if (handPart == MechPart.RightArm && rightArmActive || handPart == MechPart.LeftArm && leftArmActive) {
+            		currentArmActive = true;
+            	}
+            	
+            	BioMechPlayerData playerData = getDataForLocalPlayer();
+            	if (playerData != null) {
+            		
+            		if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
+        				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+        			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(offHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
+        				offHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+        			}
+        			ItemStack newRenderItem = mainHandRenderStack;
+        			if (handPart == MechPart.LeftArm) {
+        				newRenderItem = offHandRenderStack;
+        			}
+        			if (newRenderItem.getItem() instanceof ArmorBase base) {
+    					base.onHandTick(currentArmActive, newRenderItem, handPart, Minecraft.getInstance().getPartialTick());
+    				}
+            		
+            	}
+            	
+    			
+    		}
+    	}
+    	
     	public static boolean requireModifierKeyForArmUsage = true;
     	boolean rightArmActive = false;
     	boolean leftArmActive = false;
@@ -425,6 +473,8 @@ public class BioMech
                 		}
             		}
         		}
+        		
+        		this.clientHandTick();
         	}
         }
     	
@@ -483,85 +533,6 @@ public class BioMech
             				newRenderItem = offHandRenderStack;
             			}
             			event.setCanceled(true);
-            			
-            			if (playerData.getForSlot(handPart).itemStack.getItem() instanceof ArmorBase base) {
-            				if (base instanceof MiningLaserArmArmor laser) {
-            					//laser.dispatcher.mining(Minecraft.getInstance().player, playerData.getForSlot(handPart).itemStack);
-            				}
-            			}
-            			
-            			if (currentArmActive) {
-            				if (newRenderItem.getItem() instanceof ArmorBase base) {
-                				if (base instanceof MiningLaserArmArmor laser) {
-                					//laser.dispatcher.mining(Minecraft.getInstance().player, newRenderItem);
-                					
-                					AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(newRenderItem);
-                					if (anim != null) {
-                						AzBakedAnimation startUsing = anim.getAnimation(newRenderItem, MiningLaserDispatcher.START_USING_COMMAND.animationName);
-                    					int useTicks = newRenderItem.getTag().getInt("useTicks");
-                    					++useTicks;
-                    					newRenderItem.getTag().putInt("useTicks", useTicks);
-                    					if (useTicks <= (int)startUsing.length()) {
-                    						BioMech.LOGGER.info("useTicks=" + useTicks);
-                    						BioMech.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.START_USING_COMMAND.command);
-                    						//send packet to server asking for start_using anim
-                    					}
-                    					else {
-                    						BioMech.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.MINING_COMMAND.command);
-                    						//send packet to server asking for mining anim
-                    						
-                    						HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(Minecraft.getInstance().player, (e) -> true, Minecraft.getInstance().player.getBlockReach());
-                    						//BlockHitResult bhr = Minecraft.getInstance().player.level().clip(new ClipContext(Minecraft.getInstance().player.getEyePosition(), 
-                    						//		Minecraft.getInstance().player.getViewVector(event.getPartialTick()), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
-                    						
-                    						double handMult = 1.0;
-                    						if (handPart == MechPart.RightArm)
-                    							handMult = -1.0;
-                    						Vec3 viewVec = Minecraft.getInstance().player.getViewVector(event.getPartialTick());
-                    						Vec3 perpendicular = new Vec3(viewVec.z, 0.0, -viewVec.x);
-                							Vec3 startLoc = Minecraft.getInstance().player.getEyePosition(event.getPartialTick()).add(0.0, -0.2, 0.0).add(perpendicular.scale(0.25f * handMult));
-                    						Vec3 endLoc = hitResult.getLocation();
-                    						if (hitResult instanceof EntityHitResult ehr) {
-                    							endLoc = ehr.getEntity().getPosition(1.0f).add(0.0, ehr.getEntity().getEyeHeight()/2.0, 0.0);
-                    						}
-                    						Vec3 endToStartVec = endLoc.subtract(startLoc);
-                    						int max = (int)(endToStartVec.length()*12);
-                    						for (int i=0; i<max; ++i) {
-                    							double vecScale = 0.08 + (i + 1)*1.0f/max;
-                    							Vec3 loc = startLoc.add(endToStartVec.scale(vecScale));
-                        						Minecraft.getInstance().level.addParticle((ParticleOptions) BioMechRegistry.PARTICLE_TYPE_LASER.get(), loc.x, loc.y, loc.z, viewVec.scale(vecScale).x, viewVec.scale(vecScale).y, viewVec.scale(vecScale).z);
-                    						}
-                    						
-                    						if (hitResult instanceof BlockHitResult bhr) {
-                    							BlockPos pos = bhr.getBlockPos();
-                        						BlockState state = Minecraft.getInstance().level.getBlockState(pos);
-                        						if (!state.isAir()) {
-                        							ParticleType particles = ForgeRegistries.PARTICLE_TYPES
-                        									.getValue(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.BLOCK));
-                        							if (particles != null) {
-                        								BlockParticleOption blockParticle = new BlockParticleOption(particles, state);
-                    									for (int i = 0; i < 10; ++i) {
-                    										Minecraft.getInstance().level.addParticle(blockParticle,
-                    												endLoc.x + (Math.random() * 1.0 - 0.5), 
-                    												endLoc.y + (Math.random() * 1.0 - 0.5),
-                    												endLoc.z + (Math.random() * 1.0 - 0.5), 
-                    												0.0D, 0.0D, 0.0D);
-                    									}
-                        							}
-                        							//this.mineIfPossible(player, world, pos, mInfo);
-                        						}
-                    						}
-                    					}
-                					} else {
-                						BioMech.LOGGER.error("Could not get animator for item: " + newRenderItem);
-                					}
-                				}
-                			}
-            			} else {
-            				newRenderItem.getTag().putInt("useTicks", 0);
-            				BioMech.clientSideItemAnimation(newRenderItem, MiningLaserDispatcher.PASSIVE_COMMAND.command);
-            				//send packet to server asking for passive anim
-            			}
             			
             			if (handPart == MechPart.LeftArm && hideOffHandWhileInactive && !currentArmActive) {
             				return;
