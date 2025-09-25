@@ -247,7 +247,42 @@ public class BioMech
     	}
     }
 
-	@SuppressWarnings("deprecation")
+    //The concept of a first person arm itemstack only exists on the client for the local player
+    @SuppressWarnings("deprecation")
+	public ItemStack getFirstPersonArmItemStack(ItemStack itemStack, MechPart handPart) {
+    	class ItemStackHolder {
+			ItemStack itemStack;
+		}
+		ItemStackHolder ish = new ItemStackHolder();
+		ish.itemStack = itemStack;
+		final MechPart clientPart = handPart;
+		DistExecutor.runWhenOn(Dist.CLIENT, () ->
+			new Runnable() {
+				public void run() {
+					if (clientPart == MechPart.RightArm)
+						ish.itemStack = ClientModEvents.mainHandRenderStack;
+					else
+						ish.itemStack = ClientModEvents.offHandRenderStack;
+				}
+			}
+			
+		);
+		
+		return ish.itemStack;
+    }
+    
+    public static ItemStack getThirdPersonArmItemStack(BioMechPlayerData playerData, MechPart part) {
+		ItemStack itemStack = ItemStack.EMPTY;
+		
+		SlottedItem slotted = playerData.getForSlot(part);
+		itemStack = slotted.itemStack;
+		if (slotted.mechPart == MechPart.LeftArm && !slotted.leftArmItemStack.isEmpty()) {
+			itemStack = slotted.leftArmItemStack;
+		}
+		
+		return itemStack;
+	}
+    
 	private void tickHandsForPlayer(final Player player, BioMechPlayerData playerData) {
 		InteractionHand[] hands = { InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND };
 		
@@ -268,39 +303,20 @@ public class BioMech
 			ItemStack itemStack = playerData.getForSlot(handPart).itemStack;
 			if (itemStack.getItem() instanceof ArmorBase base) {
 				if (isMechArmActive(player, playerData, handPart)) {
-					class ItemStackHolder {
-						ItemStack itemStack;
-					}
-					ItemStackHolder ish = new ItemStackHolder();
-					ish.itemStack = itemStack;
-					final MechPart clientPart = handPart;
-					DistExecutor.runWhenOn(Dist.CLIENT, () ->
-						new Runnable() {
-							public void run() {
-								if (clientPart == MechPart.RightArm)
-									ish.itemStack = ClientModEvents.mainHandRenderStack;
-								else
-									ish.itemStack = ClientModEvents.offHandRenderStack;
-							}
-						}
-						
-					);
+					itemStack = getFirstPersonArmItemStack(itemStack, handPart);
 					float partialTick = 1.0f;
-					base.onHandTick(currentArmActive, ish.itemStack, player, handPart, partialTick);
+					base.onHandTick(currentArmActive, itemStack, player, handPart, partialTick);
 				}
 			}
 		}
 	}
-
+	
 	private void tickInventoryForPlayer(final Player player, BioMechPlayerData playerData) {
 		List<SlottedItem> slottedItems = playerData.getAllSlots();
 		for (SlottedItem slotted : slottedItems) {
 			if (!slotted.itemStack.isEmpty()) {
-				
-				ItemStack tickingItem = slotted.itemStack;
-				if (slotted.mechPart == MechPart.LeftArm && !slotted.leftArmItemStack.isEmpty()) {
-					tickingItem = slotted.leftArmItemStack;
-				}
+								
+				ItemStack tickingItem = getThirdPersonArmItemStack(playerData, slotted.mechPart);
 				tickingItem.inventoryTick(player.level(), player, -1, slotted.mechPart == MechPart.LeftArm);
 			}
 		}
