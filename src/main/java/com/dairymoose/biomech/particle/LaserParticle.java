@@ -1,16 +1,20 @@
 package com.dairymoose.biomech.particle;
 
+import com.dairymoose.biomech.BioMech;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
+import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -66,10 +70,14 @@ public class LaserParticle extends TextureSheetParticle {
 	   };
    
    public ParticleRenderType getRenderType() {
-      //return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
 	   return PARTICLE_SHEET_LIT_TRANSLUCENT;
    }
-
+   
+	@Override
+	protected int getLightColor(float p_107249_) {
+		return LightTexture.FULL_BRIGHT;
+	}
+   
    @OnlyIn(Dist.CLIENT)
    public static class Provider implements ParticleProvider<SimpleParticleType> {
       private final SpriteSet sprite;

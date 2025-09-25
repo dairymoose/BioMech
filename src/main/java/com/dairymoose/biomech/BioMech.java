@@ -114,6 +114,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemPickupEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -234,25 +235,76 @@ public class BioMech
 		BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), slottedItemPacket);
     }
     
+    public static Map<UUID, HandActiveStatus> handActiveMap = new HashMap<>();
     @SubscribeEvent
     public void onPlayerTick(final PlayerTickEvent event) {
     	if (event.phase == TickEvent.Phase.START) {
     		BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
     		if (playerData != null) {
-    			List<SlottedItem> slottedItems = playerData.getAllSlots();
-    			for (SlottedItem slotted : slottedItems) {
-    				if (!slotted.itemStack.isEmpty()) {
-    					
-    					ItemStack tickingItem = slotted.itemStack;
-    					if (slotted.mechPart == MechPart.LeftArm && !slotted.leftArmItemStack.isEmpty()) {
-    						tickingItem = slotted.leftArmItemStack;
-    					}
-    					tickingItem.inventoryTick(event.player.level(), event.player, -1, slotted.mechPart == MechPart.LeftArm);
-    				}
-    			}
+    			tickInventoryForPlayer(event.player, playerData);
+    			tickHandsForPlayer(event.player, playerData);
     		}
     	}
     }
+
+	@SuppressWarnings("deprecation")
+	private void tickHandsForPlayer(final Player player, BioMechPlayerData playerData) {
+		InteractionHand[] hands = { InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND };
+		
+		HandActiveStatus has = handActiveMap.computeIfAbsent(player.getUUID(), (uuid) -> new HandActiveStatus());
+		for (InteractionHand hand : hands) {
+			
+			MechPart handPart = null;
+			if (hand == InteractionHand.MAIN_HAND)
+				handPart = MechPart.RightArm;
+			else if (hand == InteractionHand.OFF_HAND)
+				handPart = MechPart.LeftArm;
+			
+			boolean currentArmActive = false;
+			if (handPart == MechPart.RightArm && has.rightHandActive || handPart == MechPart.LeftArm && has.leftHandActive) {
+				currentArmActive = true;
+			}
+			
+			ItemStack itemStack = playerData.getForSlot(handPart).itemStack;
+			if (itemStack.getItem() instanceof ArmorBase base) {
+				if (isMechArmActive(player, playerData, handPart)) {
+					class ItemStackHolder {
+						ItemStack itemStack;
+					}
+					ItemStackHolder ish = new ItemStackHolder();
+					ish.itemStack = itemStack;
+					final MechPart clientPart = handPart;
+					DistExecutor.runWhenOn(Dist.CLIENT, () ->
+						new Runnable() {
+							public void run() {
+								if (clientPart == MechPart.RightArm)
+									ish.itemStack = ClientModEvents.mainHandRenderStack;
+								else
+									ish.itemStack = ClientModEvents.offHandRenderStack;
+							}
+						}
+						
+					);
+					float partialTick = 1.0f;
+					base.onHandTick(currentArmActive, ish.itemStack, player, handPart, partialTick);
+				}
+			}
+		}
+	}
+
+	private void tickInventoryForPlayer(final Player player, BioMechPlayerData playerData) {
+		List<SlottedItem> slottedItems = playerData.getAllSlots();
+		for (SlottedItem slotted : slottedItems) {
+			if (!slotted.itemStack.isEmpty()) {
+				
+				ItemStack tickingItem = slotted.itemStack;
+				if (slotted.mechPart == MechPart.LeftArm && !slotted.leftArmItemStack.isEmpty()) {
+					tickingItem = slotted.leftArmItemStack;
+				}
+				tickingItem.inventoryTick(player.level(), player, -1, slotted.mechPart == MechPart.LeftArm);
+			}
+		}
+	}
     
     @SubscribeEvent
     public void onPlayerJoinServerEvent(final PlayerEvent.PlayerLoggedInEvent event) {
@@ -321,6 +373,28 @@ public class BioMech
 		//packet.handle();
     }
     
+    public static boolean isRightMechArmActive(Player player, BioMechPlayerData playerData) {
+    	if (player == null)
+    		return false;
+		return !playerData.getForSlot(MechPart.RightArm).itemStack.isEmpty() && player.getMainHandItem().isEmpty();
+	}
+	
+	public static boolean isLeftMechArmActive(Player player, BioMechPlayerData playerData) {
+		if (player == null)
+    		return false;
+		return !playerData.getForSlot(MechPart.LeftArm).itemStack.isEmpty() && player.getOffhandItem().isEmpty();
+	}
+	
+	public static boolean isMechArmActive(Player player, BioMechPlayerData playerData, MechPart part) {
+		if (part == MechPart.RightArm) {
+			return BioMech.isRightMechArmActive(player, playerData);
+		}
+		else if (part == MechPart.LeftArm) {
+			return BioMech.isLeftMechArmActive(player, playerData);
+		}
+		return false;
+	}
+    
     public static boolean hideOffHandWhileInactive = false;
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -355,126 +429,135 @@ public class BioMech
     	
     	@SubscribeEvent
     	public void onClickInput(InputEvent.InteractionKeyMappingTriggered event) {
-    		if (rightArmActive && event.isAttack() && Minecraft.getInstance().options.keyAttack.getKey().equals(HOTKEY_RIGHT_ARM.getKey())) {
-    			event.setSwingHand(false);
-    			event.setCanceled(true);
+    		HandActiveStatus has = this.getLocalHandActiveStatus();
+    		
+    		if (has != null) {
+    			if (has.rightHandActive && event.isAttack() && Minecraft.getInstance().options.keyAttack.getKey().equals(HOTKEY_RIGHT_ARM.getKey())) {
+        			event.setSwingHand(false);
+        			event.setCanceled(true);
+        		}
+        		
+        		if (has.leftHandActive && event.isUseItem() && Minecraft.getInstance().options.keyUse.getKey().equals(HOTKEY_LEFT_ARM.getKey())) {
+        			event.setSwingHand(false);
+        			event.setCanceled(true);
+        		}
+    		}
+    	}
+    	
+//    	public void clientHandTick() {
+//    		if (Minecraft.getInstance().player == null)
+//    			return;
+//			
+//    		float partialTick = Minecraft.getInstance().getPartialTick();
+//    		InteractionHand[] hands = { InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND };
+//    		
+//    		for (InteractionHand hand : hands) {
+//    			
+//    			EquipmentSlot equipSlot = null;
+//            	MechPart handPart = null;
+//            	//if (event.getArm() == HumanoidArm.RIGHT) {
+//            	if (hand == InteractionHand.MAIN_HAND) {
+//            		handPart = MechPart.RightArm;
+//            		equipSlot = EquipmentSlot.MAINHAND;
+//            	//} else if (event.getArm() == HumanoidArm.LEFT) {
+//            	} else if (hand == InteractionHand.OFF_HAND) {
+//            		handPart = MechPart.LeftArm;
+//            		equipSlot = EquipmentSlot.OFFHAND;
+//            	}
+//            	
+//            	boolean currentArmActive = false;
+//            	if (handPart == MechPart.RightArm && rightArmActive || handPart == MechPart.LeftArm && leftArmActive) {
+//            		currentArmActive = true;
+//            	}
+//            	
+//            	BioMechPlayerData playerData = getDataForLocalPlayer();
+//            	if (playerData != null) {
+//            		
+//            		if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
+//        				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+//        			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(offHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
+//        				offHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+//        			}
+//        			ItemStack newRenderItem = mainHandRenderStack;
+//        			if (handPart == MechPart.LeftArm) {
+//        				newRenderItem = offHandRenderStack;
+//        			}
+//        			if (newRenderItem.getItem() instanceof ArmorBase base) {
+//        				if (isMechArmActive(playerData, handPart)) {
+//        					base.onHandTick(currentArmActive, newRenderItem, handPart, Minecraft.getInstance().getPartialTick());
+//        				}
+//    				}
+//            		
+//            	}
+//            	
+//    			
+//    		}
+//    	}
+    	
+    	public HandActiveStatus getLocalHandActiveStatus() {
+    		if (Minecraft.getInstance().player != null) {
+    			UUID localUuid = Minecraft.getInstance().player.getUUID();
+        		HandActiveStatus has = handActiveMap.computeIfAbsent(localUuid, (uuid) -> new HandActiveStatus());
+        		
+        		return has;
     		}
     		
-    		if (leftArmActive && event.isUseItem() && Minecraft.getInstance().options.keyUse.getKey().equals(HOTKEY_LEFT_ARM.getKey())) {
-    			event.setSwingHand(false);
-    			event.setCanceled(true);
-    		}
-    	}
-
-    	public boolean isRightMechArmActive(BioMechPlayerData playerData) {
-    		return !playerData.getForSlot(MechPart.RightArm).itemStack.isEmpty() && Minecraft.getInstance().player.getMainHandItem().isEmpty();
-    	}
-    	
-    	public boolean isLeftMechArmActive(BioMechPlayerData playerData) {
-    		return !playerData.getForSlot(MechPart.LeftArm).itemStack.isEmpty() && Minecraft.getInstance().player.getOffhandItem().isEmpty();
-    	}
-    	
-    	public boolean isMechArmActive(BioMechPlayerData playerData, MechPart part) {
-    		if (part == MechPart.RightArm) {
-    			return this.isRightMechArmActive(playerData);
-    		}
-    		else if (part == MechPart.LeftArm) {
-    			return this.isLeftMechArmActive(playerData);
-    		}
-    		return false;
-    	}
-    	
-    	public void clientHandTick() {
-    		if (Minecraft.getInstance().player == null)
-    			return;
-			
-    		float partialTick = Minecraft.getInstance().getPartialTick();
-    		InteractionHand[] hands = { InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND };
-    		
-    		for (InteractionHand hand : hands) {
-    			
-    			EquipmentSlot equipSlot = null;
-            	MechPart handPart = null;
-            	//if (event.getArm() == HumanoidArm.RIGHT) {
-            	if (hand == InteractionHand.MAIN_HAND) {
-            		handPart = MechPart.RightArm;
-            		equipSlot = EquipmentSlot.MAINHAND;
-            	//} else if (event.getArm() == HumanoidArm.LEFT) {
-            	} else if (hand == InteractionHand.OFF_HAND) {
-            		handPart = MechPart.LeftArm;
-            		equipSlot = EquipmentSlot.OFFHAND;
-            	}
-            	
-            	boolean currentArmActive = false;
-            	if (handPart == MechPart.RightArm && rightArmActive || handPart == MechPart.LeftArm && leftArmActive) {
-            		currentArmActive = true;
-            	}
-            	
-            	BioMechPlayerData playerData = getDataForLocalPlayer();
-            	if (playerData != null) {
-            		
-            		if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
-        				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
-        			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(offHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
-        				offHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
-        			}
-        			ItemStack newRenderItem = mainHandRenderStack;
-        			if (handPart == MechPart.LeftArm) {
-        				newRenderItem = offHandRenderStack;
-        			}
-        			if (newRenderItem.getItem() instanceof ArmorBase base) {
-    					base.onHandTick(currentArmActive, newRenderItem, handPart, Minecraft.getInstance().getPartialTick());
-    				}
-            		
-            	}
-            	
-    			
-    		}
+    		return null;
     	}
     	
     	public static boolean requireModifierKeyForArmUsage = true;
-    	boolean rightArmActive = false;
-    	boolean leftArmActive = false;
+    	//boolean rightArmActive = false;
+    	//boolean leftArmActive = false;
     	@SubscribeEvent
         public void onClientTick(final ClientTickEvent event) {
         	if (event.phase == TickEvent.Phase.START) {
-        		BioMechPlayerData playerData = this.getDataForLocalPlayer();
-        		if (playerData != null) {
-        			if (requireModifierKeyForArmUsage) {
-            			if (HOTKEY_ENABLE_ARM_FUNCTION.isDown()) {
-                			if (isRightMechArmActive(playerData) && HOTKEY_RIGHT_ARM.isDown()) {
-                				while (HOTKEY_RIGHT_ARM.consumeClick());
-                    			rightArmActive = true;
+        		HandActiveStatus has = this.getLocalHandActiveStatus();
+        		if (has != null) {
+        			boolean initialRight = has.rightHandActive;
+            		boolean initialLeft = has.leftHandActive;
+            		
+            		BioMechPlayerData playerData = this.getDataForLocalPlayer();
+            		if (playerData != null) {
+            			Player localPlayer = Minecraft.getInstance().player;
+            			if (requireModifierKeyForArmUsage) {
+                			if (HOTKEY_ENABLE_ARM_FUNCTION.isDown()) {
+                    			if (isRightMechArmActive(localPlayer, playerData) && HOTKEY_RIGHT_ARM.isDown()) {
+                    				while (HOTKEY_RIGHT_ARM.consumeClick());
+                    				has.rightHandActive = true;
+                        		}
+                    			
+                    			if (isLeftMechArmActive(localPlayer, playerData) && HOTKEY_LEFT_ARM.isDown()) {
+                    				while (HOTKEY_LEFT_ARM.consumeClick());
+                    				has.leftHandActive = true;
+                        		}
                     		}
-                			
-                			if (isLeftMechArmActive(playerData) && HOTKEY_LEFT_ARM.isDown()) {
-                				while (HOTKEY_LEFT_ARM.consumeClick());
-                    			leftArmActive = true;
+                    		if (!HOTKEY_RIGHT_ARM.isDown()) {
+                    			has.rightHandActive = false;
                     		}
-                		}
-                		if (!HOTKEY_RIGHT_ARM.isDown()) {
-                			rightArmActive = false;
-                		}
-                		
-                		if (!HOTKEY_LEFT_ARM.isDown()) {
-                			leftArmActive = false;
-                		}
-            		} else {
-            			if (isRightMechArmActive(playerData) && HOTKEY_RIGHT_ARM.isDown()) {
-                			rightArmActive = true;
+                    		
+                    		if (!HOTKEY_LEFT_ARM.isDown()) {
+                    			has.leftHandActive = false;
+                    		}
                 		} else {
-                			rightArmActive = false;
-                		}
-                		
-                		if (isLeftMechArmActive(playerData) && HOTKEY_LEFT_ARM.isDown()) {
-                			leftArmActive = true;
-                		} else {
-                			leftArmActive = false;
+                			if (isRightMechArmActive(localPlayer, playerData) && HOTKEY_RIGHT_ARM.isDown()) {
+                				has.rightHandActive = true;
+                    		} else {
+                    			has.rightHandActive = false;
+                    		}
+                    		
+                    		if (isLeftMechArmActive(localPlayer, playerData) && HOTKEY_LEFT_ARM.isDown()) {
+                    			has.leftHandActive = true;
+                    		} else {
+                    			has.leftHandActive= false;
+                    		}
                 		}
             		}
+            		
+            		if (initialRight != has.rightHandActive || initialLeft != has.leftHandActive) {
+            			//send HandActiveStatusPacket to server
+            		}
+            		//this.clientHandTick();
         		}
-        		
-        		this.clientHandTick();
         	}
         }
     	
@@ -495,8 +578,8 @@ public class BioMech
         
         public static boolean disableAllRenderingLogic = false;
         
-        ItemStack mainHandRenderStack = ItemStack.EMPTY;
-        ItemStack offHandRenderStack = ItemStack.EMPTY;
+        public static ItemStack mainHandRenderStack = ItemStack.EMPTY;
+        public static ItemStack offHandRenderStack = ItemStack.EMPTY;
         @SubscribeEvent
         public void onRenderFirstPersonHand(RenderHandEvent event) {
         	if (disableAllRenderingLogic)
@@ -517,30 +600,33 @@ public class BioMech
             		equipSlot = EquipmentSlot.OFFHAND;
             	}
             	
-            	boolean currentArmActive = false;
-            	if (handPart == MechPart.RightArm && rightArmActive || handPart == MechPart.LeftArm && leftArmActive) {
-            		currentArmActive = true;
-            	}
-            	if (playerData != null && handPart != null && equipSlot != null) {
-            		if (isMechArmActive(playerData, handPart) && playerData.getForSlot(handPart).visible) {
-            			if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
-            				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
-            			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(offHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
-            				offHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
-            			}
-            			ItemStack newRenderItem = mainHandRenderStack;
-            			if (handPart == MechPart.LeftArm) {
-            				newRenderItem = offHandRenderStack;
-            			}
-            			event.setCanceled(true);
-            			
-            			if (handPart == MechPart.LeftArm && hideOffHandWhileInactive && !currentArmActive) {
-            				return;
-            			}
-            			ItemInHandRenderer iihr = new ItemInHandRenderer(Minecraft.getInstance(), Minecraft.getInstance().getEntityRenderDispatcher(), Minecraft.getInstance().getItemRenderer());
-            			iihr.renderArmWithItem(Minecraft.getInstance().player, event.getPartialTick(), event.getInterpolatedPitch(), event.getHand(), 
-            					event.getSwingProgress(), newRenderItem, event.getEquipProgress(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
-            		}
+            	HandActiveStatus has = this.getLocalHandActiveStatus();
+            	if (has != null) {
+            		boolean currentArmActive = false;
+                	if (handPart == MechPart.RightArm && has.rightHandActive || handPart == MechPart.LeftArm && has.leftHandActive) {
+                		currentArmActive = true;
+                	}
+                	if (playerData != null && handPart != null && equipSlot != null) {
+                		if (isMechArmActive(Minecraft.getInstance().player, playerData, handPart) && playerData.getForSlot(handPart).visible) {
+                			if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
+                				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+                			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(offHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
+                				offHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+                			}
+                			ItemStack newRenderItem = mainHandRenderStack;
+                			if (handPart == MechPart.LeftArm) {
+                				newRenderItem = offHandRenderStack;
+                			}
+                			event.setCanceled(true);
+                			
+                			if (handPart == MechPart.LeftArm && hideOffHandWhileInactive && !currentArmActive) {
+                				return;
+                			}
+                			ItemInHandRenderer iihr = new ItemInHandRenderer(Minecraft.getInstance(), Minecraft.getInstance().getEntityRenderDispatcher(), Minecraft.getInstance().getItemRenderer());
+                			iihr.renderArmWithItem(Minecraft.getInstance().player, event.getPartialTick(), event.getInterpolatedPitch(), event.getHand(), 
+                					event.getSwingProgress(), newRenderItem, event.getEquipProgress(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
+                		}
+                	}
             	}
         	}
         	catch (Exception e) {

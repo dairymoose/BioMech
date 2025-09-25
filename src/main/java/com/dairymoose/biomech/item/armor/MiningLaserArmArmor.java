@@ -29,6 +29,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public abstract class MiningLaserArmArmor extends ArmorBase {
@@ -43,15 +45,19 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 	}
 
 	@Override
-	public void onHandTick(boolean active, ItemStack itemStack, MechPart handPart, float partialTick) {
+	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick) {
 		if (active) {
-			// laser.dispatcher.mining(Minecraft.getInstance().player, itemStack);
-
 			AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
 			if (anim != null) {
 				AzBakedAnimation startUsing = anim.getAnimation(itemStack, MiningLaserDispatcher.START_USING_COMMAND.animationName);
 				int useTicks = itemStack.getTag().getInt("useTicks");
-				++useTicks;
+				if (FMLEnvironment.dist == Dist.CLIENT) {
+					if (player.level().isClientSide)
+						++useTicks;
+				} else {
+					++useTicks;
+				}
+
 				itemStack.getTag().putInt("useTicks", useTicks);
 				if (useTicks <= (int) startUsing.length()) {
 					BioMech.LOGGER.info("useTicks=" + useTicks);
@@ -61,19 +67,15 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 					BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.MINING_COMMAND.command);
 					// send packet to server asking for mining anim
 
-					HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(Minecraft.getInstance().player,
-							(e) -> true, Minecraft.getInstance().player.getBlockReach() * 1.2);
-					// BlockHitResult bhr = Minecraft.getInstance().player.level().clip(new
-					// ClipContext(Minecraft.getInstance().player.getEyePosition(),
-					// Minecraft.getInstance().player.getViewVector(event.getPartialTick()),
-					// ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
+					HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
+							(e) -> true, player.getBlockReach() * 1.2);
 
 					double handMult = 1.0;
 					if (handPart == MechPart.RightArm)
 						handMult = -1.0;
-					Vec3 viewVec = Minecraft.getInstance().player.getViewVector(partialTick);
+					Vec3 viewVec = player.getViewVector(partialTick);
 					Vec3 perpendicular = new Vec3(viewVec.z, 0.0, -viewVec.x);
-					Vec3 startLoc = Minecraft.getInstance().player.getEyePosition(partialTick).add(0.0, -0.2, 0.0)
+					Vec3 startLoc = player.getEyePosition(partialTick).add(0.0, -0.2, 0.0)
 							.add(perpendicular.scale(0.22f * handMult));
 					Vec3 endLoc = hitResult.getLocation();
 					if (hitResult instanceof EntityHitResult ehr) {
