@@ -34,7 +34,9 @@ import com.dairymoose.biomech.item.armor.MiningLaserArmArmor;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
+import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
+import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
 import com.dairymoose.biomech.particle.LaserParticle;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -191,6 +193,8 @@ public class BioMech
 	    
 	    int msgId = 0;
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundUpdateSlottedItemPacket.class, ClientboundUpdateSlottedItemPacket::write, ClientboundUpdateSlottedItemPacket::new, ClientboundUpdateSlottedItemPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundHandStatusPacket.class, ServerboundHandStatusPacket::write, ServerboundHandStatusPacket::new, ServerboundHandStatusPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundHandStatusPacket.class, ClientboundHandStatusPacket::write, ClientboundHandStatusPacket::new, ClientboundHandStatusPacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -295,9 +299,13 @@ public class BioMech
 			else if (hand == InteractionHand.OFF_HAND)
 				handPart = MechPart.LeftArm;
 			
+			boolean bothHandsInactive = false;
 			boolean currentArmActive = false;
 			if (handPart == MechPart.RightArm && has.rightHandActive || handPart == MechPart.LeftArm && has.leftHandActive) {
 				currentArmActive = true;
+			}
+			if (!has.leftHandActive && !has.rightHandActive) {
+				bothHandsInactive = true;
 			}
 			
 			ItemStack itemStack = playerData.getForSlot(handPart).itemStack;
@@ -305,7 +313,7 @@ public class BioMech
 				if (isMechArmActive(player, playerData, handPart)) {
 					itemStack = getFirstPersonArmItemStack(itemStack, handPart);
 					float partialTick = 1.0f;
-					base.onHandTick(currentArmActive, itemStack, player, handPart, partialTick);
+					base.onHandTick(currentArmActive, itemStack, player, handPart, partialTick, bothHandsInactive);
 				}
 			}
 		}
@@ -570,9 +578,8 @@ public class BioMech
             		}
             		
             		if (initialRight != has.rightHandActive || initialLeft != has.leftHandActive) {
-            			//send HandActiveStatusPacket to server
+            			BioMechNetwork.INSTANCE.sendToServer(new ServerboundHandStatusPacket(has));
             		}
-            		//this.clientHandTick();
         		}
         	}
         }

@@ -22,6 +22,10 @@ public class BioMechPlayerData {
 	public SlottedItem rightArm = new SlottedItem(MechPart.RightArm);
 	public SlottedItem back = new SlottedItem(MechPart.Back);
 	
+	public static String ITEMS = "Items";
+	public static String SLOT = "Slot";
+	public static String VISIBLE = "Visible";
+	
 	public static class SlottedItem {
 		public SlottedItem(MechPart mechPart) {
 			this.itemStack = ItemStack.EMPTY;
@@ -100,13 +104,13 @@ public class BioMechPlayerData {
 					CompoundTag itemTag = new CompoundTag(); 
 					slotted.itemStack.save(itemTag);
 					slotTag.put("Item", itemTag);
-					slotTag.putBoolean("Visible", slotted.visible);
-					items.put(slotted.mechPart.name() + "Slot", slotTag);
+					slotTag.putBoolean(VISIBLE, slotted.visible);
+					items.put(slotted.mechPart.name() + SLOT, slotTag);
 				}
 			}
 		);
 		
-		result.put("Items", items);
+		result.put(ITEMS, items);
 		return result;
 	}
 	
@@ -131,19 +135,19 @@ public class BioMechPlayerData {
 	public static BioMechPlayerData deserialize(CompoundTag tag) {
 		BioMechPlayerData data = null;
 		if (tag != null) {
-			CompoundTag items = tag.getCompound("Items");
+			CompoundTag items = tag.getCompound(ITEMS);
 			if (items != null) {
 				data = new BioMechPlayerData();
 				MechPart[] parts = MechPart.values();
 				for (MechPart part : parts) {
-					CompoundTag slottedItemTag = items.getCompound(part.name() + "Slot");
+					CompoundTag slottedItemTag = items.getCompound(part.name() + SLOT);
 					if (slottedItemTag != null) {
 						SlottedItem slottedItem = new SlottedItem(part);
 						
 						CompoundTag itemStackTag = slottedItemTag.getCompound("Item");
 						slottedItem.itemStack = ItemStack.of(itemStackTag);
 						
-						boolean visible = slottedItemTag.getBoolean("Visible");
+						boolean visible = slottedItemTag.getBoolean(VISIBLE);
 						slottedItem.visible = visible;
 						
 						data.getAllSlots().set(part.ordinal(), slottedItem);

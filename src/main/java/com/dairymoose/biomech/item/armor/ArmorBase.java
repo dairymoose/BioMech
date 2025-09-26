@@ -52,7 +52,7 @@ public class ArmorBase extends ArmorItem {
 		super(NOTHING_MATERIAL, type, props);
 	}
 	
-	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick) {
+	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick, boolean bothHandsInactive) {
 		
 	}
 	
