@@ -1,14 +1,11 @@
 package com.dairymoose.biomech.particle;
 
-import com.dairymoose.biomech.BioMech;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 
-import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
@@ -26,7 +23,7 @@ public class LaserParticle extends TextureSheetParticle {
       super(p_105773_, p_105774_, p_105775_, p_105776_);
       this.setSize(0.02F, 0.02F);
       this.quadSize *= this.random.nextFloat() * 0.12F + 0.05F;
-      this.quadSize *= 0.7f;
+      this.quadSize *= 0.65f;
       this.xd = p_105777_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;
       this.yd = p_105778_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;
       this.zd = p_105779_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;

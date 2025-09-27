@@ -36,6 +36,8 @@ import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
 import com.dairymoose.biomech.particle.LaserParticle;
+import com.dairymoose.biomech.particle.ThickerLaserParticle;
+import com.dairymoose.biomech.particle.ThickestLaserParticle;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
@@ -417,7 +419,8 @@ public class BioMech
         @SubscribeEvent
         public static void onRegisterParticle(RegisterParticleProvidersEvent event) {
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_LASER.get(), LaserParticle.Provider::new);
-        	//event.registerSpecial(BioMechRegistry.PARTICLE_TYPE_LASER.get(), LaserParticle.Provider::createParticle);
+        	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_THICKER_LASER.get(), ThickerLaserParticle.Provider::new);
+        	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_THICKEST_LASER.get(), ThickestLaserParticle.Provider::new);
         }
         
     	@SubscribeEvent

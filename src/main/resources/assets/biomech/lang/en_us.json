@@ -23,7 +23,7 @@
 	"item.biomech.mining_laser_arm": "§5Mining Laser Arm§0",
 	"item.biomech.mining_laser_arm.tooltip1": "Hold alt+mouse click to activate.",
 	"item.biomech.mining_laser_arm.tooltip2": "Hold to mine any pickaxe-mineable block.",
-	"item.biomech.mining_laser_arm.tooltip3": "The longer you hold the beam, the stronger it becomes.  Max 10 seconds (up to 3x faster).",
+	"item.biomech.mining_laser_arm.tooltip3": "The longer you hold the beam, the stronger it becomes.  Max 8 seconds (up to 3x faster).",
 		
 	"item.biomech.mining_laser_left_arm": "§7Left Mining Laser Arm§0",
 	

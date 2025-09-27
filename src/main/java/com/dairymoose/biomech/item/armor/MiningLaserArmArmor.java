@@ -54,6 +54,11 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 		public static float progressMax = 100.0f;
 	}
 	
+	public float getLaserPower(int useTicks) {
+		return Math.min(useTicks / (float)(SECONDS_UNTIL_MAX_LASER*20), 1.0f);
+	}
+	
+	public int SECONDS_UNTIL_MAX_LASER = 8;
 	public static float minSpeedMult = 3.2f;
 	public static float maxSpeedMult = minSpeedMult * 3.0f;
 	public static double blockReachMult = 1.3;
@@ -120,12 +125,22 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 							}
 							Vec3 endToStartVec = endLoc.subtract(startLoc);
 							int max = (int) (endToStartVec.length() * 16);
-							double startDist = 0.075;
+							double startDist = 0.07;
 							for (int i = 0; i < max; ++i) {
 								double vecScale = startDist + (i + 1) * 1.0f / max;
 								Vec3 loc = startLoc.add(endToStartVec.scale(vecScale));
+								
+								float power = this.getLaserPower(useTicks);
+								ParticleOptions laserParticle = null;
+								if (power <= 0.33f) {
+									laserParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_LASER.get();
+								} else if (power <= 0.66f) {
+									laserParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_THICKER_LASER.get();
+								} else {
+									laserParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_THICKEST_LASER.get();
+								}
 								Minecraft.getInstance().level.addParticle(
-										(ParticleOptions) BioMechRegistry.PARTICLE_TYPE_LASER.get(), loc.x, loc.y,
+										laserParticle, loc.x, loc.y,
 										loc.z, viewVec.scale(vecScale).x, viewVec.scale(vecScale).y,
 										viewVec.scale(vecScale).z);
 							}
@@ -168,7 +183,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 									float blockDestroySpeed = blockState.getDestroySpeed(player.level(), dbp.pos);
 									float toolSpeed = miningTool.getDestroySpeed(blockState);
 									float miningSpeed = (toolSpeed / blockDestroySpeed);
-									float speedMult = Mth.lerp(Math.min(useTicks / 200.0f, 1.0f), minSpeedMult,
+									float speedMult = Mth.lerp(this.getLaserPower(useTicks), minSpeedMult,
 											maxSpeedMult);
 									dbp.progress += miningSpeed * speedMult;
 									player.level().destroyBlockProgress(0, dbp.pos,
