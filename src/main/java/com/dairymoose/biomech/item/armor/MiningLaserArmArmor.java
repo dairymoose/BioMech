@@ -96,17 +96,17 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 						if (useTicks <= START_USING_TICK_COUNT) {
 							// BioMech.LOGGER.info("useTicks=" + useTicks);
 							BioMech.clientSideItemAnimation(itemStack,
-									MiningLaserDispatcher.START_USING_COMMAND.command);
+									MiningLaserDispatcher.START_USING_COMMAND.cmd);
 							// send packet to server asking for start_using anim
 
 							BioMech.clientSideItemAnimation(thirdPersonItemStack,
-									MiningLaserDispatcher.START_USING_3D_COMMAND.command);
+									MiningLaserDispatcher.START_USING_3D_COMMAND.cmd);
 							player.setYBodyRot(player.getYHeadRot());
 						} else {
-							BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.MINING_COMMAND.command);
+							BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.MINING_COMMAND.cmd);
 							// send packet to server asking for mining anim
 							BioMech.clientSideItemAnimation(thirdPersonItemStack,
-									MiningLaserDispatcher.MINING_3D_COMMAND.command);
+									MiningLaserDispatcher.MINING_3D_COMMAND.cmd);
 							player.setYBodyRot(player.getYHeadRot());
 
 							HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
@@ -226,7 +226,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 				if (thirdPersonItemStack.getTag() != null && thirdPersonItemStack.getTag().contains("useTicks")) {
 					thirdPersonItemStack.getTag().putInt("useTicks", 0);
 					if (player.level().isClientSide) {
-						BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.PASSIVE_COMMAND.command);
+						BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.PASSIVE_COMMAND.cmd);
 					}
 					// send packet to server asking for passive anim
 				}
@@ -252,15 +252,15 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 					if (entity instanceof LivingEntity living && !living.isSpectator()) {
 						if (level.isClientSide) {
 							if (player.getMainHandItem().isEmpty() && stack.getItem() instanceof MiningLaserRightArmArmor) {
-								BioMech.clientSideItemAnimation(stack, MiningLaserDispatcher.PASSIVE_COMMAND.command);
+								BioMech.clientSideItemAnimation(stack, MiningLaserDispatcher.PASSIVE_COMMAND.cmd);
 								//this.dispatcher.passive(entity, stack);
 							}
 							else if (player.getOffhandItem().isEmpty() && stack.getItem() instanceof MiningLaserLeftArmArmor) {
-								BioMech.clientSideItemAnimation(stack, MiningLaserDispatcher.PASSIVE_COMMAND.command);
+								BioMech.clientSideItemAnimation(stack, MiningLaserDispatcher.PASSIVE_COMMAND.cmd);
 								//this.dispatcher.passive(entity, stack);
 							}
 							else {
-								BioMech.clientSideItemAnimation(stack, MiningLaserDispatcher.INERT_COMMAND.command);
+								BioMech.clientSideItemAnimation(stack, MiningLaserDispatcher.INERT_COMMAND.cmd);
 								//this.dispatcher.inert(entity, stack);
 							}
 						}

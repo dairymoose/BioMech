@@ -7,7 +7,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class AnimCommand {
 
-	public final AzCommand command;
+	public final AzCommand cmd;
 	public final String controllerName;
 	public final String animationName;
 	public final AzPlayBehavior playBehavior;
@@ -16,11 +16,11 @@ public class AnimCommand {
 		this.controllerName = controllerName;
 		this.animationName = animationName;
 		this.playBehavior = playBehavior;
-		command = AzCommand.create(controllerName, animationName, playBehavior);
+		cmd = AzCommand.create(controllerName, animationName, playBehavior);
 	}
 	
 	public void sendForItem(Entity entity, ItemStack itemStack) {
-		command.sendForItem(entity, itemStack);
+		cmd.sendForItem(entity, itemStack);
 	}
 	
 }
