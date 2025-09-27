@@ -10,7 +10,6 @@ import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.item.anim.MiningLaserDispatcher;
-import com.dairymoose.biomech.particle.LaserParticle;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -126,7 +125,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 								double vecScale = startDist + (i + 1) * 1.0f / max;
 								Vec3 loc = startLoc.add(endToStartVec.scale(vecScale));
 								Minecraft.getInstance().level.addParticle(
-										new LaserParticle(null, useTicks, handMult, max, startDist, i, vecScale), loc.x, loc.y,
+										(ParticleOptions) BioMechRegistry.PARTICLE_TYPE_LASER.get(), loc.x, loc.y,
 										loc.z, viewVec.scale(vecScale).x, viewVec.scale(vecScale).y,
 										viewVec.scale(vecScale).z);
 							}
