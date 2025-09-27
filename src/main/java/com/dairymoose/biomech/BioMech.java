@@ -26,6 +26,8 @@ import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
+import com.dairymoose.biomech.item.BioMechActivator;
+import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
@@ -378,12 +380,16 @@ public class BioMech
     public static boolean isRightMechArmActive(Player player, BioMechPlayerData playerData) {
     	if (player == null)
     		return false;
+    	if (player.getMainHandItem().getItem() instanceof BioMechActivator)
+    		return true;
 		return !playerData.getForSlot(MechPart.RightArm).itemStack.isEmpty() && player.getMainHandItem().isEmpty();
 	}
 	
 	public static boolean isLeftMechArmActive(Player player, BioMechPlayerData playerData) {
 		if (player == null)
     		return false;
+		if (player.getMainHandItem().getItem() instanceof BioMechActivator || player.getOffhandItem().getItem() instanceof BioMechActivator)
+    		return true;
 		return !playerData.getForSlot(MechPart.LeftArm).itemStack.isEmpty() && player.getOffhandItem().isEmpty();
 	}
 	
@@ -609,6 +615,17 @@ public class BioMech
                 		currentArmActive = true;
                 	}
                 	if (playerData != null && handPart != null && equipSlot != null) {
+                		if (!(Minecraft.getInstance().player.getMainHandItem().getItem() instanceof BioMechActivator)) {
+                			if ((Minecraft.getInstance().player.getMainHandItem().getItem() instanceof BioMechDeactivator && 
+                    				(event.getHand() == InteractionHand.MAIN_HAND || (event.getHand() == InteractionHand.OFF_HAND && Minecraft.getInstance().player.getOffhandItem().isEmpty())))
+                    				
+                    				||
+                    				
+                    				(Minecraft.getInstance().player.getOffhandItem().getItem() instanceof BioMechDeactivator && event.getHand() == InteractionHand.OFF_HAND)) {
+                    			event.setCanceled(true);
+                    			return;
+                    		}
+                		}
                 		if (isMechArmActive(Minecraft.getInstance().player, playerData, handPart) && playerData.getForSlot(handPart).visible) {
                 			if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
                 				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
@@ -698,6 +715,21 @@ public class BioMech
         		    poseStack.translate(0.0F, -1.501F, 0.0F);
         		    
         		    priorItems.clear();
+        		    class ActivatorStatus {
+        		    	boolean hasMainHandActivator = false;
+            		    boolean hasOffHandActivator = false;
+        		    }
+        		    ActivatorStatus as = new ActivatorStatus();
+        		    if (renderEntity.getMainHandItem().getItem() instanceof BioMechActivator || renderEntity.getMainHandItem().getItem() instanceof BioMechDeactivator) {
+        		    	as.hasMainHandActivator = true;
+        		    	priorItems.put(EquipmentSlot.MAINHAND, renderEntity.getMainHandItem());
+        		    	renderEntity.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+        		    }
+        		    if (renderEntity.getOffhandItem().getItem() instanceof BioMechActivator || renderEntity.getOffhandItem().getItem() instanceof BioMechDeactivator) {
+        		    	as.hasOffHandActivator = true;
+        		    	priorItems.put(EquipmentSlot.OFFHAND, renderEntity.getOffhandItem());
+        		    	renderEntity.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+        		    }
         		    BioMechPlayerData playerData = BioMech.globalPlayerData.get(renderEntity.getUUID());
         		    if (playerData != null) {
         		    	playerData.getAllSlots().forEach((slottedItem) -> {
@@ -728,6 +760,13 @@ public class BioMech
             		    			
         		    				poseStack.pushPose();
         		    				HandActiveStatus has = handActiveMap.computeIfAbsent(event.getEntity().getUUID(), (uuid) -> new HandActiveStatus());
+        		    				//activator item moves the arm forward slightly, we'll undo that here
+        		    				if (slottedItem.mechPart == MechPart.RightArm && as.hasMainHandActivator) {
+        		    					poseStack.mulPose(Axis.XP.rotationDegrees(15.0f));
+        		    				}
+        		    				if (slottedItem.mechPart == MechPart.LeftArm && as.hasOffHandActivator) {
+        		    					poseStack.mulPose(Axis.XP.rotationDegrees(15.0f));
+        		    				}
         		    				if (slottedItem.mechPart == MechPart.RightArm && has.rightHandActive) {
         		    					poseStack.mulPose(Axis.XP.rotationDegrees(renderEntity.getXRot()));
         		    				} else if (slottedItem.mechPart == MechPart.LeftArm && has.leftHandActive) {

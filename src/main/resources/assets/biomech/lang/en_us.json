@@ -5,6 +5,9 @@
 	"item.biomech.generic.tooltip2": "§aRequires BioMech Suit§0",
 	"tooltip.biomech.suitenergy": "Suit Energy",
 
+	"item.biomech.biomech_activator": "BioMech Activator",
+	"item.biomech.biomech_deactivator": "BioMech Deactivator",
+	
 	"item.biomech.power_leggings": "§5Power Leggings§0",
 	"item.biomech.power_leggings.tooltip1": "Crouch to store kinetic power.",
 	"item.biomech.power_leggings.tooltip2": "After a half-second, you gain increased jump height.",
