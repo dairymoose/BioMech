@@ -120,8 +120,8 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 									.add(perpendicular.scale(0.22f * handMult));
 							Vec3 endLoc = hitResult.getLocation();
 							if (hitResult instanceof EntityHitResult ehr) {
-								endLoc = ehr.getEntity().getPosition(1.0f).add(0.0,
-										ehr.getEntity().getEyeHeight() / 2.0, 0.0);
+								Vec3 vecToEntity = ehr.getLocation().subtract(player.position());
+								endLoc = player.getEyePosition(partialTick).add(viewVec.scale(vecToEntity.length()));
 							}
 							Vec3 endToStartVec = endLoc.subtract(startLoc);
 							int max = (int) (endToStartVec.length() * 16);
@@ -181,6 +181,16 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 										player.level().destroyBlock(dbp.pos, true);
 										dbp.pos = null;
 										dbp.progress = 0;
+									}
+								}
+							} else if (hitResult instanceof EntityHitResult ehr) {
+								Entity e = ehr.getEntity();
+								if (e instanceof LivingEntity living) {
+									if (!living.isInvulnerable() && !living.fireImmune()) {
+										living.hurt(player.level().damageSources().onFire(), 1.0f);
+										if (living.getRemainingFireTicks() <= 40) {
+											living.setRemainingFireTicks(40);
+										}
 									}
 								}
 							}

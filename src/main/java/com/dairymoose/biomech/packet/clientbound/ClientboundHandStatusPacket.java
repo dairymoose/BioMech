@@ -52,7 +52,7 @@ public class ClientboundHandStatusPacket implements Packet<net.minecraft.network
 	
 	@SuppressWarnings("deprecation")
 	public void handle(net.minecraft.network.protocol.game.ClientGamePacketListener handler) {
-		BioMech.LOGGER.debug("Handle ClientboundHandStatusPacket");
+		BioMech.LOGGER.trace("Handle ClientboundHandStatusPacket");
 		if (handler instanceof net.minecraft.client.multiplayer.ClientPacketListener) {
 			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
 				@Override

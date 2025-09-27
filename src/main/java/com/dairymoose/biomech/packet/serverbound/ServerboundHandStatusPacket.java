@@ -47,7 +47,7 @@ public class ServerboundHandStatusPacket implements Packet<ServerGamePacketListe
 	}
 	
 	public void handle(ServerGamePacketListener packetListener) {
-		BioMech.LOGGER.debug("Handle ServerboundHandStatusPacket");
+		BioMech.LOGGER.trace("Handle ServerboundHandStatusPacket");
 		if (packetListener instanceof ServerGamePacketListenerImpl) {
 			ServerGamePacketListenerImpl serverHandler = (ServerGamePacketListenerImpl)packetListener;
 			Level world = serverHandler.player.level();
