@@ -10,10 +10,8 @@ import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.item.anim.MiningLaserDispatcher;
+import com.dairymoose.biomech.particle.LaserParticle;
 
-import mod.azure.azurelib.rewrite.animation.AzAnimator;
-import mod.azure.azurelib.rewrite.animation.AzAnimatorAccessor;
-import mod.azure.azurelib.rewrite.animation.primitive.AzBakedAnimation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -21,7 +19,6 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -31,8 +28,6 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -60,10 +55,11 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 		public static float progressMax = 100.0f;
 	}
 	
-	public static float minSpeedMult = 3.0f;
+	public static float minSpeedMult = 3.2f;
 	public static float maxSpeedMult = minSpeedMult * 3.0f;
 	public static double blockReachMult = 1.3;
 	private static ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
+	public static int START_USING_TICK_COUNT = 5;
 	Map<Player, DestroyBlockProgress> dbpMap = new HashMap<>();
 	@Override
 	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick,
@@ -75,14 +71,14 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 			ItemStack thirdPersonItemStack = BioMech.getThirdPersonArmItemStack(playerData, handPart);
 			if (active) {
 				// if third person view is active, this will work
-				AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(thirdPersonItemStack);
-				if (anim == null) {
+				//AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(thirdPersonItemStack);
+				//if (anim == null) {
 					// if first person view is active, this will work
-					anim = AzAnimatorAccessor.getOrNull(itemStack);
-				}
-				if (anim != null) {
-					AzBakedAnimation startUsing = anim.getAnimation(itemStack,
-							MiningLaserDispatcher.START_USING_COMMAND.animationName);
+					//anim = AzAnimatorAccessor.getOrNull(itemStack);
+				//}
+				//if (anim != null) {
+					//AzBakedAnimation startUsing = anim.getAnimation(itemStack,
+					//		MiningLaserDispatcher.START_USING_COMMAND.animationName);
 					int useTicks = thirdPersonItemStack.getTag().getInt("useTicks");
 					if (FMLEnvironment.dist == Dist.CLIENT) {
 						if (player.level().isClientSide)
@@ -93,7 +89,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 
 					thirdPersonItemStack.getTag().putInt("useTicks", useTicks);
 					if (player.level().isClientSide) {
-						if (useTicks <= (int) startUsing.length()) {
+						if (useTicks <= START_USING_TICK_COUNT) {
 							// BioMech.LOGGER.info("useTicks=" + useTicks);
 							BioMech.clientSideItemAnimation(itemStack,
 									MiningLaserDispatcher.START_USING_COMMAND.command);
@@ -130,7 +126,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 								double vecScale = startDist + (i + 1) * 1.0f / max;
 								Vec3 loc = startLoc.add(endToStartVec.scale(vecScale));
 								Minecraft.getInstance().level.addParticle(
-										(ParticleOptions) BioMechRegistry.PARTICLE_TYPE_LASER.get(), loc.x, loc.y,
+										new LaserParticle(null, useTicks, handMult, max, startDist, i, vecScale), loc.x, loc.y,
 										loc.z, viewVec.scale(vecScale).x, viewVec.scale(vecScale).y,
 										viewVec.scale(vecScale).z);
 							}
@@ -139,11 +135,13 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 								BlockPos pos = bhr.getBlockPos();
 								BlockState state = Minecraft.getInstance().level.getBlockState(pos);
 								if (!state.isAir()) {
+									float blockDestroySpeed = state.getDestroySpeed(player.level(), pos);
+									
 									ParticleType particles = ForgeRegistries.PARTICLE_TYPES
 											.getValue(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.BLOCK));
-									if (particles != null) {
+									if (particles != null && blockDestroySpeed > 0.0f) {
 										BlockParticleOption blockParticle = new BlockParticleOption(ParticleTypes.BLOCK, state);
-										for (int i = 0; i < 4; ++i) {
+										for (int i = 0; i < 3; ++i) {
 											Minecraft.getInstance().level.addParticle(blockParticle,
 													endLoc.x + (Math.random() * 1.0 - 0.5),
 													endLoc.y + (Math.random() * 1.0 - 0.5),
@@ -156,7 +154,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 					}
 
 					if (!player.level().isClientSide) {
-						if (active && useTicks >= (int) startUsing.length()) {
+						if (active && useTicks >= START_USING_TICK_COUNT) {
 							HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player, (e) -> !(e instanceof ItemEntity) && !e.isSpectator(),
 									player.getBlockReach() * blockReachMult);
 							if (hitResult instanceof BlockHitResult bhr) {
@@ -205,13 +203,15 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 							}
 						}
 					}
-				} else {
-					BioMech.LOGGER.error("Could not get animator for item: " + itemStack);
-				}
+				//} else {
+				//	BioMech.LOGGER.error("Could not get animator for item: " + itemStack);
+				//}
 			} else {
 				if (thirdPersonItemStack.getTag() != null && thirdPersonItemStack.getTag().contains("useTicks")) {
 					thirdPersonItemStack.getTag().putInt("useTicks", 0);
-					BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.PASSIVE_COMMAND.command);
+					if (player.level().isClientSide) {
+						BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.PASSIVE_COMMAND.command);
+					}
 					// send packet to server asking for passive anim
 				}
 			}

@@ -22,7 +22,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class LaserParticle extends TextureSheetParticle {
-	LaserParticle(ClientLevel p_105773_, double p_105774_, double p_105775_, double p_105776_, double p_105777_, double p_105778_, double p_105779_) {
+	public LaserParticle(ClientLevel p_105773_, double p_105774_, double p_105775_, double p_105776_, double p_105777_, double p_105778_, double p_105779_) {
       super(p_105773_, p_105774_, p_105775_, p_105776_);
       this.setSize(0.02F, 0.02F);
       this.quadSize *= this.random.nextFloat() * 0.12F + 0.05F;
