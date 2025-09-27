@@ -37,12 +37,53 @@
 				}
 			}
 		},
+		"animation.mining_laser_right_arm.start_using_third_person": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.25,
+			"bones": {
+				"mech": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.25": {
+							"vector": [-85, 0, 0]
+						}
+					}
+				},
+				"drillhead": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, "query.anim_time*20", 0]
+						},
+						"0.25": {
+							"vector": [0, "query.anim_time*1200", 0]
+						}
+					}
+				}
+			}
+		},
 		"animation.mining_laser_right_arm.mining": {
 			"loop": true,
 			"bones": {
 				"mech": {
 					"rotation": {
 						"vector": [50, 0, 0]
+					}
+				},
+				"drillhead": {
+					"rotation": {
+						"vector": [0, "query.anim_time*1200", 0]
+					}
+				}
+			}
+		},
+		"animation.mining_laser_right_arm.mining_third_person": {
+			"loop": true,
+			"bones": {
+				"mech": {
+					"rotation": {
+						"vector": [-85, 0, 0]
 					}
 				},
 				"drillhead": {

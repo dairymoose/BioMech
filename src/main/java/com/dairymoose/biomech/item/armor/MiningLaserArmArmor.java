@@ -100,12 +100,14 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 							// send packet to server asking for start_using anim
 
 							BioMech.clientSideItemAnimation(thirdPersonItemStack,
-									MiningLaserDispatcher.START_USING_COMMAND.command);
+									MiningLaserDispatcher.START_USING_3D_COMMAND.command);
+							player.setYBodyRot(player.getYHeadRot());
 						} else {
 							BioMech.clientSideItemAnimation(itemStack, MiningLaserDispatcher.MINING_COMMAND.command);
 							// send packet to server asking for mining anim
 							BioMech.clientSideItemAnimation(thirdPersonItemStack,
-									MiningLaserDispatcher.MINING_COMMAND.command);
+									MiningLaserDispatcher.MINING_3D_COMMAND.command);
+							player.setYBodyRot(player.getYHeadRot());
 
 							HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
 									(e) -> !(e instanceof ItemEntity) && !e.isSpectator(),
@@ -116,8 +118,8 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 								handMult = -1.0;
 							Vec3 viewVec = player.getViewVector(partialTick);
 							Vec3 perpendicular = new Vec3(viewVec.z, 0.0, -viewVec.x);
-							Vec3 startLoc = player.getEyePosition(partialTick).add(0.0, -0.2, 0.0)
-									.add(perpendicular.scale(0.22f * handMult));
+							Vec3 startLoc = player.getEyePosition(partialTick).add(0.0, -0.28, 0.0)
+									.add(perpendicular.scale(0.32f * handMult));
 							Vec3 endLoc = hitResult.getLocation();
 							if (hitResult instanceof EntityHitResult ehr) {
 								Vec3 vecToEntity = ehr.getLocation().subtract(player.position());

@@ -726,7 +726,15 @@ public class BioMech
         		    					event.getEntity().setItemSlot(EquipmentSlot.FEET, ItemStack.EMPTY);
         		    				}
             		    			
+        		    				poseStack.pushPose();
+        		    				HandActiveStatus has = handActiveMap.computeIfAbsent(event.getEntity().getUUID(), (uuid) -> new HandActiveStatus());
+        		    				if (slottedItem.mechPart == MechPart.RightArm && has.rightHandActive) {
+        		    					poseStack.mulPose(Axis.XP.rotationDegrees(renderEntity.getXRot()));
+        		    				} else if (slottedItem.mechPart == MechPart.LeftArm && has.leftHandActive) {
+        		    					poseStack.mulPose(Axis.XP.rotationDegrees(renderEntity.getXRot()));
+        		    				}
                         		    hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, equipmentSlot, event.getPackedLight(), armorModel);
+                        		    poseStack.popPose();
                         		    if (slottedItem.mechPart == MechPart.LeftArm || slottedItem.mechPart == MechPart.RightArm || slottedItem.mechPart == MechPart.Back) {
                         		    	event.getEntity().setItemSlot(equipmentSlot, priorItem);
                         		    } else {
