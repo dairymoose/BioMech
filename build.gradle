@@ -160,7 +160,7 @@ dependencies {
 	annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
 	implementation fg.deobf("curse.maven:jei-238222:6075247")
-	implementation fg.deobf("curse.maven:configured-457570:5180900")
+	implementation fg.deobf("curse.maven:config-menus-forge-544048:4672356")
 	implementation fg.deobf("curse.maven:optiscale-581183:5193019")
 	implementation fg.deobf("curse.maven:xaeros-minimap-263420:5262365")
 	implementation fg.deobf("curse.maven:xaeros-world-map-317780:5262424")

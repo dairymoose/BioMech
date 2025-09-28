@@ -1,6 +1,7 @@
 package com.dairymoose.biomech;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,6 +69,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -82,6 +84,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.entries.EntryGroup;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.minecraft.world.level.storage.loot.functions.LootItemFunction.Builder;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.InputEvent;
@@ -91,23 +103,32 @@ import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.LootTableLoadEvent;
+import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.event.server.ServerLifecycleEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(BioMech.MODID)
@@ -201,12 +222,69 @@ public class BioMech
 			}
 		}
 	}
-
+    
     private void commonSetup(final FMLCommonSetupEvent event)
     {
-        BioMechConfig.reinit();
-        
         AzureLib.initialize();
+    }
+   
+    Float lootBioMechInChest = null;
+    Float lootBioMechInMineshaft = null;
+    @SubscribeEvent
+    public void onAlterLootTable(LootTableLoadEvent event) {
+    	if (lootBioMechInChest == null) {
+    		File f = BioMechConfig.getBiomechEarlyConfigFile();
+    		CompoundTag tag = null;
+    		try {
+    			tag = NbtIo.read(f);
+    		} catch (IOException e) {
+    			BioMech.LOGGER.error("Failed to read early config file biomech.cfg");
+    		}
+    		lootBioMechInChest = 0.05f;
+    		lootBioMechInMineshaft = 0.33f;
+    		boolean gotGlobalConfigValue = false;
+    		boolean gotMineshaftConfigValue = false;
+    		if (tag != null) {
+    			if (tag.contains("lootBioMechInChest")) {
+    				lootBioMechInChest = (float) tag.getDouble("lootBioMechInChest");
+    				BioMech.LOGGER.info("Got lootBioMechInChest value of " + lootBioMechInChest + " from file");
+    				gotGlobalConfigValue = true;
+    			}
+    			if (tag.contains("lootBioMechInMineshaft")) {
+    				lootBioMechInMineshaft = (float) tag.getDouble("lootBioMechInMineshaft");
+    				BioMech.LOGGER.info("Got lootBioMechInMineshaft value of " + lootBioMechInMineshaft + " from file");
+    				gotMineshaftConfigValue = true;
+    			}
+    		}
+    		if (!gotGlobalConfigValue) {
+    			BioMech.LOGGER.info("Using default lootBioMechInChest value of " + lootBioMechInChest);
+    		}
+    		if (!gotMineshaftConfigValue) {
+    			BioMech.LOGGER.info("Using default lootBioMechInMineshaft value of " + lootBioMechInMineshaft);
+    		}
+    	}
+		
+    	//LOGGER.info(ServerLifecycleHooks.getCurrentServer().getWorldPath(LevelResource.ROOT).toString());
+    	if (event.getName().getPath().contains("chests")) {
+    		String mineshaftText = "";
+    		float chance = lootBioMechInChest;
+    		if ("chests/abandoned_mineshaft".equals(event.getName().getPath())) {
+    			chance = lootBioMechInMineshaft;
+    			mineshaftText = " mineshaft";
+    		}
+    		LOGGER.debug("alter" + mineshaftText + " loot table: " + event.getTable().getLootTableId().getPath());
+    		//event.getTable().addPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance((float)(double)BioMechConfig.SERVER.lootBioMechInChest.get()))
+    		event.getTable().addPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance(lootBioMechInChest))
+    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_MINING_LASER_ARM.get()))
+    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get()))
+    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_BIOMECH_ACTIVATOR.get()))
+    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get()))
+    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_POWER_ARM.get()))
+    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_POWER_CHEST.get()))
+    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_POWER_HELMET.get()))
+    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_POWER_LEGGINGS.get()))
+    				.build());
+    	}
     }
     
     public static Map<UUID, BioMechPlayerData> globalPlayerData = new HashMap<>();
@@ -421,7 +499,7 @@ public class BioMech
     	public static final KeyMapping HOTKEY_RIGHT_ARM = new KeyMapping("key.right_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_LEFT, "key.categories.biomech");
     	public static final KeyMapping HOTKEY_LEFT_ARM = new KeyMapping("key.left_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_RIGHT, "key.categories.biomech");
     	
-        public static final List<KeyMapping> allKeyMappings = List.of(HOTKEY_RIGHT_ARM, HOTKEY_LEFT_ARM);
+        public static final List<KeyMapping> allKeyMappings = List.of(HOTKEY_RIGHT_ARM, HOTKEY_LEFT_ARM, HOTKEY_ENABLE_ARM_FUNCTION);
 
         @SubscribeEvent
         public static void onRegisterParticle(RegisterParticleProvidersEvent event) {
@@ -883,4 +961,5 @@ public class BioMech
         
     }
 }
+
 

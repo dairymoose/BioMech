@@ -1,5 +1,8 @@
 package com.dairymoose.biomech.config;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -7,6 +10,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
@@ -70,24 +75,48 @@ public class BioMechConfig {
 				}
 				};});
 
-			
+			File f = getBiomechEarlyConfigFile();
+			CompoundTag tag = new CompoundTag();
+			tag.putDouble("lootBioMechInChest", BioMechConfig.SERVER.lootBioMechInChest.get());
+			tag.putDouble("lootBioMechInMineshaft", BioMechConfig.SERVER.lootBioMechInMineshaft.get());
+			BioMech.LOGGER.debug("[BioMech]: Save global loot chance: " + BioMechConfig.SERVER.lootBioMechInChest.get());
+			BioMech.LOGGER.debug("[BioMech]: Save mineshaft loot chance: " + BioMechConfig.SERVER.lootBioMechInMineshaft.get());
+			NbtIo.write(tag, f);
 			
 		} catch (Exception ex) {
 			BioMech.LOGGER.error("Error initializing config", ex);
 		}
 	}
 	
+	public static File getBiomechEarlyConfigFile() {
+		File f = new File("biomech.cfg");
+		if (!f.exists()) {
+			try {
+				if (f.createNewFile()) {
+					return f;
+				}
+			} catch (IOException e) {
+				BioMech.LOGGER.error("Error creating biomech.cfg", e);
+			}
+		} else {
+			return f;
+		}
+		
+		return null;
+	}
+	
+//	@SubscribeEvent
+//	public static void onConfigReloaded(ModConfigEvent.Reloading event) {
+//		if (commonSpec.isLoaded()) {
+//			BioMechConfig.reinit();
+//		}
+//	}
+	
 	@SubscribeEvent
-	public static void onConfigReloaded(ModConfigEvent.Reloading event) {
+    public static void onConfigLoadedEvent(ModConfigEvent event) {
 		if (commonSpec.isLoaded()) {
 			BioMechConfig.reinit();
 		}
-	}
-	
-	@SubscribeEvent
-    static void onLoad(final ModConfigEvent event)
-    {
-    	reinit();
     }
 	
 }
