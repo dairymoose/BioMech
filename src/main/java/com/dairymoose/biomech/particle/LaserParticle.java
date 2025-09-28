@@ -23,7 +23,7 @@ public class LaserParticle extends TextureSheetParticle {
       super(p_105773_, p_105774_, p_105775_, p_105776_);
       this.setSize(0.02F, 0.02F);
       this.quadSize *= this.random.nextFloat() * 0.12F + 0.05F;
-      this.quadSize *= 0.65f;
+      this.quadSize *= 0.70f;
       this.xd = p_105777_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;
       this.yd = p_105778_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;
       this.zd = p_105779_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;

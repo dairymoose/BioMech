@@ -54,13 +54,14 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 		public static float progressMax = 100.0f;
 	}
 
+	//power from 0.0 to 1.0
 	public float getLaserPower(int useTicks) {
 		return Math.min(useTicks / (float) (SECONDS_UNTIL_MAX_LASER * 20), 1.0f);
 	}
 
-	public int SECONDS_UNTIL_MAX_LASER = 10;
+	public int SECONDS_UNTIL_MAX_LASER = 12;
 	public static float minSpeedMult = 2.5f;
-	public static float maxSpeedMult = minSpeedMult * 5.0f;
+	public static float maxSpeedMult = minSpeedMult * 6.0f;
 	public static double blockReachMult = 1.4;
 	private static ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
 	public static int START_USING_TICK_COUNT = 5;
@@ -166,8 +167,11 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 						HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
 								(e) -> !(e instanceof ItemEntity) && !e.isSpectator(),
 								player.getBlockReach() * blockReachMult);
+						
+						float laserPower = this.getLaserPower(useTicks);
 						if (hitResult instanceof BlockHitResult bhr) {
 							BlockState blockState = player.level().getBlockState(bhr.getBlockPos());
+							
 							if (!blockState.isAir()) {
 								DestroyBlockProgress dbp = dbpMap.computeIfAbsent(player,
 										(p) -> new DestroyBlockProgress());
@@ -178,7 +182,8 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 								float blockDestroySpeed = blockState.getDestroySpeed(player.level(), dbp.pos);
 								float toolSpeed = miningTool.getDestroySpeed(blockState);
 								float miningSpeed = (toolSpeed / blockDestroySpeed);
-								float speedMult = Mth.lerp(this.getLaserPower(useTicks), minSpeedMult, maxSpeedMult);
+								float speedMult = Mth.lerp(laserPower, minSpeedMult, maxSpeedMult);
+								
 								dbp.progress += miningSpeed * speedMult;
 								player.level().destroyBlockProgress(0, dbp.pos,
 										(int) (10 * (float) dbp.progress / DestroyBlockProgress.progressMax));
@@ -193,9 +198,9 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 							Entity e = ehr.getEntity();
 							if (e instanceof LivingEntity living) {
 								if (!living.isInvulnerable() && !living.fireImmune()) {
-									living.hurt(player.level().damageSources().onFire(), 1.0f);
-									if (living.getRemainingFireTicks() <= 40) {
-										living.setRemainingFireTicks(40);
+									living.hurt(player.level().damageSources().onFire(), 2.0f*laserPower);
+									if (living.getRemainingFireTicks() <= 30) {
+										living.setRemainingFireTicks(30);
 									}
 								}
 							}
