@@ -166,6 +166,12 @@ dependencies {
 	implementation fg.deobf("curse.maven:xaeros-world-map-317780:5262424")
 	//implementation fg.deobf("curse.maven:create-328085:4835191")
 	
+	
+	implementation fg.deobf("curse.maven:kotlin-for-forge-351264:5402061")
+	implementation fg.deobf("curse.maven:fzzy-config-1005914:6843463")
+	implementation fg.deobf("curse.maven:emi-580555:6420945")
+	implementation fg.deobf("curse.maven:emi-loot-681783:6449092")
+	
 	implementation fg.deobf("curse.maven:spark-361579:4738952")
 
     // For more info:
