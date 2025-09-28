@@ -273,8 +273,7 @@ public class BioMech
     			mineshaftText = " mineshaft";
     		}
     		LOGGER.debug("alter" + mineshaftText + " loot table: " + event.getTable().getLootTableId().getPath());
-    		//event.getTable().addPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance((float)(double)BioMechConfig.SERVER.lootBioMechInChest.get()))
-    		event.getTable().addPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance(lootBioMechInChest))
+    		event.getTable().addPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance(chance))
     				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_MINING_LASER_ARM.get()))
     				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get()))
     				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_BIOMECH_ACTIVATOR.get()))
