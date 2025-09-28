@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import com.dairymoose.biomech.item.armor.MechPartUtil;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
+import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
@@ -43,6 +45,8 @@ import com.dairymoose.biomech.particle.MaxLaserParticle;
 import com.dairymoose.biomech.particle.ThickerLaserParticle;
 import com.dairymoose.biomech.particle.ThickestLaserParticle;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
@@ -63,13 +67,20 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
+import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -84,14 +95,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.storage.LevelResource;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.entries.EntryGroup;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
-import net.minecraft.world.level.storage.loot.functions.LootItemFunction.Builder;
-import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.api.distmarker.Dist;
@@ -99,36 +104,30 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
-import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.event.server.ServerLifecycleEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(BioMech.MODID)
@@ -196,6 +195,7 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundUpdateSlottedItemPacket.class, ClientboundUpdateSlottedItemPacket::write, ClientboundUpdateSlottedItemPacket::new, ClientboundUpdateSlottedItemPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundHandStatusPacket.class, ServerboundHandStatusPacket::write, ServerboundHandStatusPacket::new, ServerboundHandStatusPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundHandStatusPacket.class, ClientboundHandStatusPacket::write, ClientboundHandStatusPacket::new, ClientboundHandStatusPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundEnergySyncPacket.class, ClientboundEnergySyncPacket::write, ClientboundEnergySyncPacket::new, ClientboundEnergySyncPacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -296,14 +296,22 @@ public class BioMech
 		BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), slottedItemPacket);
     }
     
+    public static int RESYNC_ENERGY_TICK_PERIOD = 60;
     public static Map<UUID, HandActiveStatus> handActiveMap = new HashMap<>();
     @SubscribeEvent
     public void onPlayerTick(final PlayerTickEvent event) {
     	if (event.phase == TickEvent.Phase.START) {
     		BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
     		if (playerData != null) {
+    			playerData.tickEnergy(event.player);
     			tickInventoryForPlayer(event.player, playerData);
     			tickHandsForPlayer(event.player, playerData);
+    			
+				if (event.player.tickCount % RESYNC_ENERGY_TICK_PERIOD == 0) {
+					if (event.player instanceof ServerPlayer sp) {
+						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax));
+					}
+    			}
     		}
     	}
     }
@@ -531,56 +539,87 @@ public class BioMech
         		}
     		}
     	}
-    	
-//    	public void clientHandTick() {
-//    		if (Minecraft.getInstance().player == null)
-//    			return;
-//			
-//    		float partialTick = Minecraft.getInstance().getPartialTick();
-//    		InteractionHand[] hands = { InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND };
-//    		
-//    		for (InteractionHand hand : hands) {
-//    			
-//    			EquipmentSlot equipSlot = null;
-//            	MechPart handPart = null;
-//            	//if (event.getArm() == HumanoidArm.RIGHT) {
-//            	if (hand == InteractionHand.MAIN_HAND) {
-//            		handPart = MechPart.RightArm;
-//            		equipSlot = EquipmentSlot.MAINHAND;
-//            	//} else if (event.getArm() == HumanoidArm.LEFT) {
-//            	} else if (hand == InteractionHand.OFF_HAND) {
-//            		handPart = MechPart.LeftArm;
-//            		equipSlot = EquipmentSlot.OFFHAND;
-//            	}
-//            	
-//            	boolean currentArmActive = false;
-//            	if (handPart == MechPart.RightArm && rightArmActive || handPart == MechPart.LeftArm && leftArmActive) {
-//            		currentArmActive = true;
-//            	}
-//            	
-//            	BioMechPlayerData playerData = getDataForLocalPlayer();
-//            	if (playerData != null) {
-//            		
-//            		if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
-//        				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
-//        			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(offHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
-//        				offHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
-//        			}
-//        			ItemStack newRenderItem = mainHandRenderStack;
-//        			if (handPart == MechPart.LeftArm) {
-//        				newRenderItem = offHandRenderStack;
-//        			}
-//        			if (newRenderItem.getItem() instanceof ArmorBase base) {
-//        				if (isMechArmActive(playerData, handPart)) {
-//        					base.onHandTick(currentArmActive, newRenderItem, handPart, Minecraft.getInstance().getPartialTick());
-//        				}
-//    				}
-//            		
-//            	}
-//            	
-//    			
-//    		}
-//    	}
+
+    	private ResourceLocation GUI_SUIT_ENERGY_LOCATION = new ResourceLocation(MODID, "textures/gui/suit_energy.png");
+    	private int GUI_SUIT_ENERGY_TEX_SIZE = 32;
+    	private int GUI_SUIT_ENERGY_BORDER_HEIGHT = 8;
+		@SubscribeEvent
+		public void renderOverlayEvent(RenderGuiOverlayEvent.Pre overlayEvent) {
+			BioMechPlayerData playerData = this.getDataForLocalPlayer();
+
+			if (playerData != null) {
+				boolean hasAnyBioMechArmor = playerData.getAllSlots().stream()
+						.anyMatch((slotted) -> !slotted.itemStack.isEmpty());
+				if (hasAnyBioMechArmor) {
+					float suitEnergy = playerData.getSuitEnergy();
+					
+					Window window = overlayEvent.getWindow();
+					RenderSystem.setShader(GameRenderer::getPositionTexShader);
+					float xScale = BioMechConfig.CLIENT.energySuitGuiXScale.get().floatValue();
+					float yScale = BioMechConfig.CLIENT.energySuitGuiYScale.get().floatValue();
+					if (xScale > 0.0f && yScale > 0.0f && playerData.suitEnergyMax > 0.0f) {
+						float suitEnergyPct = suitEnergy/playerData.suitEnergyMax;
+						float visibleThreshold = BioMechConfig.CLIENT.showEnergySuitGuiThreshold.get().floatValue();
+						
+						if (suitEnergyPct <= visibleThreshold) {
+							float xScaleInv = 1.0f/xScale;
+							float yScaleInv = 1.0f/yScale;
+							int xStart = (int) ((window.getGuiScaledWidth() * BioMechConfig.CLIENT.energySuitGuiXPos.get().floatValue() * xScaleInv));
+							int yStart = (int) ((window.getGuiScaledHeight() * BioMechConfig.CLIENT.energySuitGuiYPos.get().floatValue() * yScaleInv));
+							float xStartTexture = 0.0f;
+							float yStartTexture = 0.0f;
+							
+							//RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, BioMechConfig.CLIENT.energySuitGuiOpacity.get().floatValue());
+							overlayEvent.getGuiGraphics().pose().pushPose();
+							overlayEvent.getGuiGraphics().pose().scale(xScale, yScale, 1.0f);
+							//draw border
+							overlayEvent.getGuiGraphics().blit(this.GUI_SUIT_ENERGY_LOCATION, xStart, yStart, xStartTexture,
+									yStartTexture, GUI_SUIT_ENERGY_TEX_SIZE, GUI_SUIT_ENERGY_BORDER_HEIGHT, GUI_SUIT_ENERGY_TEX_SIZE,
+									GUI_SUIT_ENERGY_TEX_SIZE);
+							//draw bar
+							overlayEvent.getGuiGraphics().blit(this.GUI_SUIT_ENERGY_LOCATION, xStart, yStart, xStartTexture,
+									(float) GUI_SUIT_ENERGY_BORDER_HEIGHT,
+									1 + (int) Math.ceil((GUI_SUIT_ENERGY_TEX_SIZE - 2) * suitEnergyPct), GUI_SUIT_ENERGY_BORDER_HEIGHT,
+									GUI_SUIT_ENERGY_TEX_SIZE, GUI_SUIT_ENERGY_TEX_SIZE);
+							
+							if (BioMechConfig.CLIENT.showSuitEnergyText.get().booleanValue()) {
+								float textXScale = BioMechConfig.CLIENT.suitEnergyTextXScale.get().floatValue();
+								float textYScale = BioMechConfig.CLIENT.suitEnergyTextYScale.get().floatValue();
+								float textXScaleInv = 1.0f/textXScale;
+								float textYScaleInv = 1.0f/textYScale;
+								float barHeight = GUI_SUIT_ENERGY_BORDER_HEIGHT * yScale;
+								int halfBarHeight = (int)(barHeight / 2.0f);
+								int leftMargin = (int)(3.0f*xScale);
+								overlayEvent.getGuiGraphics().pose().scale(textXScale, textYScale, 1.0f);
+								float pixelXDiff = xStart*textXScaleInv - xStart;
+								float pixelYDiff = yStart*textYScaleInv - yStart;
+								overlayEvent.getGuiGraphics().pose().translate(pixelXDiff, pixelYDiff, 0.0f);
+								overlayEvent.getGuiGraphics().pose().translate(leftMargin, halfBarHeight, 0.0f);
+								Component component1 = MutableComponent
+										.create(new LiteralContents(String.valueOf((int)suitEnergy)))
+										.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xFFFFFF)));
+								overlayEvent.getGuiGraphics().drawString(Minecraft.getInstance().font, component1,
+										xStart,
+										yStart, 0, true);
+								overlayEvent.getGuiGraphics().pose().scale(1.0f, 1.0f, 1.0f);
+							}
+							
+							overlayEvent.getGuiGraphics().pose().popPose();
+							//RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+						}
+					}
+					
+					//draw ENERGY text
+//					RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 0.5f);
+//					overlayEvent.getGuiGraphics().blit(this.GUI_SUIT_ENERGY_LOCATION, xStart, yStart, xStartTexture,
+//							(float) GUI_SUIT_ENERGY_BORDER_HEIGHT * 2, GUI_SUIT_ENERGY_TEX_SIZE,
+//							GUI_SUIT_ENERGY_BORDER_HEIGHT, GUI_SUIT_ENERGY_TEX_SIZE, GUI_SUIT_ENERGY_TEX_SIZE);
+//
+//					RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+				}
+			}
+
+		}
     	
     	public HandActiveStatus getLocalHandActiveStatus() {
     		if (Minecraft.getInstance().player != null) {

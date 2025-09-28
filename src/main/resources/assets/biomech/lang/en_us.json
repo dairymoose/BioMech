@@ -4,6 +4,7 @@
 	"item.biomech.generic.tooltip": "§4Requires BioMech Suit§0",
 	"item.biomech.generic.tooltip2": "§aRequires BioMech Suit§0",
 	"tooltip.biomech.suitenergy": "Suit Energy",
+	"tooltip.biomech.suitenergypersec": "Suit Energy/sec",
 
 	"item.biomech.biomech_activator": "BioMech Activator",
 	"item.biomech.biomech_deactivator": "BioMech Deactivator",

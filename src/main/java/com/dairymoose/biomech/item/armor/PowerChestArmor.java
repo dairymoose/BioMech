@@ -18,6 +18,7 @@ public class PowerChestArmor extends ArmorBase {
 	public PowerChestArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 100;
+		this.suitEnergyPerSec = 1.0f;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Chest;
 	}

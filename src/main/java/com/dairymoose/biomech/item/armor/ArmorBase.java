@@ -46,6 +46,7 @@ public class ArmorBase extends ArmorItem {
 	protected MechPart mechPart = null;
 	protected boolean hidePlayerModel = false;
 	protected int suitEnergy = 0;
+	protected float suitEnergyPerSec = 0.0f;
 	private static ArmorMaterial NOTHING_MATERIAL = new NothingMaterial();
 	
 	public ArmorBase(ArmorMaterial material, Type type, Properties props) {
@@ -54,6 +55,14 @@ public class ArmorBase extends ArmorItem {
 	
 	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick, boolean bothHandsInactive) {
 		
+	}
+	
+	public float getSuitEnergy() {
+		return this.suitEnergy;
+	}
+	
+	public float getSuitEnergyPerSec() {
+		return this.suitEnergyPerSec;
 	}
 	
 	public Item getLeftArmItem() {
@@ -99,6 +108,10 @@ public class ArmorBase extends ArmorItem {
 		if (suitEnergy > 0) {
 			MutableComponent suitEnergyTt = Component.translatable("tooltip.biomech.suitenergy");
 			comp.add(Component.literal("§2+" + suitEnergy + " " + suitEnergyTt.getString() + "§0"));
+		}
+		if (suitEnergyPerSec > 0.0f) {
+			MutableComponent suitEnergyTt = Component.translatable("tooltip.biomech.suitenergypersec");
+			comp.add(Component.literal("§b+" + suitEnergyPerSec + " " + suitEnergyTt.getString() + "§0"));
 		}
 		comp.add(Component.empty());
 		MutableComponent t1 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip1", "");

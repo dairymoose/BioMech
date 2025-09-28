@@ -2,14 +2,19 @@ package com.dairymoose.biomech;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.DoubleSummaryStatistics;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class BioMechPlayerData {
 	public static final int SLOT_COUNT = 6;
@@ -22,6 +27,19 @@ public class BioMechPlayerData {
 	public SlottedItem rightArm = new SlottedItem(MechPart.RightArm);
 	public SlottedItem back = new SlottedItem(MechPart.Back);
 	
+	public float suitEnergyPerSecBaseline = 5.0f;
+	
+	private float suitEnergy = 0.0f;
+	public float suitEnergyMax = 0.0f;
+	public float suitEnergyPerSec = suitEnergyPerSecBaseline;
+	
+	public int lastUsedEnergyTick = -1000;
+	public int ticksRequiredToRegenEnergy = 15;
+	
+	public static String SUIT_ENERGY = "SuitEnergy";
+	public static String SUIT_ENERGY_MAX = "SuitEnergyMax";
+	public static String SUIT_ENERGY_PER_SEC = "SuitEnergyPerSec";
+	public static String ITEM = "Item";
 	public static String ITEMS = "Items";
 	public static String SLOT = "Slot";
 	public static String VISIBLE = "Visible";
@@ -37,6 +55,75 @@ public class BioMechPlayerData {
 		public ItemStack itemStack;
 		public ItemStack leftArmItemStack;
 		public MechPart mechPart;
+	}
+	
+	public float getSuitEnergy() {
+		return this.suitEnergy;
+	}
+	
+	public void setSuitEnergy(float amount) {
+		this.suitEnergy = amount;
+		if (this.suitEnergy > this.suitEnergyMax) {
+			this.suitEnergy = this.suitEnergyMax;
+		}
+	}
+	
+	public boolean canRegenEnergy(Player player) {
+		int tickDiff = player.tickCount - lastUsedEnergyTick;
+		if (tickDiff >= ticksRequiredToRegenEnergy) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	private void internalSpendSuitEnergy(Player player, float amount) {
+		this.lastUsedEnergyTick = player.tickCount;
+		this.suitEnergy -= amount;
+		if (this.suitEnergy < 0.0f)
+			this.suitEnergy = 0.0f;
+	}
+	
+	public void spendSuitEnergy(Player player, float amount) {
+		if (FMLEnvironment.dist == Dist.CLIENT) {
+			if (player.level().isClientSide)
+				this.internalSpendSuitEnergy(player, amount);
+		} else {
+			this.internalSpendSuitEnergy(player, amount);
+		}
+		
+	}
+	
+	private void internalTickEnergy(Player player) {
+		if (this.canRegenEnergy(player)) {
+			this.suitEnergy += suitEnergyPerSec/20.0f;
+			if (this.suitEnergy > suitEnergyMax) {
+				this.suitEnergy = suitEnergyMax;
+			}
+		}
+	}
+	
+	public void tickEnergy(Player player) {
+		if (FMLEnvironment.dist == Dist.CLIENT) {
+			if (player.level().isClientSide)
+				this.internalTickEnergy(player);
+		} else {
+			this.internalTickEnergy(player);
+		}
+	}
+	
+	public void restoreAllSuitEnergy() {
+		this.suitEnergy = suitEnergyMax;
+	}
+	
+	public void recalculateSuitEnergyMax() {
+		DoubleSummaryStatistics dssEnergyPerSec = this.getAllSlots().stream().filter((slotted) -> slotted.itemStack.getItem() instanceof ArmorBase).
+				map((slotted) -> ((ArmorBase)slotted.itemStack.getItem()).getSuitEnergyPerSec()).collect(Collectors.summarizingDouble((d) -> d));
+		DoubleSummaryStatistics dssEnergy = this.getAllSlots().stream().filter((slotted) -> slotted.itemStack.getItem() instanceof ArmorBase).
+				map((slotted) -> ((ArmorBase)slotted.itemStack.getItem()).getSuitEnergy()).collect(Collectors.summarizingDouble((d) -> d));
+		this.suitEnergyMax = (float) dssEnergy.getSum();
+		this.suitEnergyPerSec = suitEnergyPerSecBaseline + (float) dssEnergyPerSec.getSum();
+		BioMech.LOGGER.debug("suitEnergyMax=" + this.suitEnergyMax + ", suitEnergyPerSec=" + this.suitEnergyPerSec);
 	}
 	
 	public void setForSlot(MechPart mechPart, ItemStack itemStack) {
@@ -103,7 +190,7 @@ public class BioMechPlayerData {
 					CompoundTag slotTag = new CompoundTag();
 					CompoundTag itemTag = new CompoundTag(); 
 					slotted.itemStack.save(itemTag);
-					slotTag.put("Item", itemTag);
+					slotTag.put(ITEM, itemTag);
 					slotTag.putBoolean(VISIBLE, slotted.visible);
 					items.put(slotted.mechPart.name() + SLOT, slotTag);
 				}
@@ -111,6 +198,9 @@ public class BioMechPlayerData {
 		);
 		
 		result.put(ITEMS, items);
+		result.putFloat(SUIT_ENERGY, data.suitEnergy);
+		result.putFloat(SUIT_ENERGY_MAX, data.suitEnergyMax);
+		result.putFloat(SUIT_ENERGY_PER_SEC, data.suitEnergyPerSec);
 		return result;
 	}
 	
@@ -144,7 +234,7 @@ public class BioMechPlayerData {
 					if (slottedItemTag != null) {
 						SlottedItem slottedItem = new SlottedItem(part);
 						
-						CompoundTag itemStackTag = slottedItemTag.getCompound("Item");
+						CompoundTag itemStackTag = slottedItemTag.getCompound(ITEM);
 						slottedItem.itemStack = ItemStack.of(itemStackTag);
 						
 						boolean visible = slottedItemTag.getBoolean(VISIBLE);
@@ -154,6 +244,10 @@ public class BioMechPlayerData {
 						setFieldByMechPart(data, part, slottedItem);
 					}
 				}
+				
+				data.suitEnergy = tag.getFloat(SUIT_ENERGY);
+				data.suitEnergyMax = tag.getFloat(SUIT_ENERGY_MAX);
+				data.suitEnergyPerSec = tag.getFloat(SUIT_ENERGY_PER_SEC);
 			}
 		}
 		

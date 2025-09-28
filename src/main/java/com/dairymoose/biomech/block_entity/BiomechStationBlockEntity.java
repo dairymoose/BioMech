@@ -1,5 +1,7 @@
 package com.dairymoose.biomech.block_entity;
 
+import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.block_entity.anim.BioMechStationDispatcher;
@@ -44,19 +46,19 @@ public class BioMechStationBlockEntity extends RandomizableContainerBlockEntity 
 	public static final BlockEntityType<BioMechStationBlockEntity> BIOMECH_STATION_BLOCK_ENTITY = BlockEntityType.Builder.of(BioMechStationBlockEntity::new, BioMechRegistry.BLOCK_BIOMECH_STATION.get()).build(null);
 
 	@Override
-	public void startOpen(Player p_18955_) {
-		super.startOpen(p_18955_);
+	public void startOpen(Player player) {
+		super.startOpen(player);
 		currentlyOpened = true;
 	}
 	
 	@Override
-	public void stopOpen(Player p_18954_) {
-		super.stopOpen(p_18954_);
+	public void stopOpen(Player player) {
+		super.stopOpen(player);
 		currentlyOpened = false;
 	}
 	
 	@Override
-	public boolean canOpen(Player p_59643_) {
+	public boolean canOpen(Player player) {
 		if (this.currentlyOpened) {
 			return false;
 		}

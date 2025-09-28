@@ -119,15 +119,20 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 				BioMech.sendItemSlotUpdateForPlayer(player);
 		}
 	   
-	   public void removed(Player p_39721_) {
-	      super.removed(p_39721_);
-	      if (this.container != null) {
-	    	  this.container.clearContent();
-	    	  this.container.stopOpen(p_39721_);
-	      }
-	   }
+		public void removed(Player player) {
+			super.removed(player);
+			if (this.container != null) {
+				this.container.clearContent();
+				this.container.stopOpen(player);
 
-	   public boolean stillValid(Player p_39712_) {
+				BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
+				if (playerData != null) {
+					playerData.recalculateSuitEnergyMax();
+				}
+			}
+		}
+
+	   public boolean stillValid(Player player) {
 	      return true;
 	   }
 

@@ -65,6 +65,8 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 	public static double blockReachMult = 1.4;
 	private static ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
 	public static int START_USING_TICK_COUNT = 5;
+	public static float energyPerSec = 5.0f;
+	public static float energyPerTick = energyPerSec / 20.0f;
 	Map<Player, DestroyBlockProgress> dbpMap = new HashMap<>();
 
 	@Override
@@ -75,6 +77,11 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 
 		if (playerData != null) {
 			ItemStack thirdPersonItemStack = BioMech.getThirdPersonArmItemStack(playerData, handPart);
+			
+			if (playerData.getSuitEnergy() < energyPerTick) {
+				active = false;
+			}
+			
 			if (active) {
 				int useTicks = thirdPersonItemStack.getTag().getInt("useTicks");
 				if (FMLEnvironment.dist == Dist.CLIENT) {
@@ -83,8 +90,10 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 				} else {
 					++useTicks;
 				}
-
+				
 				thirdPersonItemStack.getTag().putInt("useTicks", useTicks);
+
+				boolean didHit = false;
 				if (player.level().isClientSide) {
 					if (useTicks <= START_USING_TICK_COUNT) {
 						// BioMech.LOGGER.info("useTicks=" + useTicks);
@@ -143,6 +152,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 							BlockPos pos = bhr.getBlockPos();
 							BlockState state = Minecraft.getInstance().level.getBlockState(pos);
 							if (!state.isAir()) {
+								didHit = true;
 								float blockDestroySpeed = state.getDestroySpeed(player.level(), pos);
 
 								ParticleType particles = ForgeRegistries.PARTICLE_TYPES
@@ -158,6 +168,8 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 									}
 								}
 							}
+						} else if (hitResult instanceof EntityHitResult ehr) {
+							didHit = true;
 						}
 					}
 				}
@@ -173,6 +185,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 							BlockState blockState = player.level().getBlockState(bhr.getBlockPos());
 							
 							if (!blockState.isAir()) {
+								didHit = true;
 								DestroyBlockProgress dbp = dbpMap.computeIfAbsent(player,
 										(p) -> new DestroyBlockProgress());
 								if (dbp.pos == null || !dbp.pos.equals(bhr.getBlockPos())) {
@@ -195,6 +208,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 								}
 							}
 						} else if (hitResult instanceof EntityHitResult ehr) {
+							didHit = true;
 							Entity e = ehr.getEntity();
 							if (e instanceof LivingEntity living) {
 								if (!living.isInvulnerable() && !living.fireImmune()) {
@@ -216,6 +230,12 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 						}
 					}
 				}
+				
+				if (didHit) {
+					playerData.spendSuitEnergy(player, energyPerTick);
+				}
+				
+				
 			} else {
 				if (thirdPersonItemStack.getTag() != null && thirdPersonItemStack.getTag().contains("useTicks")) {
 					thirdPersonItemStack.getTag().putInt("useTicks", 0);
