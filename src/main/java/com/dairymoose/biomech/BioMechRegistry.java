@@ -47,6 +47,7 @@ public class BioMechRegistry {
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_LASER = BioMech.PARTICLES.register("laser", () -> new SimpleParticleType(false));
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_THICKER_LASER = BioMech.PARTICLES.register("thicker_laser", () -> new SimpleParticleType(false));
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_THICKEST_LASER = BioMech.PARTICLES.register("thickest_laser", () -> new SimpleParticleType(false));
+	public static RegistryObject<ParticleType> PARTICLE_TYPE_MAX_LASER = BioMech.PARTICLES.register("max_laser", () -> new SimpleParticleType(false));
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_STATION = BioMech.ITEMS.register("biomech_station", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_STATION.get(), new Item.Properties()));
 	

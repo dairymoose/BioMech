@@ -8,10 +8,10 @@ import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class ThickerLaserParticle extends LaserParticle {
-	public ThickerLaserParticle(ClientLevel p_105773_, double p_105774_, double p_105775_, double p_105776_, double p_105777_, double p_105778_, double p_105779_) {
+public class MaxLaserParticle extends LaserParticle {
+	public MaxLaserParticle(ClientLevel p_105773_, double p_105774_, double p_105775_, double p_105776_, double p_105777_, double p_105778_, double p_105779_) {
       super(p_105773_, p_105774_, p_105775_, p_105776_, p_105777_, p_105778_, p_105779_);
-      this.quadSize *= 1.3f;
+      this.quadSize *= 1.70f;
    }
 
    @OnlyIn(Dist.CLIENT)
@@ -24,7 +24,7 @@ public class ThickerLaserParticle extends LaserParticle {
       
       @Override
       public TextureSheetParticle createParticle(SimpleParticleType p_105804_, ClientLevel p_105805_, double p_105806_, double p_105807_, double p_105808_, double p_105809_, double p_105810_, double p_105811_) {
-			ThickerLaserParticle laserParticle = new ThickerLaserParticle(p_105805_, p_105806_, p_105807_, p_105808_, p_105809_, p_105810_, p_105811_);
+			MaxLaserParticle laserParticle = new MaxLaserParticle(p_105805_, p_105806_, p_105807_, p_105808_, p_105809_, p_105810_, p_105811_);
 			laserParticle.pickSprite(this.sprite);
 			return laserParticle;
       }

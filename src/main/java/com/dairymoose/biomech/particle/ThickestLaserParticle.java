@@ -11,7 +11,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class ThickestLaserParticle extends LaserParticle {
 	public ThickestLaserParticle(ClientLevel p_105773_, double p_105774_, double p_105775_, double p_105776_, double p_105777_, double p_105778_, double p_105779_) {
       super(p_105773_, p_105774_, p_105775_, p_105776_, p_105777_, p_105778_, p_105779_);
-      this.quadSize *= 2.1f;
+      this.quadSize *= 1.69f;
    }
 
    @OnlyIn(Dist.CLIENT)
