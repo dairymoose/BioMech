@@ -295,7 +295,6 @@ public class BioMech
     		event.getTable().addPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance(chance))
     				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_MINING_LASER_ARM.get()))
     				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get()))
-    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_BIOMECH_ACTIVATOR.get()))
     				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get()))
     				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_POWER_ARM.get()))
     				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_POWER_CHEST.get()))
