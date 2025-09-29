@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -31,31 +32,43 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class BioMechStationBlock extends HorizontalDirectionalBlock implements EntityBlock {
+public class BioMechStationBlock extends HorizontalDirectionalBlock implements EntityBlock, SimpleWaterloggedBlock {
 
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final BooleanProperty MULTIBLOCK = BooleanProperty.create("multiblock");
+	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+	
 	private static boolean instantTeleportToStation = false;
 	public static boolean configWalkToBioMechStation = true;
 	
 	public BioMechStationBlock(Properties props) {
 		super(props);
-		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(MULTIBLOCK, false));
+		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(MULTIBLOCK, false).setValue(WATERLOGGED, Boolean.FALSE));
 	}
 
+	@Override
+	public FluidState getFluidState(BlockState p_204507_1_) {
+		return (Boolean) p_204507_1_.getValue(WATERLOGGED)
+				? Fluids.WATER.getSource(false)
+				: super.getFluidState(p_204507_1_);
+	}
+	
 	@Override
 	public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
 		return BioMechRegistry.BLOCK_ENTITY_BIOMECH_STATION.get().create(blockPos, blockState);
 	}
 	
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-		return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite());
+		FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
+		return this.defaultBlockState().setValue(FACING, ctx.getHorizontalDirection().getOpposite()).setValue(WATERLOGGED, fluidState.getType() == Fluids.WATER);
 	}
 
 	@Override
@@ -80,13 +93,17 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 		return Direction.UP;
 	}
 	
-	public BlockState updateShape(BlockState p_49525_, Direction p_49526_, BlockState p_49527_, LevelAccessor p_49528_,
-			BlockPos p_49529_, BlockPos p_49530_) {
-		if (p_49526_ == getNeighbourDirection(p_49525_.getValue(MULTIBLOCK))) {
-			if (!(p_49527_.is(this) && p_49527_.getValue(MULTIBLOCK) != p_49525_.getValue(MULTIBLOCK)))
+	public BlockState updateShape(BlockState blockState, Direction p_49526_, BlockState p_49527_, LevelAccessor level,
+			BlockPos pos, BlockPos p_49530_) {
+		if ((Boolean) blockState.getValue(WATERLOGGED)) {
+			level.scheduleTick(pos, Fluids.WATER,
+					Fluids.WATER.getTickDelay(level));
+		}
+		if (p_49526_ == getNeighbourDirection(blockState.getValue(MULTIBLOCK))) {
+			if (!(p_49527_.is(this) && p_49527_.getValue(MULTIBLOCK) != blockState.getValue(MULTIBLOCK)))
 					return Blocks.AIR.defaultBlockState();
 		}
-		return super.updateShape(p_49525_, p_49526_, p_49527_, p_49528_, p_49529_, p_49530_);
+		return super.updateShape(blockState, p_49526_, p_49527_, level, pos, p_49530_);
 	}
 	
 	public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
@@ -142,7 +159,7 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 	}
 
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> p_54097_) {
-		p_54097_.add(FACING, MULTIBLOCK);
+		p_54097_.add(FACING, MULTIBLOCK, WATERLOGGED);
 	}
 	
 	private InteractionResult useBlock(BlockState blockState, Level level, BlockPos blockPos, Player player,

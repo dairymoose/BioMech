@@ -27,7 +27,7 @@ public class BioMechPlayerData {
 	public SlottedItem rightArm = new SlottedItem(MechPart.RightArm);
 	public SlottedItem back = new SlottedItem(MechPart.Back);
 	
-	public float suitEnergyPerSecBaseline = 5.0f;
+	public float suitEnergyPerSecBaseline = 3.0f;
 	
 	private float suitEnergy = 0.0f;
 	public float suitEnergyMax = 0.0f;
@@ -59,6 +59,10 @@ public class BioMechPlayerData {
 	
 	public float getSuitEnergy() {
 		return this.suitEnergy;
+	}
+	
+	public float getSuitEnergyPercent() {
+		return this.suitEnergy/this.suitEnergyMax;
 	}
 	
 	public void setSuitEnergy(float amount) {

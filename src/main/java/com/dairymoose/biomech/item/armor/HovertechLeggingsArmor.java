@@ -32,7 +32,7 @@ public class HovertechLeggingsArmor extends ArmorBase {
 	public HovertechLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 4;
-		this.suitEnergyPerSec = 0.5f;
+		this.suitEnergyPerSec = -0.25f;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Leggings;
 	}

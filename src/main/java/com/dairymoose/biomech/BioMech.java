@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.armor.renderer.BackScubaTankRenderer;
 import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.LavastrideLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.MiningLaserLeftArmRenderer;
@@ -72,6 +72,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -94,6 +95,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -120,7 +122,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -132,33 +133,45 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-// The value here should match an entry in the META-INF/mods.toml file
+/*
+ * - Adding new chest/back/etc armor:
+ * Add .geo.json file
+ * Add textures.item texture for 3d model
+ * Draw custom image for icon in textures.item.icon package
+ * Add custom image to minecraft:generated item in models.item
+ * Add localization
+ * Add renderer in armor.renderer package
+ * Add ArmorBase class in item.armor package
+ * Add new armor to BioMechRegistry
+ * Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry)
+ * 
+ * - Adding new arms:
+ * Add .geo.json file
+ * Copy .geo.json file to _item.geo.json
+ * Add animation in animations.item package
+ * Export display settings and put it models.item
+ * Add localization
+ * Add renderer in armor.renderer package
+ * Add ArmorBase class in item.armor package
+ * Add new armor to BioMechRegistry
+ * Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry & AzItemRendererRegistry)
+ * If animated: add to AzIdentityRegistry
+ * 
+ */
+
 @Mod(BioMech.MODID)
 public class BioMech
 {
-    // Define mod id in a common place for everything to reference
     public static final String MODID = "biomech";
-    // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
-    // Create a Deferred Register to hold Blocks which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
-    // Create a Deferred Register to hold Items which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    // Create a Deferred Register to hold CreativeModeTabs which will all be registered under the "examplemod" namespace
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, MODID);
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, MODID);
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, MODID);
     
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
-
-//    // Creates a creative tab with the id "examplemod:example_tab" for the example item, that is placed after the combat tab
-//    public static final RegistryObject<CreativeModeTab> EXAMPLE_TAB = CREATIVE_MODE_TABS.register("example_tab", () -> CreativeModeTab.builder()
-//            .withTabsBefore(CreativeModeTabs.COMBAT)
-//            .icon(() -> EXAMPLE_ITEM.get().getDefaultInstance())
-//            .displayItems((parameters, output) -> {
-//                output.accept(EXAMPLE_ITEM.get()); // Add the example item to the tab. For your own tabs, this method is preferred over the event
-//            }).build());
 
     private static BioMechCraftingFlags craftingFlags;
     
@@ -168,27 +181,19 @@ public class BioMech
 		
         IEventBus modEventBus = context.getModEventBus();
 
-        // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
         
         modEventBus.addListener(this::addItemsToCreativeTab);
 
-        // Register the Deferred Register to the mod event bus so blocks get registered
         BLOCKS.register(modEventBus);
-        // Register the Deferred Register to the mod event bus so items get registered
         ITEMS.register(modEventBus);
-        // Register the Deferred Register to the mod event bus so tabs get registered
         CREATIVE_MODE_TABS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
         MENUS.register(modEventBus);
         PARTICLES.register(modEventBus);
         SOUNDS.register(modEventBus);
         
-        // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
-
-        // Register the item to a creative tab
-        //modEventBus.addListener(this::addCreative);
 
         craftingFlags = new BioMechCraftingFlags();
         
@@ -853,6 +858,7 @@ public class BioMech
         		//playerModel.copyPropertiesTo(armorModel);
         		
         		try {
+        			PlayerRenderer playerRenderer = event.getRenderer();
         			PlayerModel playerModel = event.getRenderer().getModel();
         			//armorRenderer.prepForRender(renderEntity, itemToRender, itemToRender.getEquipmentSlot(), playerModel);
         			AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
@@ -885,7 +891,7 @@ public class BioMech
     					f2 = f1 - f;
     				}
         			
-        			this.setupRotations((AbstractClientPlayer)renderEntity, poseStack, 0.0f, f, event.getPartialTick());
+    				playerRenderer.setupRotations((AbstractClientPlayer)renderEntity, poseStack, 0.0f, f, event.getPartialTick());
         			poseStack.scale(-1.0F, -1.0F, 1.0F);
         		    this.scale((AbstractClientPlayer)renderEntity, poseStack, event.getPartialTick());
         		    poseStack.translate(0.0F, -1.501F, 0.0F);
@@ -928,7 +934,9 @@ public class BioMech
         		    				}
         		    				
         		    				ItemStack priorFeetItem = null;
+        		    				//this is required so AzureLib actually does any render at all in renderArmorPiece
         		    				event.getEntity().setItemSlot(equipmentSlot, itemStackToRender);
+        		    				//event.getEntity().setItemSlot(equipmentSlot, new ItemStack(Items.LEATHER_CHESTPLATE));
         		    				if (slottedItem.mechPart == MechPart.Leggings) {
         		    					priorFeetItem = event.getEntity().getItemBySlot(EquipmentSlot.FEET);
         		    					event.getEntity().setItemSlot(EquipmentSlot.FEET, ItemStack.EMPTY);
@@ -949,6 +957,8 @@ public class BioMech
         		    					poseStack.mulPose(Axis.XP.rotationDegrees(renderEntity.getXRot()));
         		    				}
                         		    hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, equipmentSlot, event.getPackedLight(), armorModel);
+                        		    //this is required so that AzureLib does not re-render the same armor when it comes time to render the player via default MC logic
+                        		    event.getEntity().setItemSlot(equipmentSlot, ItemStack.EMPTY);
                         		    poseStack.popPose();
                         		    if (slottedItem.mechPart == MechPart.LeftArm || slottedItem.mechPart == MechPart.RightArm || slottedItem.mechPart == MechPart.Back) {
                         		    	event.getEntity().setItemSlot(equipmentSlot, priorItem);
@@ -1001,12 +1011,6 @@ public class BioMech
         	}
         }
         
-        protected void setupRotations(AbstractClientPlayer player, PoseStack poseStack, float bob, float yaw, float partialTick) {
-        	if (!player.hasPose(Pose.SLEEPING)) {
-        		poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - yaw));
-             }
-         }
-        
         protected void scale(AbstractClientPlayer player, PoseStack poseStack, float partialTick) {
             float f = 0.9375F;
             poseStack.scale(0.9375F, 0.9375F, 0.9375F);
@@ -1045,6 +1049,8 @@ public class BioMech
         	AzArmorRendererRegistry.register(PowerHelmetRenderer::new, BioMechRegistry.ITEM_POWER_HELMET.get());
         	AzArmorRendererRegistry.register(MiningLaserRightArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
         	AzArmorRendererRegistry.register(MiningLaserLeftArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
+        	AzArmorRendererRegistry.register(BackScubaTankRenderer::new, BioMechRegistry.ITEM_BACK_SCUBA_TANK.get());
+        	
         	
         	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());

@@ -4,6 +4,7 @@ import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.block_entity.BioMechStationBlockEntity;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
+import com.dairymoose.biomech.item.armor.BackScubaTankArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.LavastrideLeggingsArmor;
 import com.dairymoose.biomech.item.armor.MiningLaserLeftArmArmor;
@@ -63,6 +64,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_POWER_ARM = BioMech.ITEMS.register("power_arm", () -> new PowerRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_POWER_LEFT_ARM = BioMech.ITEMS.register("left_power_arm", () -> new PowerLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_POWER_HELMET = BioMech.ITEMS.register("power_helmet", () -> new PowerHelmetArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_BACK_SCUBA_TANK = BioMech.ITEMS.register("back_scuba_tank", () -> new BackScubaTankArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_MINING_LASER_ARM = BioMech.ITEMS.register("mining_laser_arm", () -> new MiningLaserRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_MINING_LASER_LEFT_ARM = BioMech.ITEMS.register("mining_laser_left_arm", () -> new MiningLaserLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));

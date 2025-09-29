@@ -66,10 +66,13 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 	public static double blockReachMult = 1.4;
 	private static ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
 	public static int START_USING_TICK_COUNT = 5;
+	
 	public static float energyPerSec = 5.0f;
-	public static float energyPerSecMiss = 1.0f;
 	public static float energyPerTick = energyPerSec / 20.0f;
+	
+	public static float energyPerSecMiss = 1.0f;
 	public static float energyPerTickMiss = energyPerSecMiss / 20.0f;
+	
 	private static int SOUND_TICK_DURATION = 3;
 	Map<Player, DestroyBlockProgress> dbpMap = new HashMap<>();
 
@@ -154,16 +157,16 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 
 						if (hitResult instanceof BlockHitResult bhr) {
 							BlockPos pos = bhr.getBlockPos();
-							BlockState state = Minecraft.getInstance().level.getBlockState(pos);
-							if (!state.isAir()) {
+							BlockState blockState = Minecraft.getInstance().level.getBlockState(pos);
+							if (!blockState.isAir() && !blockState.getFluidState().isSource()) {
 								didHit = true;
-								float blockDestroySpeed = state.getDestroySpeed(player.level(), pos);
+								float blockDestroySpeed = blockState.getDestroySpeed(player.level(), pos);
 
 								ParticleType particles = ForgeRegistries.PARTICLE_TYPES
 										.getValue(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.BLOCK));
 								if (particles != null && blockDestroySpeed > 0.0f) {
 									BlockParticleOption blockParticle = new BlockParticleOption(ParticleTypes.BLOCK,
-											state);
+											blockState);
 									for (int i = 0; i < 3; ++i) {
 										Minecraft.getInstance().level.addParticle(blockParticle,
 												endLoc.x + (Math.random() * 1.0 - 0.5),
@@ -197,7 +200,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 						if (hitResult instanceof BlockHitResult bhr) {
 							BlockState blockState = player.level().getBlockState(bhr.getBlockPos());
 							
-							if (!blockState.isAir()) {
+							if (!blockState.isAir() && !blockState.getFluidState().isSource()) {
 								didHit = true;
 								DestroyBlockProgress dbp = dbpMap.computeIfAbsent(player,
 										(p) -> new DestroyBlockProgress());
