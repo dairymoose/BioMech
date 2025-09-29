@@ -6,6 +6,7 @@ import java.util.List;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
+import com.google.common.collect.Lists;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,12 +15,14 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
 public class HovertechLeggingsArmor extends ArmorBase {
 
@@ -32,11 +35,12 @@ public class HovertechLeggingsArmor extends ArmorBase {
 	public HovertechLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 4;
-		this.suitEnergyPerSec = -0.25f;
+		this.suitEnergyPerSec = -0.5f;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Leggings;
 	}
 
+	double pickupRadiusScale = 2.0f;
 	@Override
 	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
@@ -77,9 +81,33 @@ public class HovertechLeggingsArmor extends ArmorBase {
 													player.getZ() + (Math.random() - .5) * 0.6, 0.0, -1.2, 0.0);
 										}
 									}
-									if (level.isClientSide) {
-										//BioMech.LOGGER.debug("floatAmount=" + floatAmount + " for targetY=" + targetY
-										//		+ " and tickCount=" + entity.tickCount);
+									if (!level.isClientSide) {
+										
+										//expand pickup range
+										if (player.getHealth() > 0.0F && !player.isSpectator()) {
+									         AABB aabb;
+									         if (player.isPassenger() && !player.getVehicle().isRemoved()) {
+									            aabb = player.getBoundingBox().minmax(player.getVehicle().getBoundingBox()).inflate(pickupRadiusScale*1.0D, pickupRadiusScale*0.0D, pickupRadiusScale*1.0D);
+									         } else {
+									            aabb = player.getBoundingBox().inflate(pickupRadiusScale*1.0D, pickupRadiusScale*0.5D, pickupRadiusScale*1.0D);
+									         }
+
+									         List<Entity> list = player.level().getEntities(player, aabb);
+									         List<Entity> list1 = Lists.newArrayList();
+
+									         for(int i = 0; i < list.size(); ++i) {
+									            Entity e = list.get(i);
+									            if (e.getType() == EntityType.EXPERIENCE_ORB) {
+									               list1.add(e);
+									            } else if (!e.isRemoved()) {
+									            	e.playerTouch(player);
+									            }
+									         }
+
+									         if (!list1.isEmpty()) {
+									        	 list1.get((int)(Math.random() * list1.size())).playerTouch(player);
+									         }
+									      }
 									}
 								}
 								living.setOnGround(true);
