@@ -67,7 +67,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 	private static ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
 	public static int START_USING_TICK_COUNT = 5;
 	public static float energyPerSec = 5.0f;
-	public static float energyPerSecMiss = 0.5f;
+	public static float energyPerSecMiss = 1.0f;
 	public static float energyPerTick = energyPerSec / 20.0f;
 	public static float energyPerTickMiss = energyPerSecMiss / 20.0f;
 	private static int SOUND_TICK_DURATION = 3;
