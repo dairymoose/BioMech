@@ -1,0 +1,7 @@
+{
+  "laser_loop": {
+    "category": "block",
+    "subtitle": "entity.subtitle.laser_loop",
+    "sounds": [ "biomech:item/laser_loop" ]
+  }
+}

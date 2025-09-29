@@ -17,6 +17,7 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -67,11 +68,12 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 	public static int START_USING_TICK_COUNT = 5;
 	public static float energyPerSec = 5.0f;
 	public static float energyPerTick = energyPerSec / 20.0f;
+	private static int SOUND_TICK_DURATION = 3;
 	Map<Player, DestroyBlockProgress> dbpMap = new HashMap<>();
 
 	@Override
 	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick,
-			boolean bothHandsInactive) {
+			boolean bothHandsInactive, boolean bothHandsActive) {
 
 		BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 
@@ -171,6 +173,16 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 						} else if (hitResult instanceof EntityHitResult ehr) {
 							didHit = true;
 						}
+						
+						if (player.tickCount % SOUND_TICK_DURATION == 0) {
+							float volume = 0.62f;
+							float laserPitch = 0.85f + this.getLaserPower(useTicks)*0.3f;
+							if (didHit) {
+								laserPitch *= 1.04f;
+							}
+							player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_LASER_LOOP.get(), SoundSource.PLAYERS, volume, laserPitch, false);
+							//player.level().playLocalSound(player.blockPosition(), BioMechRegistry.SOUND_EVENT_LASER_LOOP.get(), SoundSource.PLAYERS, 1.0f, laserPitch, false);
+						}
 					}
 				}
 
@@ -211,8 +223,12 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 							didHit = true;
 							Entity e = ehr.getEntity();
 							if (e instanceof LivingEntity living) {
-								if (!living.isInvulnerable() && !living.fireImmune()) {
-									living.hurt(player.level().damageSources().onFire(), 2.0f*laserPower);
+								if (!living.isInvulnerable() && !living.fireImmune() && !living.isDeadOrDying()) {
+									float damageMult = 1.0f;
+									if (bothHandsActive) {
+										damageMult = 2.0f;
+									}
+									living.hurt(player.level().damageSources().onFire(), damageMult*1.5f*laserPower);
 									if (living.getRemainingFireTicks() <= 30) {
 										living.setRemainingFireTicks(30);
 									}

@@ -6,10 +6,8 @@ import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.LavastrideLeggingsArmor;
-import com.dairymoose.biomech.item.armor.MiningLaserArmArmor;
 import com.dairymoose.biomech.item.armor.MiningLaserLeftArmArmor;
 import com.dairymoose.biomech.item.armor.MiningLaserRightArmArmor;
-import com.dairymoose.biomech.item.armor.PowerArmArmor;
 import com.dairymoose.biomech.item.armor.PowerChestArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.armor.PowerLeftArmArmor;
@@ -20,6 +18,8 @@ import com.dairymoose.biomech.menu.BioMechStationMenu;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ArmorItem.Type;
@@ -48,6 +48,8 @@ public class BioMechRegistry {
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_THICKER_LASER = BioMech.PARTICLES.register("thicker_laser", () -> new SimpleParticleType(false));
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_THICKEST_LASER = BioMech.PARTICLES.register("thickest_laser", () -> new SimpleParticleType(false));
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_MAX_LASER = BioMech.PARTICLES.register("max_laser", () -> new SimpleParticleType(false));
+	
+	public static RegistryObject<SoundEvent> SOUND_EVENT_LASER_LOOP = BioMech.SOUNDS.register("laser_loop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "laser_loop")));
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_STATION = BioMech.ITEMS.register("biomech_station", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_STATION.get(), new Item.Properties()));
 	

@@ -83,6 +83,7 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -147,6 +148,7 @@ public class BioMech
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, MODID);
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, MODID);
+    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, MODID);
     
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
 
@@ -180,6 +182,7 @@ public class BioMech
         BLOCK_ENTITY_TYPES.register(modEventBus);
         MENUS.register(modEventBus);
         PARTICLES.register(modEventBus);
+        SOUNDS.register(modEventBus);
         
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -232,6 +235,7 @@ public class BioMech
    
     Float lootBioMechInChest = null;
     Float lootBioMechInMineshaft = null;
+    Float lootBioMechInDungeon = null;
     @SubscribeEvent
     public void onAlterLootTable(LootTableLoadEvent event) {
     	if (lootBioMechInChest == null) {
@@ -244,8 +248,10 @@ public class BioMech
     		}
     		lootBioMechInChest = 0.05f;
     		lootBioMechInMineshaft = 0.33f;
+    		lootBioMechInDungeon = 0.33f;
     		boolean gotGlobalConfigValue = false;
     		boolean gotMineshaftConfigValue = false;
+    		boolean gotDungeonConfigValue = false;
     		if (tag != null) {
     			if (tag.contains("lootBioMechInChest")) {
     				lootBioMechInChest = (float) tag.getDouble("lootBioMechInChest");
@@ -257,12 +263,20 @@ public class BioMech
     				BioMech.LOGGER.info("Got lootBioMechInMineshaft value of " + lootBioMechInMineshaft + " from file");
     				gotMineshaftConfigValue = true;
     			}
+    			if (tag.contains("lootBioMechInDungeon")) {
+    				lootBioMechInMineshaft = (float) tag.getDouble("lootBioMechInDungeon");
+    				BioMech.LOGGER.info("Got lootBioMechInMineshaft value of " + lootBioMechInDungeon + " from file");
+    				gotMineshaftConfigValue = true;
+    			}
     		}
     		if (!gotGlobalConfigValue) {
     			BioMech.LOGGER.info("Using default lootBioMechInChest value of " + lootBioMechInChest);
     		}
     		if (!gotMineshaftConfigValue) {
     			BioMech.LOGGER.info("Using default lootBioMechInMineshaft value of " + lootBioMechInMineshaft);
+    		}
+    		if (!gotDungeonConfigValue) {
+    			BioMech.LOGGER.info("Using default lootBioMechInMineshaft value of " + lootBioMechInDungeon);
     		}
     	}
 		
@@ -273,6 +287,9 @@ public class BioMech
     		if ("chests/abandoned_mineshaft".equals(event.getName().getPath())) {
     			chance = lootBioMechInMineshaft;
     			mineshaftText = " mineshaft";
+    		} else if ("chests/simple_dungeon".equals(event.getName().getPath())) {
+    			chance = lootBioMechInDungeon;
+    			mineshaftText = " dungeon";
     		}
     		LOGGER.debug("alter" + mineshaftText + " loot table: " + event.getTable().getLootTableId().getPath());
     		event.getTable().addPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance(chance))
@@ -385,6 +402,7 @@ public class BioMech
 				handPart = MechPart.LeftArm;
 			
 			boolean bothHandsInactive = false;
+			boolean bothHandsActive = false;
 			boolean currentArmActive = false;
 			if (handPart == MechPart.RightArm && has.rightHandActive || handPart == MechPart.LeftArm && has.leftHandActive) {
 				currentArmActive = true;
@@ -392,13 +410,16 @@ public class BioMech
 			if (!has.leftHandActive && !has.rightHandActive) {
 				bothHandsInactive = true;
 			}
+			if (has.leftHandActive && has.rightHandActive) {
+				bothHandsActive = true;
+			}
 			
 			ItemStack itemStack = playerData.getForSlot(handPart).itemStack;
 			if (itemStack.getItem() instanceof ArmorBase base) {
 				if (isMechArmActive(player, playerData, handPart)) {
 					itemStack = getFirstPersonArmItemStack(itemStack, handPart);
 					float partialTick = 1.0f;
-					base.onHandTick(currentArmActive, itemStack, player, handPart, partialTick, bothHandsInactive);
+					base.onHandTick(currentArmActive, itemStack, player, handPart, partialTick, bothHandsInactive, bothHandsActive);
 				}
 			}
 		}

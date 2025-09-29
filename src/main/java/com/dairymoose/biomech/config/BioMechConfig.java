@@ -79,8 +79,10 @@ public class BioMechConfig {
 			CompoundTag tag = new CompoundTag();
 			tag.putDouble("lootBioMechInChest", BioMechConfig.SERVER.lootBioMechInChest.get());
 			tag.putDouble("lootBioMechInMineshaft", BioMechConfig.SERVER.lootBioMechInMineshaft.get());
+			tag.putDouble("lootBioMechInDungeon", BioMechConfig.SERVER.lootBioMechInDungeon.get());
 			BioMech.LOGGER.debug("[BioMech]: Save global loot chance: " + BioMechConfig.SERVER.lootBioMechInChest.get());
 			BioMech.LOGGER.debug("[BioMech]: Save mineshaft loot chance: " + BioMechConfig.SERVER.lootBioMechInMineshaft.get());
+			BioMech.LOGGER.debug("[BioMech]: Save dungeon loot chance: " + BioMechConfig.SERVER.lootBioMechInDungeon.get());
 			NbtIo.write(tag, f);
 			
 		} catch (Exception ex) {
