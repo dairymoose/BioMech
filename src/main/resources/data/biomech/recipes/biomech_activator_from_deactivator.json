@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "biomech:biomech_deactivator"
+    }
+  ],
+  "result": {
+    "item": "biomech:biomech_activator",
+    "count": 1
+  },
+  "conditions": [
+      {
+        "type": "biomech:crafting_flag",
+          "crafting_flag": "enableBioMechActivator"
+      }
+    ]
+} 

@@ -65,6 +65,8 @@ public class BioMechConfig {
 		
 		try {
 			addConfigElement(BioMechConfig.COMMON.enableBioMechStation);
+			addConfigElement(BioMechConfig.COMMON.enableBioMechActivator);
+			addConfigElement(BioMechConfig.COMMON.enableBioMechDeactivator);
 			
 			BioMechStationBlock.configWalkToBioMechStation = BioMechConfig.COMMON.walkToBioMechStation.get().booleanValue();
 

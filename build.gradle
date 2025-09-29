@@ -173,6 +173,7 @@ dependencies {
 	implementation fg.deobf("curse.maven:emi-loot-681783:6449092")
 	
 	implementation fg.deobf("curse.maven:spark-361579:4738952")
+	implementation fg.deobf("curse.maven:tagtooltips-899941:6407506")
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

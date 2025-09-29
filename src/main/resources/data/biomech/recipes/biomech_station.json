@@ -1,19 +1,19 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "I I",
+    "i i",
     "#y#",
-    "I I"
+    "i i"
   ],
   "key": {
     "#": {
-      "tag": "forge:ingots/iron"
+    	"tag": "forge:ingots/iron"
     },
-	"I": {
-      "item": "minecraft:iron_nugget"
-    },
+	"i": {
+		"tag": "forge:nuggets/iron"
+	},
 	"y": {
-	  "item": "minecraft:orange_dye"
+		"item": "minecraft:orange_dye"
 	}
   },
   "result": {

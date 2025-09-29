@@ -175,7 +175,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 						}
 						
 						if (player.tickCount % SOUND_TICK_DURATION == 0) {
-							float volume = 0.58f;
+							float volume = 0.55f;
 							float laserPitch = 0.85f + this.getLaserPower(useTicks)*0.3f;
 							if (didHit) {
 								laserPitch *= 1.04f;
