@@ -32,6 +32,7 @@ public class BioMechPlayerData {
 	private float suitEnergy = 0.0f;
 	public float suitEnergyMax = 0.0f;
 	public float suitEnergyPerSec = suitEnergyPerSecBaseline;
+	public float suitEnergyPerSecTemporaryModifier = 0.0f;
 	
 	public int lastUsedEnergyTick = -1000;
 	public int ticksRequiredToRegenEnergy = 15;
@@ -100,9 +101,12 @@ public class BioMechPlayerData {
 	
 	private void internalTickEnergy(Player player) {
 		if (this.canRegenEnergy(player)) {
-			this.suitEnergy += suitEnergyPerSec/20.0f;
+			this.suitEnergy += suitEnergyPerSec/20.0f + suitEnergyPerSecTemporaryModifier/20.0f;
 			if (this.suitEnergy > suitEnergyMax) {
 				this.suitEnergy = suitEnergyMax;
+			}
+			if (this.suitEnergy < 0.0f) {
+				this.suitEnergy = 0.0f;
 			}
 		}
 	}

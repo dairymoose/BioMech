@@ -26,9 +26,9 @@ public class BackScubaTankArmor extends ArmorBase {
 		this.mechPart = MechPart.Back;
 	}
 
-	public static float energyPerSec = 0.25f;
+	//public static float energyPerSecMaxDrain = -0.5f;
+	public static float energyPerSec = 0.5f;
 	public static float energyPerTick = energyPerSec / 20.0f;
-	public static float MIN_ENERGY_TO_USE = 0.70f;
 	public static int AIR_INCREMENT = 3;
 	@Override
 	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
@@ -36,19 +36,16 @@ public class BackScubaTankArmor extends ArmorBase {
 			List<Item> armorItems = new ArrayList<Item>();
 			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
 			if (armorItems.contains(BioMechRegistry.ITEM_BACK_SCUBA_TANK.get()) || slotId == -1) {
-				if (entity instanceof LivingEntity living && !living.isSpectator()) {
-					if (living.isUnderWater()) {
-						BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
+				if (entity instanceof LivingEntity living) {
+					BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
+					if (living.isUnderWater() && !living.isSpectator()) {
 						
 						boolean active = false;
 						if (playerData != null) {
 							if (playerData.getSuitEnergy() < energyPerTick || living.hasEffect(MobEffects.WATER_BREATHING) || living.hasEffect(MobEffects.CONDUIT_POWER)) {
 								active = false;
 							} else {
-								if (playerData.canRegenEnergy(player) && playerData.getSuitEnergyPercent() < MIN_ENERGY_TO_USE) {
-									active = false;
-								} else
-									active = true;
+								active = true;
 							}
 							
 							if (active) {
@@ -61,6 +58,8 @@ public class BackScubaTankArmor extends ArmorBase {
 								}
 								
 								player.setAirSupply(air);
+							} else {
+								playerData.spendSuitEnergy(player, 0.0f);
 							}
 						}
 					}
