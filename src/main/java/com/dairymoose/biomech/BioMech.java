@@ -265,8 +265,8 @@ public class BioMech
     			}
     			if (tag.contains("lootBioMechInDungeon")) {
     				lootBioMechInMineshaft = (float) tag.getDouble("lootBioMechInDungeon");
-    				BioMech.LOGGER.info("Got lootBioMechInMineshaft value of " + lootBioMechInDungeon + " from file");
-    				gotMineshaftConfigValue = true;
+    				BioMech.LOGGER.info("Got lootBioMechInDungeon value of " + lootBioMechInDungeon + " from file");
+    				gotDungeonConfigValue = true;
     			}
     		}
     		if (!gotGlobalConfigValue) {
@@ -276,7 +276,7 @@ public class BioMech
     			BioMech.LOGGER.info("Using default lootBioMechInMineshaft value of " + lootBioMechInMineshaft);
     		}
     		if (!gotDungeonConfigValue) {
-    			BioMech.LOGGER.info("Using default lootBioMechInMineshaft value of " + lootBioMechInDungeon);
+    			BioMech.LOGGER.info("Using default lootBioMechInDungeon value of " + lootBioMechInDungeon);
     		}
     	}
 		

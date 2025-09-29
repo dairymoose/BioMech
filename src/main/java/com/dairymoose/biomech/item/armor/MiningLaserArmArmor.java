@@ -175,13 +175,12 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 						}
 						
 						if (player.tickCount % SOUND_TICK_DURATION == 0) {
-							float volume = 0.62f;
+							float volume = 0.58f;
 							float laserPitch = 0.85f + this.getLaserPower(useTicks)*0.3f;
 							if (didHit) {
 								laserPitch *= 1.04f;
 							}
 							player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_LASER_LOOP.get(), SoundSource.PLAYERS, volume, laserPitch, false);
-							//player.level().playLocalSound(player.blockPosition(), BioMechRegistry.SOUND_EVENT_LASER_LOOP.get(), SoundSource.PLAYERS, 1.0f, laserPitch, false);
 						}
 					}
 				}
