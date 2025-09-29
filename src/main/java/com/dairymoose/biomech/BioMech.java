@@ -891,6 +891,7 @@ public class BioMech
     					f2 = f1 - f;
     				}
         			
+    				//setupRotations accounts for yaw, elytra flight, swimming, etc
     				playerRenderer.setupRotations((AbstractClientPlayer)renderEntity, poseStack, 0.0f, f, event.getPartialTick());
         			poseStack.scale(-1.0F, -1.0F, 1.0F);
         		    this.scale((AbstractClientPlayer)renderEntity, poseStack, event.getPartialTick());
