@@ -107,6 +107,14 @@ public class ArmorBase extends ArmorItem {
 		else {
 			comp.add(Component.translatable("item.biomech.generic.tooltip"));
 		}
+		if (this.mechPart != null) {
+			MutableComponent slotTt = Component.translatable("tooltip.biomech.slot.tooltip");
+			String partName = this.mechPart.name();
+			if (mechPart == MechPart.RightArm) {
+				partName = "Arm";
+			}
+			comp.add(Component.literal(slotTt.getString() + ": " + partName));
+		}
 		if (suitEnergy != 0) {
 			MutableComponent suitEnergyTt = Component.translatable("tooltip.biomech.suitenergy");
 			comp.add(Component.literal("§2+" + suitEnergy + " " + suitEnergyTt.getString() + "§0"));

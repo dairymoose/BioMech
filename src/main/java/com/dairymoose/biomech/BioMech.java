@@ -145,15 +145,15 @@ import net.minecraftforge.registries.RegistryObject;
  * 
  * - Adding new arms:
  * Add .geo.json file
- * Copy .geo.json file to _item.geo.json
- * Add animation in animations.item package
- * Export display settings and put it models.item
+ * <Arm Specific>: Copy .geo.json file to _item.geo.json
+ * <Arm Specific>: Add animation in animations.item package
+ * <Arm Specific>: Export display settings and put it models.item
  * Add localization
  * Add renderer in armor.renderer package
  * Add ArmorBase class in item.armor package
  * Add new armor to BioMechRegistry
- * Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry & AzItemRendererRegistry)
- * If animated: add to AzIdentityRegistry
+ * <Arm Specific>: Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry & AzItemRendererRegistry)
+ * <Arm Specific>: If animated: add to AzIdentityRegistry
  * 
  */
 

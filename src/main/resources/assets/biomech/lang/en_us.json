@@ -6,6 +6,8 @@
 	"tooltip.biomech.suitenergy": "Suit Energy",
 	"tooltip.biomech.suitenergypersec": "Suit Energy/sec",
 	
+	"tooltip.biomech.slot.tooltip": "Slot",
+	
 	"entity.subtitle.laser_loop": "Laser Burns",
 
 	"item.biomech.biomech_activator": "BioMech Activator",
@@ -42,7 +44,7 @@
 	"item.biomech.power_helmet": "§5Power Helmet§0",
 	"item.biomech.power_helmet.tooltip1": "Non-critical attacks have a 33% chance to instead be a critical strike.",
 
-	"item.biomech.back_scuba_tank": "§5Back Scuba Tank§0",
+	"item.biomech.back_scuba_tank": "§5Scuba Tank§0",
 	"item.biomech.back_scuba_tank.tooltip1": "Automatically consumes energy while underwater.",
 	"item.biomech.back_scuba_tank.tooltip2": "While energy holds, you will have air to breath.",
 	"item.biomech.back_scuba_tank.tooltip3": "Prevents energy regeneration while supplying air.",
