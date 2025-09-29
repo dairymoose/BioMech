@@ -67,7 +67,9 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 	private static ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
 	public static int START_USING_TICK_COUNT = 5;
 	public static float energyPerSec = 5.0f;
+	public static float energyPerSecMiss = 0.5f;
 	public static float energyPerTick = energyPerSec / 20.0f;
+	public static float energyPerTickMiss = energyPerSecMiss / 20.0f;
 	private static int SOUND_TICK_DURATION = 3;
 	Map<Player, DestroyBlockProgress> dbpMap = new HashMap<>();
 
@@ -175,7 +177,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 						}
 						
 						if (player.tickCount % SOUND_TICK_DURATION == 0) {
-							float volume = 0.55f;
+							float volume = 0.45f;
 							float laserPitch = 0.85f + this.getLaserPower(useTicks)*0.3f;
 							if (didHit) {
 								laserPitch *= 1.04f;
@@ -248,6 +250,8 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 				
 				if (didHit) {
 					playerData.spendSuitEnergy(player, energyPerTick);
+				} else {
+					playerData.spendSuitEnergy(player, energyPerTickMiss);
 				}
 				
 				
