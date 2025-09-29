@@ -937,7 +937,6 @@ public class BioMech
         		    				ItemStack priorFeetItem = null;
         		    				//this is required so AzureLib actually does any render at all in renderArmorPiece
         		    				event.getEntity().setItemSlot(equipmentSlot, itemStackToRender);
-        		    				//event.getEntity().setItemSlot(equipmentSlot, new ItemStack(Items.LEATHER_CHESTPLATE));
         		    				if (slottedItem.mechPart == MechPart.Leggings) {
         		    					priorFeetItem = event.getEntity().getItemBySlot(EquipmentSlot.FEET);
         		    					event.getEntity().setItemSlot(EquipmentSlot.FEET, ItemStack.EMPTY);

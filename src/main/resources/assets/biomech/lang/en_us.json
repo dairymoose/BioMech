@@ -43,7 +43,7 @@
 	"item.biomech.power_helmet.tooltip1": "Non-critical attacks have a 33% chance to instead be a critical strike.",
 
 	"item.biomech.back_scuba_tank": "§5Back Scuba Tank§0",
-	"item.biomech.back_scuba_tank.tooltip1": "Automatically consumes energy while underwater.",
+	"item.biomech.back_scuba_tank.tooltip1": "Automatically consumes energy while underwater (0.25/sec).",
 	"item.biomech.back_scuba_tank.tooltip2": "While energy holds, you will have extra air to breath.",
 	"item.biomech.back_scuba_tank.tooltip3": "Require at least 70% suit energy to activate.",
 	
