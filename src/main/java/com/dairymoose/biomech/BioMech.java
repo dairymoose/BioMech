@@ -3,6 +3,8 @@ package com.dairymoose.biomech;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -296,6 +298,12 @@ public class BioMech
 		BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), slottedItemPacket);
     }
     
+    //client-side energy drain tracking
+    private static float suitEnergyLast = 0.0f;
+	private static float suitEnergyDiffSum = 0.0f;
+	private static int TICKS_TO_UPDATE_ENERGY_DIFF = 20;
+	private static float calcEnergyDiffOneSec = 0.0f;
+	
     public static int RESYNC_ENERGY_TICK_PERIOD = 60;
     public static Map<UUID, HandActiveStatus> handActiveMap = new HashMap<>();
     @SubscribeEvent
@@ -306,6 +314,17 @@ public class BioMech
     			playerData.tickEnergy(event.player);
     			tickInventoryForPlayer(event.player, playerData);
     			tickHandsForPlayer(event.player, playerData);
+    			if (event.player.level().isClientSide) {
+    				float suitEnergy = playerData.getSuitEnergy();
+    				float oneTickEnergyDiff = suitEnergy - suitEnergyLast; 
+					suitEnergyDiffSum += oneTickEnergyDiff;
+					suitEnergyLast = suitEnergy;
+					
+					if (Minecraft.getInstance().player.tickCount % TICKS_TO_UPDATE_ENERGY_DIFF == 0) {
+						BioMech.calcEnergyDiffOneSec = suitEnergyDiffSum;
+						suitEnergyDiffSum = 0.0f;
+					}
+    			}
     			
 				if (event.player.tickCount % RESYNC_ENERGY_TICK_PERIOD == 0) {
 					if (event.player instanceof ServerPlayer sp) {
@@ -582,27 +601,46 @@ public class BioMech
 									1 + (int) Math.ceil((GUI_SUIT_ENERGY_TEX_SIZE - 2) * suitEnergyPct), GUI_SUIT_ENERGY_BORDER_HEIGHT,
 									GUI_SUIT_ENERGY_TEX_SIZE, GUI_SUIT_ENERGY_TEX_SIZE);
 							
+							float textXScale = BioMechConfig.CLIENT.suitEnergyTextXScale.get().floatValue();
+							float textYScale = BioMechConfig.CLIENT.suitEnergyTextYScale.get().floatValue();
+							overlayEvent.getGuiGraphics().pose().scale(textXScale, textYScale, 1.0f);
 							if (BioMechConfig.CLIENT.showSuitEnergyText.get().booleanValue()) {
-								float textXScale = BioMechConfig.CLIENT.suitEnergyTextXScale.get().floatValue();
-								float textYScale = BioMechConfig.CLIENT.suitEnergyTextYScale.get().floatValue();
 								float textXScaleInv = 1.0f/textXScale;
 								float textYScaleInv = 1.0f/textYScale;
 								float barHeight = GUI_SUIT_ENERGY_BORDER_HEIGHT * yScale;
 								int halfBarHeight = (int)(barHeight / 2.0f);
 								int leftMargin = (int)(3.0f*xScale);
-								overlayEvent.getGuiGraphics().pose().scale(textXScale, textYScale, 1.0f);
+								
 								float pixelXDiff = xStart*textXScaleInv - xStart;
 								float pixelYDiff = yStart*textYScaleInv - yStart;
 								overlayEvent.getGuiGraphics().pose().translate(pixelXDiff, pixelYDiff, 0.0f);
 								overlayEvent.getGuiGraphics().pose().translate(leftMargin, halfBarHeight, 0.0f);
+								//print suit energy
 								Component component1 = MutableComponent
 										.create(new LiteralContents(String.valueOf((int)suitEnergy)))
 										.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xFFFFFF)));
 								overlayEvent.getGuiGraphics().drawString(Minecraft.getInstance().font, component1,
 										xStart,
 										yStart, 0, true);
-								overlayEvent.getGuiGraphics().pose().scale(1.0f, 1.0f, 1.0f);
 							}
+							if (BioMechConfig.CLIENT.showEnergyDrainRate.get().booleanValue()) {
+								NumberFormat nf = new DecimalFormat("#.#");
+								//print suit energy gain/loss
+								Component component2 = null;
+								if (calcEnergyDiffOneSec >= 0.0f) {
+									component2 = MutableComponent
+									.create(new LiteralContents(nf.format(calcEnergyDiffOneSec)))
+									.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0x00FF00)));
+								} else {
+									component2 = MutableComponent
+									.create(new LiteralContents(nf.format(calcEnergyDiffOneSec)))
+									.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xFF0000)));
+								}
+								overlayEvent.getGuiGraphics().drawString(Minecraft.getInstance().font, component2,
+										(int)(xStart + GUI_SUIT_ENERGY_TEX_SIZE*xScale - 0.2f*xScale),
+										yStart, 0, true);
+							}
+							overlayEvent.getGuiGraphics().pose().scale(1.0f, 1.0f, 1.0f);
 							
 							overlayEvent.getGuiGraphics().pose().popPose();
 							//RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);

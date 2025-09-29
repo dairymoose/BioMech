@@ -17,6 +17,8 @@ public class BioMechClientConfig {
 	public final ConfigValue<Double> suitEnergyTextXScale;
 	public final ConfigValue<Double> suitEnergyTextYScale;
 	
+	public final ForgeConfigSpec.BooleanValue showEnergyDrainRate;
+	
 	public BioMechClientConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("first_person");
 		this.hideOffHandWhileNotInUse = builder.comment("hideOffHandWhileNotInUse").translation("config.biomech.hideOffHandWhileNotInUse").define("hideOffHandWhileNotInUse", false);
@@ -32,6 +34,7 @@ public class BioMechClientConfig {
 		this.showSuitEnergyText = builder.comment("showSuitEnergyText").translation("config.biomech.showSuitEnergyText").define("showSuitEnergyText", true);
 		this.suitEnergyTextXScale = builder.comment("suitEnergyTextXScale").translation("config.biomech.suitEnergyTextXScale").defineInRange("suitEnergyTextXScale", 0.5, 0.0, 5.0);
 		this.suitEnergyTextYScale = builder.comment("suitEnergyTextYScale").translation("config.biomech.suitEnergyTextYScale").defineInRange("suitEnergyTextYScale", 0.5, 0.0, 5.0);
+		this.showEnergyDrainRate = builder.comment("showEnergyDrainRate").translation("config.biomech.showEnergyDrainRate").define("showEnergyDrainRate", false);
 		builder.pop();
 	}
 	

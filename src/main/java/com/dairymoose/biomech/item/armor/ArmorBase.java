@@ -1,5 +1,7 @@
 package com.dairymoose.biomech.item.armor;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -110,8 +112,9 @@ public class ArmorBase extends ArmorItem {
 			comp.add(Component.literal("§2+" + suitEnergy + " " + suitEnergyTt.getString() + "§0"));
 		}
 		if (suitEnergyPerSec > 0.0f) {
+			NumberFormat nf = new DecimalFormat("##.#");
 			MutableComponent suitEnergyTt = Component.translatable("tooltip.biomech.suitenergypersec");
-			comp.add(Component.literal("§b+" + suitEnergyPerSec + " " + suitEnergyTt.getString() + "§0"));
+			comp.add(Component.literal("§b+" + nf.format(suitEnergyPerSec) + " " + suitEnergyTt.getString() + "§0"));
 		}
 		comp.add(Component.empty());
 		MutableComponent t1 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip1", "");
