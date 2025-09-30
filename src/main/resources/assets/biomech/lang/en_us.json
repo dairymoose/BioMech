@@ -49,6 +49,10 @@
 	"item.biomech.back_scuba_tank.tooltip2": "While energy holds, you will have air to breath.",
 	"item.biomech.back_scuba_tank.tooltip3": "Prevents energy regeneration while supplying air.",
 	
+	"item.biomech.back_jetpack": "§5Jetpack§0",
+	"item.biomech.back_jetpack.tooltip1": "Hold alt+spacebar to activate.",
+	"item.biomech.back_jetpack.tooltip2": "Consumes energy while active.",
+	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",
 	"key.left_arm": "Use Left Arm",

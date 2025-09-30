@@ -16,6 +16,7 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.armor.renderer.BackJetpackRenderer;
 import com.dairymoose.biomech.armor.renderer.BackScubaTankRenderer;
 import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.LavastrideLeggingsRenderer;
@@ -102,6 +103,7 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.InputEvent;
@@ -116,6 +118,7 @@ import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -134,7 +137,7 @@ import net.minecraftforge.registries.RegistryObject;
 /*
  * - Adding new chest/back/etc armor:
  * Add .geo.json file
- * Add textures.item texture for 3d model
+ * Add textures.item .png texture for 3d model
  * Draw custom image for icon in textures.item.icon package
  * Add custom image to minecraft:generated item in models.item
  * Add localization
@@ -142,9 +145,11 @@ import net.minecraftforge.registries.RegistryObject;
  * Add ArmorBase class in item.armor package
  * Add new armor to BioMechRegistry
  * Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry)
+ * Add to method onAlterLootTable
  * 
  * - Adding new arms:
  * Add .geo.json file
+ * Add textures.item .png texture for 3d model
  * <Arm Specific>: Copy .geo.json file to _item.geo.json
  * <Arm Specific>: Add animation in animations.item package
  * <Arm Specific>: Export display settings and put it models.item
@@ -154,6 +159,7 @@ import net.minecraftforge.registries.RegistryObject;
  * Add new armor to BioMechRegistry
  * <Arm Specific>: Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry & AzItemRendererRegistry)
  * <Arm Specific>: If animated: add to AzIdentityRegistry
+ * Add to method onAlterLootTable
  * 
  */
 
@@ -315,6 +321,20 @@ public class BioMech
 		CompoundTag playerDataTag = BioMechPlayerData.serialize(playerData);
 		ClientboundUpdateSlottedItemPacket slottedItemPacket = new ClientboundUpdateSlottedItemPacket(player.getUUID(), playerDataTag);
 		BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), slottedItemPacket);
+    }
+    
+    public static boolean localPlayerDidJump = false;
+    @SubscribeEvent
+    public void onJump(LivingEvent.LivingJumpEvent event) {
+    	if (event.getEntity() instanceof Player player) {
+    		BioMech.LOGGER.info("onJump");
+    		if (player.onGround() && localPlayerHoldingAlt) {
+    			Vec3 delta = player.getDeltaMovement();
+    			player.setDeltaMovement(delta.x, 0.0, delta.z);
+    		} else {
+    			localPlayerDidJump = true;
+    		}
+    	}
     }
     
     //client-side energy drain tracking
@@ -531,6 +551,10 @@ public class BioMech
 		return false;
 	}
     
+	public static boolean primedForMidairJump = false;
+	public static boolean localPlayerJumping = false;
+	public static boolean localPlayerHoldingAlt = false;
+	
     public static boolean hideOffHandWhileInactive = false;
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -699,6 +723,19 @@ public class BioMech
     	@SubscribeEvent
         public void onClientTick(final ClientTickEvent event) {
         	if (event.phase == TickEvent.Phase.START) {
+        		if (Minecraft.getInstance().player != null) {
+        			localPlayerHoldingAlt = HOTKEY_ENABLE_ARM_FUNCTION.isDown();
+        			BioMech.localPlayerJumping = Minecraft.getInstance().player.input.jumping;
+        			if (Minecraft.getInstance().player.onGround()) {
+        				primedForMidairJump = false;
+        			} else if (!BioMech.localPlayerJumping) {
+        				primedForMidairJump = true;
+        			}
+        			
+        			Minecraft.getInstance().player.setJumping(false);
+        			Minecraft.getInstance().player.input.jumping = false;
+        		}
+        		
         		HandActiveStatus has = this.getLocalHandActiveStatus();
         		if (has != null) {
         			boolean initialRight = has.rightHandActive;
@@ -707,6 +744,7 @@ public class BioMech
             		BioMechPlayerData playerData = this.getDataForLocalPlayer();
             		if (playerData != null) {
             			Player localPlayer = Minecraft.getInstance().player;
+            			
             			if (requireModifierKeyForArmUsage) {
                 			if (HOTKEY_ENABLE_ARM_FUNCTION.isDown()) {
                     			if (isRightMechArmActive(localPlayer, playerData) && HOTKEY_RIGHT_ARM.isDown()) {
@@ -1048,7 +1086,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(MiningLaserRightArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
         	AzArmorRendererRegistry.register(MiningLaserLeftArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(BackScubaTankRenderer::new, BioMechRegistry.ITEM_BACK_SCUBA_TANK.get());
-        	
+        	AzArmorRendererRegistry.register(BackJetpackRenderer::new, BioMechRegistry.ITEM_BACK_JETPACK.get());
         	
         	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
