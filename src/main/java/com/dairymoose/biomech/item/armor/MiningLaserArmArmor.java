@@ -227,12 +227,12 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 							didHit = true;
 							Entity e = ehr.getEntity();
 							if (e instanceof LivingEntity living) {
-								if (!living.isInvulnerable() && !living.fireImmune() && !living.isDeadOrDying()) {
+								if (!living.isInvulnerable() && !living.isDeadOrDying()) {
 									float damageMult = 1.0f;
 									if (bothHandsActive) {
 										damageMult = 2.0f;
 									}
-									living.hurt(player.level().damageSources().onFire(), damageMult*1.5f*laserPower);
+									living.hurt(player.level().damageSources().playerAttack(player), damageMult*1.5f*laserPower);
 									if (living.getRemainingFireTicks() <= 30) {
 										living.setRemainingFireTicks(30);
 									}
