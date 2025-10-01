@@ -3,5 +3,10 @@
     "category": "block",
     "subtitle": "entity.subtitle.laser_loop",
     "sounds": [ "biomech:item/laser_loop" ]
-  }
+  },
+  "jetpack_loop": {
+      "category": "block",
+      "subtitle": "entity.subtitle.jetpack_loop",
+      "sounds": [ "biomech:item/jetpack_loop" ]
+    }
 }

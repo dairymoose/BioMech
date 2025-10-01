@@ -9,6 +9,7 @@ import com.dairymoose.biomech.BioMechRegistry;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -82,10 +83,10 @@ public class BackJetpackArmor extends ArmorBase {
 									float deltaY = 0.0f;
 									if (player.getDeltaMovement().y <= 0.20f) {
 										deltaY = yPerTickStage1;
-										BioMech.LOGGER.info("yPerTickStage1, " + player.getDeltaMovement().y);
+										//BioMech.LOGGER.info("yPerTickStage1, " + player.getDeltaMovement().y);
 									} else if (player.getDeltaMovement().y < 0.30) {
 										deltaY = yPerTickStage2;
-										BioMech.LOGGER.info("yPerTickStage2, " + player.getDeltaMovement().y);
+										//BioMech.LOGGER.info("yPerTickStage2, " + player.getDeltaMovement().y);
 									} else {
 										double movementSpeedSqr = player.getDeltaMovement().y*player.getDeltaMovement().y;
 										deltaY = yPerTickStage2;
@@ -93,10 +94,10 @@ public class BackJetpackArmor extends ArmorBase {
 											//acceleration is slowed down as we speed up to simulate wind resistance
 											//starts at 11.22*0.09=1.01
 											deltaY /= 11.22f*movementSpeedSqr;
-											BioMech.LOGGER.info("deltaY=" + deltaY + " vs yPerTickStage2=" + yPerTickStage2);
+											//BioMech.LOGGER.info("deltaY=" + deltaY + " vs yPerTickStage2=" + yPerTickStage2);
 										}
 										
-										BioMech.LOGGER.info("yPerTickStageFinal, " + player.getDeltaMovement().y);
+										//BioMech.LOGGER.info("yPerTickStageFinal, " + player.getDeltaMovement().y);
 									}
 									
 									player.addDeltaMovement(new Vec3(0.0f, deltaY, 0.0f));
@@ -128,10 +129,10 @@ public class BackJetpackArmor extends ArmorBase {
 										//acceleration is slowed down as we speed up to simulate wind resistance
 										//starts at 0.84*1.21=1.02
 										calcFallFlyingBoost /= 0.84f*movementSpeedSqr;
-										BioMech.LOGGER.info("calcFallFlyingBoost=" + calcFallFlyingBoost + " vs fallFlyingBoost=" + fallFlyingBoost);
+										//BioMech.LOGGER.info("calcFallFlyingBoost=" + calcFallFlyingBoost + " vs fallFlyingBoost=" + fallFlyingBoost);
 									}
 									if (player.isSwimming()) {
-										calcFallFlyingBoost *= 0.40f;
+										calcFallFlyingBoost *= 0.33f;
 									}
 									
 									float yComponent = (float)(calcFallFlyingBoost * Math.sin(Math.toRadians(-pitch)));
@@ -148,6 +149,7 @@ public class BackJetpackArmor extends ArmorBase {
 								float smokeYOffset = 0.12f;
 								float smokeDepthOffset = 0.0f;
 								float[] angleAdjust = { -22.0f, 22.0f};
+								float angleJitter = 5.0f;
 								if (isFlyingOrSwimming) {
 									particleY = 0.25f;
 									particleDepth = -0.05f;
@@ -157,9 +159,11 @@ public class BackJetpackArmor extends ArmorBase {
 									
 									angleAdjust[0] = -80.0f;
 									angleAdjust[1] = 80.0f;
+									angleJitter = 10.0f;
 								}
 								for (int a=0; a<angleAdjust.length; ++a) {
 									float angle = player.yBodyRot + angleAdjust[a];
+									angle += (Math.random() - 0.5f) * 2.0f*angleJitter;
 									
 									double xComp = -Math.sin(Math.toRadians(angle));
 									double zComp = Math.cos(Math.toRadians(angle));
@@ -175,6 +179,11 @@ public class BackJetpackArmor extends ArmorBase {
 									if (player.tickCount % 2 == 0) {
 										player.level().addParticle(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z,
 												0.0f, -0.4f, 0.0f);
+									}
+									if (player.tickCount % 5 == 0) {
+										float volume = 0.6f;
+										float pitch = 1.0f; 
+										player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_JETPACK_LOOP.get(), SoundSource.PLAYERS, volume, pitch, false);
 									}
 								}
 							}
