@@ -373,8 +373,9 @@ public class BioMech
     //client-side energy drain tracking
     private static float suitEnergyLast = 0.0f;
 	private static float suitEnergyDiffSum = 0.0f;
-	private static int TICKS_TO_UPDATE_ENERGY_DIFF = 20;
-	private static float calcEnergyDiffOneSec = 0.0f;
+	private static int TICKS_TO_UPDATE_ENERGY_DIFF = 10;
+	private static int TICKS_PER_SECOND = 20;
+	private static float calcEnergyDiffOnePeriod = 0.0f;
 	
     public static int RESYNC_ENERGY_TICK_PERIOD = 60;
     public static Map<UUID, HandActiveStatus> handActiveMap = new HashMap<>();
@@ -393,7 +394,7 @@ public class BioMech
 					suitEnergyLast = suitEnergy;
 					
 					if (Minecraft.getInstance().player.tickCount % TICKS_TO_UPDATE_ENERGY_DIFF == 0) {
-						BioMech.calcEnergyDiffOneSec = suitEnergyDiffSum;
+						BioMech.calcEnergyDiffOnePeriod = suitEnergyDiffSum / ((float)TICKS_TO_UPDATE_ENERGY_DIFF/TICKS_PER_SECOND);
 						suitEnergyDiffSum = 0.0f;
 					}
     			}
@@ -708,13 +709,13 @@ public class BioMech
 								NumberFormat nf = new DecimalFormat("#.#");
 								//print suit energy gain/loss
 								Component component2 = null;
-								if (calcEnergyDiffOneSec >= 0.0f) {
+								if (calcEnergyDiffOnePeriod >= 0.0f) {
 									component2 = MutableComponent
-									.create(new LiteralContents(nf.format(calcEnergyDiffOneSec)))
+									.create(new LiteralContents(nf.format(calcEnergyDiffOnePeriod)))
 									.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0x00FF00)));
 								} else {
 									component2 = MutableComponent
-									.create(new LiteralContents(nf.format(calcEnergyDiffOneSec)))
+									.create(new LiteralContents(nf.format(calcEnergyDiffOnePeriod)))
 									.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xFF0000)));
 								}
 								overlayEvent.getGuiGraphics().drawString(Minecraft.getInstance().font, component2,
