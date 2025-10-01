@@ -51,6 +51,8 @@ public class BioMechRegistry {
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_THICKEST_LASER = BioMech.PARTICLES.register("thickest_laser", () -> new SimpleParticleType(false));
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_MAX_LASER = BioMech.PARTICLES.register("max_laser", () -> new SimpleParticleType(false));
 	
+	public static RegistryObject<ParticleType> PARTICLE_TYPE_INSTANT_SMOKE = BioMech.PARTICLES.register("instant_smoke", () -> new SimpleParticleType(false));
+	
 	public static RegistryObject<SoundEvent> SOUND_EVENT_LASER_LOOP = BioMech.SOUNDS.register("laser_loop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "laser_loop")));
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_STATION = BioMech.ITEMS.register("biomech_station", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_STATION.get(), new Item.Properties()));

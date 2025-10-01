@@ -7,6 +7,8 @@ import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -75,7 +77,8 @@ public class BackJetpackArmor extends ArmorBase {
 							if (active) {
 								playerData.spendSuitEnergy(player, energyPerTick);
 								
-								if (!player.isFallFlying() && !player.isSwimming()) {
+								boolean isFlyingOrSwimming = player.isFallFlying() || player.isSwimming();
+								if (!isFlyingOrSwimming) {
 									float deltaY = 0.0f;
 									if (player.getDeltaMovement().y <= 0.20f) {
 										deltaY = yPerTickStage1;
@@ -137,6 +140,42 @@ public class BackJetpackArmor extends ArmorBase {
 									float zComponent = (float)(horizontalComponent * Math.cos(Math.toRadians(yaw)));
 									
 									player.addDeltaMovement(new Vec3(xComponent, yComponent, zComponent));
+								}
+								
+								float particleY = 0.6f;
+								float particleDepth = -0.27f;
+								
+								float smokeYOffset = 0.12f;
+								float smokeDepthOffset = 0.0f;
+								float[] angleAdjust = { -22.0f, 22.0f};
+								if (isFlyingOrSwimming) {
+									particleY = 0.25f;
+									particleDepth = -0.05f;
+									
+									smokeYOffset = 0.0f;
+									smokeDepthOffset = -0.03f;
+									
+									angleAdjust[0] = -80.0f;
+									angleAdjust[1] = 80.0f;
+								}
+								for (int a=0; a<angleAdjust.length; ++a) {
+									float angle = player.yBodyRot + angleAdjust[a];
+									
+									double xComp = -Math.sin(Math.toRadians(angle));
+									double zComp = Math.cos(Math.toRadians(angle));
+									Vec3 loc = player.position().add(
+											new Vec3(particleDepth * xComp, particleY, particleDepth * zComp));
+									Vec3 smokeLoc = loc.add(new Vec3(smokeDepthOffset * xComp, smokeYOffset, smokeDepthOffset * zComp));
+									
+									if (!isFlyingOrSwimming || player.tickCount % 2 == 0) {
+										player.level().addParticle((ParticleOptions) BioMechRegistry.PARTICLE_TYPE_INSTANT_SMOKE.get(), smokeLoc.x, smokeLoc.y, smokeLoc.z,
+												0.0f, 0.0f, 0.0f);
+									}
+									
+									if (player.tickCount % 2 == 0) {
+										player.level().addParticle(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z,
+												0.0f, -0.4f, 0.0f);
+									}
 								}
 							}
 						}

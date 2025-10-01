@@ -151,13 +151,13 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 							} else {
 								laserParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_MAX_LASER.get();
 							}
-							Minecraft.getInstance().level.addParticle(laserParticle, loc.x, loc.y, loc.z,
+							player.level().addParticle(laserParticle, loc.x, loc.y, loc.z,
 									viewVec.scale(vecScale).x, viewVec.scale(vecScale).y, viewVec.scale(vecScale).z);
 						}
 
 						if (hitResult instanceof BlockHitResult bhr) {
 							BlockPos pos = bhr.getBlockPos();
-							BlockState blockState = Minecraft.getInstance().level.getBlockState(pos);
+							BlockState blockState = player.level().getBlockState(pos);
 							if (!blockState.isAir() && !blockState.getFluidState().isSource()) {
 								didHit = true;
 								float blockDestroySpeed = blockState.getDestroySpeed(player.level(), pos);
@@ -168,7 +168,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 									BlockParticleOption blockParticle = new BlockParticleOption(ParticleTypes.BLOCK,
 											blockState);
 									for (int i = 0; i < 3; ++i) {
-										Minecraft.getInstance().level.addParticle(blockParticle,
+										player.level().addParticle(blockParticle,
 												endLoc.x + (Math.random() * 1.0 - 0.5),
 												endLoc.y + (Math.random() * 1.0 - 0.5),
 												endLoc.z + (Math.random() * 1.0 - 0.5), 0.0D, 0.0D, 0.0D);

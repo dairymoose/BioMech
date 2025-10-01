@@ -45,6 +45,7 @@ import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
+import com.dairymoose.biomech.particle.InstantSmokeParticle;
 import com.dairymoose.biomech.particle.LaserParticle;
 import com.dairymoose.biomech.particle.MaxLaserParticle;
 import com.dairymoose.biomech.particle.ThickerLaserParticle;
@@ -612,6 +613,7 @@ public class BioMech
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_THICKER_LASER.get(), ThickerLaserParticle.Provider::new);
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_THICKEST_LASER.get(), ThickestLaserParticle.Provider::new);
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_MAX_LASER.get(), MaxLaserParticle.Provider::new);
+        	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_INSTANT_SMOKE.get(), InstantSmokeParticle.Provider::new);
         }
         
     	@SubscribeEvent
