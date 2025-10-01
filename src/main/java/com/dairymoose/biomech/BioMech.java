@@ -1016,9 +1016,6 @@ public class BioMech
             		    			
         		    				poseStack.pushPose();
         		    				HandActiveStatus has = handActiveMap.computeIfAbsent(event.getEntity().getUUID(), (uuid) -> new HandActiveStatus());
-//        		    				if (slottedItem.mechPart == MechPart.RightArm) {
-//        		    					poseStack.translate(-0.5, 0.0, 0.0);
-//        		    				}
         		    				//activator item moves the arm forward slightly, we'll undo that here
         		    				if (slottedItem.mechPart == MechPart.RightArm && as.hasMainHandActivator) {
         		    					poseStack.mulPose(Axis.XP.rotationDegrees(15.0f));
