@@ -987,6 +987,7 @@ public class BioMech
         		    BioMechPlayerData playerData = BioMech.globalPlayerData.get(renderEntity.getUUID());
         		    if (playerData != null) {
         		    	playerData.getAllSlots().forEach((slottedItem) -> {
+        		    		
         		    		if (!slottedItem.itemStack.isEmpty() && slottedItem.visible) {
         		    			ItemStack itemStackToRender = slottedItem.itemStack;
         		    			EquipmentSlot equipmentSlot = LivingEntity.getEquipmentSlotForItem(itemStackToRender);
@@ -1058,27 +1059,7 @@ public class BioMech
         		    	});
         		    }
         		    
-        			//hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, EquipmentSlot.CHEST, event.getPackedLight(), armorModel);
-        			//event.getEntity().setItemSlot(EquipmentSlot.CHEST, new ItemStack(BioMechRegistry.ITEM_POWER_LEFT_ARM.get()));
-        			//hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, EquipmentSlot.CHEST, event.getPackedLight(), armorModel);
-        			//event.getEntity().setItemSlot(EquipmentSlot.CHEST, priorItem);
         			poseStack.popPose();
-        			
-        			//delete this
-        			Iterable<ItemStack> armorSlots = event.getEntity().getArmorSlots();
-            		for (ItemStack itemStack : armorSlots) {
-            			if (itemStack.getItem() instanceof ArmorBase armorBase) {
-            				MechPart mechPart = armorBase.getMechPart();
-            				if (mechPart != null) {
-            					List<ModelPart> parts = MechPartUtil.getCorrespondingModelParts(playerModel, mechPart);
-            					if (armorBase.shouldHidePlayerModel()) {
-            						for (ModelPart part : parts) {
-            							part.visible = false;
-            						}
-            					}
-            				}
-            			}
-            		}
         		} catch (Exception e) {
         			LOGGER.error("render error", e);
         		}

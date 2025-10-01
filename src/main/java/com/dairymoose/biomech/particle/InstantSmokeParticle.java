@@ -26,7 +26,6 @@ public class InstantSmokeParticle extends SmokeParticle {
       @Override
       public TextureSheetParticle createParticle(SimpleParticleType p_105804_, ClientLevel p_105805_, double p_105806_, double p_105807_, double p_105808_, double p_105809_, double p_105810_, double p_105811_) {
 			InstantSmokeParticle instantSmokeParticle = new InstantSmokeParticle(p_105805_, p_105806_, p_105807_, p_105808_, p_105809_, p_105810_, p_105811_, 1.0f, sprite);
-			//instantSmokeParticle.pickSprite(this.sprite);
 			return instantSmokeParticle;
       }
    }
