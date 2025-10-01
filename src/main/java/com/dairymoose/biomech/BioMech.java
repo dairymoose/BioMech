@@ -32,6 +32,7 @@ import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
+import com.dairymoose.biomech.config.BioMechServerConfig;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
@@ -272,9 +273,9 @@ public class BioMech
     		} catch (IOException e) {
     			BioMech.LOGGER.error("Failed to read early config file biomech.cfg");
     		}
-    		lootBioMechInChest = 0.067f;
-    		lootBioMechInMineshaft = 0.40f;
-    		lootBioMechInDungeon = 0.40f;
+    		lootBioMechInChest = (float) BioMechServerConfig.defaultChestLootChance;
+    		lootBioMechInMineshaft = (float) BioMechServerConfig.defaultMineshaftLootChance;
+    		lootBioMechInDungeon = (float) BioMechServerConfig.defaultDungeonLootChance;
     		boolean gotGlobalConfigValue = false;
     		boolean gotMineshaftConfigValue = false;
     		boolean gotDungeonConfigValue = false;
