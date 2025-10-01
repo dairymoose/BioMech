@@ -18,7 +18,8 @@ public class BioMechCommand {
     }
 
     public static class BioMechCmd {
-        static ArgumentBuilder<CommandSourceStack, ?> register() {
+        @SuppressWarnings({ "static-access", "unchecked" })
+		static ArgumentBuilder<CommandSourceStack, ?> register() {
             return Commands.literal("energy").
                     requires(cs->cs.hasPermission(0)).
                     then(Commands.argument("value", IntegerArgumentType.integer(0)).

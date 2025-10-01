@@ -15,6 +15,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -97,9 +98,24 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 		this.inventoryLabelY = this.imageHeight - 94;
 	}
 
+	public static final int SLOT_TEXTURE_START_X = 176;
+	public static final int SLOT_TEXTURE_START_Y = 20;
+	
+	public static final int SLOT_ICON_WIDTH = 16;
+	public static final int SLOT_ICON_HEIGHT = 16;
+	protected void renderSlotIcons(GuiGraphics gui, float p_282737_, int p_281678_, int p_281465_) {
+		for (int i=0; i<BioMechStationMenu.mechPartsBySlot.length; ++i) {
+			Slot slot = this.getMenu().getSlotForMechPart(BioMechStationMenu.mechPartsBySlot[i]);
+			if (slot != null && !slot.hasItem()) {
+				gui.blit(GUI_LOCATION, this.leftPos + BioMechStationMenu.xCoordinatesBySlot[i], this.topPos + BioMechStationMenu.yCoordinatesBySlot[i], SLOT_TEXTURE_START_X, SLOT_TEXTURE_START_Y + SLOT_ICON_HEIGHT*i, SLOT_ICON_WIDTH, SLOT_ICON_HEIGHT);
+			}
+		}
+	}
+	
 	public void render(GuiGraphics p_282918_, int p_282102_, int p_282423_, float p_282621_) {
 		this.renderBackground(p_282918_);
 		super.render(p_282918_, p_282102_, p_282423_, p_282621_);
+		this.renderSlotIcons(p_282918_, p_282621_, p_282102_, p_282423_);
 		this.renderTooltip(p_282918_, p_282102_, p_282423_);
 
 		this.xMouse = (float) p_282102_;

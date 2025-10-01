@@ -23,34 +23,18 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 public class BioMechStationMenu extends AbstractContainerMenu {
 
-	public static final int CONTAINER_ID = 0;
-	   public static final int RESULT_SLOT = 0;
-	   public static final int CRAFT_SLOT_START = 1;
-	   public static final int CRAFT_SLOT_END = 5;
-	   public static final int ARMOR_SLOT_START = 5;
-	   public static final int ARMOR_SLOT_END = 9;
-	   public static final int INV_SLOT_START = 9;
-	   public static final int INV_SLOT_END = 36;
-	   public static final int USE_ROW_SLOT_START = 36;
-	   public static final int USE_ROW_SLOT_END = 45;
-	   public static final int SHIELD_SLOT = 45;
-	   public static final ResourceLocation BLOCK_ATLAS = new ResourceLocation("textures/atlas/blocks.png");
-	   public static final ResourceLocation EMPTY_ARMOR_SLOT_HELMET = new ResourceLocation("item/empty_armor_slot_helmet");
-	   public static final ResourceLocation EMPTY_ARMOR_SLOT_CHESTPLATE = new ResourceLocation("item/empty_armor_slot_chestplate");
-	   public static final ResourceLocation EMPTY_ARMOR_SLOT_LEGGINGS = new ResourceLocation("item/empty_armor_slot_leggings");
-	   public static final ResourceLocation EMPTY_ARMOR_SLOT_BOOTS = new ResourceLocation("item/empty_armor_slot_boots");
-	   public static final ResourceLocation EMPTY_ARMOR_SLOT_SHIELD = new ResourceLocation("item/empty_armor_slot_shield");
-	   static final ResourceLocation[] TEXTURE_EMPTY_SLOTS = new ResourceLocation[]{EMPTY_ARMOR_SLOT_BOOTS, EMPTY_ARMOR_SLOT_LEGGINGS, EMPTY_ARMOR_SLOT_CHESTPLATE, EMPTY_ARMOR_SLOT_HELMET};
-	   private static final EquipmentSlot[] SLOT_IDS = new EquipmentSlot[]{EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
 	   public boolean active;
-	   private Player owner;
 	   private Container container = null;
 
 		public BioMechStationMenu(int p_39640_, Inventory p_39641_) {
 			this(p_39640_, p_39641_, new SimpleContainer(6));
 		}
 	   
-	   public BioMechStationMenu(int p_39640_, Inventory inventory, final Container stationContainer) {
+		public static MechPart[] mechPartsBySlot = {MechPart.Back, MechPart.Head, MechPart.RightArm, MechPart.Chest, MechPart.LeftArm, MechPart.Leggings};
+		public static int[] xCoordinatesBySlot = {31, 68, 50, 68, 86, 68};
+		public static int[] yCoordinatesBySlot = {13, 16, 29, 34, 29, 52};
+		public static int[] mechPartsByOrdinal = {1, 3, 5, 4, 2, 0};
+		public BioMechStationMenu(int p_39640_, Inventory inventory, final Container stationContainer) {
 	      super(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), p_39640_);
 	      //this.active = p_39641_;
 	      //this.owner = p_39708_;
@@ -62,9 +46,7 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 	      
 	      this.container.clearContent();
 	      
-	      MechPart[] mechPartsBySlot = {MechPart.Back, MechPart.Head, MechPart.RightArm, MechPart.Chest, MechPart.LeftArm, MechPart.Leggings};
-	      int[] xCoordinatesBySlot = {31, 68, 50, 68, 86, 68};
-	      int[] yCoordinatesBySlot = {13, 16, 29, 34, 29, 52};
+	      //first 6 slots: [0 - 5]
 	      int slotIdCounter = 0;
 	      for (MechPart mechPart : mechPartsBySlot) {
 	    	  this.container.setItem(slotIdCounter, playerData.getForSlot(mechPart).itemStack);
@@ -98,16 +80,26 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 	    	  ++slotIdCounter;
 	      }
 
+	      //next 27 slots: [6 - 32]
 	      for(int l = 0; l < 3; ++l) {
 	         for(int j1 = 0; j1 < 9; ++j1) {
 	            this.addSlot(new Slot(inventory, j1 + (l + 1) * 9, 8 + j1 * 18, 84 + l * 18));
 	         }
 	      }
 
+	      //next 9 slots: [33 - 41]
 	      for(int i1 = 0; i1 < 9; ++i1) {
 	         this.addSlot(new Slot(inventory, i1, 8 + i1 * 18, 142));
 	      }
 	   }
+
+		public Slot getSlotForMechPart(MechPart part) {
+			if (part != null) {
+				return this.slots.get(mechPartsByOrdinal[part.ordinal()]);
+			}
+
+			return null;
+		}
 
 		static void onEquipItem(Player player, MechPart mechPart, ItemStack newItem, ItemStack oldItem) {
 			BioMechPlayerData playerData = BioMech.globalPlayerData.computeIfAbsent(player.getUUID(), (uuid) -> new BioMechPlayerData());
@@ -118,7 +110,7 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 			if (!player.level().isClientSide)
 				BioMech.sendItemSlotUpdateForPlayer(player);
 		}
-	   
+
 		public void removed(Player player) {
 			super.removed(player);
 			if (this.container != null) {
@@ -132,70 +124,62 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 			}
 		}
 
-	   public boolean stillValid(Player player) {
-	      return true;
-	   }
+		public boolean stillValid(Player player) {
+			return true;
+		}
 
-	   public ItemStack quickMoveStack(Player p_39723_, int p_39724_) {
-	      ItemStack itemstack = ItemStack.EMPTY;
-	      Slot slot = this.slots.get(p_39724_);
-	      if (slot.hasItem()) {
-	         ItemStack itemstack1 = slot.getItem();
-	         itemstack = itemstack1.copy();
-	         EquipmentSlot equipmentslot = Mob.getEquipmentSlotForItem(itemstack);
-	         if (p_39724_ == 0) {
-	            if (!this.moveItemStackTo(itemstack1, 9, 45, true)) {
-	               return ItemStack.EMPTY;
-	            }
+		public ItemStack quickMoveStack(Player p_39723_, int slotIndex) {
+			ItemStack itemstack = ItemStack.EMPTY;
+			Slot slot = this.slots.get(slotIndex);
+			if (slot.hasItem()) {
+				ItemStack itemstack1 = slot.getItem();
+				itemstack = itemstack1.copy();
+				if (itemstack.getItem() instanceof ArmorBase base) {
+					if (slotIndex < mechPartsBySlot.length) {
+						//inventory slots are all beyond 5
+						if (!this.moveItemStackTo(itemstack1, 6, 42, false)) {
+				            return ItemStack.EMPTY;
+				         }
+					} else {
+						MechPart part = base.getMechPart();
+						Slot mechSlot = this.getSlotForMechPart(part);
+						if (mechSlot != null) {
+							if (!mechSlot.hasItem()) {
+								if (!this.moveItemStackTo(itemstack1, mechSlot.index, mechSlot.index + 1, false)) {
+									return ItemStack.EMPTY;
+								}
+							} else {
+								if (part == MechPart.RightArm) {
+									Slot leftArmSlot = this.getSlotForMechPart(MechPart.LeftArm);
+									if (leftArmSlot != null && !leftArmSlot.hasItem()) {
+										if (!this.moveItemStackTo(itemstack1, leftArmSlot.index, leftArmSlot.index + 1, false)) {
+											return ItemStack.EMPTY;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
 
-	            slot.onQuickCraft(itemstack1, itemstack);
-	         } else if (p_39724_ >= 1 && p_39724_ < 5) {
-	            if (!this.moveItemStackTo(itemstack1, 9, 45, false)) {
-	               return ItemStack.EMPTY;
-	            }
-	         } else if (p_39724_ >= 5 && p_39724_ < 9) {
-	            if (!this.moveItemStackTo(itemstack1, 9, 45, false)) {
-	               return ItemStack.EMPTY;
-	            }
-	         } else if (equipmentslot.getType() == EquipmentSlot.Type.ARMOR && !this.slots.get(8 - equipmentslot.getIndex()).hasItem()) {
-	            int i = 8 - equipmentslot.getIndex();
-	            if (!this.moveItemStackTo(itemstack1, i, i + 1, false)) {
-	               return ItemStack.EMPTY;
-	            }
-	         } else if (equipmentslot == EquipmentSlot.OFFHAND && !this.slots.get(45).hasItem()) {
-	            if (!this.moveItemStackTo(itemstack1, 45, 46, false)) {
-	               return ItemStack.EMPTY;
-	            }
-	         } else if (p_39724_ >= 9 && p_39724_ < 36) {
-	            if (!this.moveItemStackTo(itemstack1, 36, 45, false)) {
-	               return ItemStack.EMPTY;
-	            }
-	         } else if (p_39724_ >= 36 && p_39724_ < 45) {
-	            if (!this.moveItemStackTo(itemstack1, 9, 36, false)) {
-	               return ItemStack.EMPTY;
-	            }
-	         } else if (!this.moveItemStackTo(itemstack1, 9, 45, false)) {
-	            return ItemStack.EMPTY;
-	         }
+				if (itemstack1.isEmpty()) {
+					slot.setByPlayer(ItemStack.EMPTY);
+				} else {
+					slot.setChanged();
+				}
 
-	         if (itemstack1.isEmpty()) {
-	            slot.setByPlayer(ItemStack.EMPTY);
-	         } else {
-	            slot.setChanged();
-	         }
+				if (itemstack1.getCount() == itemstack.getCount()) {
+					return ItemStack.EMPTY;
+				}
 
-	         if (itemstack1.getCount() == itemstack.getCount()) {
-	            return ItemStack.EMPTY;
-	         }
+				slot.onTake(p_39723_, itemstack1);
+				if (slotIndex == 0) {
+					p_39723_.drop(itemstack1, false);
+				}
+			}
 
-	         slot.onTake(p_39723_, itemstack1);
-	         if (p_39724_ == 0) {
-	            p_39723_.drop(itemstack1, false);
-	         }
-	      }
-
-	      return itemstack;
-	   }
+			return itemstack;
+		}
 
 
 }
