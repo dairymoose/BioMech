@@ -11,9 +11,9 @@ public class BioMechServerConfig {
 
 	public BioMechServerConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("loot");
-		this.lootBioMechInChest = builder.comment("lootBioMechInChest").translation("config.biomech.lootBioMechInChest").define("lootBioMechInChest", 0.0625);
-		this.lootBioMechInMineshaft = builder.comment("lootBioMechInMineshaft").translation("config.biomech.lootBioMechInMineshaft").define("lootBioMechInMineshaft", 0.33);
-		this.lootBioMechInDungeon = builder.comment("lootBioMechInDungeon").translation("config.biomech.lootBioMechInDungeon").define("lootBioMechInDungeon", 0.33);
+		this.lootBioMechInChest = builder.comment("lootBioMechInChest").translation("config.biomech.lootBioMechInChest").define("lootBioMechInChest", 0.067);
+		this.lootBioMechInMineshaft = builder.comment("lootBioMechInMineshaft").translation("config.biomech.lootBioMechInMineshaft").define("lootBioMechInMineshaft", 0.40);
+		this.lootBioMechInDungeon = builder.comment("lootBioMechInDungeon").translation("config.biomech.lootBioMechInDungeon").define("lootBioMechInDungeon", 0.40);
 		builder.pop();
 	}
 	

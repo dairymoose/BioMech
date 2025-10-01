@@ -45,6 +45,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ArmorBase extends ArmorItem {
 
+	protected boolean addToLootTable = true;
 	protected MechPart mechPart = null;
 	protected boolean hidePlayerModel = false;
 	protected int suitEnergy = 0;
@@ -57,6 +58,10 @@ public class ArmorBase extends ArmorItem {
 	
 	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick, boolean bothHandsInactive, boolean bothHandsActive) {
 		
+	}
+
+	public boolean shouldAddToLootTable() {
+		return addToLootTable;
 	}
 	
 	public float getSuitEnergy() {

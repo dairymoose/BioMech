@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -114,12 +115,15 @@ import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -145,7 +149,6 @@ import net.minecraftforge.registries.RegistryObject;
  * Add ArmorBase class in item.armor package
  * Add new armor to BioMechRegistry
  * Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry)
- * Add to method onAlterLootTable
  * 
  * - Adding new arms:
  * Add .geo.json file
@@ -159,7 +162,6 @@ import net.minecraftforge.registries.RegistryObject;
  * Add new armor to BioMechRegistry
  * <Arm Specific>: Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry & AzItemRendererRegistry)
  * <Arm Specific>: If animated: add to AzIdentityRegistry
- * Add to method onAlterLootTable
  * 
  */
 
@@ -237,27 +239,41 @@ public class BioMech
 		}
 	}
     
+    @SubscribeEvent
+    public void onCommand(RegisterCommandsEvent event) {
+		BioMechCommand.register(event.getDispatcher());
+	}
+    
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         AzureLib.initialize();
     }
    
+    @SubscribeEvent
+    public void onStopServer(ServerStoppedEvent event) {
+    	LOGGER.info("server stopped");
+		lootBioMechInChest = null;
+		lootBioMechInMineshaft = null;
+		lootBioMechInDungeon = null;
+    }
+    
     Float lootBioMechInChest = null;
     Float lootBioMechInMineshaft = null;
     Float lootBioMechInDungeon = null;
     @SubscribeEvent
     public void onAlterLootTable(LootTableLoadEvent event) {
+    	List<Item> addedLootItems = new ArrayList<>();
     	if (lootBioMechInChest == null) {
-    		File f = BioMechConfig.getBiomechEarlyConfigFile();
+    		File file = BioMechConfig.getBiomechEarlyConfigFile();
     		CompoundTag tag = null;
     		try {
-    			tag = NbtIo.read(f);
+    			tag = NbtIo.read(file);
     		} catch (IOException e) {
     			BioMech.LOGGER.error("Failed to read early config file biomech.cfg");
     		}
-    		lootBioMechInChest = 0.05f;
-    		lootBioMechInMineshaft = 0.33f;
-    		lootBioMechInDungeon = 0.33f;
+    		lootBioMechInChest = 0.067f;
+    		lootBioMechInMineshaft = 0.40f;
+    		lootBioMechInDungeon = 0.40f;
     		boolean gotGlobalConfigValue = false;
     		boolean gotMineshaftConfigValue = false;
     		boolean gotDungeonConfigValue = false;
@@ -273,7 +289,7 @@ public class BioMech
     				gotMineshaftConfigValue = true;
     			}
     			if (tag.contains("lootBioMechInDungeon")) {
-    				lootBioMechInMineshaft = (float) tag.getDouble("lootBioMechInDungeon");
+    				lootBioMechInDungeon = (float) tag.getDouble("lootBioMechInDungeon");
     				BioMech.LOGGER.info("Got lootBioMechInDungeon value of " + lootBioMechInDungeon + " from file");
     				gotDungeonConfigValue = true;
     			}
@@ -287,6 +303,26 @@ public class BioMech
     		if (!gotDungeonConfigValue) {
     			BioMech.LOGGER.info("Using default lootBioMechInDungeon value of " + lootBioMechInDungeon);
     		}
+    		
+    		Field[] allFields = BioMechRegistry.class.getDeclaredFields();
+			for (Field f : allFields) {
+				if (f.getType() == RegistryObject.class) {
+					try {
+						RegistryObject value = (RegistryObject) f.get(null);
+						if (value != null) {
+							if (value.get() instanceof ArmorBase ab) {
+								if (ab.shouldAddToLootTable()) {
+									addedLootItems.add(ab);
+									LOGGER.debug("Added loot is: " + value.get());
+								}
+							}
+						}
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						LOGGER.error("Error registering items with creative tab", e);
+					}
+				}
+			}
+			
     	}
 		
     	//LOGGER.info(ServerLifecycleHooks.getCurrentServer().getWorldPath(LevelResource.ROOT).toString());
@@ -301,15 +337,13 @@ public class BioMech
     			mineshaftText = " dungeon";
     		}
     		LOGGER.debug("alter" + mineshaftText + " loot table: " + event.getTable().getLootTableId().getPath());
-    		event.getTable().addPool(LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance(chance))
-    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_MINING_LASER_ARM.get()))
-    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get()))
-    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get()))
-    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_POWER_ARM.get()))
-    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_POWER_CHEST.get()))
-    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_POWER_HELMET.get()))
-    				.add(LootItem.lootTableItem(BioMechRegistry.ITEM_POWER_LEGGINGS.get()))
-    				.build());
+    		
+    		LootPool.Builder lootPool = LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance(chance));
+    		for (Item item : addedLootItems) {
+    			lootPool = lootPool.add(LootItem.lootTableItem(item));
+    		}
+    		
+    		event.getTable().addPool(lootPool.build());
     	}
     }
     
@@ -323,16 +357,12 @@ public class BioMech
 		BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), slottedItemPacket);
     }
     
-    public static boolean localPlayerDidJump = false;
     @SubscribeEvent
     public void onJump(LivingEvent.LivingJumpEvent event) {
     	if (event.getEntity() instanceof Player player) {
-    		BioMech.LOGGER.info("onJump");
     		if (player.onGround() && localPlayerHoldingAlt) {
     			Vec3 delta = player.getDeltaMovement();
     			player.setDeltaMovement(delta.x, 0.0, delta.z);
-    		} else {
-    			localPlayerDidJump = true;
     		}
     	}
     }
