@@ -251,18 +251,19 @@ public class BioMech
    
     @SubscribeEvent
     public void onStopServer(ServerStoppedEvent event) {
-    	LOGGER.info("server stopped");
 		lootBioMechInChest = null;
 		lootBioMechInMineshaft = null;
 		lootBioMechInDungeon = null;
+		lootItemsToAdd.clear();
     }
     
     Float lootBioMechInChest = null;
     Float lootBioMechInMineshaft = null;
     Float lootBioMechInDungeon = null;
+    List<Item> lootItemsToAdd = new ArrayList<>();
     @SubscribeEvent
     public void onAlterLootTable(LootTableLoadEvent event) {
-    	List<Item> addedLootItems = new ArrayList<>();
+    	
     	if (lootBioMechInChest == null) {
     		File file = BioMechConfig.getBiomechEarlyConfigFile();
     		CompoundTag tag = null;
@@ -312,7 +313,7 @@ public class BioMech
 						if (value != null) {
 							if (value.get() instanceof ArmorBase ab) {
 								if (ab.shouldAddToLootTable()) {
-									addedLootItems.add(ab);
+									lootItemsToAdd.add(ab);
 									LOGGER.debug("Added loot is: " + value.get());
 								}
 							}
@@ -339,7 +340,7 @@ public class BioMech
     		LOGGER.debug("alter" + mineshaftText + " loot table: " + event.getTable().getLootTableId().getPath());
     		
     		LootPool.Builder lootPool = LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance(chance));
-    		for (Item item : addedLootItems) {
+    		for (Item item : lootItemsToAdd) {
     			lootPool = lootPool.add(LootItem.lootTableItem(item));
     		}
     		
