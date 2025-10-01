@@ -75,7 +75,7 @@ public class BackJetpackArmor extends ArmorBase {
 							if (active) {
 								playerData.spendSuitEnergy(player, energyPerTick);
 								
-								if (!player.isFallFlying()) {
+								if (!player.isFallFlying() && !player.isSwimming()) {
 									float deltaY = 0.0f;
 									if (player.getDeltaMovement().y <= 0.20f) {
 										deltaY = yPerTickStage1;
@@ -126,6 +126,9 @@ public class BackJetpackArmor extends ArmorBase {
 										//starts at 0.84*1.21=1.02
 										calcFallFlyingBoost /= 0.84f*movementSpeedSqr;
 										BioMech.LOGGER.info("calcFallFlyingBoost=" + calcFallFlyingBoost + " vs fallFlyingBoost=" + fallFlyingBoost);
+									}
+									if (player.isSwimming()) {
+										calcFallFlyingBoost *= 0.40f;
 									}
 									
 									float yComponent = (float)(calcFallFlyingBoost * Math.sin(Math.toRadians(-pitch)));
