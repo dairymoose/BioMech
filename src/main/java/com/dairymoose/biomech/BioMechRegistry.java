@@ -20,6 +20,7 @@ import com.dairymoose.biomech.item.armor.PowerLeftArmArmor;
 import com.dairymoose.biomech.item.armor.PowerLeggingsArmor;
 import com.dairymoose.biomech.item.armor.PowerRightArmArmor;
 import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
+import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
 
 import net.minecraft.core.particles.ParticleType;
@@ -75,6 +76,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_IRON_MECH_CHESTPLATE = BioMech.ITEMS.register("iron_mech_chestplate", () -> new IronMechChestArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_DIAMOND_MECH_CHESTPLATE = BioMech.ITEMS.register("diamond_mech_chestplate", () -> new DiamondMechChestArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_SPRING_LOADED_LEGGINGS = BioMech.ITEMS.register("spring_loaded_leggings", () -> new SpringLoadedLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_POWER_CHEST = BioMech.ITEMS.register("power_chest", () -> new PowerChestArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_POWER_LEGGINGS = BioMech.ITEMS.register("power_leggings", () -> new PowerLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));

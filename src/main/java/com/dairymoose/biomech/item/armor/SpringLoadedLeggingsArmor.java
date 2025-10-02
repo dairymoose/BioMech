@@ -1,0 +1,75 @@
+package com.dairymoose.biomech.item.armor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechRegistry;
+import com.dairymoose.biomech.HandActiveStatus;
+
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+
+public class SpringLoadedLeggingsArmor extends ArmorBase {
+
+	public SpringLoadedLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+		super(p_40386_, p_266831_, p_40388_);
+		this.suitEnergy = 5;
+		this.hidePlayerModel = true;
+		this.mechPart = MechPart.Leggings;
+	}
+
+	@Override
+	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+		if (entity instanceof Player player) {
+			List<Item> armorItems = new ArrayList<Item>();
+			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			if (armorItems.contains(BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get()) || slotId == -1) {
+				if (entity instanceof LivingEntity living && !living.isSpectator()) {
+					HandActiveStatus has = BioMech.handActiveMap.get(player.getUUID());
+					if (has != null) {
+						if (!level.isClientSide) {
+							MobEffectInstance jumpBoost = living.getEffect(MobEffects.JUMP);
+							if (jumpBoost == null || jumpBoost.endsWithin(10)) {
+								living.addEffect(new MobEffectInstance(MobEffects.JUMP, 40, 0, false, false, false));
+							}
+						}
+						
+						CompoundTag tag = stack.getOrCreateTag();
+						if (has.jumpActive) {
+							int jumpsLeft;
+							if (!tag.contains("JumpsLeft")) {
+								tag.putInt("JumpsLeft", 1);
+							}
+							jumpsLeft = tag.getInt("JumpsLeft");
+							
+							if (BioMech.primedForMidairJump && jumpsLeft > 0) {
+								--jumpsLeft;
+								tag.putInt("JumpsLeft", jumpsLeft);
+								player.setOnGround(true);
+								//BioMech.primedForMidairJump = false;
+							}
+						} else {
+							if (player.onGround()) {
+								tag.putInt("JumpsLeft", 1);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+}
+	

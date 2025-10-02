@@ -73,6 +73,9 @@
 	"item.biomech.night_vision_visor": "§5Night Vision Visor§0",
 	"item.biomech.night_vision_visor.tooltip1": "Grants permanent night vision.",
 	
+	"item.biomech.spring_loaded_leggings": "§5Spring-Loaded Leggings§0",
+	"item.biomech.spring_loaded_leggings.tooltip1": "Increases jump height and allows the user to double-jump.",
+	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",
 	"key.left_arm": "Use Left Arm",

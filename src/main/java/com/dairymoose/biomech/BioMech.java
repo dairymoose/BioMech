@@ -32,6 +32,7 @@ import com.dairymoose.biomech.armor.renderer.PowerLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.SpiderWalkersRenderer;
+import com.dairymoose.biomech.armor.renderer.SpringLoadedLeggingsRenderer;
 import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.config.BioMechConfig;
@@ -1112,6 +1113,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(NightVisionVisorRenderer::new, BioMechRegistry.ITEM_NIGHT_VISION_VISOR.get());
         	AzArmorRendererRegistry.register(IronMechChestplateRenderer::new, BioMechRegistry.ITEM_IRON_MECH_CHESTPLATE.get());
         	AzArmorRendererRegistry.register(DiamondMechArmorRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_CHESTPLATE.get());
+        	AzArmorRendererRegistry.register(SpringLoadedLeggingsRenderer::new, BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
         	
         	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
