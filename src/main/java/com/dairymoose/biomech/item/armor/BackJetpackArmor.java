@@ -9,9 +9,9 @@ import com.dairymoose.biomech.BioMechRegistry;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.Connection;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -20,7 +20,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
 
 public class BackJetpackArmor extends ArmorBase {
 
@@ -63,6 +62,18 @@ public class BackJetpackArmor extends ArmorBase {
 					
 					if (player.onGround()) {
 						jetpackPreviouslyActive = false;
+					} else {
+						if (!level.isClientSide) {
+							List<Connection> connections = player.getServer().getConnection().getConnections();
+							for (int i=0; i<connections.size(); ++i) {
+								if (connections.get(i).getPacketListener() instanceof ServerGamePacketListenerImpl sgpl) {
+									if (sgpl.player != null && sgpl.player.getId() == player.getId()) {
+										//prevent 'player is flying' disconnect error on server
+										sgpl.aboveGroundTickCount = 0;
+									}
+								}
+							}
+						}
 					}
 					
 					if (jetpackInputActive) {
