@@ -63,16 +63,15 @@ public class SpiderWalkersArmor extends ArmorBase {
 									}
 								} else {
 									boolean hasAnyMatch = false;
-									if (!player.onGround()) {
-										for (float x=-1.5f; x<=1.5f; ++x) {
-											for (float y=0.0f; y<=0.0f; ++y) {
-												for (float z=-1.5f; z<=1.5f; ++z) {
-													BlockPos pos = BlockPos.containing(player.position().add(x, y, z));
-													BlockState state = level.getBlockState(pos);
-													if (!state.isAir()) {
-														hasAnyMatch = true;
-														break;
-													}
+									
+									for (float x=-1.5f; x<=1.5f; ++x) {
+										for (float y=0.0f; y<=0.0f; ++y) {
+											for (float z=-1.5f; z<=1.5f; ++z) {
+												BlockPos pos = BlockPos.containing(player.position().add(x, y, z));
+												BlockState state = level.getBlockState(pos);
+												if (!state.isAir()) {
+													hasAnyMatch = true;
+													break;
 												}
 											}
 										}
@@ -84,6 +83,7 @@ public class SpiderWalkersArmor extends ArmorBase {
 										Vec3 delta = player.getDeltaMovement();
 										player.setDeltaMovement(delta.x, 0.0, delta.z);
 										player.resetFallDistance();
+										player.setOnGround(true);
 									}
 								}
 							}
