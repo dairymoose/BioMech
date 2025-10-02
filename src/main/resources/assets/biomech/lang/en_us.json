@@ -57,6 +57,11 @@
 	"item.biomech.back_jetpack.tooltip2": "Consumes energy while active.",
 	"item.biomech.back_jetpack.tooltip3": "Provides vertical thrust.  If an elytra is active, provides forward thrust.",
 	
+	"item.biomech.spider_walkers": "§5Spider Walkers§0",
+	"item.biomech.spider_walkers.tooltip1": "Hold alt while walking into a wall to activate.",
+	"item.biomech.spider_walkers.tooltip2": "Climbs walls while active.",
+	"item.biomech.spider_walkers.tooltip3": "Costs a small amount of suit energy while active.",
+	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",
 	"key.left_arm": "Use Left Arm",

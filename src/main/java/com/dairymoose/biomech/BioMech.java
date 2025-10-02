@@ -28,6 +28,7 @@ import com.dairymoose.biomech.armor.renderer.PowerHelmetRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.SpiderWalkersRenderer;
 import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.config.BioMechConfig;
@@ -775,10 +776,13 @@ public class BioMech
         		if (has != null) {
         			boolean initialRight = has.rightHandActive;
             		boolean initialLeft = has.leftHandActive;
+            		boolean initialModifier = has.modifierKeyActive;
             		
             		BioMechPlayerData playerData = this.getDataForLocalPlayer();
             		if (playerData != null) {
             			Player localPlayer = Minecraft.getInstance().player;
+            			
+            			has.modifierKeyActive = HOTKEY_ENABLE_ARM_FUNCTION.isDown();
             			
             			if (requireModifierKeyForArmUsage) {
                 			if (HOTKEY_ENABLE_ARM_FUNCTION.isDown()) {
@@ -814,7 +818,7 @@ public class BioMech
                 		}
             		}
             		
-            		if (initialRight != has.rightHandActive || initialLeft != has.leftHandActive) {
+            		if (initialRight != has.rightHandActive || initialLeft != has.leftHandActive || initialModifier != has.modifierKeyActive) {
             			BioMechNetwork.INSTANCE.sendToServer(new ServerboundHandStatusPacket(has));
             		}
         		}
@@ -1103,6 +1107,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(MiningLaserLeftArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(BackScubaTankRenderer::new, BioMechRegistry.ITEM_BACK_SCUBA_TANK.get());
         	AzArmorRendererRegistry.register(BackJetpackRenderer::new, BioMechRegistry.ITEM_BACK_JETPACK.get());
+        	AzArmorRendererRegistry.register(SpiderWalkersRenderer::new, BioMechRegistry.ITEM_SPIDER_WALKERS.get());
         	
         	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
