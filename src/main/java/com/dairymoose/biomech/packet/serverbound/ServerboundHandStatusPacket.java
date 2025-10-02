@@ -53,9 +53,7 @@ public class ServerboundHandStatusPacket implements Packet<ServerGamePacketListe
 			Level world = serverHandler.player.level();
 			if (world != null) {
 				if (has != null) {
-					HandActiveStatus playerHas = BioMech.handActiveMap.computeIfAbsent(serverHandler.player.getUUID(), (uuid) -> new HandActiveStatus());
-					playerHas.leftHandActive = has.leftHandActive;
-					playerHas.rightHandActive = has.rightHandActive;
+					HandActiveStatus playerHas = BioMech.handActiveMap.put(serverHandler.player.getUUID(), has);
 					
 					BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), new ClientboundHandStatusPacket(serverHandler.player.getUUID(), playerHas));
 				}

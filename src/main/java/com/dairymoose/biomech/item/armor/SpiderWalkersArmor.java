@@ -37,7 +37,7 @@ public class SpiderWalkersArmor extends ArmorBase {
 	public static float energyPerSec = 1.0f;
 	public static float energyPerTick = energyPerSec/20.0f;
 	
-	public static float energyPerSecHover = 0.2f;
+	public static float energyPerSecHover = 1.0f;
 	public static float energyPerTickHover = energyPerSecHover/20.0f;
 	
 	@Override

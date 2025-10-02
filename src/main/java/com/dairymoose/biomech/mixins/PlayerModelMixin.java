@@ -70,21 +70,16 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 				}
 			}
 			SlottedItem legSlot = playerData.getForSlot(MechPart.Leggings);
-			if (legSlot.itemStack.getItem() instanceof SpiderWalkersArmor) {
-//				if (humanoidModel instanceof PlayerModel playerModel) {
-//					playerModel.rightPants.yRot = 0.0f;
-//					playerModel.rightPants.xRot = 0.0f;
-//				}
-//				this.rightLeg.yRot = 0.0f;
-//				this.leftLeg.yRot = 0.0f;
-				
-				//left-right-shuffle
-				this.rightLeg.yRot = this.rightLeg.xRot/5.0f;
-				this.leftLeg.yRot = -this.leftLeg.xRot/5.0f;
-				
-				//normal leg walking forward-and-back
-				this.rightLeg.xRot = this.rightLeg.xRot/4.0f;
-				this.leftLeg.xRot = this.leftLeg.xRot/4.0f;
+			if (legSlot.itemStack.getItem() instanceof SpiderWalkersArmor armor) {
+				if (legSlot.visible) {
+					//left-right-shuffle
+					this.rightLeg.yRot = this.rightLeg.xRot/5.0f;
+					this.leftLeg.yRot = -this.leftLeg.xRot/5.0f;
+					
+					//normal leg walking forward-and-back
+					this.rightLeg.xRot = this.rightLeg.xRot/4.0f;
+					this.leftLeg.xRot = this.leftLeg.xRot/4.0f;
+				}
 			}
 		}
 	}

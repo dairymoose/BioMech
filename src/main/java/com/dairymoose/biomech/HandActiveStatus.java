@@ -7,10 +7,12 @@ public class HandActiveStatus {
 	public static String LEFT_ACTIVE = "LeftHandActive";
 	public static String RIGHT_ACTIVE = "RightHandActive";
 	public static String MODIFIER_ACTIVE = "ModifierActive";
+	public static String JUMP_ACTIVE = "JumpActive";
 	
 	public boolean leftHandActive = false;
 	public boolean rightHandActive = false;
 	public boolean modifierKeyActive = false;
+	public boolean jumpActive = false;
 	
 	public static CompoundTag serialize(HandActiveStatus has) {
 		CompoundTag root = new CompoundTag();
@@ -18,6 +20,7 @@ public class HandActiveStatus {
 		root.putBoolean(LEFT_ACTIVE, has.leftHandActive);
 		root.putBoolean(RIGHT_ACTIVE, has.rightHandActive);
 		root.putBoolean(MODIFIER_ACTIVE, has.modifierKeyActive);
+		root.putBoolean(JUMP_ACTIVE, has.jumpActive);
 		
 		return root;
 	}
@@ -37,8 +40,13 @@ public class HandActiveStatus {
 		else
 			valid = false;
 		
-		if (tag.contains(RIGHT_ACTIVE))
+		if (tag.contains(MODIFIER_ACTIVE))
 			has.modifierKeyActive = tag.getBoolean(MODIFIER_ACTIVE);
+		else
+			valid = false;
+		
+		if (tag.contains(JUMP_ACTIVE))
+			has.jumpActive = tag.getBoolean(JUMP_ACTIVE);
 		else
 			valid = false;
 		

@@ -768,8 +768,8 @@ public class BioMech
         				primedForMidairJump = true;
         			}
         			
-        			Minecraft.getInstance().player.setJumping(false);
-        			Minecraft.getInstance().player.input.jumping = false;
+        			//Minecraft.getInstance().player.setJumping(false);
+        			//Minecraft.getInstance().player.input.jumping = false;
         		}
         		
         		HandActiveStatus has = this.getLocalHandActiveStatus();
@@ -777,12 +777,14 @@ public class BioMech
         			boolean initialRight = has.rightHandActive;
             		boolean initialLeft = has.leftHandActive;
             		boolean initialModifier = has.modifierKeyActive;
+            		boolean initialJump = has.jumpActive;
             		
             		BioMechPlayerData playerData = this.getDataForLocalPlayer();
             		if (playerData != null) {
             			Player localPlayer = Minecraft.getInstance().player;
             			
             			has.modifierKeyActive = HOTKEY_ENABLE_ARM_FUNCTION.isDown();
+            			has.jumpActive = Minecraft.getInstance().player.input.jumping;
             			
             			if (requireModifierKeyForArmUsage) {
                 			if (HOTKEY_ENABLE_ARM_FUNCTION.isDown()) {
@@ -818,7 +820,7 @@ public class BioMech
                 		}
             		}
             		
-            		if (initialRight != has.rightHandActive || initialLeft != has.leftHandActive || initialModifier != has.modifierKeyActive) {
+            		if (initialRight != has.rightHandActive || initialLeft != has.leftHandActive || initialModifier != has.modifierKeyActive || initialJump != has.jumpActive) {
             			BioMechNetwork.INSTANCE.sendToServer(new ServerboundHandStatusPacket(has));
             		}
         		}
