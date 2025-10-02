@@ -759,19 +759,6 @@ public class BioMech
     	@SubscribeEvent
         public void onClientTick(final ClientTickEvent event) {
         	if (event.phase == TickEvent.Phase.START) {
-        		if (Minecraft.getInstance().player != null) {
-        			localPlayerHoldingAlt = HOTKEY_ENABLE_ARM_FUNCTION.isDown();
-        			BioMech.localPlayerJumping = Minecraft.getInstance().player.input.jumping;
-        			if (Minecraft.getInstance().player.onGround()) {
-        				primedForMidairJump = false;
-        			} else if (!BioMech.localPlayerJumping) {
-        				primedForMidairJump = true;
-        			}
-        			
-        			//Minecraft.getInstance().player.setJumping(false);
-        			//Minecraft.getInstance().player.input.jumping = false;
-        		}
-        		
         		HandActiveStatus has = this.getLocalHandActiveStatus();
         		if (has != null) {
         			boolean initialRight = has.rightHandActive;
@@ -785,6 +772,16 @@ public class BioMech
             			
             			has.modifierKeyActive = HOTKEY_ENABLE_ARM_FUNCTION.isDown();
             			has.jumpActive = Minecraft.getInstance().player.input.jumping;
+            			
+            			if (Minecraft.getInstance().player != null) {
+                			localPlayerHoldingAlt = HOTKEY_ENABLE_ARM_FUNCTION.isDown();
+                			BioMech.localPlayerJumping = Minecraft.getInstance().player.input.jumping;
+                			if (Minecraft.getInstance().player.onGround()) {
+                				primedForMidairJump = false;
+                			} else if (!BioMech.localPlayerJumping) {
+                				primedForMidairJump = true;
+                			}
+                		}
             			
             			if (requireModifierKeyForArmUsage) {
                 			if (HOTKEY_ENABLE_ARM_FUNCTION.isDown()) {

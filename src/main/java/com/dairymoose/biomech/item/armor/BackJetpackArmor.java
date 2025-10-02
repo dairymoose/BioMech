@@ -21,6 +21,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class BackJetpackArmor extends ArmorBase {
 
@@ -49,7 +51,7 @@ public class BackJetpackArmor extends ArmorBase {
 				if (entity instanceof LivingEntity living) {
 					HandActiveStatus has = BioMech.handActiveMap.get(player.getUUID());
 					if (has != null) {
-						boolean modifierActive = has.modifierKeyActive || BioMech.primedForMidairJump || !level.isClientSide;
+						boolean modifierActive = has.modifierKeyActive || BioMech.primedForMidairJump || (FMLEnvironment.dist == Dist.DEDICATED_SERVER && !level.isClientSide);
 						
 						BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 						if (!living.isSpectator() && modifierActive && has.jumpActive) {
