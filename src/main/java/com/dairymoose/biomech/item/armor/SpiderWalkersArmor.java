@@ -64,9 +64,10 @@ public class SpiderWalkersArmor extends ArmorBase {
 								} else {
 									boolean hasAnyMatch = false;
 									
-									for (float x=-1.5f; x<=1.5f; ++x) {
+									float gripRadius = 1.35f;
+									for (float x=-gripRadius; x<=gripRadius; ++x) {
 										for (float y=0.0f; y<=0.0f; ++y) {
-											for (float z=-1.5f; z<=1.5f; ++z) {
+											for (float z=-gripRadius; z<=gripRadius; ++z) {
 												BlockPos pos = BlockPos.containing(player.position().add(x, y, z));
 												BlockState state = level.getBlockState(pos);
 												if (!state.isAir()) {
