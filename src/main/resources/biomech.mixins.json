@@ -1,0 +1,17 @@
+{
+  "minVersion": "0.8",
+  "required": true,
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "biomech.refmap.json",
+  "package": "com.dairymoose.biomech.mixins",
+  //only applies to client, not dedicated server
+ "client": [
+  	"PlayerModelMixin", //redirect on setupAnims
+  ],
+  //applys to dedicated server and client
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

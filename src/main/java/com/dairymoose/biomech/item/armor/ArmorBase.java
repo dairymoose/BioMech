@@ -51,6 +51,7 @@ public class ArmorBase extends ArmorItem {
 	protected int suitEnergy = 0;
 	protected float suitEnergyPerSec = 0.0f;
 	private static ArmorMaterial NOTHING_MATERIAL = new NothingMaterial();
+	protected float armDistance = 5.0f;
 	
 	public ArmorBase(ArmorMaterial material, Type type, Properties props) {
 		super(NOTHING_MATERIAL, type, props);
@@ -60,6 +61,10 @@ public class ArmorBase extends ArmorItem {
 		
 	}
 
+	public float getArmDistance() {
+		return this.armDistance;
+	}
+	
 	public boolean shouldAddToLootTable() {
 		return addToLootTable;
 	}
