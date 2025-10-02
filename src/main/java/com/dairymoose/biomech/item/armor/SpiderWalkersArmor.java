@@ -37,7 +37,7 @@ public class SpiderWalkersArmor extends ArmorBase {
 	public static float energyPerSec = 1.0f;
 	public static float energyPerTick = energyPerSec/20.0f;
 	
-	public static float energyPerSecHover = 0.1f;
+	public static float energyPerSecHover = 0.0f;
 	public static float energyPerTickHover = energyPerSecHover/20.0f;
 	
 	@Override
@@ -58,19 +58,22 @@ public class SpiderWalkersArmor extends ArmorBase {
 										playerData.spendSuitEnergy(player, energyPerTick);
 										
 										Vec3 delta = player.getDeltaMovement();
-										player.setDeltaMovement(delta.x, 0.28, delta.z);
+										player.setDeltaMovement(delta.x, 0.31, delta.z);
 										player.resetFallDistance();
 									}
 								} else {
 									boolean hasAnyMatch = false;
-									for (int x=-1; x<=1; ++x) {
-										for (int y=0; y<=0; ++y) {
-											for (int z=-1; z<=1; ++z) {
-												BlockPos pos = player.blockPosition().relative(Axis.X, x).relative(Axis.Y, y).relative(Axis.Z, z);
-												BlockState state = level.getBlockState(pos);
-												if (!state.isAir()) {
-													hasAnyMatch = true;
-													break;
+									if (!player.onGround()) {
+										for (float x=-1.5f; x<=1.5f; ++x) {
+											for (float y=0.0f; y<=0.0f; ++y) {
+												for (float z=-1.5f; z<=1.5f; ++z) {
+													BlockPos pos = BlockPos.containing(player.position().add(x, y, z));
+													//BlockPos pos = player.blockPosition().relative(Axis.X, x).relative(Axis.Y, y).relative(Axis.Z, z);
+													BlockState state = level.getBlockState(pos);
+													if (!state.isAir()) {
+														hasAnyMatch = true;
+														break;
+													}
 												}
 											}
 										}
