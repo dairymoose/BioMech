@@ -27,7 +27,12 @@
 				{
 					"name": "armorBody",
 					"parent": "bipedBody",
-					"pivot": [0, 24, 0],
+					"pivot": [0, 24, 0]
+				},
+				{
+					"name": "mech_body",
+					"parent": "bipedBody",
+					"pivot": [0, 10, 0],
 					"cubes": [
 						{"origin": [-5, 9.75, -2.5], "size": [10, 3, 5], "uv": [24, 16]}
 					]

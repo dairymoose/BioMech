@@ -62,6 +62,9 @@
 	"item.biomech.spider_walkers.tooltip2": "Climbs walls while active.  Can be used while falling to grip a nearby wall.",
 	"item.biomech.spider_walkers.tooltip3": "Costs a small amount of suit energy while active.",
 	
+	"item.biomech.night_vision_visor": "§5Night Vision Visor§0",
+	"item.biomech.night_vision_visor.tooltip1": "Grants permanent night vision.",
+	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",
 	"key.left_arm": "Use Left Arm",

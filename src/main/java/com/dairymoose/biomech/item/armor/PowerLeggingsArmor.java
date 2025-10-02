@@ -90,14 +90,14 @@ public class PowerLeggingsArmor extends ArmorBase {
 								&& crouchingTicks % jumpBoostAccumulationAfterFirst == 0) {
 							lastJumpBoostLevel = newJumpBoost;
 							if (!level.isClientSide)
-								living.addEffect(new MobEffectInstance(MobEffects.JUMP, 30, newJumpBoost));
+								living.addEffect(new MobEffectInstance(MobEffects.JUMP, 30, newJumpBoost, false, false, false));
 						}
 					} else {
 						if (living.hasEffect(MobEffects.JUMP) && crouchingTicks >= minTimeToGainJumpBoost
 								&& !living.onGround()) {
 							inAir = true;
 							if (!level.isClientSide)
-								living.addEffect(new MobEffectInstance(MobEffects.JUMP, 30, this.jumpBoost()));
+								living.addEffect(new MobEffectInstance(MobEffects.JUMP, 30, this.jumpBoost(), false, false, false));
 						} else {
 							living.removeEffect(MobEffects.JUMP);
 							inAir = false;

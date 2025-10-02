@@ -116,7 +116,7 @@ public class HovertechLeggingsArmor extends ArmorBase {
 							if (!level.isClientSide) {
 								if (!living.isFallFlying() && living.fallDistance >= 3.0) {
 									//BioMech.LOGGER.debug("slowfall floatAmount=" + floatAmount);
-									living.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 20, 1));
+									living.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 20, 1, false, false, false));
 								}
 							}
 						}

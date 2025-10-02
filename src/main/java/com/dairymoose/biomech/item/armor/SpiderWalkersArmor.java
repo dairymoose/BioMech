@@ -37,7 +37,7 @@ public class SpiderWalkersArmor extends ArmorBase {
 	public static float energyPerSec = 1.0f;
 	public static float energyPerTick = energyPerSec/20.0f;
 	
-	public static float energyPerSecHover = 0.0f;
+	public static float energyPerSecHover = 0.2f;
 	public static float energyPerTickHover = energyPerSecHover/20.0f;
 	
 	@Override
@@ -58,7 +58,7 @@ public class SpiderWalkersArmor extends ArmorBase {
 										playerData.spendSuitEnergy(player, energyPerTick);
 										
 										Vec3 delta = player.getDeltaMovement();
-										player.setDeltaMovement(delta.x, 0.31, delta.z);
+										player.setDeltaMovement(delta.x, 0.32, delta.z);
 										player.resetFallDistance();
 									}
 								} else {
@@ -68,7 +68,6 @@ public class SpiderWalkersArmor extends ArmorBase {
 											for (float y=0.0f; y<=0.0f; ++y) {
 												for (float z=-1.5f; z<=1.5f; ++z) {
 													BlockPos pos = BlockPos.containing(player.position().add(x, y, z));
-													//BlockPos pos = player.blockPosition().relative(Axis.X, x).relative(Axis.Y, y).relative(Axis.Z, z);
 													BlockState state = level.getBlockState(pos);
 													if (!state.isAir()) {
 														hasAnyMatch = true;

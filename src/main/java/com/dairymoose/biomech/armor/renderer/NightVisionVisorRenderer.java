@@ -1,0 +1,23 @@
+package com.dairymoose.biomech.armor.renderer;
+
+import com.dairymoose.biomech.BioMech;
+
+import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
+import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererConfig;
+import net.minecraft.resources.ResourceLocation;
+
+public class NightVisionVisorRenderer extends AzArmorRenderer {
+    private static final ResourceLocation GEO = ResourceLocation.fromNamespaceAndPath(
+        BioMech.MODID,
+        "geo/item/night_vision_visor.geo.json"
+    );
+
+    private static final ResourceLocation TEX = ResourceLocation.fromNamespaceAndPath(
+    	BioMech.MODID,
+        "textures/item/night_vision_visor.png"
+    );
+
+    public NightVisionVisorRenderer() {
+        super(AzArmorRendererConfig.builder(GEO, TEX).build());
+    }
+}
