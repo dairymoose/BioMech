@@ -22,9 +22,10 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 public class PowerLeggingsArmor extends ArmorBase {
 
 	int crouchingTicks = 0;
-	int maxJumpBoost = 7;
+	int maxJumpBoost = 8;
 	int minTimeToGainJumpBoost = 10;
 	int jumpBoostAccumulationAfterFirst = 10;
+	float jumpBoostLevelMult = 2.0f;
 	int lastJumpBoostLevel = 0;
 	boolean inAir = false;
 	
@@ -40,9 +41,9 @@ public class PowerLeggingsArmor extends ArmorBase {
 			return 0;
 		}
 		if (crouchingTicks <= minTimeToGainJumpBoost) {
-			return 1;
+			return (int)(jumpBoostLevelMult * 1);
 		}
-		return Math.min(1 + (int)((crouchingTicks-minTimeToGainJumpBoost)/jumpBoostAccumulationAfterFirst), maxJumpBoost);
+		return (int)(jumpBoostLevelMult * Math.min(1 + (int)((crouchingTicks-minTimeToGainJumpBoost)/jumpBoostAccumulationAfterFirst), maxJumpBoost));
 	}
 	
 	@Override
