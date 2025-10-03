@@ -98,7 +98,7 @@
 	"item.biomech.pipe_mech_arm.tooltip2": "You have a 2% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_arm.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
-	"item.biomech.pipe_mech_left_arm": "§7Left Pipe Mech Arm§0",
+	"item.biomech.left_pipe_mech_arm": "§7Left Pipe Mech Arm§0",
 	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",

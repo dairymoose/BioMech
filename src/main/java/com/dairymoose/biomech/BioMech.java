@@ -279,15 +279,25 @@ public class BioMech
     @SubscribeEvent
     public void onStopServer(ServerStoppedEvent event) {
 		lootBioMechInChest = null;
-		lootBioMechInMineshaft = null;
-		lootBioMechInDungeon = null;
 		lootItemsToAdd.clear();
+		lootPoolChances.clear();
     }
     
     Float lootBioMechInChest = null;
     Float lootBioMechInMineshaft = null;
     Float lootBioMechInDungeon = null;
+    Float lootBioMechInAncientCity = null;
+    Float lootBioMechInShipwreck = null;
+    Float lootBioMechInNetherFortress = null;
     List<Item> lootItemsToAdd = new ArrayList<>();
+    class AddToLootPool {
+		String lootTag;
+		Float lootChance;
+		String lootTablePath;
+		boolean gotValueFromConfig = false;
+	}
+	
+	List<AddToLootPool> lootPoolChances = new ArrayList<>();
     @SubscribeEvent
     public void onAlterLootTable(LootTableLoadEvent event) {
     	
@@ -299,38 +309,72 @@ public class BioMech
     		} catch (IOException e) {
     			BioMech.LOGGER.error("Failed to read early config file biomech.cfg");
     		}
+    		
     		lootBioMechInChest = (float) BioMechServerConfig.defaultChestLootChance;
     		lootBioMechInMineshaft = (float) BioMechServerConfig.defaultMineshaftLootChance;
     		lootBioMechInDungeon = (float) BioMechServerConfig.defaultDungeonLootChance;
-    		boolean gotGlobalConfigValue = false;
-    		boolean gotMineshaftConfigValue = false;
-    		boolean gotDungeonConfigValue = false;
+    		lootBioMechInAncientCity = (float) BioMechServerConfig.defaultDungeonLootChance;
+    		lootBioMechInShipwreck = (float) BioMechServerConfig.defaultDungeonLootChance;
+    		lootBioMechInNetherFortress = (float) BioMechServerConfig.defaultDungeonLootChance;
+    		
+    		{
+    			AddToLootPool atlp = new AddToLootPool();
+    			atlp.lootTag = "lootBioMechInChest";
+    			atlp.lootChance = lootBioMechInChest;
+    			atlp.lootTablePath = "*";
+    			lootPoolChances.add(atlp);
+    		}
+    		{
+    			AddToLootPool atlp = new AddToLootPool();
+    			atlp.lootTag = "lootBioMechInMineshaft";
+    			atlp.lootChance = lootBioMechInMineshaft;
+    			atlp.lootTablePath = "chests/abandoned_mineshaft";
+    			lootPoolChances.add(atlp);
+    		}
+    		{
+    			AddToLootPool atlp = new AddToLootPool();
+    			atlp.lootTag = "lootBioMechInDungeon";
+    			atlp.lootChance = lootBioMechInDungeon;
+    			atlp.lootTablePath = "chests/simple_dungeon";
+    			lootPoolChances.add(atlp);
+    		}
+    		{
+    			AddToLootPool atlp = new AddToLootPool();
+    			atlp.lootTag = "lootBioMechInAncientCity";
+    			atlp.lootChance = lootBioMechInAncientCity;
+    			atlp.lootTablePath = "chests/ancient_city";
+    			lootPoolChances.add(atlp);
+    		}
+    		{
+    			AddToLootPool atlp = new AddToLootPool();
+    			atlp.lootTag = "lootBioMechInShipwreck";
+    			atlp.lootChance = lootBioMechInShipwreck;
+    			atlp.lootTablePath = "chests/shipwreck_treasure";
+    			lootPoolChances.add(atlp);
+    		}
+    		{
+    			AddToLootPool atlp = new AddToLootPool();
+    			atlp.lootTag = "lootBioMechInNetherFortress";
+    			atlp.lootChance = lootBioMechInNetherFortress;
+    			atlp.lootTablePath = "chests/nether_bridge";
+    			lootPoolChances.add(atlp);
+    		}
+
     		if (tag != null) {
-    			if (tag.contains("lootBioMechInChest")) {
-    				lootBioMechInChest = (float) tag.getDouble("lootBioMechInChest");
-    				BioMech.LOGGER.info("Got lootBioMechInChest value of " + lootBioMechInChest + " from file");
-    				gotGlobalConfigValue = true;
-    			}
-    			if (tag.contains("lootBioMechInMineshaft")) {
-    				lootBioMechInMineshaft = (float) tag.getDouble("lootBioMechInMineshaft");
-    				BioMech.LOGGER.info("Got lootBioMechInMineshaft value of " + lootBioMechInMineshaft + " from file");
-    				gotMineshaftConfigValue = true;
-    			}
-    			if (tag.contains("lootBioMechInDungeon")) {
-    				lootBioMechInDungeon = (float) tag.getDouble("lootBioMechInDungeon");
-    				BioMech.LOGGER.info("Got lootBioMechInDungeon value of " + lootBioMechInDungeon + " from file");
-    				gotDungeonConfigValue = true;
+    			for (AddToLootPool atlp : lootPoolChances) {
+    				if (tag.contains(atlp.lootTag)) {
+        				atlp.lootChance = (float) tag.getDouble(atlp.lootTag);
+        				BioMech.LOGGER.info("Got " + atlp.lootTag + " value of " + atlp.lootChance + " from file");
+        				atlp.gotValueFromConfig = true;
+    				}
     			}
     		}
-    		if (!gotGlobalConfigValue) {
-    			BioMech.LOGGER.info("Using default lootBioMechInChest value of " + lootBioMechInChest);
-    		}
-    		if (!gotMineshaftConfigValue) {
-    			BioMech.LOGGER.info("Using default lootBioMechInMineshaft value of " + lootBioMechInMineshaft);
-    		}
-    		if (!gotDungeonConfigValue) {
-    			BioMech.LOGGER.info("Using default lootBioMechInDungeon value of " + lootBioMechInDungeon);
-    		}
+    		
+    		for (AddToLootPool atlp : lootPoolChances) {
+				if (!atlp.gotValueFromConfig) {
+					BioMech.LOGGER.info("Using default lootBioMechInChest value of " + atlp.lootChance);
+				}
+			}
     		
     		Field[] allFields = BioMechRegistry.class.getDeclaredFields();
 			for (Field f : allFields) {
@@ -353,18 +397,19 @@ public class BioMech
 			
     	}
 		
-    	//LOGGER.info(ServerLifecycleHooks.getCurrentServer().getWorldPath(LevelResource.ROOT).toString());
     	if (event.getName().getPath().contains("chests")) {
     		String mineshaftText = "";
-    		float chance = lootBioMechInChest;
-    		if ("chests/abandoned_mineshaft".equals(event.getName().getPath())) {
-    			chance = lootBioMechInMineshaft;
-    			mineshaftText = " mineshaft";
-    		} else if ("chests/simple_dungeon".equals(event.getName().getPath())) {
-    			chance = lootBioMechInDungeon;
-    			mineshaftText = " dungeon";
+    		float chance = 0.0f;
+    		for (AddToLootPool atlp : lootPoolChances) {
+    			if ("*".equals(atlp.lootTablePath)) {
+        			chance = atlp.lootChance;
+        		} else if (atlp.lootTablePath.equals(event.getName().getPath())) {
+        			chance = atlp.lootChance;
+        			mineshaftText = " " + atlp.lootTablePath.substring(7);
+        		}
     		}
-    		LOGGER.debug("alter" + mineshaftText + " loot table: " + event.getTable().getLootTableId().getPath());
+
+    		LOGGER.debug("alter" + mineshaftText + " loot table: " + event.getTable().getLootTableId().getPath() + " with chance: " + chance);
     		
     		LootPool.Builder lootPool = LootPool.lootPool().setRolls(ConstantValue.exactly(1.0f)).when(LootItemRandomChanceCondition.randomChance(chance));
     		for (Item item : lootItemsToAdd) {
