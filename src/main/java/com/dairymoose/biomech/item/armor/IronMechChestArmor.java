@@ -35,7 +35,7 @@ public class IronMechChestArmor extends ArmorBase {
 	//public static DamageSource bioMechAbsorb = null;
 	//public static DamageSource bioMechAbsorb = new DamageSource(Holder.direct(BioMechRegistry.DAMAGE_TYPE_BIOMECH_ABSORB.get()));
 	public static DamageType bioMechAbsorbDamageType = new DamageType("biomech:biomech_absorb", 0.0f);
-	public static float energyDamageMultiplier = 18.0f;
+	public static float energyDamageMultiplier = 15.0f;
 	
 	public static float getEnergyDamageForAttack(float damageMitigated) {
 		float energyDamage = damageMitigated * energyDamageMultiplier;
