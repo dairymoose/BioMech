@@ -80,18 +80,25 @@
 	
 	"item.biomech.pipe_mech_body": "§5Pipe Mech Body§0",
 	"item.biomech.pipe_mech_body.tooltip1": "Your body is extremely thin.",
-	"item.biomech.pipe_mech_body.tooltip2": "You have a 8% chance to outright avoid direct damage attacks.",
+	"item.biomech.pipe_mech_body.tooltip2": "You have a 5% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_body.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
 	"item.biomech.pipe_mech_legs": "§5Pipe Mech Legs§0",
 	"item.biomech.pipe_mech_legs.tooltip1": "Your legs are extremely thin.",
-	"item.biomech.pipe_mech_legs.tooltip2": "You have a 5% chance to outright avoid direct damage attacks.",
+	"item.biomech.pipe_mech_legs.tooltip2": "You have a 4% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_legs.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
 	"item.biomech.pipe_mech_head": "§5Pipe Mech Head§0",
 	"item.biomech.pipe_mech_head.tooltip1": "Your head is extremely thin.",
 	"item.biomech.pipe_mech_head.tooltip2": "You have a 3% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_head.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
+	
+	"item.biomech.pipe_mech_arm": "§5Pipe Mech Arm§0",
+	"item.biomech.pipe_mech_arm.tooltip1": "Your arm is extremely thin.",
+	"item.biomech.pipe_mech_arm.tooltip2": "You have a 2% chance to outright avoid direct damage attacks.",
+	"item.biomech.pipe_mech_arm.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
+	
+	"item.biomech.pipe_mech_left_arm": "§7Left Pipe Mech Arm§0",
 	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",

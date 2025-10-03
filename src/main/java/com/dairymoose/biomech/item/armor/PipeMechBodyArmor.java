@@ -24,7 +24,7 @@ public class PipeMechBodyArmor extends ArmorBase {
 		this.suitEnergy = 50;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Chest;
-		this.damageAvoidPct = 0.08f;
+		this.damageAvoidPct = 0.05f;
 	}
 
 	public static float energyLostFromAvoidAttack = 5.0f;

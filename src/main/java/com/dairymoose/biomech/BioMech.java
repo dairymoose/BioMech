@@ -28,7 +28,9 @@ import com.dairymoose.biomech.armor.renderer.MiningLaserRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.NightVisionVisorRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechBodyRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechHeadRenderer;
+import com.dairymoose.biomech.armor.renderer.PipeMechLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechLegsRenderer;
+import com.dairymoose.biomech.armor.renderer.PipeMechRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerChestRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerHelmetRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerLeftArmRenderer;
@@ -50,6 +52,7 @@ import com.dairymoose.biomech.item.armor.MechPartUtil;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
+import com.dairymoose.biomech.item.renderer.PipeMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
 import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
@@ -164,15 +167,17 @@ import net.minecraftforge.registries.RegistryObject;
  * Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry)
  * 
  * - Adding new arms:
- * Add .geo.json file
- * Add textures.item .png texture for 3d model
- * <Arm Specific>: Copy .geo.json file to _item.geo.json
+ * Make new right arm model named: pipe_mech_right_arm
+ * Add .geo.json file ("pipe_mech_right_arm.geo.json" and "pipe_mech_left_arm.geo.json")
+ * Add textures.item .png texture for 3d model (right arm texture only)
+ * <Arm Specific>: Copy right_arm .geo.json file to _item.geo.json
  * <Arm Specific>: Add animation in animations.item package
  * <Arm Specific>: Export display settings and put it models.item
- * Add localization
- * Add renderer in armor.renderer package
- * Add ArmorBase class in item.armor package
- * Add new armor to BioMechRegistry
+ * Add localization ("pipe_mech_arm" and "pipe_mech_left_arm")
+ * Add renderer in armor.renderer package (PipeMechRightArmRenderer & PipeMechLeftArmRenderer)
+ * Add ArmorBase class in item.armor package (PipeMechArmArmor & PipeMechRightArmArmor & PipeMechLeftArmArmor)
+ * Add new armor to BioMechRegistry (right & left arms)
+ * <Arm Specific>: Add AzItemRenderer class: PipeMechArmItemRenderer
  * <Arm Specific>: Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry & AzItemRendererRegistry)
  * <Arm Specific>: If animated: add to AzIdentityRegistry
  * 
@@ -1196,10 +1201,13 @@ public class BioMech
         	AzArmorRendererRegistry.register(PipeMechBodyRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_BODY.get());
         	AzArmorRendererRegistry.register(PipeMechLegsRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEGS.get());
         	AzArmorRendererRegistry.register(PipeMechHeadRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_HEAD.get());
+        	AzArmorRendererRegistry.register(PipeMechRightArmRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
+        	AzArmorRendererRegistry.register(PipeMechLeftArmRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEFT_ARM.get());
         	
         	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
         	AzItemRendererRegistry.register(PowerArmItemRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
+        	AzItemRendererRegistry.register(PipeMechArmItemRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
         	
         	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
         	
