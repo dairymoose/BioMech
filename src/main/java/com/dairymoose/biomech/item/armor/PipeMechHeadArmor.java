@@ -21,7 +21,7 @@ public class PipeMechHeadArmor extends ArmorBase {
 		this.suitEnergy = 5;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Head;
-		this.damageAvoidPct = 0.03f;
+		this.damageAvoidPct = 0.04f;
 	}
 	
 	@Override

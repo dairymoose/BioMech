@@ -115,7 +115,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;	
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
@@ -215,7 +215,6 @@ public class BioMech
         IEventBus modEventBus = context.getModEventBus();
 
         modEventBus.addListener(this::commonSetup);
-        
         modEventBus.addListener(this::addItemsToCreativeTab);
 
         BLOCKS.register(modEventBus);
@@ -610,6 +609,69 @@ public class BioMech
 		}
 		return false;
 	}
+	
+	@SubscribeEvent
+	public void onPlayerDamage(final LivingAttackEvent event) {
+		if (event.getEntity() instanceof Player player) {
+			BioMechPlayerData playerData = null;
+        	playerData = globalPlayerData.get(event.getEntity().getUUID());
+        	if (playerData != null) {
+        		boolean hasAnyDamageAbsorb = false;
+        		boolean hasAnyDamageAvoid = false;
+        		List<SlottedItem> slottedItems = playerData.getAllSlots();
+				for (SlottedItem slotted : slottedItems) {
+					if (!slotted.itemStack.isEmpty()) {
+						if (slotted.itemStack.getItem() instanceof ArmorBase base) {
+							if (base.getDamageAvoidPercent() > 0.0f) {
+								hasAnyDamageAvoid = true;
+							}
+							if (base.getDamageAbsorbPercent() > 0.0f) {
+								hasAnyDamageAbsorb = true;
+							}
+							
+							boolean cancel = base.onPlayerDamageTaken(event.getSource(), event.getAmount(), slotted.itemStack, player, slotted.mechPart);
+							if (cancel) {
+								event.setCanceled(true);
+							}
+						}
+					}
+				}
+				
+				//for global damage reduction or avoids
+				if (hasAnyDamageAvoid) {
+					if (!player.level().isClientSide) {
+						if (playerData.getSuitEnergy() >= PipeMechBodyArmor.energyLostFromAvoidAttack) {
+							if (PipeMechBodyArmor.avoidDirectAttack(PipeMechBodyArmor.getTotalDamageAvoidPct(player), event.getSource(), event.getAmount(), player)) {
+								//call internalSpendSuitEnergy directly because this code does not ever run twice - it only runs on server-side whether it's CLIENT or DEDICATED_SERVER
+								playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
+								BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + PipeMechBodyArmor.getTotalDamageAvoidPct(player));
+								if (event.getEntity() instanceof ServerPlayer sp) {
+									BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax));
+								}
+								event.setCanceled(true);
+								return;
+							}
+						}
+					}
+				}
+				
+				if (hasAnyDamageAbsorb) {
+					float absorbPct = IronMechChestArmor.getTotalDamageAbsorbPct(player);
+					float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, event.getAmount());
+					float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(event.getAmount(), damageMitigated);
+					float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
+					if (playerData.getSuitEnergy() >= energyDamage) {
+						if (IronMechChestArmor.absorbDirectAttack(absorbPct, event.getSource(), event.getAmount(), player)) {
+							playerData.spendSuitEnergy(player, energyDamage);
+							BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage);
+							event.setCanceled(true);
+						}
+					}
+				}
+				
+        	}
+		}
+	}
     
 	public static boolean primedForMidairJump = false;
 	public static boolean localPlayerJumping = false;
@@ -852,68 +914,6 @@ public class BioMech
         @SubscribeEvent
 		public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
 			event.registerBlockEntityRenderer(BioMechRegistry.BLOCK_ENTITY_BIOMECH_STATION.get(), context -> new BioMechStationRenderer());
-		}
-        
-        @SubscribeEvent
-		public void onPlayerDamage(final LivingAttackEvent event) {
-    		if (event.getEntity() instanceof Player player) {
-				BioMechPlayerData playerData = null;
-	        	playerData = globalPlayerData.get(event.getEntity().getUUID());
-	        	if (playerData != null) {
-	        		boolean hasAnyDamageAbsorb = false;
-	        		boolean hasAnyDamageAvoid = false;
-	        		List<SlottedItem> slottedItems = playerData.getAllSlots();
-					for (SlottedItem slotted : slottedItems) {
-						if (!slotted.itemStack.isEmpty()) {
-							if (slotted.itemStack.getItem() instanceof ArmorBase base) {
-								if (base.getDamageAvoidPercent() > 0.0f) {
-									hasAnyDamageAvoid = true;
-								}
-								if (base.getDamageAbsorbPercent() > 0.0f) {
-									hasAnyDamageAbsorb = true;
-								}
-								
-								boolean cancel = base.onPlayerDamageTaken(event.getSource(), event.getAmount(), slotted.itemStack, player, slotted.mechPart);
-								if (cancel) {
-									event.setCanceled(true);
-								}
-							}
-						}
-					}
-					
-					//for global damage reduction or avoids
-					if (hasAnyDamageAvoid) {
-						if (!event.getEntity().level().isClientSide) {
-							if (playerData.getSuitEnergy() >= PipeMechBodyArmor.energyLostFromAvoidAttack) {
-								if (PipeMechBodyArmor.avoidDirectAttack(PipeMechBodyArmor.getTotalDamageAvoidPct(player), event.getSource(), event.getAmount(), player)) {
-									playerData.spendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
-									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount());
-									if (event.getEntity() instanceof ServerPlayer sp) {
-										BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax));
-									}
-									event.setCanceled(true);
-									return;
-								}
-							}
-						}
-					}
-					
-					if (hasAnyDamageAbsorb) {
-						float absorbPct = IronMechChestArmor.getTotalDamageAbsorbPct(player);
-						float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, event.getAmount());
-						float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(event.getAmount(), damageMitigated);
-						float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
-						if (playerData.getSuitEnergy() >= energyDamage) {
-							if (IronMechChestArmor.absorbDirectAttack(absorbPct, event.getSource(), event.getAmount(), player)) {
-								playerData.spendSuitEnergy(player, energyDamage);
-								BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage);
-								event.setCanceled(true);
-							}
-						}
-					}
-					
-	        	}
-			}
 		}
         
         public BioMechPlayerData getDataForLocalPlayer() {

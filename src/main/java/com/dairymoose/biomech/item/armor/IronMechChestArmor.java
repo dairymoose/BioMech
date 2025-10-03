@@ -53,7 +53,7 @@ public class IronMechChestArmor extends ArmorBase {
 	}
 	
 	public static boolean absorbDirectAttack(float absorbPct, DamageSource damageSource, float amount, Player player) {
-		if (damageSource.type() != bioMechAbsorbDamageType && damageSource.getEntity() != null) {
+		if (damageSource.type() != bioMechAbsorbDamageType && PipeMechBodyArmor.damageSourceIsDirect(damageSource, player)) {
 			float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, amount);
 			float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(amount, damageMitigated);
 			player.hurt(new DamageSource(Holder.direct(bioMechAbsorbDamageType)), damageAfterMitigation);

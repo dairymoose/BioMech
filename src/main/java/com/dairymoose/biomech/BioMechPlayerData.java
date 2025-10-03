@@ -82,7 +82,7 @@ public class BioMechPlayerData {
 		return false;
 	}
 	
-	private void internalSpendSuitEnergy(Player player, float amount) {
+	public void internalSpendSuitEnergy(Player player, float amount) {
 		this.lastUsedEnergyTick = player.tickCount;
 		this.suitEnergy -= amount;
 		if (this.suitEnergy < 0.0f)
@@ -91,7 +91,7 @@ public class BioMechPlayerData {
 	
 	public void spendSuitEnergy(Player player, float amount) {
 		if (FMLEnvironment.dist == Dist.CLIENT) {
-			if (!player.level().isClientSide)
+			if (player.level().isClientSide)
 				this.internalSpendSuitEnergy(player, amount);
 		} else {
 			this.internalSpendSuitEnergy(player, amount);
@@ -113,7 +113,7 @@ public class BioMechPlayerData {
 	
 	public void tickEnergy(Player player) {
 		if (FMLEnvironment.dist == Dist.CLIENT) {
-			if (!player.level().isClientSide)
+			if (player.level().isClientSide)
 				this.internalTickEnergy(player);
 		} else {
 			this.internalTickEnergy(player);

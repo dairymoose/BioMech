@@ -13,6 +13,7 @@ public class MechPartUtil {
 			switch (mechPart) {
 			case Head:
 				list.add(playerModel.head);
+				list.add(playerModel.hat);
 				break;
 			case LeftArm:
 				list.add(playerModel.leftArm);
@@ -30,6 +31,9 @@ public class MechPartUtil {
 				list.add(playerModel.leftPants);
 				list.add(playerModel.rightLeg);
 				list.add(playerModel.rightPants);
+				break;
+			case Back:
+				list.add(playerModel.cloak);
 				break;
 			}
 		}

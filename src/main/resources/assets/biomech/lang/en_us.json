@@ -90,7 +90,7 @@
 	
 	"item.biomech.pipe_mech_head": "§5Pipe Mech Head§0",
 	"item.biomech.pipe_mech_head.tooltip1": "Your head is extremely thin.",
-	"item.biomech.pipe_mech_head.tooltip2": "You have a 3% chance to outright avoid direct damage attacks.",
+	"item.biomech.pipe_mech_head.tooltip2": "You have a 4% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_head.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
 	"item.biomech.pipe_mech_arm": "§5Pipe Mech Arm§0",

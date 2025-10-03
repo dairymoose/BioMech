@@ -8,7 +8,9 @@ import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 
+import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -21,7 +23,7 @@ public class PipeMechBodyArmor extends ArmorBase {
 
 	public PipeMechBodyArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
-		this.suitEnergy = 50;
+		this.suitEnergy = 70;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Chest;
 		this.damageAvoidPct = 0.05f;
@@ -29,12 +31,19 @@ public class PipeMechBodyArmor extends ArmorBase {
 
 	public static float energyLostFromAvoidAttack = 5.0f;
 	
+	public static boolean damageSourceIsDirect(DamageSource damageSource, Player player) {
+		return damageSource.type().effects() == DamageEffects.HURT && damageSource.type() != player.damageSources().magic().type();
+	}
+	
 	public static boolean avoidDirectAttack(float avoidPct, DamageSource damageSource, float amount, Player player) {
-		if (damageSource.getEntity() != null) {
+		//avoid dodging burn ticks + poison ticks
+		if (PipeMechBodyArmor.damageSourceIsDirect(damageSource, player)) {
 			double rnd = Math.random();
 			if (rnd < avoidPct) {
 				return true;
 			}
+		} else {
+			BioMech.LOGGER.info("ignoring damage of type: " + damageSource);
 		}
 		
 		return false;
