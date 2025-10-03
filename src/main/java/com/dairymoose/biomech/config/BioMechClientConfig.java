@@ -25,7 +25,7 @@ public class BioMechClientConfig {
 		builder.pop();
 		
 		builder.push("gui");
-		this.showEnergySuitGuiThreshold = builder.comment("showEnergySuitGuiThreshold").translation("config.biomech.showEnergySuitGuiThreshold").defineInRange("showEnergySuitGuiThreshold", 0.999, 0.0, 1.0);
+		this.showEnergySuitGuiThreshold = builder.comment("showEnergySuitGuiThreshold").translation("config.biomech.showEnergySuitGuiThreshold").defineInRange("showEnergySuitGuiThreshold", 0.9999, 0.0, 1.0);
 		//this.energySuitGuiOpacity = builder.comment("energySuitGuiOpacity").translation("config.biomech.energySuitGuiOpacity").defineInRange("energySuitGuiOpacity", 0.75, 0.0, 1.0);
 		this.energySuitGuiXScale = builder.comment("energySuitGuiXScale").translation("config.biomech.energySuitGuiXScale").defineInRange("energySuitGuiXScale", 1.25, 0.0, 5.0);
 		this.energySuitGuiYScale = builder.comment("energySuitGuiYScale").translation("config.biomech.energySuitGuiYScale").defineInRange("energySuitGuiYScale", 1.25, 0.0, 5.0);
