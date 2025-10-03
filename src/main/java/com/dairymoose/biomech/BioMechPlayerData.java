@@ -35,7 +35,7 @@ public class BioMechPlayerData {
 	public float suitEnergyPerSecTemporaryModifier = 0.0f;
 	
 	public int lastUsedEnergyTick = -1000;
-	public int ticksRequiredToRegenEnergy = 15;
+	public int ticksRequiredToRegenEnergy = 40;
 	
 	public static String SUIT_ENERGY = "SuitEnergy";
 	public static String SUIT_ENERGY_MAX = "SuitEnergyMax";

@@ -1,6 +1,5 @@
 package com.dairymoose.biomech;
 
-import com.dairymoose.biomech.armor.renderer.DiamondMechArmorRenderer;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.block_entity.BioMechStationBlockEntity;
 import com.dairymoose.biomech.item.BioMechActivator;
@@ -14,6 +13,9 @@ import com.dairymoose.biomech.item.armor.LavastrideLeggingsArmor;
 import com.dairymoose.biomech.item.armor.MiningLaserLeftArmArmor;
 import com.dairymoose.biomech.item.armor.MiningLaserRightArmArmor;
 import com.dairymoose.biomech.item.armor.NightVisionVisorArmor;
+import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
+import com.dairymoose.biomech.item.armor.PipeMechHeadArmor;
+import com.dairymoose.biomech.item.armor.PipeMechLegsArmor;
 import com.dairymoose.biomech.item.armor.PowerChestArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.armor.PowerLeftArmArmor;
@@ -23,11 +25,15 @@ import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ArmorItem.Type;
@@ -62,6 +68,9 @@ public class BioMechRegistry {
 	public static RegistryObject<SoundEvent> SOUND_EVENT_LASER_LOOP = BioMech.SOUNDS.register("laser_loop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "laser_loop")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_JETPACK_LOOP = BioMech.SOUNDS.register("jetpack_loop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "jetpack_loop")));
 	
+	public static final ResourceKey<DamageType> BIOMECH_ABSORB = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "biomech_absorb"));
+	//public static RegistryObject<DamageType> DAMAGE_TYPE_BIOMECH_ABSORB = BioMech.DAMAGE_TYPES.register("biomech_absorb", () -> new DamageType("biomech_absorb", 0.0f));
+	
 	public static RegistryObject<Item> ITEM_BIOMECH_STATION = BioMech.ITEMS.register("biomech_station", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_STATION.get(), new Item.Properties()));
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_ACTIVATOR = BioMech.ITEMS.register("biomech_activator", () -> new BioMechActivator(new Item.Properties()));
@@ -78,6 +87,10 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_DIAMOND_MECH_CHESTPLATE = BioMech.ITEMS.register("diamond_mech_chestplate", () -> new DiamondMechChestArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_SPRING_LOADED_LEGGINGS = BioMech.ITEMS.register("spring_loaded_leggings", () -> new SpringLoadedLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_PIPE_MECH_BODY = BioMech.ITEMS.register("pipe_mech_body", () -> new PipeMechBodyArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_PIPE_MECH_LEGS = BioMech.ITEMS.register("pipe_mech_legs", () -> new PipeMechLegsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_PIPE_MECH_HEAD = BioMech.ITEMS.register("pipe_mech_head", () -> new PipeMechHeadArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_POWER_CHEST = BioMech.ITEMS.register("power_chest", () -> new PowerChestArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_POWER_LEGGINGS = BioMech.ITEMS.register("power_leggings", () -> new PowerLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));

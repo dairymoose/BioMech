@@ -24,6 +24,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -53,6 +54,9 @@ public class ArmorBase extends ArmorItem {
 	private static ArmorMaterial NOTHING_MATERIAL = new NothingMaterial();
 	protected float armDistance = 5.0f;
 	
+	protected float damageAvoidPct = 0.0f;
+	protected float damageAbsorbPct = 0.0f;
+	
 	public ArmorBase(ArmorMaterial material, Type type, Properties props) {
 		super(NOTHING_MATERIAL, type, props);
 	}
@@ -60,7 +64,19 @@ public class ArmorBase extends ArmorItem {
 	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick, boolean bothHandsInactive, boolean bothHandsActive) {
 		
 	}
+	
+	public boolean onPlayerDamageTaken(DamageSource damageSource, float amount, ItemStack itemStack, Player player, MechPart handPart) {
+		return false;
+	}
 
+	public float getDamageAvoidPercent() {
+		return this.damageAvoidPct;
+	}
+	
+	public float getDamageAbsorbPercent() {
+		return this.damageAbsorbPct;
+	}
+	
 	public float getArmDistance() {
 		return this.armDistance;
 	}

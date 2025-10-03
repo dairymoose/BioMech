@@ -26,6 +26,9 @@ import com.dairymoose.biomech.armor.renderer.LavastrideLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.MiningLaserLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.MiningLaserRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.NightVisionVisorRenderer;
+import com.dairymoose.biomech.armor.renderer.PipeMechBodyRenderer;
+import com.dairymoose.biomech.armor.renderer.PipeMechHeadRenderer;
+import com.dairymoose.biomech.armor.renderer.PipeMechLegsRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerChestRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerHelmetRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerLeftArmRenderer;
@@ -41,8 +44,10 @@ import com.dairymoose.biomech.config.BioMechServerConfig;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
+import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
+import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
@@ -96,6 +101,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -127,6 +133,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -182,10 +189,19 @@ public class BioMech
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, MODID);
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, MODID);
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, MODID);
+    public static final DeferredRegister<DamageType> DAMAGE_TYPES = DeferredRegister.create(Registries.DAMAGE_TYPE, MODID);
     
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
 
     private static BioMechCraftingFlags craftingFlags;
+    
+    public static void INFO(String toLog) {
+    	BioMech.LOGGER.info("[" + BioMech.MODID + "] " + toLog);
+    }
+    
+    public static void DEBUG(String toLog) {
+    	BioMech.LOGGER.debug("[" + BioMech.MODID + "] " + toLog);
+    }
     
     public BioMech(FMLJavaModLoadingContext context)
     {
@@ -204,6 +220,7 @@ public class BioMech
         MENUS.register(modEventBus);
         PARTICLES.register(modEventBus);
         SOUNDS.register(modEventBus);
+        DAMAGE_TYPES.register(modEventBus);
         
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -832,6 +849,68 @@ public class BioMech
 			event.registerBlockEntityRenderer(BioMechRegistry.BLOCK_ENTITY_BIOMECH_STATION.get(), context -> new BioMechStationRenderer());
 		}
         
+        @SubscribeEvent
+		public void onPlayerDamage(final LivingAttackEvent event) {
+    		if (event.getEntity() instanceof Player player) {
+				BioMechPlayerData playerData = null;
+	        	playerData = globalPlayerData.get(event.getEntity().getUUID());
+	        	if (playerData != null) {
+	        		boolean hasAnyDamageAbsorb = false;
+	        		boolean hasAnyDamageAvoid = false;
+	        		List<SlottedItem> slottedItems = playerData.getAllSlots();
+					for (SlottedItem slotted : slottedItems) {
+						if (!slotted.itemStack.isEmpty()) {
+							if (slotted.itemStack.getItem() instanceof ArmorBase base) {
+								if (base.getDamageAvoidPercent() > 0.0f) {
+									hasAnyDamageAvoid = true;
+								}
+								if (base.getDamageAbsorbPercent() > 0.0f) {
+									hasAnyDamageAbsorb = true;
+								}
+								
+								boolean cancel = base.onPlayerDamageTaken(event.getSource(), event.getAmount(), slotted.itemStack, player, slotted.mechPart);
+								if (cancel) {
+									event.setCanceled(true);
+								}
+							}
+						}
+					}
+					
+					//for global damage reduction or avoids
+					if (hasAnyDamageAvoid) {
+						if (!event.getEntity().level().isClientSide) {
+							if (playerData.getSuitEnergy() >= PipeMechBodyArmor.energyLostFromAvoidAttack) {
+								if (PipeMechBodyArmor.avoidDirectAttack(PipeMechBodyArmor.getTotalDamageAvoidPct(player), event.getSource(), event.getAmount(), player)) {
+									playerData.spendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
+									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount());
+									if (event.getEntity() instanceof ServerPlayer sp) {
+										BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax));
+									}
+									event.setCanceled(true);
+									return;
+								}
+							}
+						}
+					}
+					
+					if (hasAnyDamageAbsorb) {
+						float absorbPct = IronMechChestArmor.getTotalDamageAbsorbPct(player);
+						float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, event.getAmount());
+						float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(event.getAmount(), damageMitigated);
+						float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
+						if (playerData.getSuitEnergy() >= energyDamage) {
+							if (IronMechChestArmor.absorbDirectAttack(absorbPct, event.getSource(), event.getAmount(), player)) {
+								playerData.spendSuitEnergy(player, energyDamage);
+								BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage);
+								event.setCanceled(true);
+							}
+						}
+					}
+					
+	        	}
+			}
+		}
+        
         public BioMechPlayerData getDataForLocalPlayer() {
         	if (Minecraft.getInstance().player != null) {
         		BioMechPlayerData playerData = null;
@@ -1114,6 +1193,9 @@ public class BioMech
         	AzArmorRendererRegistry.register(IronMechChestplateRenderer::new, BioMechRegistry.ITEM_IRON_MECH_CHESTPLATE.get());
         	AzArmorRendererRegistry.register(DiamondMechArmorRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_CHESTPLATE.get());
         	AzArmorRendererRegistry.register(SpringLoadedLeggingsRenderer::new, BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(PipeMechBodyRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_BODY.get());
+        	AzArmorRendererRegistry.register(PipeMechLegsRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEGS.get());
+        	AzArmorRendererRegistry.register(PipeMechHeadRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_HEAD.get());
         	
         	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
