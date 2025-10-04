@@ -1,17 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "i i",
     "i#i",
-    "iii"
+    "i i",
+    "   "
   ],
   "key": {
-	"#": {
+  "#": {
       "tag": "forge:storage_blocks/diamond"
     },
-	"i": {
-	  "tag": "forge:gems/diamond"
-	}
+  "i": {
+    "tag": "forge:gems/diamond"
+  }
   },
   "result": {
     "item": "biomech:diamond_mech_chestplate",

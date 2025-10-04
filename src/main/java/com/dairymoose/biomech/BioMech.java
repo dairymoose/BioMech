@@ -20,6 +20,10 @@ import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.armor.renderer.BackJetpackRenderer;
 import com.dairymoose.biomech.armor.renderer.BackScubaTankRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechArmorRenderer;
+import com.dairymoose.biomech.armor.renderer.DiamondMechHeadRenderer;
+import com.dairymoose.biomech.armor.renderer.DiamondMechLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DiamondMechLegsRenderer;
+import com.dairymoose.biomech.armor.renderer.DiamondMechRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechHeadRenderer;
@@ -55,6 +59,7 @@ import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
+import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PipeMechArmItemRenderer;
@@ -95,7 +100,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -105,11 +109,9 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.LiteralContents;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -146,10 +148,8 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
@@ -183,8 +183,8 @@ import net.minecraftforge.registries.RegistryObject;
  * <Optional>: Add tags to mech_part.json
  * 
  * - Adding new arms:
- * Make new right arm model named: pipe_mech_right_arm
- * Duplicate and flip arm model: export as pipe_mech_left_arm.geo.json
+ * BB: Make new right arm model named: pipe_mech_right_arm
+ * BB: Duplicate and flip arm model: export as pipe_mech_left_arm.geo.json
  * Add .geo.json file ("pipe_mech_right_arm.geo.json" and "pipe_mech_left_arm.geo.json")
  * Add textures.item .png texture for 3d model (right arm texture only)
  * <Arm Specific>: Copy right_arm .geo.json file to _item.geo.json
@@ -194,8 +194,9 @@ import net.minecraftforge.registries.RegistryObject;
  * Add renderer in armor.renderer package (PipeMechRightArmRenderer & PipeMechLeftArmRenderer)
  * Add ArmorBase class in item.armor package (PipeMechArmArmor & PipeMechRightArmArmor & PipeMechLeftArmArmor)
  * Add new armor to BioMechRegistry (right & left arms)
+ * Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry)
  * <Arm Specific>: Add AzItemRenderer class: PipeMechArmItemRenderer
- * <Arm Specific>: Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry & AzItemRendererRegistry)
+ * <Arm Specific>: Add new item Renderer refernece to bottom of BioMech in onClientSetup (AzItemRendererRegistry)
  * <Arm Specific / Animated>: If animated: add to AzIdentityRegistry
  * 
  */
@@ -1312,7 +1313,11 @@ public class BioMech
         	//IRON MECH
         	
         	//DIAMOND MECH
+        	AzArmorRendererRegistry.register(DiamondMechHeadRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_HEAD.get());
         	AzArmorRendererRegistry.register(DiamondMechArmorRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_CHESTPLATE.get());
+        	AzArmorRendererRegistry.register(DiamondMechLegsRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_LEGS.get());
+        	AzArmorRendererRegistry.register(DiamondMechRightArmRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_ARM.get());
+        	AzArmorRendererRegistry.register(DiamondMechLeftArmRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_LEFT_ARM.get());
         	//DIAMOND MECH
         	
         	//PIPE MECH
@@ -1323,13 +1328,17 @@ public class BioMech
         	AzArmorRendererRegistry.register(PipeMechLeftArmRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEFT_ARM.get());
         	//PIPE MECH
         	
-        	//------ Arm items ------
+        	//BioMech Station only
         	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
+        	//BioMech Station only
+        	
+        	//------ Arm items - render item display ------
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
         	AzItemRendererRegistry.register(PowerArmItemRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
         	AzItemRendererRegistry.register(PipeMechArmItemRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
         	AzItemRendererRegistry.register(IronMechArmItemRenderer::new, BioMechRegistry.ITEM_IRON_MECH_ARM.get());
-        	//------ Arm items ------
+        	AzItemRendererRegistry.register(DiamondMechArmItemRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_ARM.get());
+        	//------ Arm items - render item display ------
         	
         	//------ Arms / Animated ------
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_MINING_LASER_ARM.get(), BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
