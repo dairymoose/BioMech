@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -71,7 +70,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 
-import mezz.jei.api.constants.RecipeTypes;
 import mod.azure.azurelib.AzureLib;
 import mod.azure.azurelib.rewrite.animation.AzAnimator;
 import mod.azure.azurelib.rewrite.animation.AzAnimatorAccessor;
@@ -112,13 +110,10 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -190,7 +185,14 @@ import net.minecraftforge.registries.RegistryObject;
  * <Arm Specific>: If animated: add to AzIdentityRegistry
  * 
  */
-
+//TODO: 
+//	Implement power chest damage avoid
+//	Implement power head crit strike
+//	Implement power arm damage boost
+//	Add full Iron Mech set
+//	Add full Diamond Mech set
+//	Add missing crafting recipes
+//	Fix particles on BioMech Station
 @Mod(BioMech.MODID)
 public class BioMech
 {
