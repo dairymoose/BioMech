@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "i i",
+    "i#i",
+    "iii"
+  ],
+  "key": {
+	"#": {
+      "tag": "forge:storage_blocks/diamond"
+    },
+	"i": {
+	  "tag": "forge:gems/diamond"
+	}
+  },
+  "result": {
+    "item": "biomech:diamond_mech_chestplate",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableDiamondMechChestplateCrafting"
+    }
+  ]
+} 

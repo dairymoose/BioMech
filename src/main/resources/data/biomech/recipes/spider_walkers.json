@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "#i#",
+    " z "
+  ],
+  "key": {
+    "#": {
+      "item": "biomech:biomech_scrap_block"
+    },
+	"i": {
+      "item": "minecraft:fermented_spider_eye"
+    },
+	"z": {
+	  "item": "minecraft:iron_block"
+	}
+  },
+  "result": {
+    "item": "biomech:spider_walkers",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableSpiderWalkersCrafting"
+    }
+  ]
+} 

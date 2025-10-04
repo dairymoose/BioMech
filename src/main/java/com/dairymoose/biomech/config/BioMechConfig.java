@@ -67,7 +67,13 @@ public class BioMechConfig {
 			addConfigElement(BioMechConfig.COMMON.enableBioMechStation);
 			addConfigElement(BioMechConfig.COMMON.enableBioMechActivator);
 			addConfigElement(BioMechConfig.COMMON.enableBioMechDeactivator);
+			
 			addConfigElement(BioMechConfig.COMMON.enableBiomechScrapCrafting);
+			
+			addConfigElement(BioMechConfig.COMMON.enableIronMechChestplateCrafting);
+			addConfigElement(BioMechConfig.COMMON.enableDiamondMechChestplateCrafting);
+			
+			addConfigElement(BioMechConfig.COMMON.enableSpiderWalkersCrafting);
 			addConfigElement(BioMechConfig.COMMON.enableScubaTankCrafting);
 			addConfigElement(BioMechConfig.COMMON.enableJetpackCrafting);
 			
