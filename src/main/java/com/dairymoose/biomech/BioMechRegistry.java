@@ -45,6 +45,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -56,6 +57,8 @@ public class BioMechRegistry {
 	public static RegistryObject<CreativeModeTab> TAB_BIOMECH_CREATIVE = BioMech.CREATIVE_MODE_TABS.register("biomech_creative", () -> CreativeModeTab.builder().icon(() -> (new ItemStack(BioMechRegistry.ITEM_BIOMECH_STATION.get()))).title(Component.literal("BioMech")).build());
 	
 	public static RegistryObject<Block> BLOCK_BIOMECH_STATION = BioMech.BLOCKS.register("biomech_station", () -> new BioMechStationBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(2.0f, 5.0f)));
+	
+	public static RegistryObject<Block> BLOCK_BIOMECH_SCRAP = BioMech.BLOCKS.register("biomech_scrap_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(2.0f, 5.0f)));
 	
 	public static RegistryObject<BlockEntityType<BioMechStationBlockEntity>> BLOCK_ENTITY_BIOMECH_STATION = BioMech.BLOCK_ENTITY_TYPES.register("biomech_station", () -> BioMechStationBlockEntity.BIOMECH_STATION_BLOCK_ENTITY);
 	
@@ -76,6 +79,9 @@ public class BioMechRegistry {
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_STATION = BioMech.ITEMS.register("biomech_station", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_STATION.get(), new Item.Properties()));
 	
+	public static RegistryObject<Item> ITEM_BIOMECH_SCRAP = BioMech.ITEMS.register("biomech_scrap", () -> new Item(new Item.Properties().stacksTo(255)));
+	public static RegistryObject<Item> ITEM_BIOMECH_SCRAP_BLOCK = BioMech.ITEMS.register("biomech_scrap_block", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_SCRAP.get(), new Item.Properties()));
+	
 	public static RegistryObject<Item> ITEM_BIOMECH_ACTIVATOR = BioMech.ITEMS.register("biomech_activator", () -> new BioMechActivator(new Item.Properties()));
 	public static RegistryObject<Item> ITEM_BIOMECH_DEACTIVATOR = BioMech.ITEMS.register("biomech_deactivator", () -> new BioMechDeactivator(new Item.Properties()));
 	
@@ -95,12 +101,10 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_PIPE_MECH_LEGS = BioMech.ITEMS.register("pipe_mech_legs", () -> new PipeMechLegsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_PIPE_MECH_HEAD = BioMech.ITEMS.register("pipe_mech_head", () -> new PipeMechHeadArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_PIPE_MECH_ARM = BioMech.ITEMS.register("pipe_mech_arm", () -> new PipeMechRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
-	public static RegistryObject<Item> ITEM_PIPE_MECH_LEFT_ARM = BioMech.ITEMS.register("left_pipe_mech_arm", () -> new PipeMechLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_POWER_CHEST = BioMech.ITEMS.register("power_chest", () -> new PowerChestArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_POWER_LEGGINGS = BioMech.ITEMS.register("power_leggings", () -> new PowerLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_POWER_ARM = BioMech.ITEMS.register("power_arm", () -> new PowerRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
-	public static RegistryObject<Item> ITEM_POWER_LEFT_ARM = BioMech.ITEMS.register("left_power_arm", () -> new PowerLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_POWER_HELMET = BioMech.ITEMS.register("power_helmet", () -> new PowerHelmetArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_BACK_SCUBA_TANK = BioMech.ITEMS.register("back_scuba_tank", () -> new BackScubaTankArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
@@ -108,11 +112,14 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_BACK_JETPACK = BioMech.ITEMS.register("back_jetpack", () -> new BackJetpackArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_MINING_LASER_ARM = BioMech.ITEMS.register("mining_laser_arm", () -> new MiningLaserRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
-	public static RegistryObject<Item> ITEM_MINING_LASER_LEFT_ARM = BioMech.ITEMS.register("mining_laser_left_arm", () -> new MiningLaserLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_LAVASTRIDE_LEGGINGS = BioMech.ITEMS.register("lavastride_leggings", () -> new LavastrideLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	
-
+	public static RegistryObject<Item> ITEM_MINING_LASER_LEFT_ARM = BioMech.ITEMS.register("mining_laser_left_arm", () -> new MiningLaserLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_POWER_LEFT_ARM = BioMech.ITEMS.register("left_power_arm", () -> new PowerLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_PIPE_MECH_LEFT_ARM = BioMech.ITEMS.register("left_pipe_mech_arm", () -> new PipeMechLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_REMAINING_PICKAXE = BioMech.ITEMS.register("remaining_pickaxe", () -> new RemainingPickaxeItem(null));
+	
 	//public static RegistryObject<SoundEvent> SOUND_STALKER_AMBIENT = AwakenedEvil.SOUNDS.register("stalker_ambient", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(AwakenedEvil.MODID, "stalker_ambient")));
 	
 }

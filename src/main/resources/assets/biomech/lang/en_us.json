@@ -1,6 +1,10 @@
 {
 	"block.biomech.biomech_station": "BioMech Station",
 	
+	"item.biomech.biomech_scrap": "BioMech Scrap",
+	
+	"block.biomech.biomech_scrap_block": "BioMech Scrap Block",
+	
 	"item.biomech.generic.tooltip": "§4Requires BioMech Station§0",
 	"item.biomech.generic.tooltip2": "§aRequires BioMech Station§0",
 	"tooltip.biomech.suitenergy": "Suit Energy",
@@ -27,15 +31,11 @@
 
 	"item.biomech.power_arm": "§5Power Arm§0",
 	"item.biomech.power_arm.tooltip1": "Increases attack damage by 2 when wielding a weapon.",
-	
-	"item.biomech.left_power_arm": "§7Left Power Arm§0",
 
 	"item.biomech.mining_laser_arm": "§5Mining Laser Arm§0",
 	"item.biomech.mining_laser_arm.tooltip1": "Hold alt+mouse click to activate.",
 	"item.biomech.mining_laser_arm.tooltip2": "Hold to mine any pickaxe-mineable block.",
 	"item.biomech.mining_laser_arm.tooltip3": "The longer you hold, the stronger it becomes (max 12 seconds - up to 6x faster).",
-		
-	"item.biomech.mining_laser_left_arm": "§7Left Mining Laser Arm§0",
 	
 	"item.biomech.lavastride_leggings": "§5Lavastride Leggings§0",
 	"item.biomech.lavastride_leggings.tooltip1": "Allows the user to walk on the surface of lava.",
@@ -98,7 +98,10 @@
 	"item.biomech.pipe_mech_arm.tooltip2": "You have a 2% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_arm.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
+	"item.biomech.mining_laser_left_arm": "§7Left Mining Laser Arm§0",
+	"item.biomech.left_power_arm": "§7Left Power Arm§0",
 	"item.biomech.left_pipe_mech_arm": "§7Left Pipe Mech Arm§0",
+	"item.biomech.remaining_pickaxe": "§7Remaining Pickaxe§0",
 	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",

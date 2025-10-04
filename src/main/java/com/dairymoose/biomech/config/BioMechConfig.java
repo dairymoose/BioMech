@@ -67,6 +67,9 @@ public class BioMechConfig {
 			addConfigElement(BioMechConfig.COMMON.enableBioMechStation);
 			addConfigElement(BioMechConfig.COMMON.enableBioMechActivator);
 			addConfigElement(BioMechConfig.COMMON.enableBioMechDeactivator);
+			addConfigElement(BioMechConfig.COMMON.enableBiomechScrapCrafting);
+			addConfigElement(BioMechConfig.COMMON.enableScubaTankCrafting);
+			addConfigElement(BioMechConfig.COMMON.enableJetpackCrafting);
 			
 			BioMechStationBlock.configWalkToBioMechStation = BioMechConfig.COMMON.walkToBioMechStation.get().booleanValue();
 

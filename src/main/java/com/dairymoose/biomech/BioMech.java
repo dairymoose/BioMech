@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -70,6 +71,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 
+import mezz.jei.api.constants.RecipeTypes;
 import mod.azure.azurelib.AzureLib;
 import mod.azure.azurelib.rewrite.animation.AzAnimator;
 import mod.azure.azurelib.rewrite.animation.AzAnimatorAccessor;
@@ -102,16 +104,21 @@ import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -139,6 +146,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -281,6 +289,35 @@ public class BioMech
 		lootBioMechInChest = null;
 		lootItemsToAdd.clear();
 		lootPoolChances.clear();
+    }
+    
+    private static TagKey<Item> pickaxeBlockTag = ForgeRegistries.ITEMS.tags().createTagKey(new ResourceLocation("minecraft", "pickaxes"));
+    @SubscribeEvent
+    public void onItemCrafted(ItemCraftedEvent event) {
+    	ItemStack crafted = event.getCrafting();
+    	Container craftingGrid = event.getInventory();
+    	if (crafted.is(BioMechRegistry.ITEM_BIOMECH_SCRAP.get())) {
+			ItemStack pickaxeItem = null;
+			int itemCount = 0;
+			int pickaxeIndex = -1;
+			for (int i = 0; i < craftingGrid.getContainerSize(); ++i) {
+				ItemStack matrixItem = craftingGrid.getItem(i);
+				if (!matrixItem.isEmpty())
+					++itemCount;
+				if (matrixItem.is(pickaxeBlockTag)) {
+					pickaxeItem = matrixItem;
+					pickaxeIndex = i;
+				}
+			}
+			
+			if (itemCount == 2) {
+				if (pickaxeItem != null) {
+					//use forbidden black magic to give back the pickaxe
+					((RemainingPickaxeItem)BioMechRegistry.ITEM_REMAINING_PICKAXE.get()).remaining = pickaxeItem;
+					craftingGrid.setItem(pickaxeIndex, new ItemStack(BioMechRegistry.ITEM_REMAINING_PICKAXE.get()));
+				}
+			}
+		}
     }
     
     Float lootBioMechInChest = null;

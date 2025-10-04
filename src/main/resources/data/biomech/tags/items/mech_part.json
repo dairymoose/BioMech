@@ -1,0 +1,21 @@
+{
+  "replace": false,
+  "values": [
+	 "biomech:spider_walkers",
+	 "biomech:hovertech_leggings",
+	 "biomech:night_vision_visor",
+	 "biomech:spring_loaded_leggings",
+	 "biomech:pipe_mech_body",
+	 "biomech:pipe_mech_legs",
+	 "biomech:pipe_mech_head",
+	 "biomech:pipe_mech_arm",
+	 "biomech:power_chest",
+	 "biomech:power_leggings",
+	 "biomech:power_arm",
+	 "biomech:power_helmet",
+	 "biomech:back_scuba_tank",
+	 "biomech:back_jetpack",
+	 "biomech:mining_laser_arm",
+	 "biomech:lavastride_leggings"
+  ]
+}

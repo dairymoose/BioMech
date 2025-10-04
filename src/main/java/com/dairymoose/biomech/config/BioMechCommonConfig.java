@@ -8,6 +8,11 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableBioMechActivator;
 	public final ForgeConfigSpec.BooleanValue enableBioMechDeactivator;
 	
+	public final ForgeConfigSpec.BooleanValue enableBiomechScrapCrafting;
+	
+	public final ForgeConfigSpec.BooleanValue enableScubaTankCrafting;
+	public final ForgeConfigSpec.BooleanValue enableJetpackCrafting;
+	
 	public final ForgeConfigSpec.BooleanValue walkToBioMechStation;
 	
 	public BioMechCommonConfig(ForgeConfigSpec.Builder builder) {
@@ -15,6 +20,9 @@ public class BioMechCommonConfig {
 		this.enableBioMechStation = builder.comment("enableBioMechStation").translation("config.biomech.enableBioMechStation").define("enableBioMechStation", true);
 		this.enableBioMechActivator = builder.comment("enableBioMechActivator").translation("config.biomech.enableBioMechActivator").define("enableBioMechActivator", true);
 		this.enableBioMechDeactivator = builder.comment("enableBioMechDeactivator").translation("config.biomech.enableBioMechDeactivator").define("enableBioMechDeactivator", true);
+		this.enableBiomechScrapCrafting = builder.comment("enableBiomechScrapCrafting").translation("config.biomech.enableBiomechScrapCrafting").define("enableBiomechScrapCrafting", true);
+		this.enableScubaTankCrafting = builder.comment("enableScubaTankCrafting").translation("config.biomech.enableScubaTankCrafting").define("enableScubaTankCrafting", true);
+		this.enableJetpackCrafting = builder.comment("enableJetpackCrafting").translation("config.biomech.enableJetpackCrafting").define("enableJetpackCrafting", true);
 		builder.pop();
 		
 		builder.push("biomech_station");

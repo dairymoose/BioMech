@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-	"biomech:biomech_station"
+	"biomech:biomech_station",
+	"biomech:biomech_scrap_block"
   ]
 }

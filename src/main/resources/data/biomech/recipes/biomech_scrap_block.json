@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "biomech:biomech_scrap"
+    },
+    {
+      "item": "biomech:biomech_scrap"
+    },
+	{
+      "item": "biomech:biomech_scrap"
+    },
+	{
+      "item": "biomech:biomech_scrap"
+    },
+	{
+      "item": "biomech:biomech_scrap"
+    },
+	{
+      "item": "biomech:biomech_scrap"
+    },
+	{
+      "item": "biomech:biomech_scrap"
+    },
+	{
+      "item": "biomech:biomech_scrap"
+    },
+	{
+      "item": "biomech:biomech_scrap"
+    }
+  ],
+  "result": {
+    "item": "biomech:biomech_scrap_block",
+    "count": 1
+  }
+}

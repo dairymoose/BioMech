@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "#i#",
+    " z "
+  ],
+  "key": {
+    "#": {
+      "item": "biomech:biomech_scrap_block"
+    },
+	"i": {
+      "item": "minecraft:ghast_tear"
+    },
+	"z": {
+	  "item": "minecraft:blaze_powder"
+	}
+  },
+  "result": {
+    "item": "biomech:back_jetpack",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableJetpackCrafting"
+    }
+  ]
+} 

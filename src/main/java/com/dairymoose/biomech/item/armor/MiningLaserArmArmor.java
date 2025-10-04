@@ -73,6 +73,8 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 	public static float energyPerSecMiss = 1.0f;
 	public static float energyPerTickMiss = energyPerSecMiss / 20.0f;
 	
+	public static float laserDamageAtMaxPower = 2.0f;
+	
 	private static int SOUND_TICK_DURATION = 3;
 	Map<Player, DestroyBlockProgress> dbpMap = new HashMap<>();
 
@@ -232,7 +234,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 									if (bothHandsActive) {
 										damageMult = 2.0f;
 									}
-									living.hurt(player.level().damageSources().playerAttack(player), damageMult*1.5f*laserPower);
+									living.hurt(player.level().damageSources().playerAttack(player), damageMult*laserDamageAtMaxPower*laserPower);
 									if (living.getRemainingFireTicks() <= 30) {
 										living.setRemainingFireTicks(30);
 									}

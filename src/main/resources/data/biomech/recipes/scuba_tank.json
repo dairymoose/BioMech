@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    "#i#",
+    "   "
+  ],
+  "key": {
+    "#": {
+      "item": "biomech:biomech_scrap_block"
+    },
+	"i": {
+      "item": "minecraft:heart_of_the_sea"
+    }
+  },
+  "result": {
+    "item": "biomech:back_scuba_tank",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableScubaTankCrafting"
+    }
+  ]
+} 

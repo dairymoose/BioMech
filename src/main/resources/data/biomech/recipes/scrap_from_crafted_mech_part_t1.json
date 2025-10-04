@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "tag": "minecraft:pickaxes"
+    },
+    {
+      "tag": "biomech:crafted_mech_part_t1"
+    }
+  ],
+  "result": {
+    "item": "biomech:biomech_scrap",
+    "count": 0
+  },
+  "conditions": [
+      {
+        "type": "biomech:crafting_flag",
+          "crafting_flag": "enableBiomechScrapCrafting"
+      }
+    ]
+}
