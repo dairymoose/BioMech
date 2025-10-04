@@ -207,7 +207,6 @@ import net.minecraftforge.registries.RegistryObject;
  */
 //TODO: 
 //	Add missing crafting recipes
-//	Fix particles on BioMech Station
 @Mod(BioMech.MODID)
 public class BioMech
 {
