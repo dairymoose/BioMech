@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " # ",
+    " i ",
+    " i "
+  ],
+  "key": {
+	"#": {
+      "tag": "forge:storage_blocks/iron"
+    },
+	"i": {
+	  "tag": "forge:ingots/iron"
+	}
+  },
+  "result": {
+    "item": "biomech:iron_mech_arm",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableIronMechArmorCrafting"
+    }
+  ]
+} 
