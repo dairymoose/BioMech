@@ -66,29 +66,29 @@
 	"item.biomech.iron_mech_head": "Iron Mech Head",
 	"item.biomech.iron_mech_head.tooltip1": "3% of incoming damage is absorbed by suit energy.",
 	"item.biomech.iron_mech_head.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.iron_mech_head.tooltip3": "Absorbed damage harms suit energy at a 15x multiplier.",
+	"item.biomech.iron_mech_head.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
 	
 	"item.biomech.iron_mech_chestplate": "Iron Mech Chestplate",
-	"item.biomech.iron_mech_chestplate.tooltip1": "6% of incoming damage is absorbed by suit energy.",
+	"item.biomech.iron_mech_chestplate.tooltip1": "4% of incoming damage is absorbed by suit energy.",
 	"item.biomech.iron_mech_chestplate.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.iron_mech_chestplate.tooltip3": "Absorbed damage harms suit energy at a 15x multiplier.",
+	"item.biomech.iron_mech_chestplate.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
 	
 	"item.biomech.iron_mech_legs": "Iron Mech Legs",
 	"item.biomech.iron_mech_legs.tooltip1": "4% of incoming damage is absorbed by suit energy.",
 	"item.biomech.iron_mech_legs.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.iron_mech_legs.tooltip3": "Absorbed damage harms suit energy at a 15x multiplier.",
+	"item.biomech.iron_mech_legs.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
 	
 	"item.biomech.iron_mech_arm": "Iron Mech Arm",
-	"item.biomech.iron_mech_arm.tooltip1": "1% of incoming damage is absorbed by suit energy.",
+	"item.biomech.iron_mech_arm.tooltip1": "2% of incoming damage is absorbed by suit energy.",
 	"item.biomech.iron_mech_arm.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.iron_mech_arm.tooltip3": "Absorbed damage harms suit energy at a 15x multiplier.",
+	"item.biomech.iron_mech_arm.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
 	// IRON MECH ***
 	
 	// *** DIAMOND MECH
 	"item.biomech.diamond_mech_chestplate": "Diamond Mech Chestplate",
 	"item.biomech.diamond_mech_chestplate.tooltip1": "16% of incoming damage is absorbed by suit energy.",
 	"item.biomech.diamond_mech_chestplate.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.diamond_mech_chestplate.tooltip3": "Absorbed damage harms suit energy at a 15x multiplier.",
+	"item.biomech.diamond_mech_chestplate.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
 	// DIAMOND MECH ***
 	
 	"item.biomech.night_vision_visor": "§5Night Vision Visor§0",
@@ -117,15 +117,16 @@
 	"item.biomech.pipe_mech_arm.tooltip2": "You have a 2% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_arm.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
-	"item.biomech.mining_laser_left_arm": "§7Left Mining Laser Arm§0",
-	"item.biomech.left_power_arm": "§7Left Power Arm§0",
-	"item.biomech.left_pipe_mech_arm": "§7Left Pipe Mech Arm§0",
-	"item.biomech.remaining_pickaxe": "§7Remaining Pickaxe§0",
-	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",
 	"key.left_arm": "Use Left Arm",
 	"key.categories.biomech": "BioMech",
+	
+	"item.biomech.mining_laser_left_arm": "§7Left Mining Laser Arm§0",
+	"item.biomech.left_power_arm": "§7Left Power Arm§0",
+	"item.biomech.left_pipe_mech_arm": "§7Left Pipe Mech Arm§0",
+	"item.biomech.left_iron_mech_arm": "§7Left Iron Mech Arm§0",
+	"item.biomech.remaining_pickaxe": "§7Remaining Pickaxe§0",
 	
 	"biomech.finished": "Finished"
 }
