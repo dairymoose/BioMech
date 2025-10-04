@@ -64,13 +64,15 @@ public class IronMechChestArmor extends ArmorBase {
 			} else {
 				float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
 				//damage is only processed here on server side
-				playerData.internalSpendSuitEnergy(player, energyDamage);
-				BioMech.LOGGER.debug("heal amount = " + damageMitigated + " from raw damage = " + amount + " with energyDamage=" + energyDamage);
+				if (playerData != null) {
+					playerData.internalSpendSuitEnergy(player, energyDamage);
+				}
+				//BioMech.LOGGER.debug("heal amount = " + damageMitigated + " from raw damage = " + amount + " with energyDamage=" + energyDamage);
 				player.heal(damageMitigated);
 				return false;
 			}
 		} else {
-			BioMech.LOGGER.info("INDIRECT damage source was: " + damageSource + " with amount=" + amount);
+			//BioMech.LOGGER.info("INDIRECT damage source was: " + damageSource + " with amount=" + amount);
 		}
 		
 		return false;

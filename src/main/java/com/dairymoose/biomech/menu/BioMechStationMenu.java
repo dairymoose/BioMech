@@ -113,6 +113,7 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 			BioMech.sendItemSlotUpdateForPlayer(player);
 	}
 
+	public static int RECALCULATE_TICK = 0;
 	public void removed(Player player) {
 		super.removed(player);
 		if (this.container != null) {
@@ -122,6 +123,7 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 			BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 			if (playerData != null) {
 				playerData.recalculateSuitEnergyMax();
+				RECALCULATE_TICK = player.tickCount;
 			}
 		}
 	}

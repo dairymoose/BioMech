@@ -81,6 +81,9 @@ public class BioMechRegistry {
 	
 	public static final ResourceKey<DamageType> BIOMECH_ABSORB = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "biomech_absorb"));
 	
+	//same attributes as absorb, but does NOT ignore armor
+	public static final ResourceKey<DamageType> BIOMECH_BONUS_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "biomech_bonus_damage"));
+	
 	public static RegistryObject<Item> ITEM_BIOMECH_STATION = BioMech.ITEMS.register("biomech_station", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_STATION.get(), new Item.Properties()));
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_SCRAP = BioMech.ITEMS.register("biomech_scrap", () -> new Item(new Item.Properties().stacksTo(255)));

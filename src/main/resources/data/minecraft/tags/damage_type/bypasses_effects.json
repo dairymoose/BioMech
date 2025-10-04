@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-	"biomech:biomech_absorb"
+  "biomech:biomech_absorb",
+  "biomech:biomech_bonus_damage"
   ]
 }

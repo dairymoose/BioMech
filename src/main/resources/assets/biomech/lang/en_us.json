@@ -42,7 +42,7 @@
 	"item.biomech.lavastride_leggings.tooltip2": "Press crouch to temporarily disable.",
 
 	"item.biomech.power_chest": "§5Power Chest§0",
-	"item.biomech.power_chest.tooltip1": "Once a minute, reduces the damage of the next incoming direct damage attack by 50%.",
+	"item.biomech.power_chest.tooltip1": "Once every 30 seconds, reduces the damage of the next incoming direct damage attack by 50%.",
 
 	"item.biomech.power_helmet": "§5Power Helmet§0",
 	"item.biomech.power_helmet.tooltip1": "Non-critical attacks have a 33% chance to instead be a critical strike.",

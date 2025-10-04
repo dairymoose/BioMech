@@ -58,12 +58,15 @@ import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
+import com.dairymoose.biomech.item.armor.PowerArmArmor;
+import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PipeMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
+import com.dairymoose.biomech.menu.BioMechStationMenu;
 import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
@@ -148,12 +151,14 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
+import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -201,11 +206,6 @@ import net.minecraftforge.registries.RegistryObject;
  * 
  */
 //TODO: 
-//	Implement power chest damage avoid
-//	Implement power head crit strike
-//	Implement power arm damage boost
-//	Add full Iron Mech set
-//	Add full Diamond Mech set
 //	Add missing crafting recipes
 //	Fix particles on BioMech Station
 @Mod(BioMech.MODID)
@@ -711,7 +711,56 @@ public class BioMech
 	
 	@SubscribeEvent
 	public void onCriticalHit(CriticalHitEvent event) {
-		BioMech.LOGGER.info("critical: " + event.isVanillaCritical());
+		if (!event.isVanillaCritical()) {
+			BioMechPlayerData playerData = null;
+	    	playerData = globalPlayerData.get(event.getEntity().getUUID());
+	    	if (playerData != null) {
+	    		SlottedItem headSlot = playerData.getForSlot(MechPart.Head);
+	    		if (headSlot.itemStack.getItem() instanceof PowerHelmetArmor power) {
+	    			float powerCritChance = 0.33f;
+	    			double rnd = Math.random();
+	    			if (rnd < powerCritChance) {
+	    				event.setResult(Result.ALLOW);
+	    				BioMech.LOGGER.debug("power helmet critical proc");
+	    			}
+	    		}
+	    	}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onPlayerDealDamage(LivingAttackEvent event) {
+		if (event.getSource().getDirectEntity() instanceof Player player) {
+			if (!player.level().isClientSide) {
+				if (event.getEntity() != null && event.getSource().type() == player.level().damageSources().playerAttack(player).type()) {
+					BioMechPlayerData playerData = null;
+		        	playerData = globalPlayerData.get(player.getUUID());
+		        	if (playerData != null) {
+		        		MechPart[] parts = { MechPart.RightArm, MechPart.LeftArm };
+		        		for (MechPart part : parts) {
+		        			ItemStack itemStack = playerData.getForSlot(part).itemStack;
+			        		if (itemStack.getItem() instanceof PowerArmArmor arm) {
+			        			boolean active = false;
+			        			CompoundTag tag = itemStack.getOrCreateTag();
+			        			if (tag.contains("ActiveArm")) {
+			        				active = tag.getBoolean("ActiveArm");
+			        			}
+			        			if (!active) {
+			        				if (!event.getEntity().isDeadOrDying() && !event.getEntity().isInvulnerable() && event.getEntity().attackable() && event.getEntity().invulnerableTime <= 0) {
+			        					tag.putBoolean("ActiveArm", true);
+					        			event.getEntity().hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE), 2.0f);
+					        			event.getEntity().invulnerableTime = 0;
+					        			event.getEntity().hurtDuration = 0;
+				        				event.getEntity().hurtTime = 0;
+					        			tag.putBoolean("ActiveArm", false);
+			        				}
+			        			}
+			        		}
+		        		}
+		        	}
+				}
+			}			
+		}
 	}
 	
 	//LivingHurtEvent - damage before armor/magic mitigation
@@ -719,6 +768,9 @@ public class BioMech
 	//event incoming damage is reduced by mitigation from armor
 	@SubscribeEvent
 	public void onPlayerDamage(final LivingDamageEvent event) {
+		if (!(event.getEntity() instanceof Player player)) {
+			//BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
+		}
 		if (event.getEntity() instanceof Player player) {
 			BioMechPlayerData playerData = null;
         	playerData = globalPlayerData.get(event.getEntity().getUUID());
@@ -739,6 +791,7 @@ public class BioMech
 							boolean cancel = base.onPlayerDamageTaken(event.getSource(), event.getAmount(), slotted.itemStack, player, slotted.mechPart);
 							if (cancel) {
 								event.setCanceled(true);
+								return;
 							}
 						}
 					}
@@ -770,7 +823,7 @@ public class BioMech
 					if (playerData.getSuitEnergy() >= energyDamage) {
 						if (IronMechChestArmor.absorbDirectAttack(playerData, absorbPct, event.getSource(), event.getAmount(), player)) {
 							playerData.spendSuitEnergy(player, energyDamage);
-							BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getAmount() + " of type: " + event.getSource() + ", energyLeft=" + playerData.getSuitEnergy());
+							//BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getAmount() + " of type: " + event.getSource() + ", energyLeft=" + playerData.getSuitEnergy());
 							event.setCanceled(true);
 						}
 					}
@@ -857,7 +910,8 @@ public class BioMech
 						float suitEnergyPct = suitEnergy/playerData.suitEnergyMax;
 						float visibleThreshold = BioMechConfig.CLIENT.showEnergySuitGuiThreshold.get().floatValue();
 						
-						if (suitEnergyPct <= visibleThreshold) {
+						int ticksSinceRecalculate = Minecraft.getInstance().player.tickCount - BioMechStationMenu.RECALCULATE_TICK;
+						if (suitEnergyPct <= visibleThreshold || ticksSinceRecalculate <= 100) {
 							float xScaleInv = 1.0f/xScale;
 							float yScaleInv = 1.0f/yScale;
 							int xStart = (int) ((window.getGuiScaledWidth() * BioMechConfig.CLIENT.energySuitGuiXPos.get().floatValue() * xScaleInv));
