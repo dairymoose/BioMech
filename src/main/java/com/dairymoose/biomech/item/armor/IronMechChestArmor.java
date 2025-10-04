@@ -52,13 +52,29 @@ public class IronMechChestArmor extends ArmorBase {
 		return damageAfterMitigation;
 	}
 	
-	public static boolean absorbDirectAttack(float absorbPct, DamageSource damageSource, float amount, Player player) {
-		if (damageSource.type() != bioMechAbsorbDamageType && PipeMechBodyArmor.damageSourceIsDirect(damageSource, player)) {
+	public static boolean absorbDirectAttack(BioMechPlayerData playerData, float absorbPct, DamageSource damageSource, float amount, Player player) {
+		if (!damageSource.getMsgId().equals(player.level().damageSources().source(BioMechRegistry.BIOMECH_ABSORB).getMsgId()) && PipeMechBodyArmor.damageSourceIsDirect(damageSource, player)) {
 			float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, amount);
 			float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(amount, damageMitigated);
-			player.hurt(new DamageSource(Holder.direct(bioMechAbsorbDamageType)), damageAfterMitigation);
-			
-			return true;
+			//player.hurt(new DamageSource(Holder.direct(bioMechAbsorbDamageType)), damageAfterMitigation);
+			float unmitigatedPredictedHp = player.getHealth() - amount;
+			float mitigatedPredictedHp = player.getHealth() - damageAfterMitigation;
+			if (unmitigatedPredictedHp <= 0.0f && mitigatedPredictedHp > 0.0f) {
+				//prevent the damage entirely and apply biomech_absorb damage
+				//this case only occurs if the damage would immediately kill the player - but we predicted they should be saved instead
+				player.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_ABSORB), damageAfterMitigation);
+				BioMech.LOGGER.debug("inflict: " + damageAfterMitigation + " damage, avoid killing blow with Absorb, damage source was: " + damageSource + " with amount=" + amount + " unmitigatedHp=" + unmitigatedPredictedHp + ", mitigated=" + mitigatedPredictedHp + "/currentHp=" + player.getHealth());
+				return true;
+			} else {
+				float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
+				//damage is only processed here on server side
+				playerData.internalSpendSuitEnergy(player, energyDamage);
+				BioMech.LOGGER.debug("heal amount = " + damageMitigated + " from raw damage = " + amount + " with energyDamage=" + energyDamage);
+				player.heal(damageMitigated);
+				return false;
+			}
+		} else {
+			BioMech.LOGGER.info("INDIRECT damage source was: " + damageSource + " with amount=" + amount);
 		}
 		
 		return false;

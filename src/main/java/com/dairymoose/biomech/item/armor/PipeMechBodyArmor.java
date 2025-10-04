@@ -32,7 +32,7 @@ public class PipeMechBodyArmor extends ArmorBase {
 	public static float energyLostFromAvoidAttack = 5.0f;
 	
 	public static boolean damageSourceIsDirect(DamageSource damageSource, Player player) {
-		return damageSource.type().effects() == DamageEffects.HURT && damageSource.type() != player.damageSources().magic().type();
+		return damageSource.type().effects() == DamageEffects.HURT && damageSource.type() != player.damageSources().magic().type() && damageSource.type() != player.damageSources().fall().type();
 	}
 	
 	public static boolean avoidDirectAttack(float avoidPct, DamageSource damageSource, float amount, Player player) {

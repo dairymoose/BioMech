@@ -92,6 +92,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -101,9 +102,11 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -141,7 +144,10 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -699,7 +705,15 @@ public class BioMech
 	}
 	
 	@SubscribeEvent
-	public void onPlayerDamage(final LivingAttackEvent event) {
+	public void onCriticalHit(CriticalHitEvent event) {
+		BioMech.LOGGER.info("critical: " + event.isVanillaCritical());
+	}
+	
+	//LivingHurtEvent - damage before armor/magic mitigation
+	//LivingDamageEvent - damage after armor/magic mitigation
+	//event incoming damage is reduced by mitigation from armor
+	@SubscribeEvent
+	public void onPlayerDamage(final LivingDamageEvent event) {
 		if (event.getEntity() instanceof Player player) {
 			BioMechPlayerData playerData = null;
         	playerData = globalPlayerData.get(event.getEntity().getUUID());
@@ -749,9 +763,9 @@ public class BioMech
 					float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(event.getAmount(), damageMitigated);
 					float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
 					if (playerData.getSuitEnergy() >= energyDamage) {
-						if (IronMechChestArmor.absorbDirectAttack(absorbPct, event.getSource(), event.getAmount(), player)) {
+						if (IronMechChestArmor.absorbDirectAttack(playerData, absorbPct, event.getSource(), event.getAmount(), player)) {
 							playerData.spendSuitEnergy(player, energyDamage);
-							BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getAmount());
+							BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getAmount() + " of type: " + event.getSource() + ", energyLeft=" + playerData.getSuitEnergy());
 							event.setCanceled(true);
 						}
 					}
