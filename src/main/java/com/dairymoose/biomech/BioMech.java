@@ -1300,6 +1300,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(BackJetpackRenderer::new, BioMechRegistry.ITEM_BACK_JETPACK.get());
         	AzArmorRendererRegistry.register(SpiderWalkersRenderer::new, BioMechRegistry.ITEM_SPIDER_WALKERS.get());
         	AzArmorRendererRegistry.register(NightVisionVisorRenderer::new, BioMechRegistry.ITEM_NIGHT_VISION_VISOR.get());
+        	AzArmorRendererRegistry.register(SpringLoadedLeggingsRenderer::new, BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
@@ -1309,9 +1310,9 @@ public class BioMech
         	AzArmorRendererRegistry.register(IronMechLeftArmRenderer::new, BioMechRegistry.ITEM_IRON_MECH_LEFT_ARM.get());
         	//IRON MECH
         	
+        	//DIAMOND MECH
         	AzArmorRendererRegistry.register(DiamondMechArmorRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_CHESTPLATE.get());
-        	
-        	AzArmorRendererRegistry.register(SpringLoadedLeggingsRenderer::new, BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
+        	//DIAMOND MECH
         	
         	//PIPE MECH
         	AzArmorRendererRegistry.register(PipeMechHeadRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_HEAD.get());
