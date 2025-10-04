@@ -62,15 +62,34 @@
 	"item.biomech.spider_walkers.tooltip2": "Climbs walls while active.  Can be used while falling to grip a nearby wall.",
 	"item.biomech.spider_walkers.tooltip3": "Costs a small amount of suit energy while active.",
 	
+	// *** IRON MECH
+	"item.biomech.iron_mech_head": "Iron Mech Head",
+	"item.biomech.iron_mech_head.tooltip1": "3% of incoming damage is absorbed by suit energy.",
+	"item.biomech.iron_mech_head.tooltip2": "No damage reduction if the suit is out of energy.",
+	"item.biomech.iron_mech_head.tooltip3": "Absorbed damage harms suit energy at a 15x multiplier.",
+	
 	"item.biomech.iron_mech_chestplate": "Iron Mech Chestplate",
-	"item.biomech.iron_mech_chestplate.tooltip1": "8% of incoming damage is absorbed by suit energy.",
+	"item.biomech.iron_mech_chestplate.tooltip1": "6% of incoming damage is absorbed by suit energy.",
 	"item.biomech.iron_mech_chestplate.tooltip2": "No damage reduction if the suit is out of energy.",
 	"item.biomech.iron_mech_chestplate.tooltip3": "Absorbed damage harms suit energy at a 15x multiplier.",
 	
+	"item.biomech.iron_mech_legs": "Iron Mech Legs",
+	"item.biomech.iron_mech_legs.tooltip1": "4% of incoming damage is absorbed by suit energy.",
+	"item.biomech.iron_mech_legs.tooltip2": "No damage reduction if the suit is out of energy.",
+	"item.biomech.iron_mech_legs.tooltip3": "Absorbed damage harms suit energy at a 15x multiplier.",
+	
+	"item.biomech.iron_mech_arm": "Iron Mech Arm",
+	"item.biomech.iron_mech_arm.tooltip1": "1% of incoming damage is absorbed by suit energy.",
+	"item.biomech.iron_mech_arm.tooltip2": "No damage reduction if the suit is out of energy.",
+	"item.biomech.iron_mech_arm.tooltip3": "Absorbed damage harms suit energy at a 15x multiplier.",
+	// IRON MECH ***
+	
+	// *** DIAMOND MECH
 	"item.biomech.diamond_mech_chestplate": "Diamond Mech Chestplate",
 	"item.biomech.diamond_mech_chestplate.tooltip1": "16% of incoming damage is absorbed by suit energy.",
 	"item.biomech.diamond_mech_chestplate.tooltip2": "No damage reduction if the suit is out of energy.",
 	"item.biomech.diamond_mech_chestplate.tooltip3": "Absorbed damage harms suit energy at a 15x multiplier.",
+	// DIAMOND MECH ***
 	
 	"item.biomech.night_vision_visor": "§5Night Vision Visor§0",
 	"item.biomech.night_vision_visor.tooltip1": "Grants permanent night vision.",

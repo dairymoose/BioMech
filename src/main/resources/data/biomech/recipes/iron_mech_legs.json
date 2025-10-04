@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "i i",
     "i#i",
-    "iii"
+    "i i",
+    "i i"
   ],
   "key": {
 	"#": {
@@ -14,7 +14,7 @@
 	}
   },
   "result": {
-    "item": "biomech:iron_mech_chestplate",
+    "item": "biomech:iron_mech_legs",
     "count": 1
   },
   "conditions": [

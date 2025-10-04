@@ -70,8 +70,8 @@ public class BioMechConfig {
 			
 			addConfigElement(BioMechConfig.COMMON.enableBiomechScrapCrafting);
 			
-			addConfigElement(BioMechConfig.COMMON.enableIronMechChestplateCrafting);
-			addConfigElement(BioMechConfig.COMMON.enableDiamondMechChestplateCrafting);
+			addConfigElement(BioMechConfig.COMMON.enableIronMechArmorCrafting);
+			addConfigElement(BioMechConfig.COMMON.enableDiamondMechArmorCrafting);
 			
 			addConfigElement(BioMechConfig.COMMON.enableSpiderWalkersCrafting);
 			addConfigElement(BioMechConfig.COMMON.enableScubaTankCrafting);

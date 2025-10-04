@@ -22,6 +22,8 @@ import com.dairymoose.biomech.armor.renderer.BackScubaTankRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechArmorRenderer;
 import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechChestplateRenderer;
+import com.dairymoose.biomech.armor.renderer.IronMechHeadRenderer;
+import com.dairymoose.biomech.armor.renderer.IronMechLegsRenderer;
 import com.dairymoose.biomech.armor.renderer.LavastrideLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.MiningLaserLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.MiningLaserRightArmRenderer;
@@ -168,6 +170,8 @@ import net.minecraftforge.registries.RegistryObject;
  * Add ArmorBase class in item.armor package
  * Add new armor to BioMechRegistry
  * Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry)
+ * <Optional>: Add crafting recipe
+ * <Optional>: Add tags to mech_part.json
  * 
  * - Adding new arms:
  * Make new right arm model named: pipe_mech_right_arm
@@ -747,7 +751,7 @@ public class BioMech
 					if (playerData.getSuitEnergy() >= energyDamage) {
 						if (IronMechChestArmor.absorbDirectAttack(absorbPct, event.getSource(), event.getAmount(), player)) {
 							playerData.spendSuitEnergy(player, energyDamage);
-							BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage);
+							BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getAmount());
 							event.setCanceled(true);
 						}
 					}
@@ -1279,23 +1283,36 @@ public class BioMech
         	AzArmorRendererRegistry.register(BackJetpackRenderer::new, BioMechRegistry.ITEM_BACK_JETPACK.get());
         	AzArmorRendererRegistry.register(SpiderWalkersRenderer::new, BioMechRegistry.ITEM_SPIDER_WALKERS.get());
         	AzArmorRendererRegistry.register(NightVisionVisorRenderer::new, BioMechRegistry.ITEM_NIGHT_VISION_VISOR.get());
+        	
+        	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
         	AzArmorRendererRegistry.register(IronMechChestplateRenderer::new, BioMechRegistry.ITEM_IRON_MECH_CHESTPLATE.get());
+        	AzArmorRendererRegistry.register(IronMechLegsRenderer::new, BioMechRegistry.ITEM_IRON_MECH_LEGS.get());
+        	
         	AzArmorRendererRegistry.register(DiamondMechArmorRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_CHESTPLATE.get());
+        	
         	AzArmorRendererRegistry.register(SpringLoadedLeggingsRenderer::new, BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
+        	
+        	AzArmorRendererRegistry.register(PipeMechHeadRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_HEAD.get());
         	AzArmorRendererRegistry.register(PipeMechBodyRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_BODY.get());
         	AzArmorRendererRegistry.register(PipeMechLegsRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEGS.get());
-        	AzArmorRendererRegistry.register(PipeMechHeadRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_HEAD.get());
         	AzArmorRendererRegistry.register(PipeMechRightArmRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
         	AzArmorRendererRegistry.register(PipeMechLeftArmRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEFT_ARM.get());
+        	
+        	//------
         	
         	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
         	AzItemRendererRegistry.register(PowerArmItemRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
         	AzItemRendererRegistry.register(PipeMechArmItemRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
         	
-        	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
+        	//------
         	
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_MINING_LASER_ARM.get(), BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
+        	
+        	
+        	//------
+        	
+        	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
         }
         
     }

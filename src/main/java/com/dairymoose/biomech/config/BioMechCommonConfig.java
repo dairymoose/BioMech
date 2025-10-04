@@ -10,8 +10,8 @@ public class BioMechCommonConfig {
 	
 	public final ForgeConfigSpec.BooleanValue enableBiomechScrapCrafting;
 	
-	public final ForgeConfigSpec.BooleanValue enableIronMechChestplateCrafting;
-	public final ForgeConfigSpec.BooleanValue enableDiamondMechChestplateCrafting;
+	public final ForgeConfigSpec.BooleanValue enableIronMechArmorCrafting;
+	public final ForgeConfigSpec.BooleanValue enableDiamondMechArmorCrafting;
 	
 	public final ForgeConfigSpec.BooleanValue enableSpiderWalkersCrafting;
 	public final ForgeConfigSpec.BooleanValue enableScubaTankCrafting;
@@ -27,8 +27,8 @@ public class BioMechCommonConfig {
 		
 		this.enableBiomechScrapCrafting = builder.comment("enableBiomechScrapCrafting").translation("config.biomech.enableBiomechScrapCrafting").define("enableBiomechScrapCrafting", true);
 		
-		this.enableIronMechChestplateCrafting = builder.comment("enableIronMechChestplateCrafting").translation("config.biomech.enableIronMechChestplateCrafting").define("enableIronMechChestplateCrafting", true);
-		this.enableDiamondMechChestplateCrafting = builder.comment("enableDiamondMechChestplateCrafting").translation("config.biomech.enableDiamondMechChestplateCrafting").define("enableDiamondMechChestplateCrafting", true);
+		this.enableIronMechArmorCrafting = builder.comment("enableIronMechArmorCrafting").translation("config.biomech.enableIronMechArmorCrafting").define("enableIronMechArmorCrafting", true);
+		this.enableDiamondMechArmorCrafting = builder.comment("enableDiamondMechArmorCrafting").translation("config.biomech.enableDiamondMechArmorCrafting").define("enableDiamondMechArmorCrafting", true);
 		
 		this.enableSpiderWalkersCrafting = builder.comment("enableSpiderWalkersCrafting").translation("config.biomech.enableSpiderWalkersCrafting").define("enableSpiderWalkersCrafting", true);
 		this.enableScubaTankCrafting = builder.comment("enableScubaTankCrafting").translation("config.biomech.enableScubaTankCrafting").define("enableScubaTankCrafting", true);

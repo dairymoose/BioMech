@@ -28,7 +28,7 @@ public class IronMechChestArmor extends ArmorBase {
 		this.mechPart = MechPart.Chest;
 		this.armDistance = 8.0f;
 		this.addToLootTable = false;
-		this.damageAbsorbPct = 0.05f;
+		this.damageAbsorbPct = 0.06f;
 	}
 
 	//public static DamageSource bioMechAbsorb = new DamageSource(Holder.direct(BioMechRegistry.DAMAGE_TYPE_BIOMECH_ABSORB.get()));
