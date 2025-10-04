@@ -49,6 +49,7 @@ public class ArmorBase extends ArmorItem {
 	protected boolean addToLootTable = true;
 	protected MechPart mechPart = null;
 	protected boolean hidePlayerModel = false;
+	protected boolean alwaysHidePlayerHat = false;
 	protected int suitEnergy = 0;
 	protected float suitEnergyPerSec = 0.0f;
 	private static ArmorMaterial NOTHING_MATERIAL = new NothingMaterial();
@@ -99,6 +100,10 @@ public class ArmorBase extends ArmorItem {
 
 	public boolean shouldHidePlayerModel() {
 		return this.hidePlayerModel;
+	}
+	
+	public boolean alwaysHidePlayerHat() {
+		return this.alwaysHidePlayerHat;
 	}
 	
 	public MechPart getMechPart() {

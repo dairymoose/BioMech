@@ -21,6 +21,7 @@ public class NightVisionVisorArmor extends ArmorBase {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 0;
 		this.hidePlayerModel = false;
+		this.alwaysHidePlayerHat = true;
 		this.mechPart = MechPart.Head;
 	}
 

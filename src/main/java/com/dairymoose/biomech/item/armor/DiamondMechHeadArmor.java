@@ -28,6 +28,7 @@ public class DiamondMechHeadArmor extends ArmorBase {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 5;
 		this.hidePlayerModel = false;
+		this.alwaysHidePlayerHat = true;
 		this.mechPart = MechPart.Head;
 		this.addToLootTable = false;
 		this.damageAbsorbPct = 0.04f;

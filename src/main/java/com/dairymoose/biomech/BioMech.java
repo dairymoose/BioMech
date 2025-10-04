@@ -1300,6 +1300,9 @@ public class BioMech
                     							part.visible = false;
                     						}
                     					}
+                        		    	if (base.alwaysHidePlayerHat()) {
+                        		    		playerModel.hat.visible = false;
+                        		    	}
                         		    }
         		    			}
         		    		}
