@@ -184,6 +184,7 @@ import net.minecraftforge.registries.RegistryObject;
  * 
  * - Adding new arms:
  * Make new right arm model named: pipe_mech_right_arm
+ * Duplicate and flip arm model: export as pipe_mech_left_arm.geo.json
  * Add .geo.json file ("pipe_mech_right_arm.geo.json" and "pipe_mech_left_arm.geo.json")
  * Add textures.item .png texture for 3d model (right arm texture only)
  * <Arm Specific>: Copy right_arm .geo.json file to _item.geo.json
