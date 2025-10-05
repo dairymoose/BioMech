@@ -20,6 +20,7 @@ import com.dairymoose.biomech.item.armor.IronMechRightArmArmor;
 import com.dairymoose.biomech.item.armor.LavastrideLeggingsArmor;
 import com.dairymoose.biomech.item.armor.MiningLaserLeftArmArmor;
 import com.dairymoose.biomech.item.armor.MiningLaserRightArmArmor;
+import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
 import com.dairymoose.biomech.item.armor.NightVisionVisorArmor;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.armor.PipeMechHeadArmor;
@@ -93,6 +94,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_BIOMECH_DEACTIVATOR = BioMech.ITEMS.register("biomech_deactivator", () -> new BioMechDeactivator(new Item.Properties()));
 	
 	public static RegistryObject<Item> ITEM_SPIDER_WALKERS = BioMech.ITEMS.register("spider_walkers", () -> new SpiderWalkersArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_MOBILITY_TREADS = BioMech.ITEMS.register("mobility_treads", () -> new MobilityTreadsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_HOVERTECH_LEGGINGS = BioMech.ITEMS.register("hovertech_leggings", () -> new HovertechLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	

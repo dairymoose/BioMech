@@ -7,10 +7,13 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.armor.renderer.MobilityTreadsRenderer;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
+import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
 import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -80,6 +83,20 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 					this.rightLeg.xRot = this.rightLeg.xRot/4.0f;
 					this.leftLeg.xRot = this.leftLeg.xRot/4.0f;
 				}
+			} else if (legSlot.itemStack.getItem() instanceof MobilityTreadsArmor armor) {
+				if (legSlot.visible) {
+					if (BioMech.originalBobView == null) {
+						BioMech.originalBobView = Minecraft.getInstance().options.bobView().get();
+					}
+					Minecraft.getInstance().options.bobView().set(false);
+					//normal leg walking forward-and-back
+					this.rightLeg.xRot = 0.0f;
+					this.leftLeg.xRot = 0.0f;
+				} else {
+					BioMech.resetBobView();
+				}
+			} else {
+				BioMech.resetBobView();
 			}
 		}
 	}

@@ -57,6 +57,10 @@
 	"item.biomech.back_jetpack.tooltip2": "Consumes energy while active.",
 	"item.biomech.back_jetpack.tooltip3": "Provides vertical thrust.  If an elytra is active, provides forward thrust.",
 	
+	"item.biomech.mobility_treads": "§5Mobility Treads§0",
+	"item.biomech.mobility_treads.tooltip1": "Grants increased movement speed.",
+	"item.biomech.mobility_treads.tooltip2": "Speed increases even more after 5 seconds of forward motion.",
+	
 	"item.biomech.spider_walkers": "§5Spider Walkers§0",
 	"item.biomech.spider_walkers.tooltip1": "Hold alt while walking into a wall to activate.",
 	"item.biomech.spider_walkers.tooltip2": "Climbs walls while active.  Can be used while falling to grip a nearby wall.",

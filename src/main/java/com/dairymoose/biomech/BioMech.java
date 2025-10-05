@@ -33,6 +33,7 @@ import com.dairymoose.biomech.armor.renderer.IronMechRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.LavastrideLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.MiningLaserLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.MiningLaserRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.MobilityTreadsRenderer;
 import com.dairymoose.biomech.armor.renderer.NightVisionVisorRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechBodyRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechHeadRenderer;
@@ -57,6 +58,7 @@ import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
+import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.armor.PowerArmArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
@@ -71,6 +73,7 @@ import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
+import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket;
 import com.dairymoose.biomech.particle.InstantSmokeParticle;
 import com.dairymoose.biomech.particle.LaserParticle;
 import com.dairymoose.biomech.particle.MaxLaserParticle;
@@ -137,6 +140,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCon
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ComputeFovModifierEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -207,6 +211,30 @@ import net.minecraftforge.registries.RegistryObject;
  */
 //TODO: 
 //	Add missing crafting recipes
+//	Back: Battery Pack
+//	Chest: Elytra
+//	Chest: Behemoth (full set?) hulkbuster theme
+//	Head: Creeper, Enderman
+//	Arm: Extendo-Arm (block reach +2, entity reach +0.5)
+//	Arm: Grapple/zipline arm
+//	Arm: Buzzsaw arm
+//	Arm: Drill arm (3x3)
+//	Head: light helmet?
+//	Back: shield projector?
+//	Legs: unicycle
+//	Legs: skies
+//	Legs: wall-e treads
+//	head: wall-e spyglass
+//	claptrap suit?
+//	Arm: flamethrower
+//	Arm: gatling
+//	Arm: shield
+//	Arm: Claw arms
+//	Robocop outfit?
+//	Terminator outfit?
+//	Wall-E outfit?
+//	Iron giant outfit?
+//	I robot Outfit?
 @Mod(BioMech.MODID)
 public class BioMech
 {
@@ -263,6 +291,7 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundHandStatusPacket.class, ServerboundHandStatusPacket::write, ServerboundHandStatusPacket::new, ServerboundHandStatusPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundHandStatusPacket.class, ClientboundHandStatusPacket::write, ClientboundHandStatusPacket::new, ClientboundHandStatusPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundEnergySyncPacket.class, ClientboundEnergySyncPacket::write, ClientboundEnergySyncPacket::new, ClientboundEnergySyncPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMobilityTreadsPacket.class, ServerboundMobilityTreadsPacket::write, ServerboundMobilityTreadsPacket::new, ServerboundMobilityTreadsPacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -291,6 +320,24 @@ public class BioMech
 	}
     
     @SubscribeEvent
+    public void onFovEvent(ComputeFovModifierEvent event) {
+    	BioMechPlayerData playerData = BioMech.globalPlayerData.get(event.getPlayer().getUUID());
+		if (playerData != null) {
+			ItemStack itemStack = playerData.getForSlot(MechPart.Leggings).itemStack;
+			if (itemStack.getItem() instanceof MobilityTreadsArmor armor) {
+				float fovMod = 1.f + (MobilityTreadsArmor.SPEED_BOOST_SLOW + 1) * 0.1f;
+				if (MobilityTreadsArmor.localPlayerSpeedBoosting) {
+					fovMod = 1.f + (MobilityTreadsArmor.SPEED_BOOST_FAST + 1) * 0.1f;
+				}
+				
+				float calcFov = event.getNewFovModifier() / fovMod;
+				//BioMech.LOGGER.info("fov calc=" + calcFov + " vs " + event.getNewFovModifier());
+				event.setNewFovModifier(calcFov);
+			}
+		}
+	}
+    
+    @SubscribeEvent
     public void onCommand(RegisterCommandsEvent event) {
 		BioMechCommand.register(event.getDispatcher());
 	}
@@ -300,8 +347,23 @@ public class BioMech
         AzureLib.initialize();
     }
    
+    @SuppressWarnings("deprecation")
+	public static void resetBobView() {
+    	DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
+			@Override
+			public void run() {
+				if (originalBobView != null) {
+		    		Minecraft.getInstance().options.bobView().set(originalBobView);
+		    		BioMech.originalBobView = null;
+		    	}
+			}});
+    	
+    }
+    
+    public static Boolean originalBobView = null;
     @SubscribeEvent
     public void onStopServer(ServerStoppedEvent event) {
+    	BioMech.resetBobView();
 		lootBioMechInChest = null;
 		lootItemsToAdd.clear();
 		lootPoolChances.clear();
@@ -832,6 +894,8 @@ public class BioMech
 		}
 	}
     
+	public static ItemStack currentRenderItemStackContext = null;
+	
 	public static boolean primedForMidairJump = false;
 	public static boolean localPlayerJumping = false;
 	public static boolean localPlayerHoldingAlt = false;
@@ -1278,7 +1342,9 @@ public class BioMech
         		    				} else if (slottedItem.mechPart == MechPart.LeftArm && has.leftHandActive) {
         		    					poseStack.mulPose(Axis.XP.rotationDegrees(renderEntity.getXRot()));
         		    				}
+        		    				BioMech.currentRenderItemStackContext = itemStackToRender;
                         		    hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, equipmentSlot, event.getPackedLight(), armorModel);
+                        		    BioMech.currentRenderItemStackContext = null;
                         		    //this is required so that AzureLib does not re-render the same armor when it comes time to render the player via default MC logic
                         		    event.getEntity().setItemSlot(equipmentSlot, ItemStack.EMPTY);
                         		    poseStack.popPose();
@@ -1359,6 +1425,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(SpiderWalkersRenderer::new, BioMechRegistry.ITEM_SPIDER_WALKERS.get());
         	AzArmorRendererRegistry.register(NightVisionVisorRenderer::new, BioMechRegistry.ITEM_NIGHT_VISION_VISOR.get());
         	AzArmorRendererRegistry.register(SpringLoadedLeggingsRenderer::new, BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
+        	AzArmorRendererRegistry.register(MobilityTreadsRenderer::new, BioMechRegistry.ITEM_MOBILITY_TREADS.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
