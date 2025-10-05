@@ -17,6 +17,7 @@ public class BioMechServerConfig {
 	public final ConfigValue<Double> lootBioMechInAncientCity;
 	public final ConfigValue<Double> lootBioMechInShipwreck;
 	public final ConfigValue<Double> lootBioMechInNetherFortress;
+	public final ForgeConfigSpec.BooleanValue elytraMechChestplateCanBeLooted;
 
 	public BioMechServerConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("loot");
@@ -26,6 +27,7 @@ public class BioMechServerConfig {
 		this.lootBioMechInAncientCity = builder.comment("lootBioMechInAncientCity").translation("config.biomech.lootBioMechInAncientCity").define("lootBioMechInAncientCity", defaultAncientCityLootChance);
 		this.lootBioMechInShipwreck = builder.comment("lootBioMechInShipwreck").translation("config.biomech.lootBioMechInShipwreck").define("lootBioMechInShipwreck", defaultShipwreckLootChance);
 		this.lootBioMechInNetherFortress = builder.comment("lootBioMechInNetherFortress").translation("config.biomech.lootBioMechInNetherFortress").define("lootBioMechInNetherFortress", defaultNetherFortressLootChance);
+		this.elytraMechChestplateCanBeLooted = builder.comment("elytraMechChestplateCanBeLooted").translation("config.biomech.elytraMechChestplateCanBeLooted").define("elytraMechChestplateCanBeLooted", true);
 		builder.pop();
 	}
 	

@@ -24,6 +24,7 @@ import com.dairymoose.biomech.armor.renderer.DiamondMechHeadRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechLegsRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.ElytraMechChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechHeadRenderer;
@@ -55,6 +56,7 @@ import com.dairymoose.biomech.config.BioMechServerConfig;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
+import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
@@ -130,6 +132,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -158,6 +161,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
@@ -475,6 +479,7 @@ public class BioMech
     			lootPoolChances.add(atlp);
     		}
 
+    		boolean addElytraChestToLootPool = true;
     		if (tag != null) {
     			for (AddToLootPool atlp : lootPoolChances) {
     				if (tag.contains(atlp.lootTag)) {
@@ -483,6 +488,8 @@ public class BioMech
         				atlp.gotValueFromConfig = true;
     				}
     			}
+    			
+    			addElytraChestToLootPool = tag.getBoolean("ElytraMechChestplateCanBeLooted");
     		}
     		
     		for (AddToLootPool atlp : lootPoolChances) {
@@ -499,8 +506,16 @@ public class BioMech
 						if (value != null) {
 							if (value.get() instanceof ArmorBase ab) {
 								if (ab.shouldAddToLootTable()) {
-									lootItemsToAdd.add(ab);
-									LOGGER.debug("Added loot is: " + value.get());
+									boolean shouldAdd = true;
+									if (ab instanceof ElytraMechChestplateArmor armor) {
+										if (!addElytraChestToLootPool) {
+											shouldAdd = false;
+										}
+									}
+									if (shouldAdd) {
+										lootItemsToAdd.add(ab);
+										LOGGER.debug("Added loot is: " + value.get());
+									}
 								}
 							}
 						}
@@ -562,6 +577,8 @@ public class BioMech
 	private static int TICKS_PER_SECOND = 20;
 	private static float calcEnergyDiffOnePeriod = 0.0f;
 	
+	private ItemStack elytraItemStackC = new ItemStack(Items.ELYTRA);
+	private ItemStack tempChestItemC = null;
     public static int RESYNC_ENERGY_TICK_PERIOD = 60;
     public static Map<UUID, HandActiveStatus> handActiveMap = new HashMap<>();
     @SubscribeEvent
@@ -588,6 +605,22 @@ public class BioMech
 					if (event.player instanceof ServerPlayer sp) {
 						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax));
 					}
+    			}
+				
+				if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ElytraMechChestplateArmor armor) {
+					if (event.player.level().isClientSide) {
+						elytraItemStackC.setDamageValue(0);
+						tempChestItemC = event.player.getItemBySlot(EquipmentSlot.CHEST);
+						event.player.setItemSlot(EquipmentSlot.CHEST, elytraItemStackC);
+					}
+				}
+    		}
+    	}
+    	if (event.phase == TickEvent.Phase.END) {
+    		if (tempChestItemC != null) {
+    			if (event.player.level().isClientSide) {
+    				event.player.setItemSlot(EquipmentSlot.CHEST, tempChestItemC);
+    				tempChestItemC = null;
     			}
     		}
     	}
@@ -1426,6 +1459,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(NightVisionVisorRenderer::new, BioMechRegistry.ITEM_NIGHT_VISION_VISOR.get());
         	AzArmorRendererRegistry.register(SpringLoadedLeggingsRenderer::new, BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
         	AzArmorRendererRegistry.register(MobilityTreadsRenderer::new, BioMechRegistry.ITEM_MOBILITY_TREADS.get());
+        	AzArmorRendererRegistry.register(ElytraMechChestplateRenderer::new, BioMechRegistry.ITEM_ELYTRA_MECH_CHESTPLATE.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());

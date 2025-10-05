@@ -6,10 +6,12 @@
   "package": "com.dairymoose.biomech.mixins",
   //only applies to client, not dedicated server
  "client": [
-  	"PlayerModelMixin", //redirect on setupAnims
+  	"PlayerModelMixin" //redirect on setupAnims
   ],
   //applys to dedicated server and client
   "mixins": [
+	"LivingEntityUpdateFallFlyingMixin", //per-tick checks for continued elytra flight
+	"PlayerFallFlyingMixin" //when trying to initially begin elytra flight
   ],
   "injectors": {
     "defaultRequire": 1

@@ -11,6 +11,7 @@ import com.dairymoose.biomech.item.armor.DiamondMechHeadArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechLeftArmArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechLegsArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechRightArmArmor;
+import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.IronMechHeadArmor;
@@ -96,6 +97,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_SPIDER_WALKERS = BioMech.ITEMS.register("spider_walkers", () -> new SpiderWalkersArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_MOBILITY_TREADS = BioMech.ITEMS.register("mobility_treads", () -> new MobilityTreadsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_ELYTRA_MECH_CHESTPLATE = BioMech.ITEMS.register("elytra_mech_chestplate", () -> new ElytraMechChestplateArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_HOVERTECH_LEGGINGS = BioMech.ITEMS.register("hovertech_leggings", () -> new HovertechLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	

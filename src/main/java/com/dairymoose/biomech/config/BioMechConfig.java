@@ -76,6 +76,7 @@ public class BioMechConfig {
 			addConfigElement(BioMechConfig.COMMON.enableSpiderWalkersCrafting);
 			addConfigElement(BioMechConfig.COMMON.enableScubaTankCrafting);
 			addConfigElement(BioMechConfig.COMMON.enableJetpackCrafting);
+			addConfigElement(BioMechConfig.COMMON.enableElytraMechChestplateCrafting);
 			
 			BioMechStationBlock.configWalkToBioMechStation = BioMechConfig.COMMON.walkToBioMechStation.get().booleanValue();
 
@@ -94,12 +95,14 @@ public class BioMechConfig {
 			tag.putDouble("lootBioMechInAncientCity", BioMechConfig.SERVER.lootBioMechInAncientCity.get());
 			tag.putDouble("lootBioMechInShipwreck", BioMechConfig.SERVER.lootBioMechInShipwreck.get());
 			tag.putDouble("lootBioMechInNetherFortress", BioMechConfig.SERVER.lootBioMechInNetherFortress.get());
+			tag.putBoolean("ElytraMechChestplateCanBeLooted", BioMechConfig.SERVER.elytraMechChestplateCanBeLooted.get().booleanValue());
 			BioMech.LOGGER.debug("[BioMech]: Save global loot chance: " + BioMechConfig.SERVER.lootBioMechInChest.get());
 			BioMech.LOGGER.debug("[BioMech]: Save mineshaft loot chance: " + BioMechConfig.SERVER.lootBioMechInMineshaft.get());
 			BioMech.LOGGER.debug("[BioMech]: Save dungeon loot chance: " + BioMechConfig.SERVER.lootBioMechInDungeon.get());
 			BioMech.LOGGER.debug("[BioMech]: Save ancient_city loot chance: " + BioMechConfig.SERVER.lootBioMechInAncientCity.get());
 			BioMech.LOGGER.debug("[BioMech]: Save shipwreck loot chance: " + BioMechConfig.SERVER.lootBioMechInShipwreck.get());
 			BioMech.LOGGER.debug("[BioMech]: Save nether fortress loot chance: " + BioMechConfig.SERVER.lootBioMechInNetherFortress.get());
+			BioMech.LOGGER.debug("[BioMech]: Save elytra chestplate loot flag: " + BioMechConfig.SERVER.elytraMechChestplateCanBeLooted.get());
 			NbtIo.write(tag, f);
 			
 		} catch (Exception ex) {

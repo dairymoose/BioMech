@@ -16,6 +16,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableSpiderWalkersCrafting;
 	public final ForgeConfigSpec.BooleanValue enableScubaTankCrafting;
 	public final ForgeConfigSpec.BooleanValue enableJetpackCrafting;
+	public final ForgeConfigSpec.BooleanValue enableElytraMechChestplateCrafting;
 	
 	public final ForgeConfigSpec.BooleanValue walkToBioMechStation;
 	
@@ -33,6 +34,7 @@ public class BioMechCommonConfig {
 		this.enableSpiderWalkersCrafting = builder.comment("enableSpiderWalkersCrafting").translation("config.biomech.enableSpiderWalkersCrafting").define("enableSpiderWalkersCrafting", true);
 		this.enableScubaTankCrafting = builder.comment("enableScubaTankCrafting").translation("config.biomech.enableScubaTankCrafting").define("enableScubaTankCrafting", true);
 		this.enableJetpackCrafting = builder.comment("enableJetpackCrafting").translation("config.biomech.enableJetpackCrafting").define("enableJetpackCrafting", true);
+		this.enableElytraMechChestplateCrafting = builder.comment("enableElytraMechChestplateCrafting").translation("config.biomech.enableElytraMechChestplateCrafting").define("enableElytraMechChestplateCrafting", true);
 		builder.pop();
 		
 		builder.push("biomech_station");
