@@ -22,6 +22,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 public class HovertechLeggingsArmor extends ArmorBase {
@@ -35,7 +36,6 @@ public class HovertechLeggingsArmor extends ArmorBase {
 	public HovertechLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 4;
-		this.suitEnergyPerSec = -0.5f;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Leggings;
 	}
@@ -53,9 +53,21 @@ public class HovertechLeggingsArmor extends ArmorBase {
 					if (player.containerMenu instanceof BioMechStationMenu) {
 						return;
 					}
-					BlockPos overheadBlock = entity.blockPosition().above();
-					BlockPos overheadBlock2 = entity.blockPosition().above().above();
-					BlockPos overheadBlock3 = entity.blockPosition().above().above().above();
+					double yVal = entity.getY();
+					BlockPos sturdyBelowPos = entity.blockPosition();
+					for (int i=0; i<3; ++i) {
+						BlockState sturdyBelowState = level.getBlockState(sturdyBelowPos);
+						if (sturdyBelowState.isFaceSturdy(level, sturdyBelowPos, Direction.UP)) {
+							break;
+						} else {
+							sturdyBelowPos = sturdyBelowPos.below();
+						}
+					}
+					sturdyBelowPos = sturdyBelowPos.above();
+					
+					BlockPos overheadBlock = sturdyBelowPos.above();
+					BlockPos overheadBlock2 = sturdyBelowPos.above().above();
+					BlockPos overheadBlock3 = sturdyBelowPos.above().above().above();
 					
 					boolean overheadNotSturdy = !level.getBlockState(overheadBlock).isFaceSturdy(level, overheadBlock, Direction.DOWN);
 					boolean overhead2NotSturdy = !level.getBlockState(overheadBlock2).isFaceSturdy(level, overheadBlock2, Direction.DOWN);
@@ -70,6 +82,8 @@ public class HovertechLeggingsArmor extends ArmorBase {
 					}
 					
 					if (toggledOn && overheadNotSturdy && overhead2NotSturdy && overhead3NotSturdy) {
+						BioMech.allowFlyingForPlayer(player);
+						
 						double floatAmount = living.getY() - (entity.blockPosition().below().getY()
 								+ level.getBlockFloorHeight(entity.blockPosition().below()));
 						double targetY = floatBottom + floatMagnitude / 2.0
@@ -127,7 +141,13 @@ public class HovertechLeggingsArmor extends ArmorBase {
 									      }
 									}
 								}
+								BioMech.LOGGER.info("set on ground");
 								living.setOnGround(true);
+							} else if (living.isCrouching()) {
+								if (living.getDeltaMovement().y >= -0.08f && living.getDeltaMovement().y <= -0.01) {
+									//fall 5x faster than normal
+									living.setDeltaMovement(living.getDeltaMovement().x, -0.40f, living.getDeltaMovement().z);
+								}
 							}
 						} else {
 							if (!level.isClientSide) {

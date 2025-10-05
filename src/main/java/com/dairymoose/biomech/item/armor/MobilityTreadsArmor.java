@@ -94,7 +94,7 @@ public class MobilityTreadsArmor extends ArmorBase {
 							stack.getTag().putInt("LastCollisionTick", lastCollisionTick);
 						} else {
 							int tickDiff = player.tickCount - lastCollisionTick;
-							if (!requestedSpeedBoost && tickDiff >= (SECONDS_UNTIL_SPEED_BOOST * TICKS_PER_SEC)) {
+							if (!requestedSpeedBoost && tickDiff >= (SECONDS_UNTIL_SPEED_BOOST * TICKS_PER_SEC) && player.onGround()) {
 								localPlayerSpeedBoosting = true;
 								
 								requestedSpeedBoost = true;

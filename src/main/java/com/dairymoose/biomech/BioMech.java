@@ -57,6 +57,7 @@ import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
+import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
@@ -112,6 +113,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
@@ -119,6 +121,7 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.LiteralContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -301,6 +304,20 @@ public class BioMech
 		return inputType == expectedType ? (BlockEntityTicker) tickerInterface : null;
 	}
     
+    public static void allowFlyingForPlayer(Player player) {
+    	if (!player.level().isClientSide) {
+			List<Connection> connections = player.getServer().getConnection().getConnections();
+			for (int i=0; i<connections.size(); ++i) {
+				if (connections.get(i).getPacketListener() instanceof ServerGamePacketListenerImpl sgpl) {
+					if (sgpl.player != null && sgpl.player.getId() == player.getId()) {
+						//prevent 'player is flying' disconnect error on server
+						sgpl.aboveGroundTickCount = 0;
+					}
+				}
+			}
+		}
+    }
+    
     private void addItemsToCreativeTab(BuildCreativeModeTabContentsEvent event) {
 		if (event.getTab() == BioMechRegistry.TAB_BIOMECH_CREATIVE.get()) {
 			Field[] allFields = BioMechRegistry.class.getDeclaredFields();
@@ -323,6 +340,18 @@ public class BioMech
 	}
     
     @SubscribeEvent
+    public void onPlayerCalcBreakSpeed(PlayerEvent.BreakSpeed event) {
+    	BioMechPlayerData playerData = BioMech.globalPlayerData.get(event.getEntity().getUUID());
+		if (playerData != null) {
+			if (playerData.getForSlot(MechPart.Leggings).itemStack.getItem() instanceof HovertechLeggingsArmor armor)
+			if (!event.getEntity().onGround()) {
+				//undo ground effect from player.getDigSpeed
+				event.setNewSpeed(event.getNewSpeed() * 5.0f);
+			}
+		}
+    }
+    
+    @SubscribeEvent
     public void onFovEvent(ComputeFovModifierEvent event) {
     	BioMechPlayerData playerData = BioMech.globalPlayerData.get(event.getPlayer().getUUID());
 		if (playerData != null) {
@@ -333,7 +362,15 @@ public class BioMech
 					fovMod = 1.f + (MobilityTreadsArmor.SPEED_BOOST_FAST + 1) * 0.1f;
 				}
 				
-				float calcFov = event.getNewFovModifier() / fovMod;
+				float calcFov = event.getNewFovModifier();
+				//try to avoid altering FOV but allow other legitimate FOV sources
+				float fovAccountingForSpeed = (event.getNewFovModifier() / fovMod);
+				if (fovAccountingForSpeed <= 1.182f) {
+					calcFov = 1.0f;
+				} else {
+					BioMech.LOGGER.info("adjust fov=" + fovAccountingForSpeed);
+				}
+
 				//BioMech.LOGGER.info("fov calc=" + calcFov + " vs " + event.getNewFovModifier());
 				event.setNewFovModifier(calcFov);
 			}

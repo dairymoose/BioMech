@@ -86,10 +86,12 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 				}
 			} else if (legSlot.itemStack.getItem() instanceof MobilityTreadsArmor armor) {
 				if (legSlot.visible) {
-					if (BioMech.originalBobView == null) {
-						BioMech.originalBobView = Minecraft.getInstance().options.bobView().get();
+					if (living.isControlledByLocalInstance()) {
+						if (BioMech.originalBobView == null) {
+							BioMech.originalBobView = Minecraft.getInstance().options.bobView().get();
+						}
+						Minecraft.getInstance().options.bobView().set(false);
 					}
-					Minecraft.getInstance().options.bobView().set(false);
 					
 					//greatly reduce arm bob
 					if (this.attackTime == 0.0f && this.swimAmount == 0.0f) {
@@ -101,10 +103,14 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 					this.rightLeg.xRot = 0.0f;
 					this.leftLeg.xRot = 0.0f;
 				} else {
-					BioMech.resetBobView();
+					if (living.isControlledByLocalInstance()) {
+						BioMech.resetBobView();
+					}
 				}
 			} else {
-				BioMech.resetBobView();
+				if (living.isControlledByLocalInstance()) {
+					BioMech.resetBobView();
+				}
 			}
 			
 			//prevent laser arms from pivoting up and down while walking

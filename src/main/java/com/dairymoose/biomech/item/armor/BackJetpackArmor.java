@@ -1,7 +1,10 @@
 package com.dairymoose.biomech.item.armor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
@@ -42,6 +45,8 @@ public class BackJetpackArmor extends ArmorBase {
 	public static float yPerTickStage1 = 0.13f;
 	public static float yPerTickStage2 = 0.092f;
 	public static float fallFlyingBoost = 0.095f;
+	
+	public static Map<UUID, Double> lastY = new HashMap<>();
 	@Override
 	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
@@ -68,17 +73,7 @@ public class BackJetpackArmor extends ArmorBase {
 						if (player.onGround()) {
 							jetpackPreviouslyActive = false;
 						} else {
-							if (!level.isClientSide) {
-								List<Connection> connections = player.getServer().getConnection().getConnections();
-								for (int i=0; i<connections.size(); ++i) {
-									if (connections.get(i).getPacketListener() instanceof ServerGamePacketListenerImpl sgpl) {
-										if (sgpl.player != null && sgpl.player.getId() == player.getId()) {
-											//prevent 'player is flying' disconnect error on server
-											sgpl.aboveGroundTickCount = 0;
-										}
-									}
-								}
-							}
+							BioMech.allowFlyingForPlayer(player);
 						}
 						
 						if (jetpackInputActive) {
@@ -96,7 +91,7 @@ public class BackJetpackArmor extends ArmorBase {
 									
 									boolean isFlyingOrSwimming = player.isFallFlying() || player.isSwimming();
 									if (!isFlyingOrSwimming) {
-										if (player.isLocalPlayer()) {
+										if (player.isLocalPlayer() || !level.isClientSide) {
 											float deltaY = 0.0f;
 											if (player.getDeltaMovement().y <= 0.20f) {
 												deltaY = yPerTickStage1;
@@ -116,28 +111,37 @@ public class BackJetpackArmor extends ArmorBase {
 												
 												//BioMech.LOGGER.info("yPerTickStageFinal, " + player.getDeltaMovement().y);
 											}
+											if (player.isUnderWater()) {
+												deltaY *= 0.15f;
+											}
 											
 											player.addDeltaMovement(new Vec3(0.0f, deltaY, 0.0f));
-											if (player.getDeltaMovement().y >= -0.3) {
-												player.resetFallDistance();
-											} else if (player.getDeltaMovement().y >= -0.4) {
-												player.fallDistance = 1.0f;
-											} else if (player.getDeltaMovement().y >= -0.5) {
-												player.fallDistance = 1.5f;
-											} else if (player.getDeltaMovement().y >= -0.6) {
-												player.fallDistance = 2.0f;
-											} else if (player.getDeltaMovement().y >= -0.7) {
-												player.fallDistance = 2.5f;
-											} else if (player.getDeltaMovement().y >= -0.9) {
-												player.fallDistance = 3.0f;
-											} else if (player.getDeltaMovement().y >= -1.3) {
-												player.fallDistance = 3.5f;
-											} else {
-												player.fallDistance -= 0.01f;
+											if (!level.isClientSide) {
+												double yLastTick = lastY.computeIfAbsent(player.getUUID(), (uuid) -> player.getY());
+												lastY.put(player.getUUID(), player.getY());
+												double apparentYSpeed = player.getY() - yLastTick;
+												//BioMech.LOGGER.info("apparentYSpeed=" + apparentYSpeed);
+												if (apparentYSpeed >= -0.3) {
+													player.resetFallDistance();
+												} else if (apparentYSpeed >= -0.4) {
+													player.fallDistance = 1.0f;
+												} else if (apparentYSpeed >= -0.5) {
+													player.fallDistance = 1.5f;
+												} else if (apparentYSpeed >= -0.6) {
+													player.fallDistance = 2.0f;
+												} else if (apparentYSpeed >= -0.7) {
+													player.fallDistance = 2.5f;
+												} else if (apparentYSpeed >= -0.9) {
+													player.fallDistance = 3.0f;
+												} else if (apparentYSpeed >= -1.3) {
+													player.fallDistance = 3.5f;
+												} else {
+													player.fallDistance -= 0.01f;
+												}
 											}
 										}
 									} else {
-										if (player.isLocalPlayer()) {
+										if (player.isLocalPlayer() || !level.isClientSide) {
 											float pitch = player.getXRot();
 											float yaw = player.getYRot();
 											

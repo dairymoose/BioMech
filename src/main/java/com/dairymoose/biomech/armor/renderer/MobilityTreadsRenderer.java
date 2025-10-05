@@ -58,7 +58,7 @@ public class MobilityTreadsRenderer extends AzArmorRenderer {
 	        			tickUpdatePeriod = 0;
 	        		} else {
 	        			//2.357 walking
-	        			tickUpdatePeriod = Math.max(10, (int)(100.0f / currentSpeed));
+	        			tickUpdatePeriod = Math.max(10, (int)(90.0f / currentSpeed));
 	        		}
 	        		//BioMech.LOGGER.info("animatable=" + BioMech.currentRenderItemStackContext + " with TUP=" + tickUpdatePeriod + " and currentSpeed=" + currentSpeed);
 	        	}

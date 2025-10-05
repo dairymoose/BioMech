@@ -24,6 +24,7 @@ public class PipeMechBodyArmor extends ArmorBase {
 	public PipeMechBodyArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 70;
+		this.suitEnergyPerSec = 1.0f;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Chest;
 		this.damageAvoidPct = 0.05f;
