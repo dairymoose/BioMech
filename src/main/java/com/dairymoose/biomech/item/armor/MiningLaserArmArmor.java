@@ -63,7 +63,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 	public int SECONDS_UNTIL_MAX_LASER = 12;
 	public static float minSpeedMult = 2.5f;
 	public static float maxSpeedMult = minSpeedMult * 6.0f;
-	public static double blockReachMult = 1.4;
+	public static double blockReachMult = 1.6;
 	private static ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
 	public static int START_USING_TICK_COUNT = 5;
 	
@@ -120,7 +120,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 						player.setYBodyRot(player.getYHeadRot());
 
 						HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
-								(e) -> !(e instanceof ItemEntity) && !e.isSpectator(),
+								(e) -> (e instanceof LivingEntity) && !e.isSpectator(),
 								player.getBlockReach() * blockReachMult);
 
 						double handMult = 1.0;
@@ -195,7 +195,7 @@ public abstract class MiningLaserArmArmor extends ArmorBase {
 				if (!player.level().isClientSide) {
 					if (active && useTicks >= START_USING_TICK_COUNT) {
 						HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
-								(e) -> !(e instanceof ItemEntity) && !e.isSpectator(),
+								(e) -> (e instanceof LivingEntity) && !e.isSpectator(),
 								player.getBlockReach() * blockReachMult);
 						
 						float laserPower = this.getLaserPower(useTicks);

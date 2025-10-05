@@ -7,6 +7,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.armor.renderer.MobilityTreadsRenderer;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
@@ -89,6 +90,13 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 						BioMech.originalBobView = Minecraft.getInstance().options.bobView().get();
 					}
 					Minecraft.getInstance().options.bobView().set(false);
+					
+					//greatly reduce arm bob
+					if (this.attackTime == 0.0f && this.swimAmount == 0.0f) {
+						this.rightArm.xRot = this.rightArm.xRot / 7.0f;
+						this.leftArm.xRot = this.leftArm.xRot / 7.0f;
+					}
+					
 					//normal leg walking forward-and-back
 					this.rightLeg.xRot = 0.0f;
 					this.leftLeg.xRot = 0.0f;
@@ -97,6 +105,15 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 				}
 			} else {
 				BioMech.resetBobView();
+			}
+			
+			//prevent laser arms from pivoting up and down while walking
+			HandActiveStatus has = BioMech.handActiveMap.get(living.getUUID());
+			if (has.leftHandActive) {
+				this.leftArm.xRot = 0.0f;
+			}
+			if (has.rightHandActive) {
+				this.rightArm.xRot = 0.0f;
 			}
 		}
 	}

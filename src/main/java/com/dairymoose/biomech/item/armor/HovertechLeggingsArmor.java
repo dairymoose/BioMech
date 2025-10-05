@@ -40,6 +40,8 @@ public class HovertechLeggingsArmor extends ArmorBase {
 		this.mechPart = MechPart.Leggings;
 	}
 
+	boolean lastAltState = false;
+	boolean toggledOn = true;
 	double pickupRadiusScale = 2.0f;
 	@Override
 	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
@@ -51,8 +53,23 @@ public class HovertechLeggingsArmor extends ArmorBase {
 					if (player.containerMenu instanceof BioMechStationMenu) {
 						return;
 					}
-					BlockPos overheadBlock = entity.blockPosition().above().above();
-					if (!level.getBlockState(overheadBlock).isFaceSturdy(level, overheadBlock, Direction.DOWN)) {
+					BlockPos overheadBlock = entity.blockPosition().above();
+					BlockPos overheadBlock2 = entity.blockPosition().above().above();
+					BlockPos overheadBlock3 = entity.blockPosition().above().above().above();
+					
+					boolean overheadNotSturdy = !level.getBlockState(overheadBlock).isFaceSturdy(level, overheadBlock, Direction.DOWN);
+					boolean overhead2NotSturdy = !level.getBlockState(overheadBlock2).isFaceSturdy(level, overheadBlock2, Direction.DOWN);
+					boolean overhead3NotSturdy = !level.getBlockState(overheadBlock3).isFaceSturdy(level, overheadBlock3, Direction.DOWN);
+					
+					if (level.isClientSide) {
+						if (BioMech.localPlayerHoldingAlt && !lastAltState) {
+							toggledOn = !toggledOn;
+							BioMech.LOGGER.debug("Hovertech: swap toggledOn to " + toggledOn);
+						}
+						lastAltState = BioMech.localPlayerHoldingAlt;
+					}
+					
+					if (toggledOn && overheadNotSturdy && overhead2NotSturdy && overhead3NotSturdy) {
 						double floatAmount = living.getY() - (entity.blockPosition().below().getY()
 								+ level.getBlockFloorHeight(entity.blockPosition().below()));
 						double targetY = floatBottom + floatMagnitude / 2.0

@@ -27,7 +27,7 @@
 	"item.biomech.hovertech_leggings": "§5Hovertech Leggings§0",
 	"item.biomech.hovertech_leggings.tooltip1": "Causes the user to hover above the ground, rendering ground effects harmless and increasing jump height by 1 block.",
 	"item.biomech.hovertech_leggings.tooltip2": "Also grants the wearer slowfall during falls.",
-	"item.biomech.hovertech_leggings.tooltip3": "Crouch to temporarily disable the hover technology.",
+	"item.biomech.hovertech_leggings.tooltip3": "Press alt to toggle on/off.  Crouch to temporarily disable.",
 
 	"item.biomech.power_arm": "§5Power Arm§0",
 	"item.biomech.power_arm.tooltip1": "Increases attack damage by 2 when wielding a weapon.",

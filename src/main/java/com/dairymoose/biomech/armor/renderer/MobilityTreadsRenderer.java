@@ -41,13 +41,18 @@ public class MobilityTreadsRenderer extends AzArmorRenderer {
 
 	        if (currentEntity != null) {
 	        	float currentSpeed = 0.0f;
+	        	boolean reverse = false;
 	        	
 	        	int tickUpdatePeriod = 0;
 	        	if (BioMech.currentRenderItemStackContext != null) {
 	        		CompoundTag tag = BioMech.currentRenderItemStackContext.getTag();
-	        		
+
 	        		if (tag.contains("CurrentSpeed")) {
 						currentSpeed = tag.getFloat("CurrentSpeed");
+						if (currentSpeed < 0.0f) {
+							reverse = true;
+							currentSpeed = -currentSpeed;
+						}
 					}
 	        		
 //	        		if (Math.abs(currentSpeed) <= 1E-2) {
@@ -73,7 +78,10 @@ public class MobilityTreadsRenderer extends AzArmorRenderer {
 		        		//BioMech.LOGGER.info("tickDiff=" + tickDiff + " is greater than " + tickUpdatePeriod);
 		        		lastMillis = milliTime;
 		        		//lastTick = tick;
-		        		++currentFrame;
+		        		if (reverse)
+		        			--currentFrame;
+		        		else
+		        			++currentFrame;
 		        	}
 	        	}
 	        	

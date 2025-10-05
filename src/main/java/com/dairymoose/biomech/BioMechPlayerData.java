@@ -55,6 +55,7 @@ public class BioMechPlayerData {
 		public boolean visible = true;
 		public ItemStack itemStack;
 		public ItemStack leftArmItemStack;
+		public ItemStack clientTempHandStack = ItemStack.EMPTY;
 		public MechPart mechPart;
 	}
 	

@@ -57,12 +57,6 @@ public class MobilityTreadsArmor extends ArmorBase {
 			if (armorItems.contains(BioMechRegistry.ITEM_MOBILITY_TREADS.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
 					if (level.isClientSide) {
-						float currentSpeed = (float) entity.getDeltaMovement().horizontalDistance() * 20.0f;
-						if (!player.onGround()) {
-							currentSpeed = 0.0f;
-						}
-						stack.getOrCreateTag().putFloat("CurrentSpeed", currentSpeed);
-						
 						int lastCollisionTick = 0;
 						if (stack.getTag().contains("LastCollisionTick")) {
 							lastCollisionTick = stack.getTag().getInt("LastCollisionTick");
@@ -70,13 +64,24 @@ public class MobilityTreadsArmor extends ArmorBase {
 						
 						class InputChecker {
 							boolean hasForwardImpulse = false;
+							boolean hasBackwardsImpulse = false;
 						}
 						InputChecker ic = new InputChecker();
 						DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
 							@Override
 							public void run() {
 								ic.hasForwardImpulse = Minecraft.getInstance().player.input.hasForwardImpulse();
+								ic.hasBackwardsImpulse = Minecraft.getInstance().player.input.forwardImpulse < 0.0f;
 							}});
+						
+						float currentSpeed = (float) entity.getDeltaMovement().horizontalDistance() * 20.0f;
+						if (!player.onGround()) {
+							currentSpeed = 0.0f;
+						}
+						if (ic.hasBackwardsImpulse) {
+							currentSpeed = -currentSpeed;
+						}
+						stack.getOrCreateTag().putFloat("CurrentSpeed", currentSpeed);
 						
 						if (!ic.hasForwardImpulse) {
 							if (requestedSpeedBoost) {

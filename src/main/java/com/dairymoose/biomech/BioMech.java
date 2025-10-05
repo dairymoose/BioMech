@@ -161,7 +161,6 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingTickEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
@@ -589,7 +588,7 @@ public class BioMech
     			playerData.tickEnergy(event.player);
     			tickInventoryForPlayer(event.player, playerData);
     			tickHandsForPlayer(event.player, playerData);
-    			if (event.player.level().isClientSide) {
+    			if (event.player.level().isClientSide && event.player.isLocalPlayer()) {
     				float suitEnergy = playerData.getSuitEnergy();
     				float oneTickEnergyDiff = suitEnergy - suitEnergyLast; 
 					suitEnergyDiffSum += oneTickEnergyDiff;
@@ -629,7 +628,7 @@ public class BioMech
     //The concept of a first person arm itemstack only exists on the client for the local player
     //On the server, the passed in itemStack is returned unmodified
     @SuppressWarnings("deprecation")
-	public ItemStack getFirstPersonArmItemStack(ItemStack itemStack, MechPart handPart) {
+	public ItemStack getFirstPersonArmItemStack(BioMechPlayerData playerData, ItemStack itemStack, MechPart handPart) {
     	class ItemStackHolder {
 			ItemStack itemStack;
 		}
@@ -640,9 +639,9 @@ public class BioMech
 			new Runnable() {
 				public void run() {
 					if (clientPart == MechPart.RightArm)
-						ish.itemStack = ClientModEvents.mainHandRenderStack;
+						ish.itemStack = playerData.getForSlot(handPart).clientTempHandStack;
 					else
-						ish.itemStack = ClientModEvents.offHandRenderStack;
+						ish.itemStack = playerData.getForSlot(handPart).clientTempHandStack;
 				}
 			}
 			
@@ -691,7 +690,7 @@ public class BioMech
 			ItemStack itemStack = playerData.getForSlot(handPart).itemStack;
 			if (itemStack.getItem() instanceof ArmorBase base) {
 				if (isMechArmActive(player, playerData, handPart)) {
-					itemStack = getFirstPersonArmItemStack(itemStack, handPart);
+					itemStack = getFirstPersonArmItemStack(playerData, itemStack, handPart);
 					float partialTick = 1.0f;
 					base.onHandTick(currentArmActive, itemStack, player, handPart, partialTick, bothHandsInactive, bothHandsActive);
 				}
@@ -1185,8 +1184,6 @@ public class BioMech
         
         public static boolean disableAllRenderingLogic = false;
         
-        public static ItemStack mainHandRenderStack = ItemStack.EMPTY;
-        public static ItemStack offHandRenderStack = ItemStack.EMPTY;
         @SubscribeEvent
         public void onRenderFirstPersonHand(RenderHandEvent event) {
         	if (disableAllRenderingLogic)
@@ -1226,14 +1223,14 @@ public class BioMech
                     		}
                 		}
                 		if (isMechArmActive(Minecraft.getInstance().player, playerData, handPart) && playerData.getForSlot(handPart).visible) {
-                			if (handPart == MechPart.RightArm && !ItemStack.isSameItem(mainHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
-                				mainHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
-                			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(offHandRenderStack, playerData.getForSlot(handPart).itemStack)) {
-                				offHandRenderStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+                			if (handPart == MechPart.RightArm && !ItemStack.isSameItem(playerData.getForSlot(handPart).clientTempHandStack, playerData.getForSlot(handPart).itemStack)) {
+                				playerData.getForSlot(handPart).clientTempHandStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
+                			} else if (handPart == MechPart.LeftArm && !ItemStack.isSameItem(playerData.getForSlot(handPart).clientTempHandStack, playerData.getForSlot(handPart).itemStack)) {
+                				playerData.getForSlot(handPart).clientTempHandStack = new ItemStack(playerData.getForSlot(handPart).itemStack.getItem());
                 			}
-                			ItemStack newRenderItem = mainHandRenderStack;
+                			ItemStack newRenderItem = playerData.getForSlot(handPart).clientTempHandStack;
                 			if (handPart == MechPart.LeftArm) {
-                				newRenderItem = offHandRenderStack;
+                				newRenderItem = playerData.getForSlot(handPart).clientTempHandStack;
                 			}
                 			event.setCanceled(true);
                 			
