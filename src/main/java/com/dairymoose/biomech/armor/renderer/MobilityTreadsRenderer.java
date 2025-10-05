@@ -7,7 +7,6 @@ import mod.azure.azurelib.rewrite.render.AzRendererConfig;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererConfig;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererPipeline;
-import mod.azure.azurelib.util.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -55,11 +54,6 @@ public class MobilityTreadsRenderer extends AzArmorRenderer {
 						}
 					}
 	        		
-//	        		if (Math.abs(currentSpeed) <= 1E-2) {
-//	        			tickUpdatePeriod = 0;
-//	        		} else {
-//	        			tickUpdatePeriod = Math.max(1, (int)(3.0f / currentSpeed));
-//	        		}
 	        		if (Math.abs(currentSpeed) <= 1E-2 || Minecraft.getInstance().isPaused()) {
 	        			tickUpdatePeriod = 0;
 	        		} else {
@@ -70,8 +64,6 @@ public class MobilityTreadsRenderer extends AzArmorRenderer {
 	        	}
 	        	
 	        	if (tickUpdatePeriod > 0) {
-	        		//int tick = (int) RenderUtils.getCurrentTick();
-		        	//int tickDiff = tick - lastTick;
 	        		long milliTime = System.currentTimeMillis();
 	        		long tickDiff = milliTime - lastMillis;
 		        	if (tickDiff >= tickUpdatePeriod) {
@@ -84,7 +76,7 @@ public class MobilityTreadsRenderer extends AzArmorRenderer {
 		        			++currentFrame;
 		        	}
 	        	}
-	        	
+
 	            AnimatableTexture.setAndUpdate(config.textureLocation(animatable), currentFrame);
 	        }
 		}
@@ -93,6 +85,7 @@ public class MobilityTreadsRenderer extends AzArmorRenderer {
     
     @Override
     protected AzArmorRendererPipeline createPipeline(AzRendererConfig config) {
+    	//return super.createPipeline(config);
     	return new AnimatedRendererPipeline(config, this);
     }
     
