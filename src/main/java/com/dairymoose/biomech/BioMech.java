@@ -622,9 +622,14 @@ public class BioMech
     	if (event.phase == TickEvent.Phase.START) {
     		BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
     		if (playerData != null) {
+    			
     			playerData.tickEnergy(event.player);
     			tickInventoryForPlayer(event.player, playerData);
     			tickHandsForPlayer(event.player, playerData);
+    			
+    			HandActiveStatus has = BioMech.handActiveMap.get(event.player.getUUID());
+    			checkForMidairJump(event.player, has);
+    			
     			if (event.player.level().isClientSide && event.player.isLocalPlayer()) {
     				float suitEnergy = playerData.getSuitEnergy();
     				float oneTickEnergyDiff = suitEnergy - suitEnergyLast; 
@@ -662,7 +667,26 @@ public class BioMech
     	}
     }
 
-    //The concept of a first person arm itemstack only exists on the client for the local player
+    public static class MidAirJumpStatus {
+    	public boolean primedForMidAirJump = false;
+    	public boolean lastJumpActiveStatus = false;
+    }
+    public static Map<UUID, MidAirJumpStatus> primedForMidAirJumpMap = new HashMap<>();
+    private void checkForMidairJump(Player player, HandActiveStatus has) {
+    	MidAirJumpStatus maj = primedForMidAirJumpMap.computeIfAbsent(player.getUUID(), (uuid) -> new MidAirJumpStatus());
+    	
+    	if (player.onGround()) {
+    		maj.primedForMidAirJump = false;
+			//primedForMidairJump = false;
+		} else if (!has.jumpActive && maj.lastJumpActiveStatus) {
+			maj.primedForMidAirJump = true;
+			//primedForMidairJump = true;
+		}
+    	
+    	maj.lastJumpActiveStatus = has.jumpActive;
+	}
+
+	//The concept of a first person arm itemstack only exists on the client for the local player
     //On the server, the passed in itemStack is returned unmodified
     @SuppressWarnings("deprecation")
 	public ItemStack getFirstPersonArmItemStack(BioMechPlayerData playerData, ItemStack itemStack, MechPart handPart) {
@@ -965,7 +989,6 @@ public class BioMech
     
 	public static ItemStack currentRenderItemStackContext = null;
 	
-	public static boolean primedForMidairJump = false;
 	public static boolean localPlayerJumping = false;
 	public static boolean localPlayerHoldingAlt = false;
 	
@@ -1156,11 +1179,6 @@ public class BioMech
             			if (Minecraft.getInstance().player != null) {
                 			localPlayerHoldingAlt = HOTKEY_ENABLE_ARM_FUNCTION.isDown();
                 			BioMech.localPlayerJumping = Minecraft.getInstance().player.input.jumping;
-                			if (Minecraft.getInstance().player.onGround()) {
-                				primedForMidairJump = false;
-                			} else if (!BioMech.localPlayerJumping) {
-                				primedForMidairJump = true;
-                			}
                 		}
             			
             			if (requireModifierKeyForArmUsage) {

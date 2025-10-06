@@ -54,7 +54,8 @@ public class SpringLoadedLeggingsArmor extends ArmorBase {
 							}
 							jumpsLeft = tag.getInt("JumpsLeft");
 							
-							if (BioMech.primedForMidairJump && jumpsLeft > 0) {
+							BioMech.MidAirJumpStatus maj = BioMech.primedForMidAirJumpMap.get(entity.getUUID());
+							if (maj.primedForMidAirJump && jumpsLeft > 0) {
 								--jumpsLeft;
 								tag.putInt("JumpsLeft", jumpsLeft);
 								player.setOnGround(true);
