@@ -58,7 +58,6 @@ import com.dairymoose.biomech.config.BioMechServerConfig;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
-import com.dairymoose.biomech.item.armor.DrillLeftArmArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
@@ -168,10 +167,10 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent.ItemPickupEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -419,7 +418,6 @@ public class BioMech
     private static TagKey<Item> pickaxeBlockTag = ForgeRegistries.ITEMS.tags().createTagKey(new ResourceLocation("minecraft", "pickaxes"));
     @SubscribeEvent
     public void onItemCrafted(ItemCraftedEvent event) {
-    	BioMech.LOGGER.info("item crafted");
     	ItemStack crafted = event.getCrafting();
     	Container craftingGrid = event.getInventory();
     	if (crafted.is(BioMechRegistry.ITEM_BIOMECH_SCRAP.get())) {
@@ -634,7 +632,6 @@ public class BioMech
     	if (event.phase == TickEvent.Phase.START) {
     		BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
     		if (playerData != null) {
-    			
     			playerData.tickEnergy(event.player);
     			tickInventoryForPlayer(event.player, playerData);
     			tickHandsForPlayer(event.player, playerData);
@@ -1063,6 +1060,7 @@ public class BioMech
 	public static boolean localPlayerJumping = false;
 	public static boolean localPlayerHoldingAlt = false;
 	
+	public static boolean hideMainHandWhileInactive = false;
     public static boolean hideOffHandWhileInactive = false;
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -1360,9 +1358,14 @@ public class BioMech
                 			}
                 			event.setCanceled(true);
                 			
+                			if (handPart == MechPart.RightArm && hideMainHandWhileInactive && !currentArmActive) {
+                				return;
+                			}
+                			
                 			if (handPart == MechPart.LeftArm && hideOffHandWhileInactive && !currentArmActive) {
                 				return;
                 			}
+                			
                 			ItemInHandRenderer iihr = new ItemInHandRenderer(Minecraft.getInstance(), Minecraft.getInstance().getEntityRenderDispatcher(), Minecraft.getInstance().getItemRenderer());
                 			iihr.renderArmWithItem(Minecraft.getInstance().player, event.getPartialTick(), event.getInterpolatedPitch(), event.getHand(), 
                 					event.getSwingProgress(), newRenderItem, event.getEquipProgress(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());

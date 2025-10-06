@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+	 "biomech:iron_mech_arm",
+	 "biomech:diamond_mech_arm",
+	 "biomech:drill_arm",
+	 "biomech:pipe_mech_arm",
+	 "biomech:power_arm",
+	 "biomech:mining_laser_arm"
+  ]
+}

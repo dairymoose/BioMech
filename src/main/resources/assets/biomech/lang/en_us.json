@@ -157,5 +157,23 @@
 	"item.biomech.mining_laser_left_arm": "§7Left Mining Laser Arm§0",
 	"item.biomech.remaining_pickaxe": "§7Remaining Pickaxe§0",
 	
+	"advancements.biomech.give_yourself_a_hand.title": "Give Yourself a Hand",
+	"advancements.biomech.give_yourself_a_hand.description": "Acquire any BioMech arm piece",
+	
+	"advancements.biomech.you_cant_take_the_sky_from_me.title": "You Can't Take the Sky From Me",
+	"advancements.biomech.you_cant_take_the_sky_from_me.description": "Acquire any BioMech part that grants you flight",
+	
+	"advancements.biomech.rise_above_your_station.title": "Rise Above Your Station",
+	"advancements.biomech.rise_above_your_station.description": "Craft the BioMech Station", 
+	
+	"advancements.biomech.mechanical_advantage.title": "Mechanical Advantage",
+	"advancements.biomech.mechanical_advantage.description": "Acquire any looted BioMech part",
+		
+	"advancements.biomech.stay_scrappy.title": "Stay Scrappy",
+	"advancements.biomech.stay_scrappy.description": "Scrap any looted BioMech part",
+	
+	"advancements.biomech.title.root": "BioMech",
+	"advancements.biomech.description.root": "Man and machine become one",
+	
 	"biomech.finished": "Finished"
 }

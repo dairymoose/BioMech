@@ -6,6 +6,7 @@ import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 public class BioMechClientConfig {
 
 	public final ForgeConfigSpec.BooleanValue requireEmptyHandsToActivateBioMechHands;
+	public final ForgeConfigSpec.BooleanValue hideMainHandWhileNotInUse;
 	public final ForgeConfigSpec.BooleanValue hideOffHandWhileNotInUse;
 	public final ConfigValue<Double> showEnergySuitGuiThreshold;
 	//public final ConfigValue<Double> energySuitGuiOpacity;
@@ -22,6 +23,7 @@ public class BioMechClientConfig {
 	
 	public BioMechClientConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("first_person");
+		this.hideMainHandWhileNotInUse = builder.comment("hideMainHandWhileNotInUse").translation("config.biomech.hideMainHandWhileNotInUse").define("hideMainHandWhileNotInUse", false);
 		this.hideOffHandWhileNotInUse = builder.comment("hideOffHandWhileNotInUse").translation("config.biomech.hideOffHandWhileNotInUse").define("hideOffHandWhileNotInUse", false);
 		this.requireEmptyHandsToActivateBioMechHands = builder.comment("requireEmptyHandsToActivateBioMechHands").translation("config.biomech.requireEmptyHandsToActivateBioMechHands").define("requireEmptyHandsToActivateBioMechHands", false);
 		builder.pop();

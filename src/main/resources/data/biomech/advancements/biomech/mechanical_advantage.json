@@ -1,0 +1,38 @@
+{
+    "display": {
+        "icon": {
+            "item": "biomech:night_vision_visor"
+        },
+        "title": {
+            "translate": "advancements.biomech.mechanical_advantage.title"
+        },
+        "description": {
+            "translate": "advancements.biomech.mechanical_advantage.description"
+        },
+        "frame": "goal",
+		"show_toast": true,
+        "announce_to_chat": true
+    },
+	"criteria": {
+	  "mech_item": {
+	    "trigger": "minecraft:inventory_changed",
+	    "conditions": {
+	      "player": [],
+	      "items": [
+	        {
+	          "tag": "biomech:mech_part"
+	        }
+	      ]
+	    }
+	  }
+	},
+	"requirements": [
+	  [
+	    "mech_item"
+	  ]
+	],
+	"rewards": {
+	  "experience": 100
+	},
+	"parent": "biomech:biomech/root"
+}

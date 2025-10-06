@@ -1,0 +1,30 @@
+{
+  "criteria": {
+    "tick": {
+      "conditions": {},
+      "trigger": "minecraft:tick"
+    }
+  },
+  "display": {
+    "announce_to_chat": false,
+    "background": "biomech:textures/block/biomech_scrap_block.png",
+    "description": {
+      "translate": "advancements.biomech.description.root"
+    },
+    "frame": "task",
+    "hidden": false,
+    "icon": {
+      "item": "biomech:biomech_scrap_block"
+    },
+    "show_toast": false,
+    "title": {
+      "translate": "advancements.biomech.title.root"
+    }
+  },
+  "requirements": [
+    [
+      "tick"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
