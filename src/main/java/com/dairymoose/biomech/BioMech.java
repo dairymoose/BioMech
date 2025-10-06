@@ -274,6 +274,8 @@ public class BioMech
 		
         IEventBus modEventBus = context.getModEventBus();
 
+        MinecraftForge.EVENT_BUS.register(this);
+        
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addItemsToCreativeTab);
 
@@ -285,8 +287,6 @@ public class BioMech
         PARTICLES.register(modEventBus);
         SOUNDS.register(modEventBus);
         DAMAGE_TYPES.register(modEventBus);
-        
-        MinecraftForge.EVENT_BUS.register(this);
 
         craftingFlags = new BioMechCraftingFlags();
         
@@ -320,7 +320,7 @@ public class BioMech
 		}
     }
     
-    private void addItemsToCreativeTab(BuildCreativeModeTabContentsEvent event) {
+    public void addItemsToCreativeTab(BuildCreativeModeTabContentsEvent event) {
 		if (event.getTab() == BioMechRegistry.TAB_BIOMECH_CREATIVE.get()) {
 			Field[] allFields = BioMechRegistry.class.getDeclaredFields();
 			for (Field f : allFields) {
@@ -384,7 +384,7 @@ public class BioMech
 		BioMechCommand.register(event.getDispatcher());
 	}
     
-    private void commonSetup(final FMLCommonSetupEvent event)
+    public void commonSetup(final FMLCommonSetupEvent event)
     {
         AzureLib.initialize();
     }
@@ -414,6 +414,7 @@ public class BioMech
     private static TagKey<Item> pickaxeBlockTag = ForgeRegistries.ITEMS.tags().createTagKey(new ResourceLocation("minecraft", "pickaxes"));
     @SubscribeEvent
     public void onItemCrafted(ItemCraftedEvent event) {
+    	BioMech.LOGGER.info("item crafted");
     	ItemStack crafted = event.getCrafting();
     	Container craftingGrid = event.getInventory();
     	if (crafted.is(BioMechRegistry.ITEM_BIOMECH_SCRAP.get())) {
@@ -621,6 +622,10 @@ public class BioMech
     public static Map<UUID, HandActiveStatus> handActiveMap = new HashMap<>();
     @SubscribeEvent
     public void onPlayerTick(final PlayerTickEvent event) {
+    	if (event.player == null) {
+    		return;
+    	}
+    	
     	if (event.phase == TickEvent.Phase.START) {
     		BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
     		if (playerData != null) {
@@ -831,9 +836,14 @@ public class BioMech
 
     //AzureLib bug: dispatcher doesn't work client side because it uses AzAnimatorAccessor instead of AzIdentifiableItemStackAnimatorCache
     public static void clientSideItemAnimation(ItemStack itemStack, AzCommand command) {
-    	AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
-    	if (anim != null) {
-    		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
+    	if (itemStack == null) {
+    		return;
+    	}
+    	if (itemStack.getOrCreateTag().contains(AzureLib.ITEM_UUID_TAG)) {
+    		AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
+        	if (anim != null) {
+        		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
+        	}
     	}
     	//AzItemStackDispatchCommandPacket packet = new AzItemStackDispatchCommandPacket(itemStack.getTag().getUUID("az_id"), command);
 		//packet.handle();
