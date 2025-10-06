@@ -2,9 +2,8 @@ package com.dairymoose.biomech.item.armor;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
-import com.dairymoose.biomech.item.anim.MiningLaserDispatcher;
+import com.dairymoose.biomech.item.anim.DrillDispatcher;
 
-import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -13,21 +12,31 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
-public abstract class MiningLaserArmArmor extends AbstractMiningArm {
+public abstract class DrillArmArmor extends AbstractMiningArm {
 
-	public final MiningLaserDispatcher dispatcher;
+	public final DrillDispatcher dispatcher;
 
-	public MiningLaserArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public DrillArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
-		this.dispatcher = new MiningLaserDispatcher();
+		this.dispatcher = new DrillDispatcher();
 		
-		this.minSpeedMult = 2.5f;
-		this.maxSpeedMult = minSpeedMult * 6.0f;
+		this.blockReachMult = 1.0;
+		this.energyPerSecMiss = 0.0f;
+		
+		this.minSpeedMult = 2.0f;
+		this.maxSpeedMult = minSpeedMult;
+		
+		//max of 12 seconds to mine obsidian
+		this.minMiningProgress = 0.417f;
+		
+		this.xSize = 3;
+		this.ySize = 3;
+		this.zSize = 3;
 	}
 
-	public static float laserDamageAtMaxPower = 2.0f;
+	public static float drillDamage = 3.0f;
 	
 	@Override
 	protected void playSound(Player player, int useTicks, boolean didHit) {
@@ -45,21 +54,13 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArm {
 		if (bothHandsActive) {
 			damageMult = 2.0f;
 		}
-		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*laserDamageAtMaxPower*miningPower);
-		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE), damageMult*laserDamageAtMaxPower*miningPower);
-		if (living.getRemainingFireTicks() <= 30) {
-			living.setRemainingFireTicks(30);
-		}
-	}
-	
-	//power from 0.0 to 1.0
-	public float getLaserPower(int useTicks) {
-		return Math.min(useTicks / (float) (SECONDS_UNTIL_MAX_LASER * 20), 1.0f);
+		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*drillDamage*miningPower);
+		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE), damageMult*drillDamage*miningPower);
 	}
 	
 	@Override
 	protected float getMiningPower(int useTicks) {
-		return this.getLaserPower(useTicks);
+		return 1.0f;
 	}
 	
 	@Override
@@ -96,32 +97,12 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArm {
 	
 	@Override
 	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec) {
-		Vec3 endToStartVec = endLoc.subtract(startLoc);
-		int max = (int) (endToStartVec.length() * 16);
-		double startDist = 0.07;
-		for (int i = 0; i < max; ++i) {
-			double vecScale = startDist + (i + 1) * 1.0f / max;
-			Vec3 loc = startLoc.add(endToStartVec.scale(vecScale));
-
-			float power = this.getLaserPower(useTicks);
-			ParticleOptions laserParticle = null;
-			if (power <= 0.33f) {
-				laserParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_LASER.get();
-			} else if (power <= 0.66f) {
-				laserParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_THICKER_LASER.get();
-			} else if (power <= 0.99f) {
-				laserParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_THICKEST_LASER.get();
-			} else {
-				laserParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_MAX_LASER.get();
-			}
-			player.level().addParticle(laserParticle, loc.x, loc.y, loc.z,
-					viewVec.scale(vecScale).x, viewVec.scale(vecScale).y, viewVec.scale(vecScale).z);
-		}
+		
 	}
 	
 	@Override
 	public Item getLeftArmItem() {
-		return BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get();
+		return BioMechRegistry.ITEM_DRILL_LEFT_ARM.get();
 	}
 
 

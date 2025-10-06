@@ -24,6 +24,8 @@ import com.dairymoose.biomech.armor.renderer.DiamondMechHeadRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechLegsRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DrillLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DrillRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.ElytraMechChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechChestplateRenderer;
@@ -56,6 +58,7 @@ import com.dairymoose.biomech.config.BioMechServerConfig;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
+import com.dairymoose.biomech.item.armor.DrillLeftArmArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
@@ -67,6 +70,7 @@ import com.dairymoose.biomech.item.armor.PowerArmArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
+import com.dairymoose.biomech.item.renderer.DrillItemRenderer;
 import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PipeMechArmItemRenderer;
@@ -211,14 +215,13 @@ import net.minecraftforge.registries.RegistryObject;
  * Add new armor to BioMechRegistry (right & left arms)
  * Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry)
  * <Arm Specific>: Add AzItemRenderer class: PipeMechArmItemRenderer
- * <Arm Specific>: Add new item Renderer refernece to bottom of BioMech in onClientSetup (AzItemRendererRegistry)
+ * <Arm Specific>: Add new item Renderer reference to bottom of BioMech in onClientSetup (AzItemRendererRegistry)
  * <Arm Specific / Animated>: If animated: add to AzIdentityRegistry
  * 
  */
 //TODO: 
 //	Add missing crafting recipes
 //	Back: Battery Pack
-//	Chest: Elytra
 //	Chest: Behemoth (full set?) hulkbuster theme
 //	Head: Creeper, Enderman
 //	Arm: Extendo-Arm (block reach +2, entity reach +0.5)
@@ -229,7 +232,6 @@ import net.minecraftforge.registries.RegistryObject;
 //	Back: shield projector?
 //	Legs: unicycle
 //	Legs: skies
-//	Legs: wall-e treads
 //	head: wall-e spyglass
 //	claptrap suit?
 //	Arm: flamethrower
@@ -243,6 +245,8 @@ import net.minecraftforge.registries.RegistryObject;
 //	I robot Outfit?
 //	Back: stimpack that injects buff for energy cost
 //	Back: healing fluid that heals when holding hotkey, taking energy - cannot move while healing
+//	Head: scanner that highlights nearby entities
+//	Arm: ore seeker
 @Mod(BioMech.MODID)
 public class BioMech
 {
@@ -1524,6 +1528,8 @@ public class BioMech
         	AzArmorRendererRegistry.register(SpringLoadedLeggingsRenderer::new, BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
         	AzArmorRendererRegistry.register(MobilityTreadsRenderer::new, BioMechRegistry.ITEM_MOBILITY_TREADS.get());
         	AzArmorRendererRegistry.register(ElytraMechChestplateRenderer::new, BioMechRegistry.ITEM_ELYTRA_MECH_CHESTPLATE.get());
+        	AzArmorRendererRegistry.register(DrillRightArmRenderer::new, BioMechRegistry.ITEM_DRILL_ARM.get());
+        	AzArmorRendererRegistry.register(DrillLeftArmRenderer::new, BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
@@ -1554,6 +1560,7 @@ public class BioMech
         	//BioMech Station only
         	
         	//------ Arm items - render item display ------
+        	AzItemRendererRegistry.register(DrillItemRenderer::new, BioMechRegistry.ITEM_DRILL_ARM.get());
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
         	AzItemRendererRegistry.register(PowerArmItemRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
         	AzItemRendererRegistry.register(PipeMechArmItemRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
@@ -1563,6 +1570,7 @@ public class BioMech
         	
         	//------ Arms / Animated ------
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_MINING_LASER_ARM.get(), BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
+        	AzIdentityRegistry.register(BioMechRegistry.ITEM_DRILL_ARM.get(), BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
         	//------ Arms / Animated ------
         	
         	
