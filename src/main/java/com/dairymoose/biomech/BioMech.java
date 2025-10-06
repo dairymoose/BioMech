@@ -241,6 +241,8 @@ import net.minecraftforge.registries.RegistryObject;
 //	Wall-E outfit?
 //	Iron giant outfit?
 //	I robot Outfit?
+//	Back: stimpack that injects buff for energy cost
+//	Back: healing fluid that heals when holding hotkey, taking energy - cannot move while healing
 @Mod(BioMech.MODID)
 public class BioMech
 {
