@@ -15,6 +15,7 @@ import net.minecraftforge.network.NetworkEvent;
 public class ClientboundEnergySyncPacket implements Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> {
 	private float suitEnergy;
 	private float suitEnergyMax;
+	private int remainingTicksForEnergyRegen;
 
 	public ClientboundEnergySyncPacket() {
 	}
@@ -23,19 +24,22 @@ public class ClientboundEnergySyncPacket implements Packet<net.minecraft.network
 		this.read(buffer);
 	}
 
-	public ClientboundEnergySyncPacket(float suitEnergy, float suitEnergyMax) {
+	public ClientboundEnergySyncPacket(float suitEnergy, float suitEnergyMax, int ticksUntilEnergyRegenPossible) {
 		this.suitEnergy = suitEnergy;
 		this.suitEnergyMax = suitEnergyMax;
+		this.remainingTicksForEnergyRegen = ticksUntilEnergyRegenPossible;
 	}
 
 	public void read(FriendlyByteBuf byteBuf) {
 		this.suitEnergy = byteBuf.readFloat();
 		this.suitEnergyMax = byteBuf.readFloat();
+		this.remainingTicksForEnergyRegen = byteBuf.readInt();
 	}
 
 	public void write(FriendlyByteBuf byteBuf) {
 		byteBuf.writeFloat(suitEnergy);
 		byteBuf.writeFloat(suitEnergyMax);
+		byteBuf.writeInt(remainingTicksForEnergyRegen);
 	}
 
 	public void handle(Supplier<NetworkEvent.Context> ctx) {
@@ -57,6 +61,8 @@ public class ClientboundEnergySyncPacket implements Packet<net.minecraft.network
 					if (playerData != null) {
 						playerData.suitEnergyMax = suitEnergyMax;
 						playerData.setSuitEnergy(suitEnergy);
+						if (remainingTicksForEnergyRegen > 0)
+							playerData.lastUsedEnergyTick = Minecraft.getInstance().player.tickCount - (BioMechPlayerData.ticksRequiredToRegenEnergy - remainingTicksForEnergyRegen);
 					}
 				}
 				};});

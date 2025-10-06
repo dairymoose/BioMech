@@ -19,7 +19,6 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 public class BioMechPlayerData {
 	public static final int SLOT_COUNT = 6;
 	
-	public Player player = null;
 	public SlottedItem head = new SlottedItem(MechPart.Head);
 	public SlottedItem chest = new SlottedItem(MechPart.Chest);
 	public SlottedItem leggings = new SlottedItem(MechPart.Leggings);
@@ -35,7 +34,7 @@ public class BioMechPlayerData {
 	public float suitEnergyPerSecTemporaryModifier = 0.0f;
 	
 	public int lastUsedEnergyTick = -1000;
-	public int ticksRequiredToRegenEnergy = 40;
+	public static final int ticksRequiredToRegenEnergy = 40;
 	
 	public static String SUIT_ENERGY = "SuitEnergy";
 	public static String SUIT_ENERGY_MAX = "SuitEnergyMax";
@@ -74,9 +73,17 @@ public class BioMechPlayerData {
 		}
 	}
 	
+	public int getTicksSinceLastEnergyUsage(Player player) {
+		return player.tickCount - lastUsedEnergyTick;
+	}
+	
+	public int remainingTicksForEnergyRegen(Player player) {
+		return Math.max(0, ticksRequiredToRegenEnergy - this.getTicksSinceLastEnergyUsage(player));
+	}
+	
 	public boolean canRegenEnergy(Player player) {
-		int tickDiff = player.tickCount - lastUsedEnergyTick;
-		if (tickDiff >= ticksRequiredToRegenEnergy) {
+		int remainingTicks = this.remainingTicksForEnergyRegen(player);
+		if (remainingTicks == 0) {
 			return true;
 		}
 		

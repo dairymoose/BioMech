@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 
 import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
@@ -18,6 +21,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.network.PacketDistributor;
 
 public class IronMechChestArmor extends ArmorBase {
 
@@ -60,12 +64,20 @@ public class IronMechChestArmor extends ArmorBase {
 				//this case only occurs if the damage would immediately kill the player - but we predicted they should be saved instead
 				player.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_ABSORB), damageAfterMitigation);
 				BioMech.LOGGER.debug("inflict: " + damageAfterMitigation + " damage, avoid killing blow with Absorb, damage source was: " + damageSource + " with amount=" + amount + " unmitigatedHp=" + unmitigatedPredictedHp + ", mitigated=" + mitigatedPredictedHp + "/currentHp=" + player.getHealth());
+				float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
+				playerData.spendSuitEnergy(player, energyDamage);
+				if (player instanceof ServerPlayer sp) {
+					BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+				}
 				return true;
 			} else {
 				float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
 				//damage is only processed here on server side
 				if (playerData != null) {
 					playerData.internalSpendSuitEnergy(player, energyDamage);
+				}
+				if (player instanceof ServerPlayer sp) {
+					BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
 				}
 				//BioMech.LOGGER.debug("heal amount = " + damageMitigated + " from raw damage = " + amount + " with energyDamage=" + energyDamage);
 				player.heal(damageMitigated);

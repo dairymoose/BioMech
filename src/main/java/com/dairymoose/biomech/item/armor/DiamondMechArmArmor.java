@@ -45,6 +45,7 @@ public abstract class DiamondMechArmArmor extends ArmorBase {
 		this.suitEnergy = 12;
 		this.hidePlayerModel = true;
 		this.damageAbsorbPct = 0.03f;
+		this.addToLootTable = false;
 	}
 
 	@Override

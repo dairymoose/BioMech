@@ -168,6 +168,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
@@ -655,7 +656,7 @@ public class BioMech
     			
 				if (event.player.tickCount % RESYNC_ENERGY_TICK_PERIOD == 0) {
 					if (event.player instanceof ServerPlayer sp) {
-						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax));
+						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
 					}
     			}
 				
@@ -933,6 +934,7 @@ public class BioMech
 		}
 	}
 	
+	//this event only fires on the server
 	//LivingHurtEvent - damage before armor/magic mitigation
 	//LivingDamageEvent - damage after armor/magic mitigation
 	//event incoming damage is reduced by mitigation from armor
@@ -942,6 +944,7 @@ public class BioMech
 			//BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
 		}
 		if (event.getEntity() instanceof Player player) {
+			//BioMech.LOGGER.info("damage to player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
 			BioMechPlayerData playerData = null;
         	playerData = globalPlayerData.get(event.getEntity().getUUID());
         	if (playerData != null) {
@@ -976,7 +979,7 @@ public class BioMech
 								playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
 								BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + PipeMechBodyArmor.getTotalDamageAvoidPct(player));
 								if (event.getEntity() instanceof ServerPlayer sp) {
-									BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax));
+									BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
 								}
 								event.setCanceled(true);
 								return;
@@ -992,7 +995,6 @@ public class BioMech
 					float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
 					if (playerData.getSuitEnergy() >= energyDamage) {
 						if (IronMechChestArmor.absorbDirectAttack(playerData, absorbPct, event.getSource(), event.getAmount(), player)) {
-							playerData.spendSuitEnergy(player, energyDamage);
 							//BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getAmount() + " of type: " + event.getSource() + ", energyLeft=" + playerData.getSuitEnergy());
 							event.setCanceled(true);
 						}
