@@ -53,7 +53,7 @@ public class HovertechLeggingsArmor extends ArmorBase {
 					if (player.containerMenu instanceof BioMechStationMenu) {
 						return;
 					}
-					double yVal = entity.getY();
+
 					BlockPos sturdyBelowPos = entity.blockPosition();
 					for (int i=0; i<3; ++i) {
 						BlockState sturdyBelowState = level.getBlockState(sturdyBelowPos);
