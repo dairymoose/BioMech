@@ -36,26 +36,26 @@ public abstract class DrillArmArmor extends AbstractMiningArm {
 		this.zSize = 3;
 	}
 
-	public static float drillDamage = 3.0f;
+	public static float drillDamage = 5.5f;
 	
 	@Override
 	protected void playSound(Player player, int useTicks, boolean didHit) {
-		float volume = 0.45f;
-		float laserPitch = 0.85f + this.getMiningPower(useTicks)*0.3f;
+		float volume = 1.2f;
+		float laserPitch = 1.20f;
 		if (didHit) {
-			laserPitch *= 1.04f;
+			laserPitch *= 1.10f;
 		}
-		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_LASER_LOOP.get(), SoundSource.PLAYERS, volume, laserPitch, false);
+		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_MINING_DRILL.get(), SoundSource.PLAYERS, volume, laserPitch, false);
 	}
 	
 	@Override
 	protected void dealEntityDamage(Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
 		float damageMult = 1.0f;
 		if (bothHandsActive) {
-			damageMult = 2.0f;
+			//damageMult = 2.0f;
 		}
 		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*drillDamage*miningPower);
-		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE), damageMult*drillDamage*miningPower);
+		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE), damageMult*drillDamage*miningPower/20.0f);
 	}
 	
 	@Override

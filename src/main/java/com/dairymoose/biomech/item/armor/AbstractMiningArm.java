@@ -208,7 +208,6 @@ public abstract class AbstractMiningArm extends ArmorBase {
 									
 									++dbpIndex;
 								}
-								BioMech.LOGGER.info("blocks size=" + dbpIndex + " with minPos = " + minPos + " and maxPos=" + maxPos + " with origin=" + origin);
 							}
 						} else if (hitResult instanceof EntityHitResult ehr) {
 							didHit = true;

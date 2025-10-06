@@ -4,6 +4,11 @@
     "subtitle": "entity.subtitle.laser_loop",
     "sounds": [ "biomech:item/laser_loop" ]
   },
+  "mining_drill": {
+      "category": "block",
+      "subtitle": "entity.subtitle.mining_drill",
+      "sounds": [ "biomech:item/mining_drill" ]
+    },
   "jetpack_loop": {
       "category": "block",
       "subtitle": "entity.subtitle.jetpack_loop",
