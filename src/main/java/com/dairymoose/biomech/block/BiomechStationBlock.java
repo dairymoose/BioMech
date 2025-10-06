@@ -179,18 +179,19 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 				player.setXRot(22.0f);
 			} else {
 				if (blockEntity instanceof BioMechStationBlockEntity be) {
-					if (be.canOpen(player))
-					if (be.walkToStationTicks == -1 && be.walkToStationPlayer == null) {
-						be.playerStartLoc = player.getPosition(1.0f);
-						be.playerStartYRot = player.getYRot();
-						be.walkToStationPlayer = player;
-						Vec3 blockEntityPos = blockEntity.getBlockPos().getCenter().with(Axis.Y, blockEntity.getBlockPos().getY());
-						double dist = blockEntityPos.distanceTo(be.playerStartLoc);
-						be.walkToStationTicksMax = Math.min((int)(dist/3.0 * be.WALK_TO_STATION_TICKS_MAX_DIST), be.WALK_TO_STATION_TICKS_MAX_DIST);
-						if (be.walkToStationTicksMax <= 0) {
-							be.walkToStationTicksMax = 1;
+					if (be.canOpen(player)) {
+						if (be.walkToStationTicks == -1 && be.walkToStationPlayer == null) {
+							be.playerStartLoc = player.getPosition(1.0f);
+							be.playerStartYRot = player.getYRot();
+							be.walkToStationPlayer = player;
+							Vec3 blockEntityPos = blockEntity.getBlockPos().getCenter().with(Axis.Y, blockEntity.getBlockPos().getY());
+							double dist = blockEntityPos.distanceTo(be.playerStartLoc);
+							be.walkToStationTicksMax = Math.min((int)(dist/3.0 * be.WALK_TO_STATION_TICKS_MAX_DIST), be.WALK_TO_STATION_TICKS_MAX_DIST);
+							if (be.walkToStationTicksMax <= 0) {
+								be.walkToStationTicksMax = 1;
+							}
+							be.walkToStationTicks = be.walkToStationTicksMax;
 						}
-						be.walkToStationTicks = be.walkToStationTicksMax;
 					}
 				}
 			}
@@ -200,7 +201,9 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 			return InteractionResult.SUCCESS;
 		} else {
 			if (blockEntity instanceof BioMechStationBlockEntity be) {
-				player.openMenu(be);
+				if (be.canOpen(player)) {
+					player.openMenu(be);
+				}
 			}
 
 			return InteractionResult.CONSUME;

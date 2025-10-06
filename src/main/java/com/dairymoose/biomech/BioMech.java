@@ -1286,7 +1286,7 @@ public class BioMech
         	}
         }
         
-        Map<EquipmentSlot, ItemStack> priorItems = new HashMap<>();
+        public static Map<EquipmentSlot, ItemStack> priorItems = new HashMap<>();
         //ItemStack priorItem = null;
         ItemStack itemToRender;
         @SuppressWarnings("unchecked")
@@ -1398,12 +1398,12 @@ public class BioMech
         		    				poseStack.pushPose();
         		    				HandActiveStatus has = handActiveMap.computeIfAbsent(event.getEntity().getUUID(), (uuid) -> new HandActiveStatus());
         		    				//activator item moves the arm forward slightly, we'll undo that here
-        		    				if (slottedItem.mechPart == MechPart.RightArm && as.hasMainHandActivator) {
-        		    					poseStack.mulPose(Axis.XP.rotationDegrees(15.0f));
-        		    				}
-        		    				if (slottedItem.mechPart == MechPart.LeftArm && as.hasOffHandActivator) {
-        		    					poseStack.mulPose(Axis.XP.rotationDegrees(15.0f));
-        		    				}
+//        		    				if (slottedItem.mechPart == MechPart.RightArm && as.hasMainHandActivator) {
+//        		    					poseStack.mulPose(Axis.XP.rotationDegrees(15.0f));
+//        		    				}
+//        		    				if (slottedItem.mechPart == MechPart.LeftArm && as.hasOffHandActivator) {
+//        		    					poseStack.mulPose(Axis.XP.rotationDegrees(15.0f));
+//        		    				}
         		    				if (slottedItem.mechPart == MechPart.RightArm && has.rightHandActive) {
         		    					poseStack.mulPose(Axis.XP.rotationDegrees(renderEntity.getXRot()));
         		    				} else if (slottedItem.mechPart == MechPart.LeftArm && has.leftHandActive) {
