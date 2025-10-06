@@ -79,7 +79,8 @@ public class BioMechConfig {
 			addConfigElement(BioMechConfig.COMMON.enableElytraMechChestplateCrafting);
 			
 			BioMechStationBlock.configWalkToBioMechStation = BioMechConfig.COMMON.walkToBioMechStation.get().booleanValue();
-
+			BioMech.alwaysAllowMechArmUsage = !BioMechConfig.CLIENT.requireEmptyHandsToActivateBioMechHands.get().booleanValue();
+			
 			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
 				@Override
 				public void run() {
