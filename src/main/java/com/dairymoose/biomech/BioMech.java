@@ -89,6 +89,7 @@ import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket
 import com.dairymoose.biomech.particle.InstantSmokeParticle;
 import com.dairymoose.biomech.particle.LaserParticle;
 import com.dairymoose.biomech.particle.MaxLaserParticle;
+import com.dairymoose.biomech.particle.MuzzleFlashParticle;
 import com.dairymoose.biomech.particle.ThickerLaserParticle;
 import com.dairymoose.biomech.particle.ThickestLaserParticle;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -853,11 +854,16 @@ public class BioMech
     	if (itemStack == null) {
     		return;
     	}
-    	if (itemStack.getOrCreateTag().contains(AzureLib.ITEM_UUID_TAG)) {
-    		AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
-        	if (anim != null) {
-        		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
-        	}
+    	
+    	try {
+	    	if (itemStack.getOrCreateTag().contains(AzureLib.ITEM_UUID_TAG)) {
+	    		AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
+	        	if (anim != null) {
+	        		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
+	        	}
+	    	}
+    	} catch (Exception e) {
+    		BioMech.LOGGER.error("Error playing client-side animation: " + e);
     	}
     	//AzItemStackDispatchCommandPacket packet = new AzItemStackDispatchCommandPacket(itemStack.getTag().getUUID("az_id"), command);
 		//packet.handle();
@@ -1099,6 +1105,7 @@ public class BioMech
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_THICKEST_LASER.get(), ThickestLaserParticle.Provider::new);
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_MAX_LASER.get(), MaxLaserParticle.Provider::new);
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_INSTANT_SMOKE.get(), InstantSmokeParticle.Provider::new);
+        	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_MUZZLE_FLASH.get(), MuzzleFlashParticle.Provider::new);
         }
         
     	@SubscribeEvent

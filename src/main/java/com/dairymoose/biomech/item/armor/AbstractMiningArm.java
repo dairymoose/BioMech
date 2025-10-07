@@ -72,7 +72,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 	protected boolean instantDestroyLeaves = false;
 	protected boolean onlyMinesMatchingBlocks = false;
 	
-	private static int SOUND_TICK_DURATION = 3;
+	protected int soundTickPeriod = 3;
 	Map<Player, DestroyBlockProgressList> dbpMap = new HashMap<>();
 	protected int xSize = 1;
 	protected int ySize = 1;
@@ -81,6 +81,10 @@ public abstract class AbstractMiningArm extends ArmorBase {
 	protected float minMiningProgress = 0.0f;
 
 	protected abstract float getMiningPower(int useTicks);
+	
+	protected void startUsingSound(Player player) {
+		
+	}
 	
 	protected abstract void passiveAnimation(ItemStack itemStack);
 	protected abstract void inertAnimation(ItemStack itemStack);
@@ -119,6 +123,9 @@ public abstract class AbstractMiningArm extends ArmorBase {
 				boolean didHit = false;
 				if (player.level().isClientSide) {
 					if (useTicks <= START_USING_TICK_COUNT) {
+						if (useTicks == 1) {
+							this.startUsingSound(player);
+						}
 						// BioMech.LOGGER.info("useTicks=" + useTicks);
 						this.startUsingAnimation(itemStack);
 						// send packet to server asking for start_using anim
@@ -174,7 +181,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 							didHit = true;
 						}
 						
-						if (player.tickCount % SOUND_TICK_DURATION == 0) {
+						if (player.tickCount % soundTickPeriod == 0) {
 							playSound(player, useTicks, didHit);
 						}
 					}

@@ -1,43 +1,128 @@
 package com.dairymoose.biomech.item.armor;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
+import com.dairymoose.biomech.item.anim.GatlingDispatcher;
 
-import net.minecraft.world.entity.Entity;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
 
-public abstract class GatlingArmArmor extends ArmorBase {
+public abstract class GatlingArmArmor extends AbstractMiningArm {
+
+	public final GatlingDispatcher dispatcher;
 
 	public GatlingArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
-		this.suitEnergy = 5;
+		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
+		this.dispatcher = new GatlingDispatcher();
+		
+		this.blockReachMult = 100.0;
+		
+		float EPS = 9.0f;
+		this.energyPerSec = EPS;
+		this.energyPerSecMiss = EPS;
+		
+		this.minSpeedMult = 0.75f;
+		this.maxSpeedMult = minSpeedMult;
+		
+		this.wrongToolPenalty = 10.0f;
+		
+		this.miningTool = new ItemStack(Items.IRON_SHOVEL);
+		
+		this.soundTickPeriod = 2;
+		this.instantDestroyLeaves = true;
 	}
 
+	public static float gatlingDamage = 28.0f;
+	
+	@Override
+	protected void startUsingSound(Player player) {
+		float volume = 2.0f;
+		float pitch = 1.0f;
+		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_GATLING_SPIN_UP.get(), SoundSource.PLAYERS, volume, pitch, false);
+	}
+	
+	@Override
+	protected void playSound(Player player, int useTicks, boolean didHit) {
+		float volume = 1.3f;
+		float laserPitch = 1.0f;
+		//when placed twice, it sounds powerful
+		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_GATLING_FIRING.get(), SoundSource.PLAYERS, volume, laserPitch, false);
+		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_GATLING_FIRING.get(), SoundSource.PLAYERS, volume, laserPitch, false);
+	}
+	
+	@Override
+	protected void dealEntityDamage(Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
+		float damageMult = 1.0f;
+		if (bothHandsActive) {
+			//damageMult = 2.0f;
+		}
+		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*drillDamage*miningPower);
+		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE), damageMult*gatlingDamage*miningPower/20.0f);
+	}
+	
+	@Override
+	protected float getMiningPower(int useTicks) {
+		return 1.0f;
+	}
+	
+	@Override
+	protected void passiveAnimation(ItemStack itemStack) {
+		BioMech.clientSideItemAnimation(itemStack, dispatcher.PASSIVE_COMMAND.cmd);
+	}
+	
+	@Override
+	protected void inertAnimation(ItemStack itemStack) {
+		BioMech.clientSideItemAnimation(itemStack, dispatcher.INERT_COMMAND.cmd);
+	}
+	
+	@Override
+	protected void startUsingAnimation(ItemStack itemStack) {
+		BioMech.clientSideItemAnimation(itemStack, dispatcher.SPIN_UP_COMMAND.cmd);
+	}
+	
+	@Override
+	protected void miningAnimation(ItemStack itemStack) {
+		BioMech.clientSideItemAnimation(itemStack, dispatcher.FIRING_COMMAND.cmd);
+	}
+	
+	@Override
+	protected void thirdPersonStartUsingAnimation(ItemStack itemStack) {
+		BioMech.clientSideItemAnimation(itemStack,
+				dispatcher.SPIN_UP_3D_COMMAND.cmd);
+	}
+	
+	@Override
+	protected void thirdPersonMiningAnimation(ItemStack itemStack) {
+		BioMech.clientSideItemAnimation(itemStack,
+				dispatcher.FIRING_3D_COMMAND.cmd);
+	}
+	
+	@Override
+	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec) {
+		double vecScale = 0.55;
+		Vec3 loc = startLoc.add(viewVec.scale(vecScale));
+		
+		player.level().addParticle((ParticleOptions) BioMechRegistry.PARTICLE_TYPE_MUZZLE_FLASH.get(), loc.x, loc.y, loc.z,
+				0.0, 0.0, 0.0);
+		
+		//flamethrower?
+		//player.level().addParticle(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z,
+				//viewVec.scale(vecScale).x, viewVec.scale(vecScale).y, viewVec.scale(vecScale).z);
+	}
+	
 	@Override
 	public Item getLeftArmItem() {
 		return BioMechRegistry.ITEM_GATLING_LEFT_ARM.get();
 	}
-	
-	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-		if (entity instanceof Player player) {
-			List<Item> armorItems = new ArrayList<Item>();
-			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
-			if (armorItems.contains(BioMechRegistry.ITEM_GATLING_ARM.get()) || slotId == -1) {
-				if (entity instanceof LivingEntity living && !living.isSpectator()) {
-					;
-				}
-			}
-		}
-	}
+
 
 }
-	

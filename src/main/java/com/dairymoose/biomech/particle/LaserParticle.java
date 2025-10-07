@@ -66,10 +66,10 @@ public class LaserParticle extends TextureSheetParticle {
 	      }
 	   };
    
-   public ParticleRenderType getRenderType() {
-	   return PARTICLE_SHEET_LIT_TRANSLUCENT;
-   }
-   
+	public ParticleRenderType getRenderType() {
+		return PARTICLE_SHEET_LIT_TRANSLUCENT;
+	}
+
 	@Override
 	protected int getLightColor(float p_107249_) {
 		return LightTexture.FULL_BRIGHT;
