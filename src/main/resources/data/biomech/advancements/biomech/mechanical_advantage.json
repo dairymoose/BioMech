@@ -32,7 +32,7 @@
 	  ]
 	],
 	"rewards": {
-	  "experience": 100
+	  "experience": 10
 	},
 	"parent": "biomech:biomech/root"
 }
