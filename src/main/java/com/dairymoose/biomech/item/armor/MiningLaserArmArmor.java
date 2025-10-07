@@ -46,7 +46,7 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArm {
 			//damageMult = 2.0f;
 		}
 		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*laserDamageAtMaxPower*miningPower);
-		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE), damageMult*laserDamageAtMaxPower*miningPower/20.0f);
+		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), damageMult*laserDamageAtMaxPower*miningPower/20.0f);
 		if (living.getRemainingFireTicks() <= 30) {
 			living.setRemainingFireTicks(30);
 		}

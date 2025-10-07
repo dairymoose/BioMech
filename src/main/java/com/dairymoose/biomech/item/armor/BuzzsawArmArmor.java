@@ -59,7 +59,7 @@ public abstract class BuzzsawArmArmor extends AbstractMiningArm {
 			//damageMult = 2.0f;
 		}
 		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*drillDamage*miningPower);
-		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE), damageMult*drillDamage*miningPower/20.0f);
+		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), damageMult*drillDamage*miningPower/20.0f);
 	}
 	
 	@Override

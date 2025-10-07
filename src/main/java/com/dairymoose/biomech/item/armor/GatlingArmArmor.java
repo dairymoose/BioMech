@@ -26,7 +26,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 		
 		this.blockReachMult = 100.0;
 		
-		float EPS = 9.0f;
+		float EPS = 10.0f;
 		this.energyPerSec = EPS;
 		this.energyPerSecMiss = EPS;
 		
@@ -41,7 +41,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 		this.instantDestroyLeaves = true;
 	}
 
-	public static float gatlingDamage = 28.0f;
+	public static float gatlingDamage = 30.0f;
 	
 	@Override
 	protected void startUsingSound(Player player) {
@@ -65,8 +65,15 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 		if (bothHandsActive) {
 			//damageMult = 2.0f;
 		}
+		
+		double damageFalloffFactor = 1.0;
+		double distTo = player.distanceTo(living);
+		
+		damageFalloffFactor = Math.min(1.0, Math.max(0.5, 1.0/Math.log10(distTo*0.50)));
+		
+		BioMech.LOGGER.info("falloff=" + damageFalloffFactor + " for dist=" + distTo);
 		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*drillDamage*miningPower);
-		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE), damageMult*gatlingDamage*miningPower/20.0f);
+		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), damageMult*gatlingDamage*miningPower/20.0f);
 	}
 	
 	@Override
