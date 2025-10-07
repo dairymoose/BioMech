@@ -83,6 +83,7 @@ public class BioMechConfig {
 			BioMech.alwaysAllowMechArmUsage = !BioMechConfig.CLIENT.requireEmptyHandsToActivateBioMechHands.get().booleanValue();
 			GatlingArmArmor.gatlingDamage = BioMechConfig.SERVER.gatlingDamage.get().floatValue();
 			GatlingArmArmor.gatlingEnergyPerSec = BioMechConfig.SERVER.gatlingEnergyPerSec.get().floatValue();
+			GatlingArmArmor.gatlingMinFalloff = BioMechConfig.SERVER.gatlingMinFalloffFactor.get().floatValue();
 			
 			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
 				@Override

@@ -16,6 +16,8 @@
 	"entity.subtitle.jetpack_loop": "Jetpack Burns",
 	"entity.subtitle.mining_drill": "Drill Mines",
 	"entity.subtitle.buzzsaw_loop": "Buzzsaw Buzzes",
+	"entity.subtitle.gatling_spin_up": "Gatling Spins Up",
+	"entity.subtitle.gatling_firing": "Gatling Fires",
 	
 	"item.biomech.biomech_activator": "BioMech Activator",
 	"item.biomech.biomech_deactivator": "BioMech Deactivator",

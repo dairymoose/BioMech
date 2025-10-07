@@ -19,6 +19,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 	public final GatlingDispatcher dispatcher;
 
 	public static float gatlingEnergyPerSec = 10.0f;
+	public static float gatlingMinFalloff = 0.5f;
 	
 	public GatlingArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
@@ -73,7 +74,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 		double damageFalloffFactor = 1.0;
 		double distTo = player.distanceTo(living);
 		
-		damageFalloffFactor = Math.min(1.0, Math.max(0.5, 1.0/Math.log10(distTo*0.50)));
+		damageFalloffFactor = Math.min(1.0, Math.max(gatlingMinFalloff, 1.0/Math.log10(distTo*0.50)));
 		
 		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*drillDamage*miningPower);
 		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), damageMult*gatlingDamage*miningPower/20.0f);

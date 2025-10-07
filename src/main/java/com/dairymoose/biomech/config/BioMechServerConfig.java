@@ -19,7 +19,7 @@ public class BioMechServerConfig {
 	public final ConfigValue<Double> lootBioMechInNetherFortress;
 	public final ForgeConfigSpec.BooleanValue elytraMechChestplateCanBeLooted;
 	
-	public final ConfigValue<Double> gatlingMinFalloffDamage;
+	public final ConfigValue<Double> gatlingMinFalloffFactor;
 	public final ConfigValue<Double> gatlingDamage;
 	public final ConfigValue<Double> gatlingEnergyPerSec;
 
@@ -35,7 +35,7 @@ public class BioMechServerConfig {
 		builder.pop();
 		
 		builder.push("hand_items");
-		this.gatlingMinFalloffDamage = builder.comment("gatlingMinFalloffDamage").translation("config.biomech.gatlingMinFalloffDamage").defineInRange("gatlingMinFalloffDamage", 0.5, 0.0, 1.0);
+		this.gatlingMinFalloffFactor = builder.comment("gatlingMinFalloffFactor").translation("config.biomech.gatlingMinFalloffFactor").defineInRange("gatlingMinFalloffFactor", 0.5, 0.0, 1.0);
 		this.gatlingDamage = builder.comment("gatlingDamage").translation("config.biomech.gatlingDamage").define("gatlingDamage", 30.0);
 		this.gatlingEnergyPerSec = builder.comment("gatlingEnergyPerSec").translation("config.biomech.gatlingEnergyPerSec").define("gatlingEnergyPerSec", 10.0);
 		builder.pop();
