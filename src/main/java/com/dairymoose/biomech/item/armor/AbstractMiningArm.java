@@ -86,6 +86,10 @@ public abstract class AbstractMiningArm extends ArmorBase {
 		
 	}
 	
+	protected void beginHandTick(Player player) {
+		
+	}
+	
 	protected abstract void passiveAnimation(ItemStack itemStack);
 	protected abstract void inertAnimation(ItemStack itemStack);
 	protected abstract void startUsingAnimation(ItemStack itemStack);
@@ -100,6 +104,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 		BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 
 		if (playerData != null) {
+			this.beginHandTick(player);
 			this.energyPerTick = energyPerSec / 20.0f;
 			this.energyPerTickMiss = energyPerSecMiss / 20.0f;
 			

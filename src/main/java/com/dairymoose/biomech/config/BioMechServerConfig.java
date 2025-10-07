@@ -18,6 +18,10 @@ public class BioMechServerConfig {
 	public final ConfigValue<Double> lootBioMechInShipwreck;
 	public final ConfigValue<Double> lootBioMechInNetherFortress;
 	public final ForgeConfigSpec.BooleanValue elytraMechChestplateCanBeLooted;
+	
+	public final ConfigValue<Double> gatlingMinFalloffDamage;
+	public final ConfigValue<Double> gatlingDamage;
+	public final ConfigValue<Double> gatlingEnergyPerSec;
 
 	public BioMechServerConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("loot");
@@ -28,6 +32,12 @@ public class BioMechServerConfig {
 		this.lootBioMechInShipwreck = builder.comment("lootBioMechInShipwreck").translation("config.biomech.lootBioMechInShipwreck").define("lootBioMechInShipwreck", defaultShipwreckLootChance);
 		this.lootBioMechInNetherFortress = builder.comment("lootBioMechInNetherFortress").translation("config.biomech.lootBioMechInNetherFortress").define("lootBioMechInNetherFortress", defaultNetherFortressLootChance);
 		this.elytraMechChestplateCanBeLooted = builder.comment("elytraMechChestplateCanBeLooted").translation("config.biomech.elytraMechChestplateCanBeLooted").define("elytraMechChestplateCanBeLooted", true);
+		builder.pop();
+		
+		builder.push("hand_items");
+		this.gatlingMinFalloffDamage = builder.comment("gatlingMinFalloffDamage").translation("config.biomech.gatlingMinFalloffDamage").defineInRange("gatlingMinFalloffDamage", 0.5, 0.0, 1.0);
+		this.gatlingDamage = builder.comment("gatlingDamage").translation("config.biomech.gatlingDamage").define("gatlingDamage", 30.0);
+		this.gatlingEnergyPerSec = builder.comment("gatlingEnergyPerSec").translation("config.biomech.gatlingEnergyPerSec").define("gatlingEnergyPerSec", 10.0);
 		builder.pop();
 	}
 	

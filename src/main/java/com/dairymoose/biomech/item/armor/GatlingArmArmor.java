@@ -18,6 +18,8 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 
 	public final GatlingDispatcher dispatcher;
 
+	public static float gatlingEnergyPerSec = 10.0f;
+	
 	public GatlingArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
@@ -25,10 +27,6 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 		this.dispatcher = new GatlingDispatcher();
 		
 		this.blockReachMult = 100.0;
-		
-		float EPS = 10.0f;
-		this.energyPerSec = EPS;
-		this.energyPerSecMiss = EPS;
 		
 		this.minSpeedMult = 0.75f;
 		this.maxSpeedMult = minSpeedMult;
@@ -42,6 +40,12 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 	}
 
 	public static float gatlingDamage = 30.0f;
+	
+	@Override
+	protected void beginHandTick(Player player) {
+		this.energyPerSec = gatlingEnergyPerSec;
+		this.energyPerSecMiss = gatlingEnergyPerSec;
+	}
 	
 	@Override
 	protected void startUsingSound(Player player) {

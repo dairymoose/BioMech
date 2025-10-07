@@ -9,6 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.block.BioMechStationBlock;
+import com.dairymoose.biomech.item.armor.GatlingArmArmor;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -80,6 +81,8 @@ public class BioMechConfig {
 			
 			BioMechStationBlock.configWalkToBioMechStation = BioMechConfig.COMMON.walkToBioMechStation.get().booleanValue();
 			BioMech.alwaysAllowMechArmUsage = !BioMechConfig.CLIENT.requireEmptyHandsToActivateBioMechHands.get().booleanValue();
+			GatlingArmArmor.gatlingDamage = BioMechConfig.SERVER.gatlingDamage.get().floatValue();
+			GatlingArmArmor.gatlingEnergyPerSec = BioMechConfig.SERVER.gatlingEnergyPerSec.get().floatValue();
 			
 			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
 				@Override
