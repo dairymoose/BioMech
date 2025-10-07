@@ -52,7 +52,7 @@ public class IronMechChestArmor extends ArmorBase {
 		return damageAfterMitigation;
 	}
 	
-	public static boolean absorbDirectAttack(BioMechPlayerData playerData, float absorbPct, DamageSource damageSource, float amount, Player player) {
+	public static boolean absorbDirectAttack(BioMechPlayerData playerData, float absorbPct, DamageSource damageSource, float amount, Player player, boolean consumesEnergy) {
 		if (!damageSource.getMsgId().equals(player.level().damageSources().source(BioMechRegistry.BIOMECH_ABSORB).getMsgId()) && PipeMechBodyArmor.damageSourceIsDirect(damageSource, player)) {
 			float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, amount);
 			float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(amount, damageMitigated);
@@ -65,19 +65,25 @@ public class IronMechChestArmor extends ArmorBase {
 				player.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_ABSORB), damageAfterMitigation);
 				BioMech.LOGGER.debug("inflict: " + damageAfterMitigation + " damage, avoid killing blow with Absorb, damage source was: " + damageSource + " with amount=" + amount + " unmitigatedHp=" + unmitigatedPredictedHp + ", mitigated=" + mitigatedPredictedHp + "/currentHp=" + player.getHealth());
 				float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
-				playerData.spendSuitEnergy(player, energyDamage);
-				if (player instanceof ServerPlayer sp) {
-					BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+				if (consumesEnergy) {
+					playerData.spendSuitEnergy(player, energyDamage);
+					if (player instanceof ServerPlayer sp) {
+						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+					}
 				}
+
 				return true;
 			} else {
 				float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
 				//damage is only processed here on server side
-				if (playerData != null) {
-					playerData.internalSpendSuitEnergy(player, energyDamage);
-				}
-				if (player instanceof ServerPlayer sp) {
-					BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+				if (consumesEnergy) {
+					if (playerData != null) {
+						playerData.internalSpendSuitEnergy(player, energyDamage);
+					}
+					
+					if (player instanceof ServerPlayer sp) {
+						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+					}
 				}
 				//BioMech.LOGGER.debug("heal amount = " + damageMitigated + " from raw damage = " + amount + " with energyDamage=" + energyDamage);
 				player.heal(damageMitigated);

@@ -2,6 +2,7 @@ package com.dairymoose.biomech.item.armor;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
+import com.dairymoose.biomech.item.anim.BuzzsawDispatcher;
 import com.dairymoose.biomech.item.anim.DrillDispatcher;
 
 import net.minecraft.sounds.SoundSource;
@@ -10,32 +11,33 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 
-public abstract class DrillArmArmor extends AbstractMiningArm {
+public abstract class BuzzsawArmArmor extends AbstractMiningArm {
 
-	public final DrillDispatcher dispatcher;
+	public final BuzzsawDispatcher dispatcher;
 
-	public DrillArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public BuzzsawArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
-		this.dispatcher = new DrillDispatcher();
+		this.dispatcher = new BuzzsawDispatcher();
 		
 		this.blockReachMult = 1.0;
 		this.energyPerSecMiss = 0.0f;
 		
-		this.minSpeedMult = 2.0f;
+		this.minSpeedMult = 5.0f;
 		this.maxSpeedMult = minSpeedMult;
-		
-		//max of 12 seconds to mine obsidian
-		this.minMiningProgress = 0.417f;
 		
 		this.xSize = 3;
 		this.ySize = 3;
 		this.zSize = 3;
+		this.onlyMinesMatchingBlocks = true;
 		
-		this.wrongToolPenalty = 0.75f;
+		this.miningTool = new ItemStack(Items.IRON_AXE);
+		this.wrongToolPenalty = 1.0f;
+		this.instantDestroyLeaves = true;
 	}
 
 	public static float drillDamage = 5.5f;
@@ -43,11 +45,11 @@ public abstract class DrillArmArmor extends AbstractMiningArm {
 	@Override
 	protected void playSound(Player player, int useTicks, boolean didHit) {
 		float volume = 1.2f;
-		float laserPitch = 1.20f;
+		float laserPitch = 1.0f;
 		if (didHit) {
 			laserPitch *= 1.10f;
 		}
-		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_MINING_DRILL.get(), SoundSource.PLAYERS, volume, laserPitch, false);
+		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_BUZZSAW_LOOP.get(), SoundSource.PLAYERS, volume, laserPitch, false);
 	}
 	
 	@Override
@@ -104,7 +106,7 @@ public abstract class DrillArmArmor extends AbstractMiningArm {
 	
 	@Override
 	public Item getLeftArmItem() {
-		return BioMechRegistry.ITEM_DRILL_LEFT_ARM.get();
+		return BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get();
 	}
 
 

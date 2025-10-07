@@ -19,6 +19,8 @@ import org.slf4j.Logger;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.armor.renderer.BackJetpackRenderer;
 import com.dairymoose.biomech.armor.renderer.BackScubaTankRenderer;
+import com.dairymoose.biomech.armor.renderer.BuzzsawLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.BuzzsawRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechArmorRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechHeadRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechLeftArmRenderer;
@@ -68,6 +70,7 @@ import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.armor.PowerArmArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
+import com.dairymoose.biomech.item.renderer.BuzzsawItemRenderer;
 import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.DrillItemRenderer;
 import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
@@ -170,7 +173,6 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.ItemPickupEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -332,9 +334,18 @@ public class BioMech
 					try {
 						RegistryObject value = (RegistryObject) f.get(null);
 						if (value != null) {
-							if (value.get() instanceof Item) {
-								LOGGER.debug("Value is: " + value.get());
-								event.accept(value);
+							if (value.get() instanceof Item item) {
+								boolean shouldAdd = true;
+								if (item instanceof ArmorBase ab) {
+									if (ab.getMechPart() == MechPart.LeftArm)
+										shouldAdd = false;
+								} else if (item instanceof RemainingPickaxeItem remain) {
+									shouldAdd = false;
+								}
+								if (shouldAdd) {
+									LOGGER.debug("Value is: " + item);
+									event.accept(value);
+								}
 							}
 						}
 					} catch (IllegalArgumentException | IllegalAccessException e) {
@@ -1044,7 +1055,7 @@ public class BioMech
 					float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(event.getAmount(), damageMitigated);
 					float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
 					if (playerData.getSuitEnergy() >= energyDamage) {
-						if (IronMechChestArmor.absorbDirectAttack(playerData, absorbPct, event.getSource(), event.getAmount(), player)) {
+						if (IronMechChestArmor.absorbDirectAttack(playerData, absorbPct, event.getSource(), event.getAmount(), player, true)) {
 							//BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getAmount() + " of type: " + event.getSource() + ", energyLeft=" + playerData.getSuitEnergy());
 							event.setCanceled(true);
 						}
@@ -1575,6 +1586,8 @@ public class BioMech
         	AzArmorRendererRegistry.register(ElytraMechChestplateRenderer::new, BioMechRegistry.ITEM_ELYTRA_MECH_CHESTPLATE.get());
         	AzArmorRendererRegistry.register(DrillRightArmRenderer::new, BioMechRegistry.ITEM_DRILL_ARM.get());
         	AzArmorRendererRegistry.register(DrillLeftArmRenderer::new, BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
+        	AzArmorRendererRegistry.register(BuzzsawRightArmRenderer::new, BioMechRegistry.ITEM_BUZZSAW_ARM.get());
+        	AzArmorRendererRegistry.register(BuzzsawLeftArmRenderer::new, BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
@@ -1605,6 +1618,7 @@ public class BioMech
         	//BioMech Station only
         	
         	//------ Arm items - render item display ------
+        	AzItemRendererRegistry.register(BuzzsawItemRenderer::new, BioMechRegistry.ITEM_BUZZSAW_ARM.get());
         	AzItemRendererRegistry.register(DrillItemRenderer::new, BioMechRegistry.ITEM_DRILL_ARM.get());
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
         	AzItemRendererRegistry.register(PowerArmItemRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
@@ -1616,6 +1630,7 @@ public class BioMech
         	//------ Arms / Animated ------
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_MINING_LASER_ARM.get(), BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_DRILL_ARM.get(), BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
+        	AzIdentityRegistry.register(BioMechRegistry.ITEM_BUZZSAW_ARM.get(), BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
         	//------ Arms / Animated ------
         	
         	

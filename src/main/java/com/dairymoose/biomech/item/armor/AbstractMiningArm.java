@@ -15,6 +15,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -58,7 +59,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 	protected float minSpeedMult = 2.5f;
 	protected float maxSpeedMult = minSpeedMult * 6.0f;
 	protected double blockReachMult = 1.6;
-	private static ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
+	protected ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
 	public static int START_USING_TICK_COUNT = 5;
 	
 	protected float energyPerSec = 4.0f;
@@ -66,6 +67,10 @@ public abstract class AbstractMiningArm extends ArmorBase {
 	
 	protected float energyPerSecMiss = 1.0f;
 	protected float energyPerTickMiss;
+	
+	protected float wrongToolPenalty = 1.0f;
+	protected boolean instantDestroyLeaves = false;
+	protected boolean onlyMinesMatchingBlocks = false;
 	
 	private static int SOUND_TICK_DURATION = 3;
 	Map<Player, DestroyBlockProgressList> dbpMap = new HashMap<>();
@@ -261,11 +266,21 @@ public abstract class AbstractMiningArm extends ArmorBase {
 		BlockState blockState = player.level().getBlockState(pos);
 		float blockDestroySpeed = blockState.getDestroySpeed(player.level(), dbp.pos);
 		float toolSpeed = miningTool.getDestroySpeed(blockState);
-		float miningSpeed = (toolSpeed / blockDestroySpeed);
+		boolean isCorrect = miningTool.isCorrectToolForDrops(blockState);
+		float penaltyMod = isCorrect ? 1.0f : wrongToolPenalty;
+		float miningSpeed = penaltyMod * (toolSpeed / blockDestroySpeed);
 		float speedMult = Mth.lerp(miningPower, minSpeedMult, maxSpeedMult);
 		
-		if (miningSpeed > 0.0f)
-			dbp.progress += Math.max(minMiningProgress, miningSpeed * speedMult);
+		if (miningSpeed > 0.0f) {
+			if (!onlyMinesMatchingBlocks || (isOrigin || isCorrect))
+				dbp.progress += Math.max(minMiningProgress, miningSpeed * speedMult);
+			
+			if (blockState.is(BlockTags.LEAVES)) {
+				if (instantDestroyLeaves) {
+					dbp.progress = dbp.progressMax;
+				}
+			}
+		}
 		
 		if (isOrigin) {
 			player.level().destroyBlockProgress(0, dbp.pos,

@@ -49,7 +49,7 @@ public class PowerChestArmor extends ArmorBase {
 				BioMech.LOGGER.debug("power armor proc for player=" + player.getName().getString() + " at tick=" + player.tickCount + ", heal=" + healAmount);
 				player.level().playSound(null, player.blockPosition(), SoundEvents.CHAIN_BREAK, SoundSource.PLAYERS, 2.0f, 1.2f);
 				//player.heal(healAmount);
-				return IronMechChestArmor.absorbDirectAttack(null, 0.50f, damageSource, amount, player);
+				return IronMechChestArmor.absorbDirectAttack(null, 0.50f, damageSource, amount, player, false);
 			}
 		}
 		

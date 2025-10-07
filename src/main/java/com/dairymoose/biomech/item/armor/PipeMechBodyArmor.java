@@ -44,7 +44,7 @@ public class PipeMechBodyArmor extends ArmorBase {
 				return true;
 			}
 		} else {
-			BioMech.LOGGER.info("ignoring damage of type: " + damageSource);
+			//BioMech.LOGGER.info("ignoring damage of type: " + damageSource);
 		}
 		
 		return false;

@@ -9,6 +9,11 @@
       "subtitle": "entity.subtitle.mining_drill",
       "sounds": [ "biomech:item/mining_drill" ]
     },
+  "buzzsaw_loop": {
+      "category": "block",
+      "subtitle": "entity.subtitle.buzzsaw_loop",
+      "sounds": [ "biomech:item/buzzsaw_loop" ]
+    },
   "jetpack_loop": {
       "category": "block",
       "subtitle": "entity.subtitle.jetpack_loop",
