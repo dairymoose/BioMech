@@ -71,7 +71,6 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 		
 		damageFalloffFactor = Math.min(1.0, Math.max(0.5, 1.0/Math.log10(distTo*0.50)));
 		
-		BioMech.LOGGER.info("falloff=" + damageFalloffFactor + " for dist=" + distTo);
 		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*drillDamage*miningPower);
 		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), damageMult*gatlingDamage*miningPower/20.0f);
 	}
