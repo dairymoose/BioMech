@@ -3,6 +3,8 @@
   "values": [
 	 "biomech:iron_mech_arm",
 	 "biomech:diamond_mech_arm",
+	 "biomech:buzzsaw_arm",
+	 "biomech:gatling_arm",
 	 "biomech:drill_arm",
 	 "biomech:pipe_mech_arm",
 	 "biomech:power_arm",

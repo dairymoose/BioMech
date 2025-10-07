@@ -1,0 +1,91 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.gatling_arm.inert": {
+			"loop": "hold_on_last_frame"
+		},
+		"animation.gatling_arm.spin_up": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.25,
+			"bones": {
+				"mech_body": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.25": {
+							"vector": [50, 0, 0]
+						}
+					}
+				},
+				"all_barrels": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.25": {
+							"vector": [0, "query.anim_time*1200", 0]
+						}
+					}
+				}
+			}
+		},
+		"animation.gatling_arm.firing": {
+			"loop": true,
+			"bones": {
+				"mech_body": {
+					"rotation": {
+						"vector": [50, 0, 0]
+					}
+				},
+				"all_barrels": {
+					"rotation": {
+						"vector": [0, "query.anim_time*1200", 0]
+					}
+				}
+			}
+		},
+		"animation.gatling_arm.spin_up_third_person": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.25,
+			"bones": {
+				"mech_body": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.25": {
+							"vector": [-92.5, 0, 0]
+						}
+					}
+				},
+				"all_barrels": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.25": {
+							"vector": [0, "query.anim_time*1200", 0]
+						}
+					}
+				}
+			}
+		},
+		"animation.gatling_arm.firing_third_person": {
+			"loop": true,
+			"bones": {
+				"mech_body": {
+					"rotation": {
+						"vector": [-92.5, 0, 0]
+					}
+				},
+				"all_barrels": {
+					"rotation": {
+						"vector": [0, "query.anim_time*1200", 0]
+					}
+				}
+			}
+		}
+	},
+	"azurelib_format_version": 2
+}

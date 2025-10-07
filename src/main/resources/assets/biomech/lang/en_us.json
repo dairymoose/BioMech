@@ -150,19 +150,14 @@
 	"item.biomech.buzzsaw_arm.tooltip2": "Hold to mine any axe-mineable block.",
 	"item.biomech.buzzsaw_arm.tooltip3": "Mines in a 3x3 area.",
 	
+	"item.biomech.gatling_arm": "§5Gatling Arm§0",
+	"item.biomech.gatling_arm.tooltip1": "Hold alt+mouse click to activate.",
+	"item.biomech.gatling_arm.tooltip2": "Consumes energy while active.",
+	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",
 	"key.left_arm": "Use Left Arm",
 	"key.categories.biomech": "BioMech",
-	
-	"item.biomech.left_buzzsaw_arm": "§7Left Buzzsaw Arm§0",
-	"item.biomech.left_drill_arm": "§7Left Drill Arm§0",
-	"item.biomech.left_diamond_mech_arm": "§7Left Diamond Mech Arm§0",
-	"item.biomech.left_power_arm": "§7Left Power Arm§0",
-	"item.biomech.left_pipe_mech_arm": "§7Left Pipe Mech Arm§0",
-	"item.biomech.left_iron_mech_arm": "§7Left Iron Mech Arm§0",
-	"item.biomech.mining_laser_left_arm": "§7Left Mining Laser Arm§0",
-	"item.biomech.remaining_pickaxe": "§7Remaining Pickaxe§0",
 	
 	"advancements.biomech.give_yourself_a_hand.title": "Give Yourself a Hand",
 	"advancements.biomech.give_yourself_a_hand.description": "Acquire any BioMech arm piece",

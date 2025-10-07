@@ -29,6 +29,8 @@ import com.dairymoose.biomech.armor.renderer.DiamondMechRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.DrillLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.DrillRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.ElytraMechChestplateRenderer;
+import com.dairymoose.biomech.armor.renderer.GatlingLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.GatlingRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechHeadRenderer;
@@ -73,6 +75,7 @@ import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.BuzzsawItemRenderer;
 import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.DrillItemRenderer;
+import com.dairymoose.biomech.item.renderer.GatlingItemRenderer;
 import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PipeMechArmItemRenderer;
@@ -228,8 +231,6 @@ import net.minecraftforge.registries.RegistryObject;
 //	Head: Creeper, Enderman
 //	Arm: Extendo-Arm (block reach +2, entity reach +0.5)
 //	Arm: Grapple/zipline arm
-//	Arm: Buzzsaw arm
-//	Arm: Drill arm (3x3)
 //	Head: light helmet?
 //	Back: shield projector?
 //	Legs: unicycle
@@ -1588,6 +1589,8 @@ public class BioMech
         	AzArmorRendererRegistry.register(DrillLeftArmRenderer::new, BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(BuzzsawRightArmRenderer::new, BioMechRegistry.ITEM_BUZZSAW_ARM.get());
         	AzArmorRendererRegistry.register(BuzzsawLeftArmRenderer::new, BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
+        	AzArmorRendererRegistry.register(GatlingRightArmRenderer::new, BioMechRegistry.ITEM_GATLING_ARM.get());
+        	AzArmorRendererRegistry.register(GatlingLeftArmRenderer::new, BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
@@ -1618,6 +1621,7 @@ public class BioMech
         	//BioMech Station only
         	
         	//------ Arm items - render item display ------
+        	AzItemRendererRegistry.register(GatlingItemRenderer::new, BioMechRegistry.ITEM_GATLING_ARM.get());
         	AzItemRendererRegistry.register(BuzzsawItemRenderer::new, BioMechRegistry.ITEM_BUZZSAW_ARM.get());
         	AzItemRendererRegistry.register(DrillItemRenderer::new, BioMechRegistry.ITEM_DRILL_ARM.get());
         	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
@@ -1631,6 +1635,7 @@ public class BioMech
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_MINING_LASER_ARM.get(), BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_DRILL_ARM.get(), BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_BUZZSAW_ARM.get(), BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
+        	AzIdentityRegistry.register(BioMechRegistry.ITEM_GATLING_ARM.get(), BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
         	//------ Arms / Animated ------
         	
         	

@@ -64,7 +64,7 @@ public class SpiderWalkersArmor extends ArmorBase {
 								} else {
 									boolean hasAnyMatch = false;
 									
-									float gripRadius = 1.35f;
+									float gripRadius = 1.40f;
 									for (float x=-gripRadius; x<=gripRadius; ++x) {
 										for (float y=0.0f; y<=0.0f; ++y) {
 											for (float z=-gripRadius; z<=gripRadius; ++z) {
