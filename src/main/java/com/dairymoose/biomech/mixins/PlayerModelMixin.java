@@ -92,7 +92,9 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 						if (BioMech.originalBobView == null) {
 							BioMech.originalBobView = Minecraft.getInstance().options.bobView().get();
 						}
-						Minecraft.getInstance().options.bobView().set(false);
+						//Minecraft.getInstance().options.bobView().set(false);
+						Minecraft.getInstance().player.oBob = 0.0f;
+            			Minecraft.getInstance().player.bob = 0.0f;
 					}
 					
 					//greatly reduce arm bob

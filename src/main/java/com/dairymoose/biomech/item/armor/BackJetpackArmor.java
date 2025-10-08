@@ -38,7 +38,7 @@ public class BackJetpackArmor extends ArmorBase {
 	public static float energyPerSec = 7.0f;
 	public static float energyPerTick = energyPerSec / 20.0f;
 	
-	public static float yPerTickStage1 = 0.13f;
+	public static float yPerTickStage1 = 0.117f;
 	public static float yPerTickStage2 = 0.092f;
 	public static float fallFlyingBoost = 0.095f;
 	

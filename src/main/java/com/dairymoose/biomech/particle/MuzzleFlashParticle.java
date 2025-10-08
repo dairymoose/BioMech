@@ -27,7 +27,7 @@ public class MuzzleFlashParticle extends TextureSheetParticle {
 	      this.yd += p_171912_;
 	      this.zd += p_171913_;
 	      this.quadSize = 0.1F * (this.random.nextFloat() * 0.2F + 0.5F) * 2.0F;
-	      this.quadSize *= 0.45F * p_171914_;
+	      this.quadSize *= 0.55F * p_171914_;
 	      this.lifetime = 0;
 	      this.hasPhysics = p_171919_;
 	}
@@ -35,6 +35,7 @@ public class MuzzleFlashParticle extends TextureSheetParticle {
 	@Override
 	public void tick() {
 		super.tick();
+		this.remove();
 	}
 	
 	protected MuzzleFlashParticle(ClientLevel p_107685_, double p_107686_, double p_107687_, double p_107688_, double p_107689_, double p_107690_, double p_107691_, float p_107692_, SpriteSet p_107693_) {

@@ -36,8 +36,16 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 		
 		this.miningTool = new ItemStack(Items.IRON_SHOVEL);
 		
-		this.soundTickPeriod = 2;
+		this.soundTickPeriod = 1;
 		this.instantDestroyLeaves = true;
+		
+		this.particleYFirstPerson = 1.265;
+		this.particleDistanceFromPlayerFirstPerson = 0.18;
+		this.particlePerpendicularDistanceFirstPerson = 0.42;
+		
+		this.particleYThirdPerson = 1.44;
+		this.particleDistanceFromPlayerThirdPerson = 0.25;
+		this.particlePerpendicularDistanceThirdPerson = 0.35;
 	}
 
 	public static float gatlingDamage = 30.0f;
@@ -50,17 +58,15 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 	
 	@Override
 	protected void startUsingSound(Player player) {
-		float volume = 2.0f;
+		float volume = 1.0f;
 		float pitch = 1.0f;
 		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_GATLING_SPIN_UP.get(), SoundSource.PLAYERS, volume, pitch, false);
 	}
 	
 	@Override
 	protected void playSound(Player player, int useTicks, boolean didHit) {
-		float volume = 1.3f;
+		float volume = 1.4f;
 		float laserPitch = 1.0f;
-		//when placed twice, it sounds powerful
-		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_GATLING_FIRING.get(), SoundSource.PLAYERS, volume, laserPitch, false);
 		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_GATLING_FIRING.get(), SoundSource.PLAYERS, volume, laserPitch, false);
 	}
 	

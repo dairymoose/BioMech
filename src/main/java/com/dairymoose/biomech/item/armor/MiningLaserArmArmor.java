@@ -27,7 +27,7 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArm {
 		this.maxSpeedMult = minSpeedMult * 6.0f;
 	}
 
-	public static float laserDamageAtMaxPower = 4.5f;
+	public static float laserDamageAtMaxPower = 6.0f;
 	
 	@Override
 	protected void playSound(Player player, int useTicks, boolean didHit) {
@@ -46,6 +46,11 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArm {
 			//damageMult = 2.0f;
 		}
 		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*laserDamageAtMaxPower*miningPower);
+		
+		if (miningPower < 0.33f) {
+			miningPower = 0.33f;;
+		}
+		
 		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), damageMult*laserDamageAtMaxPower*miningPower/20.0f);
 		if (living.getRemainingFireTicks() <= 30) {
 			living.setRemainingFireTicks(30);
@@ -98,7 +103,7 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArm {
 	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec) {
 		Vec3 endToStartVec = endLoc.subtract(startLoc);
 		int max = (int) (endToStartVec.length() * 16);
-		double startDist = 0.07;
+		double startDist = 0.00;
 		for (int i = 0; i < max; ++i) {
 			double vecScale = startDist + (i + 1) * 1.0f / max;
 			Vec3 loc = startLoc.add(endToStartVec.scale(vecScale));

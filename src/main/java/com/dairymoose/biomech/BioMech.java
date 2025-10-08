@@ -63,6 +63,7 @@ import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
+import com.dairymoose.biomech.item.armor.GatlingArmArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
@@ -85,6 +86,7 @@ import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
+import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket;
 import com.dairymoose.biomech.particle.InstantSmokeParticle;
 import com.dairymoose.biomech.particle.LaserParticle;
@@ -308,6 +310,7 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundHandStatusPacket.class, ClientboundHandStatusPacket::write, ClientboundHandStatusPacket::new, ClientboundHandStatusPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundEnergySyncPacket.class, ClientboundEnergySyncPacket::write, ClientboundEnergySyncPacket::new, ClientboundEnergySyncPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMobilityTreadsPacket.class, ServerboundMobilityTreadsPacket::write, ServerboundMobilityTreadsPacket::new, ServerboundMobilityTreadsPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMiningArmEntityTargetPacket.class, ServerboundMiningArmEntityTargetPacket::write, ServerboundMiningArmEntityTargetPacket::new, ServerboundMiningArmEntityTargetPacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -389,9 +392,32 @@ public class BioMech
 				} else {
 					BioMech.LOGGER.info("adjust fov=" + fovAccountingForSpeed);
 				}
-
+				
 				//BioMech.LOGGER.info("fov calc=" + calcFov + " vs " + event.getNewFovModifier());
 				event.setNewFovModifier(calcFov);
+			}
+			
+			boolean enableGatlingZoom = false;
+			if (enableGatlingZoom) {
+				HandActiveStatus has = handActiveMap.get(event.getPlayer().getUUID());
+				if (has != null) {
+					boolean gatlingZoom = false;
+					if (has.rightHandActive) {
+						SlottedItem mainHand = playerData.getForSlot(MechPart.RightArm);
+						if (mainHand.itemStack.getItem() instanceof GatlingArmArmor gat) {
+							gatlingZoom = true;
+						}
+					} else if (has.leftHandActive) {
+						SlottedItem mainHand = playerData.getForSlot(MechPart.LeftArm);
+						if (mainHand.itemStack.getItem() instanceof GatlingArmArmor gat) {
+							gatlingZoom = true;
+						}
+					}
+					
+					if (gatlingZoom) {
+						event.setNewFovModifier(event.getNewFovModifier()/1.2f);
+					}
+				}
 			}
 		}
 	}
@@ -1073,6 +1099,18 @@ public class BioMech
 		}
 	}
     
+	public static double firstPersonDistX1 = 0.25;
+	public static double firstPersonDistX2 = 0.25;
+	@SubscribeEvent
+	public void onScroll(InputEvent.MouseScrollingEvent event) {
+		if (event.getScrollDelta() > 0.0) {
+			firstPersonDistX1 += 0.05;
+		} else {
+			firstPersonDistX1 -= 0.05;
+		}
+		BioMech.LOGGER.info("firstPersonDistX=" + firstPersonDistX1);
+	}
+	
 	public static ItemStack currentRenderItemStackContext = null;
 	
 	public static boolean localPlayerJumping = false;
@@ -1354,6 +1392,12 @@ public class BioMech
                 		currentArmActive = true;
                 	}
                 	if (playerData != null && handPart != null && equipSlot != null) {
+                		if (playerData.getForSlot(MechPart.Leggings).itemStack.getItem() instanceof MobilityTreadsArmor) {
+                			//disable view bob for mobility treads
+                			Minecraft.getInstance().player.oBob = 0.0f;
+                			Minecraft.getInstance().player.bob = 0.0f;
+                		}
+                		
                 		if (!(Minecraft.getInstance().player.getMainHandItem().getItem() instanceof BioMechActivator)) {
                 			if ((Minecraft.getInstance().player.getMainHandItem().getItem() instanceof BioMechDeactivator && 
                     				(event.getHand() == InteractionHand.MAIN_HAND || (event.getHand() == InteractionHand.OFF_HAND && Minecraft.getInstance().player.getOffhandItem().isEmpty())))
@@ -1385,6 +1429,12 @@ public class BioMech
                 				return;
                 			}
                 			
+                			if (has.rightHandActive || has.leftHandActive) {
+                				//disable view bob so that particles line up with the visuals
+                				Minecraft.getInstance().player.oBob = 0.0f;
+                    			Minecraft.getInstance().player.bob = 0.0f;
+                			}
+
                 			ItemInHandRenderer iihr = new ItemInHandRenderer(Minecraft.getInstance(), Minecraft.getInstance().getEntityRenderDispatcher(), Minecraft.getInstance().getItemRenderer());
                 			iihr.renderArmWithItem(Minecraft.getInstance().player, event.getPartialTick(), event.getInterpolatedPitch(), event.getHand(), 
                 					event.getSwingProgress(), newRenderItem, event.getEquipProgress(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());

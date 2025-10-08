@@ -25,17 +25,18 @@ public abstract class DrillArmArmor extends AbstractMiningArm {
 		this.blockReachMult = 1.0;
 		this.energyPerSecMiss = 0.0f;
 		
-		this.minSpeedMult = 2.0f;
+		this.minSpeedMult = 1.5f;
 		this.maxSpeedMult = minSpeedMult;
 		
-		//max of 12 seconds to mine obsidian
-		this.minMiningProgress = 0.417f;
+		//max of 18 seconds to mine obsidian
+		this.minMiningProgress = 0.626f;
 		
 		this.xSize = 3;
 		this.ySize = 3;
 		this.zSize = 3;
 		
-		this.wrongToolPenalty = 0.75f;
+		this.wrongToolPenalty = 1.5f;
+		this.onlyMinesMatchingBlocks = true;
 	}
 
 	public static float drillDamage = 5.5f;

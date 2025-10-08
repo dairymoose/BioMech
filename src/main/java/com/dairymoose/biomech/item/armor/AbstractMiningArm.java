@@ -4,12 +4,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.joml.AxisAngle4d;
+import org.joml.Quaternionf;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
+import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTargetPacket;
 
+import net.minecraft.client.CameraType;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -32,6 +40,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -52,6 +61,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 	class DestroyBlockProgress {
 		BlockPos pos;
 		float progress = 0.0f;
+		int destroyBlockProgressId = 0;
 		public static float progressMax = 100.0f;
 	}
 
@@ -68,12 +78,24 @@ public abstract class AbstractMiningArm extends ArmorBase {
 	protected float energyPerSecMiss = 1.0f;
 	protected float energyPerTickMiss;
 	
+	protected double particleDistanceFromPlayerFirstPerson = 0.2;
+	protected double particlePerpendicularDistanceFirstPerson = 0.40;
+	protected double particleYFirstPerson = 1.3;
+	
+	protected double particleDistanceFromPlayerThirdPerson = particleDistanceFromPlayerFirstPerson;
+	protected double particlePerpendicularDistanceThirdPerson = particlePerpendicularDistanceFirstPerson;
+	protected double particleYThirdPerson = particleYFirstPerson;
+	
 	protected float wrongToolPenalty = 1.0f;
 	protected boolean instantDestroyLeaves = false;
 	protected boolean onlyMinesMatchingBlocks = false;
+	protected boolean originMustMatchToolToMineArea = true;
+	
+	private static final boolean serverEverChecksEntityHits = false;
 	
 	protected int soundTickPeriod = 3;
 	Map<Player, DestroyBlockProgressList> dbpMap = new HashMap<>();
+	Map<Player, DestroyBlockProgressList> dbpMapClient = new HashMap<>();
 	protected int xSize = 1;
 	protected int ySize = 1;
 	protected int zSize = 1;
@@ -97,6 +119,11 @@ public abstract class AbstractMiningArm extends ArmorBase {
 	protected abstract void thirdPersonStartUsingAnimation(ItemStack itemStack);
 	protected abstract void thirdPersonMiningAnimation(ItemStack itemStack);
 	
+	private Entity clientEntityTarget = null;
+	
+	public static Map<Player, Entity> entityTargetMap = new ConcurrentHashMap<>();
+	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick,
 			boolean bothHandsInactive, boolean bothHandsActive) {
@@ -152,9 +179,75 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						if (handPart == MechPart.RightArm)
 							handMult = -1.0;
 						Vec3 viewVec = player.getViewVector(partialTick);
-						Vec3 perpendicular = new Vec3(viewVec.z, 0.0, -viewVec.x);
-						Vec3 startLoc = player.getEyePosition(partialTick).add(0.0, -0.28, 0.0)
-								.add(perpendicular.scale(0.32f * handMult));
+
+						double yaw = player.getYRot();
+						
+						double yawOffset = 90.0;
+						if (handPart == MechPart.RightArm)
+							yaw += yawOffset;
+						else
+							yaw -= yawOffset;
+						
+						double particleStartY = particleYThirdPerson;
+						double particleDistance = particleDistanceFromPlayerThirdPerson;
+						double perpendicularDist = particlePerpendicularDistanceThirdPerson;
+						
+						if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ArmorBase ab) {
+							if (ab.getArmDistance() > 5.0f) {
+								//wide chest armors displace the arms
+								perpendicularDist *= 0.9f * ab.getArmDistance() / 5.0f;
+							}
+						}
+						
+						class FirstPersonCameraChecker {
+							boolean isFirstPerson = false;
+						}
+						FirstPersonCameraChecker cc = new FirstPersonCameraChecker();
+						DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
+							@Override
+							public void run() {
+								cc.isFirstPerson = Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON;
+							}});
+						
+						if (player.isLocalPlayer() && cc.isFirstPerson) {
+							particleDistance = particleDistanceFromPlayerFirstPerson;
+							particleStartY = particleYFirstPerson;
+							perpendicularDist = particlePerpendicularDistanceFirstPerson;
+						}
+						double xComp = perpendicularDist * -Math.sin(Math.toRadians(yaw));
+						double zComp = perpendicularDist * Math.cos(Math.toRadians(yaw));
+						
+						Vec3 viewVecOffset = player.getViewVector(1.0f).scale(particleDistance);
+						Vec3 startLoc = player.position().add(viewVecOffset).add(
+								new Vec3(xComp, particleStartY, zComp));
+						
+						if (player.isLocalPlayer() && cc.isFirstPerson) {
+							//the particles line up in 3rd person but look very wrong in first person
+							//do an entirely new calculation in first person
+							double lowerPitchBy = 25.0;
+							
+							double xRot = player.getXRot();
+							xRot += lowerPitchBy;
+							double yRot = player.getYRot();
+
+							double look3dDist = 0.5;
+							//3d projection with player view vector - with distance 'look3dDist'
+							float yComp3 = (float)(look3dDist * Math.sin(Math.toRadians(-xRot)));
+							float horizontalComponent = (float)(look3dDist * Math.cos(Math.toRadians(-xRot)));
+							float xComp3 = (float)(horizontalComponent * -Math.sin(Math.toRadians(yRot)));
+							float zComp3 = (float)(horizontalComponent * Math.cos(Math.toRadians(yRot)));
+
+							double firstPersonStandNextToDist = 0.25;
+							xComp = firstPersonStandNextToDist * -Math.sin(Math.toRadians(yaw));
+							zComp = firstPersonStandNextToDist * Math.cos(Math.toRadians(yaw));
+							
+							//positioned next to the player, we'll look in the exact same direction as the player, but slightly lower
+							startLoc = player.getEyePosition().add(xComp, 0.0, zComp).add(new Vec3(xComp3, yComp3, zComp3));
+									//.add(new Vec3(xComp3, yComp3, zComp3));
+							
+							viewVec = new Vec3(0.0, 0.0, 0.0);
+						}
+						
 						Vec3 endLoc = hitResult.getLocation();
 						if (hitResult instanceof EntityHitResult ehr) {
 							Vec3 vecToEntity = ehr.getLocation().subtract(player.position());
@@ -162,6 +255,9 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						}
 						this.onSpawnParticles(player, startLoc, endLoc, useTicks, viewVec);
 
+						Entity newEntityTarget = null;
+						
+						float miningPower = this.getMiningPower(useTicks);
 						if (hitResult instanceof BlockHitResult bhr) {
 							BlockPos pos = bhr.getBlockPos();
 							BlockState blockState = player.level().getBlockState(pos);
@@ -169,6 +265,8 @@ public abstract class AbstractMiningArm extends ArmorBase {
 								didHit = true;
 								float blockDestroySpeed = blockState.getDestroySpeed(player.level(), pos);
 
+								//mineAllBlocks(dbpMapClient, player, miningPower, bhr);
+								
 								ParticleType particles = ForgeRegistries.PARTICLE_TYPES
 										.getValue(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.BLOCK));
 								if (particles != null && blockDestroySpeed > 0.0f) {
@@ -184,6 +282,13 @@ public abstract class AbstractMiningArm extends ArmorBase {
 							}
 						} else if (hitResult instanceof EntityHitResult ehr) {
 							didHit = true;
+							
+							newEntityTarget = ehr.getEntity();
+						}
+						
+						if (newEntityTarget != clientEntityTarget) {
+							BioMechNetwork.INSTANCE.sendToServer(new ServerboundMiningArmEntityTargetPacket(newEntityTarget));
+							clientEntityTarget = newEntityTarget;
 						}
 						
 						if (player.tickCount % soundTickPeriod == 0) {
@@ -194,55 +299,51 @@ public abstract class AbstractMiningArm extends ArmorBase {
 
 				if (!player.level().isClientSide) {
 					if (active && useTicks >= START_USING_TICK_COUNT) {
-						HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
-								(e) -> (e instanceof LivingEntity) && !e.isSpectator(),
-								player.getBlockReach() * blockReachMult);
 						
 						float miningPower = this.getMiningPower(useTicks);
-						if (hitResult instanceof BlockHitResult bhr) {
-							BlockState blockState = player.level().getBlockState(bhr.getBlockPos());
+						
+						Entity entityTarget = entityTargetMap.get(player);
+						if (entityTarget == null) {
+							HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
+									(e) -> (e instanceof LivingEntity) && !e.isSpectator(),
+									player.getBlockReach() * blockReachMult);
 							
-							if (!blockState.isAir() && !blockState.getFluidState().isSource()) {
-								didHit = true;
-								DestroyBlockProgressList dbpList = dbpMap.computeIfAbsent(player,
-										(p) -> new DestroyBlockProgressList());
-								BlockPos origin = bhr.getBlockPos();
-								int xDiff = xSize/2;
-								int yDiff = ySize/2;
-								int zDiff = zSize/2;
-								BlockPos minPos = origin.relative(Axis.X, -xDiff).relative(Axis.Y, -yDiff).relative(Axis.Z, -zDiff);
-								BlockPos maxPos = origin.relative(Axis.X, xDiff).relative(Axis.Y, yDiff).relative(Axis.Z, zDiff);
-								Iterable<BlockPos> blocks = BlockPos.betweenClosed(minPos, maxPos);
-								int expectedSize = xSize*ySize*zSize;
-								int dbpIndex = 0;
+							if (hitResult instanceof BlockHitResult bhr) {
+								BlockState blockState = player.level().getBlockState(bhr.getBlockPos());
 								
-								for (BlockPos pos : blocks) {
-									if (dbpList.list.size() < expectedSize)
-										dbpList.list.add(new DestroyBlockProgress());
-									DestroyBlockProgress dpb = dbpList.list.get(dbpIndex);
-									//new BlockPos is required because 'pos' is a MutableBlockPos
-									populateDestroyBlockProgress(player, miningPower, new BlockPos(pos), dpb, pos.equals(origin));
-									
-									++dbpIndex;
+								if (!blockState.isAir() && !blockState.getFluidState().isSource()) {
+									didHit = true;
+									mineAllBlocks(dbpMap, player, miningPower, bhr);
+								}
+							} else if (hitResult instanceof EntityHitResult ehr) {
+								if (serverEverChecksEntityHits) {
+									entityTarget = ehr.getEntity();
 								}
 							}
-						} else if (hitResult instanceof EntityHitResult ehr) {
+						}
+						
+						if (entityTarget != null) {
 							didHit = true;
-							Entity e = ehr.getEntity();
+							Entity e = entityTarget;
 							if (e instanceof LivingEntity living) {
 								if (!living.isInvulnerable() && !living.isDeadOrDying()) {
 									dealEntityDamage(player, bothHandsActive, miningPower, living);
 								}
 							}
 						}
+						
+						
 					} else {
 						if (bothHandsInactive) {
 							DestroyBlockProgressList dbpList = dbpMap.get(player);
 							for (DestroyBlockProgress dbp : dbpList.list) {
 								if (dbp != null && dbp.pos != null) {
-									player.level().destroyBlockProgress(0, dbp.pos, 10);
+									if (dbp.destroyBlockProgressId != 0) {
+										player.level().destroyBlockProgress(dbp.destroyBlockProgressId, dbp.pos, 10);
+									}
 									dbp.pos = null;
 									dbp.progress = 0;
+									dbp.destroyBlockProgressId = 0;
 								}
 							}
 						}
@@ -269,10 +370,47 @@ public abstract class AbstractMiningArm extends ArmorBase {
 		}
 	}
 
+	private void mineAllBlocks(Map<Player, DestroyBlockProgressList> destroyBlockProgressMap, Player player, float miningPower, BlockHitResult bhr) {
+		DestroyBlockProgressList dbpList = destroyBlockProgressMap.computeIfAbsent(player,
+				(p) -> new DestroyBlockProgressList());
+		BlockPos origin = bhr.getBlockPos();
+		int xDiff = xSize/2;
+		int yDiff = ySize/2;
+		int zDiff = zSize/2;
+		int expectedSize = xSize*ySize*zSize;
+		if (originMustMatchToolToMineArea) {
+			BlockState originState = player.level().getBlockState(origin);
+			if (!this.miningTool.isCorrectToolForDrops(originState)) {
+				xDiff = 0;
+				yDiff = 0;
+				zDiff = 0;
+				expectedSize = 1;
+			}
+		}
+		BlockPos minPos = origin.relative(Axis.X, -xDiff).relative(Axis.Y, -yDiff).relative(Axis.Z, -zDiff);
+		BlockPos maxPos = origin.relative(Axis.X, xDiff).relative(Axis.Y, yDiff).relative(Axis.Z, zDiff);
+		Iterable<BlockPos> blocks = BlockPos.betweenClosed(minPos, maxPos);
+		int dbpIndex = 0;
+		
+		for (BlockPos pos : blocks) {
+			if (dbpList.list.size() < expectedSize)
+				dbpList.list.add(new DestroyBlockProgress());
+			DestroyBlockProgress dpb = dbpList.list.get(dbpIndex);
+			//new BlockPos is required because 'pos' is a MutableBlockPos
+			populateDestroyBlockProgress(player, miningPower, new BlockPos(pos), dpb, pos.equals(origin));
+			
+			++dbpIndex;
+		}
+	}
+
+	private int mineBlocksDestructionId = -1;
 	private void populateDestroyBlockProgress(Player player, float miningPower, BlockPos pos, DestroyBlockProgress dbp, boolean isOrigin) {
 		if (dbp.pos == null || !dbp.pos.equals(pos)) {
+			if (dbp.destroyBlockProgressId != 0)
+				player.level().destroyBlockProgress(dbp.destroyBlockProgressId, dbp.pos, 10);
 			dbp.pos = pos;
 			dbp.progress = 0;
+			dbp.destroyBlockProgressId = mineBlocksDestructionId--; 
 		}
 		
 		BlockState blockState = player.level().getBlockState(pos);
@@ -294,17 +432,23 @@ public abstract class AbstractMiningArm extends ArmorBase {
 			}
 		}
 		
-		if (isOrigin) {
-			player.level().destroyBlockProgress(0, dbp.pos,
+		//if (player.level().isClientSide) {
+			player.level().destroyBlockProgress(dbp.destroyBlockProgressId, dbp.pos,
 					(int) (10 * (float) dbp.progress / DestroyBlockProgress.progressMax));
-		}
+		//}
 		if (dbp.progress >= DestroyBlockProgress.progressMax) {
-			if (isOrigin) {
-				player.level().destroyBlockProgress(0, dbp.pos, 10);
+			//if (player.level().isClientSide) {
+			if (dbp.destroyBlockProgressId != 0) {
+				player.level().destroyBlockProgress(dbp.destroyBlockProgressId, dbp.pos, 10);
 			}
-			player.level().destroyBlock(dbp.pos, true);
+			//}
+			if (!player.level().isClientSide) {
+				player.level().destroyBlock(dbp.pos, true);
+			}
+			
 			dbp.pos = null;
 			dbp.progress = 0;
+			dbp.destroyBlockProgressId = 0;
 		}
 	}
 
