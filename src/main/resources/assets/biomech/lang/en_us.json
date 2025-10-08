@@ -35,7 +35,7 @@
 	"item.biomech.drill_arm": "§5Drill Arm§0",
 	"item.biomech.drill_arm.tooltip1": "Hold alt+mouse click to activate.",
 	"item.biomech.drill_arm.tooltip2": "Hold to mine any pickaxe-mineable block.",
-	"item.biomech.drill_arm.tooltip3": "Mines in a 3x3 area.",
+	"item.biomech.drill_arm.tooltip3": "Mines in a 3x3 area (pickaxe blocks only).",
 	
 	"item.biomech.power_arm": "§5Power Arm§0",
 	"item.biomech.power_arm.tooltip1": "Increases attack damage by 2 when wielding a weapon.",
@@ -150,7 +150,7 @@
 	"item.biomech.buzzsaw_arm": "§5Buzzsaw Arm§0",
 	"item.biomech.buzzsaw_arm.tooltip1": "Hold alt+mouse click to activate.",
 	"item.biomech.buzzsaw_arm.tooltip2": "Hold to mine any axe-mineable block.",
-	"item.biomech.buzzsaw_arm.tooltip3": "Mines in a 3x3 area.",
+	"item.biomech.buzzsaw_arm.tooltip3": "Mines in a 3x3 area (axe blocks only).",
 	
 	"item.biomech.gatling_arm": "§5Gatling Arm§0",
 	"item.biomech.gatling_arm.tooltip1": "Hold alt+mouse click to activate.",
