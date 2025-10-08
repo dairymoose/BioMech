@@ -35,7 +35,7 @@ public abstract class DrillArmArmor extends AbstractMiningArm {
 		this.ySize = 3;
 		this.zSize = 3;
 		
-		this.wrongToolPenalty = 1.5f;
+		this.wrongToolPenalty = 2.2f;
 		this.onlyMinesMatchingBlocks = true;
 	}
 
