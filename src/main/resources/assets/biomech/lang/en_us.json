@@ -156,6 +156,11 @@
 	"item.biomech.gatling_arm.tooltip1": "Hold alt+mouse click to activate.",
 	"item.biomech.gatling_arm.tooltip2": "Consumes energy while active.",
 	
+	"item.biomech.interceptor_arms": "§5Interceptor Arms§0",
+	"item.biomech.interceptor_arms.tooltip1": "Grants a 50% chance to automatically deflect incoming projectiles.",
+	"item.biomech.interceptor_arms.tooltip2": "If deflection occurs, you will lose 5 suit energy.",
+	"item.biomech.interceptor_arms.tooltip3": "§5The power of the sun in the palm of your hand.§0",
+	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",
 	"key.left_arm": "Use Left Arm",

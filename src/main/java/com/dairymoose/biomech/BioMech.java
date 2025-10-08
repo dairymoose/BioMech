@@ -32,6 +32,7 @@ import com.dairymoose.biomech.armor.renderer.ElytraMechChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.GatlingLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.GatlingRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.InterceptorArmsRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechHeadRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechLeftArmRenderer;
@@ -65,6 +66,7 @@ import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.GatlingArmArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
+import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
@@ -84,6 +86,7 @@ import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
 import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
+import com.dairymoose.biomech.packet.clientbound.ClientboundProjectileDodgePacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTargetPacket;
@@ -143,6 +146,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -176,6 +180,7 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
@@ -311,6 +316,7 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundEnergySyncPacket.class, ClientboundEnergySyncPacket::write, ClientboundEnergySyncPacket::new, ClientboundEnergySyncPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMobilityTreadsPacket.class, ServerboundMobilityTreadsPacket::write, ServerboundMobilityTreadsPacket::new, ServerboundMobilityTreadsPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMiningArmEntityTargetPacket.class, ServerboundMiningArmEntityTargetPacket::write, ServerboundMiningArmEntityTargetPacket::new, ServerboundMiningArmEntityTargetPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundProjectileDodgePacket.class, ClientboundProjectileDodgePacket::write, ClientboundProjectileDodgePacket::new, ClientboundProjectileDodgePacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -1027,7 +1033,64 @@ public class BioMech
 			}			
 		}
 	}
+
+	//damage avoidance is put here so that we can cancel knockbacks/etc
+	@SubscribeEvent
+	public void onPlayerDamageBeforeMitigation(final LivingAttackEvent event) {
+		if (!event.getEntity().level().isClientSide) {
+			if (event.getEntity() instanceof Player player) {
+				BioMechPlayerData playerData = null;
+	        	playerData = globalPlayerData.get(event.getEntity().getUUID());
+	        	if (playerData != null) {
+	        		DamageAbsorbInfo dai = new DamageAbsorbInfo();
+	        		List<SlottedItem> slottedItems = playerData.getAllSlots();
+	        		getDamageAbsorbStats(dai, slottedItems);
+	        		
+	        		//for global damage avoids
+					if (dai.hasAnyDamageAvoid) {
+						if (!player.level().isClientSide) {
+							if (playerData.getSuitEnergy() >= PipeMechBodyArmor.energyLostFromAvoidAttack) {
+								if (PipeMechBodyArmor.avoidDirectAttack(PipeMechBodyArmor.getTotalDamageAvoidPct(player), event.getSource(), event.getAmount(), player)) {
+									//call internalSpendSuitEnergy directly because this code does not ever run twice - it only runs on server-side whether it's CLIENT or DEDICATED_SERVER
+									playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
+									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + PipeMechBodyArmor.getTotalDamageAvoidPct(player));
+									if (event.getEntity() instanceof ServerPlayer sp) {
+										BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+									}
+									event.setCanceled(true);
+									return;
+								}
+							}
+						}
+					}
+					
+					if (dai.hasAnyProjectileAvoid) {
+						if (!player.level().isClientSide) {
+							if (playerData.getSuitEnergy() >= PipeMechBodyArmor.energyLostFromAvoidAttack) {
+								if (event.getSource().getEntity() instanceof Projectile && PipeMechBodyArmor.avoidDirectAttack(InterceptorArmsArmor.getProjectileAvoidPct(player), event.getSource(), event.getAmount(), player)) {
+									//call internalSpendSuitEnergy directly because this code does not ever run twice - it only runs on server-side whether it's CLIENT or DEDICATED_SERVER
+									playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
+									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + InterceptorArmsArmor.getProjectileAvoidPct(player));
+									if (event.getEntity() instanceof ServerPlayer sp) {
+										BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+										BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), new ClientboundProjectileDodgePacket(player));
+									}
+									event.setCanceled(true);
+									return;
+								}
+							}
+						}
+					}
+	        	}
+			}
+		}
+	}
 	
+	class DamageAbsorbInfo {
+		boolean hasAnyDamageAbsorb = false;
+		boolean hasAnyDamageAvoid = false;
+		boolean hasAnyProjectileAvoid = false;
+	}
 	//this event only fires on the server
 	//LivingHurtEvent - damage before armor/magic mitigation
 	//LivingDamageEvent - damage after armor/magic mitigation
@@ -1042,19 +1105,13 @@ public class BioMech
 			BioMechPlayerData playerData = null;
         	playerData = globalPlayerData.get(event.getEntity().getUUID());
         	if (playerData != null) {
-        		boolean hasAnyDamageAbsorb = false;
-        		boolean hasAnyDamageAvoid = false;
+        		DamageAbsorbInfo dai = new DamageAbsorbInfo();
         		List<SlottedItem> slottedItems = playerData.getAllSlots();
+				getDamageAbsorbStats(dai, slottedItems);
+				
 				for (SlottedItem slotted : slottedItems) {
 					if (!slotted.itemStack.isEmpty()) {
 						if (slotted.itemStack.getItem() instanceof ArmorBase base) {
-							if (base.getDamageAvoidPercent() > 0.0f) {
-								hasAnyDamageAvoid = true;
-							}
-							if (base.getDamageAbsorbPercent() > 0.0f) {
-								hasAnyDamageAbsorb = true;
-							}
-							
 							boolean cancel = base.onPlayerDamageTaken(event.getSource(), event.getAmount(), slotted.itemStack, player, slotted.mechPart);
 							if (cancel) {
 								event.setCanceled(true);
@@ -1064,25 +1121,7 @@ public class BioMech
 					}
 				}
 				
-				//for global damage reduction or avoids
-				if (hasAnyDamageAvoid) {
-					if (!player.level().isClientSide) {
-						if (playerData.getSuitEnergy() >= PipeMechBodyArmor.energyLostFromAvoidAttack) {
-							if (PipeMechBodyArmor.avoidDirectAttack(PipeMechBodyArmor.getTotalDamageAvoidPct(player), event.getSource(), event.getAmount(), player)) {
-								//call internalSpendSuitEnergy directly because this code does not ever run twice - it only runs on server-side whether it's CLIENT or DEDICATED_SERVER
-								playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
-								BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + PipeMechBodyArmor.getTotalDamageAvoidPct(player));
-								if (event.getEntity() instanceof ServerPlayer sp) {
-									BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
-								}
-								event.setCanceled(true);
-								return;
-							}
-						}
-					}
-				}
-				
-				if (hasAnyDamageAbsorb) {
+				if (dai.hasAnyDamageAbsorb) {
 					float absorbPct = IronMechChestArmor.getTotalDamageAbsorbPct(player);
 					float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, event.getAmount());
 					float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(event.getAmount(), damageMitigated);
@@ -1094,8 +1133,25 @@ public class BioMech
 						}
 					}
 				}
-				
         	}
+		}
+	}
+
+	private void getDamageAbsorbStats(DamageAbsorbInfo dai, List<SlottedItem> slottedItems) {
+		for (SlottedItem slotted : slottedItems) {
+			if (!slotted.itemStack.isEmpty()) {
+				if (slotted.itemStack.getItem() instanceof ArmorBase base) {
+					if (base.getDamageAvoidPercent() > 0.0f) {
+						dai.hasAnyDamageAvoid = true;
+					}
+					if (base.getDamageAbsorbPercent() > 0.0f) {
+						dai.hasAnyDamageAbsorb = true;
+					}
+					if (base.getProjectileAvoidPercent() > 0.0f) {
+						dai.hasAnyProjectileAvoid = true;
+					}
+				}
+			}
 		}
 	}
 	
@@ -1636,6 +1692,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(BuzzsawLeftArmRenderer::new, BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(GatlingRightArmRenderer::new, BioMechRegistry.ITEM_GATLING_ARM.get());
         	AzArmorRendererRegistry.register(GatlingLeftArmRenderer::new, BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
+        	AzArmorRendererRegistry.register(InterceptorArmsRenderer::new, BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
@@ -1661,10 +1718,6 @@ public class BioMech
         	AzArmorRendererRegistry.register(PipeMechLeftArmRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEFT_ARM.get());
         	//PIPE MECH
         	
-        	//BioMech Station only
-        	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
-        	//BioMech Station only
-        	
         	//------ Arm items - render item display ------
         	AzItemRendererRegistry.register(GatlingItemRenderer::new, BioMechRegistry.ITEM_GATLING_ARM.get());
         	AzItemRendererRegistry.register(BuzzsawItemRenderer::new, BioMechRegistry.ITEM_BUZZSAW_ARM.get());
@@ -1681,12 +1734,19 @@ public class BioMech
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_DRILL_ARM.get(), BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_BUZZSAW_ARM.get(), BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_GATLING_ARM.get(), BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
+        	AzIdentityRegistry.register(BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
         	//------ Arms / Animated ------
+        	
+        	
         	
         	
         	//------
         	
         	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
+        	
+        	//BioMech Station only
+        	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
+        	//BioMech Station only
         }
         
     }

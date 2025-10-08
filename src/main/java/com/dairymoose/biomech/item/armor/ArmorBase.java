@@ -55,6 +55,7 @@ public class ArmorBase extends ArmorItem {
 	private static ArmorMaterial NOTHING_MATERIAL = new NothingMaterial();
 	protected float armDistance = 5.0f;
 	
+	protected float projectileAvoidPct = 0.0f;
 	protected float damageAvoidPct = 0.0f;
 	protected float damageAbsorbPct = 0.0f;
 	
@@ -70,6 +71,10 @@ public class ArmorBase extends ArmorItem {
 		return false;
 	}
 
+	public float getProjectileAvoidPercent() {
+		return this.projectileAvoidPct;
+	}
+	
 	public float getDamageAvoidPercent() {
 		return this.damageAvoidPct;
 	}
