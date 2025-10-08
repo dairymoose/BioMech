@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.joml.AxisAngle4d;
-import org.joml.Quaternionf;
-
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
@@ -178,7 +175,9 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						double handMult = 1.0;
 						if (handPart == MechPart.RightArm)
 							handMult = -1.0;
-						Vec3 viewVec = player.getViewVector(partialTick);
+						
+						Vec3 originalPlayerViewVec = player.getViewVector(partialTick);
+						Vec3 viewVec = originalPlayerViewVec;
 
 						double yaw = player.getYRot();
 						
@@ -251,6 +250,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						Vec3 endLoc = hitResult.getLocation();
 						if (hitResult instanceof EntityHitResult ehr) {
 							Vec3 vecToEntity = ehr.getLocation().subtract(player.position());
+							viewVec = originalPlayerViewVec;
 							endLoc = player.getEyePosition(partialTick).add(viewVec.scale(vecToEntity.length()));
 						}
 						this.onSpawnParticles(player, startLoc, endLoc, useTicks, viewVec);
