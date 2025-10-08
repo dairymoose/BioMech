@@ -83,7 +83,7 @@
 				{
 					"name": "spring2",
 					"parent": "mech_left",
-					"pivot": [3.45, 8.05, -0.25],
+					"pivot": [2.45, 11.05, -0.25],
 					"cubes": [
 						{
 							"origin": [3.95, 9.5, -0.25],
@@ -1349,7 +1349,7 @@
 				},
 				{
 					"name": "bottom_foot2",
-					"parent": "mech_left",
+					"parent": "spring2",
 					"pivot": [2.2, 0, 0],
 					"cubes": [
 						{
@@ -1431,7 +1431,7 @@
 				{
 					"name": "spring",
 					"parent": "mech_right",
-					"pivot": [-3.45, 8.05, -0.25],
+					"pivot": [-2.45, 11.05, -0.25],
 					"cubes": [
 						{
 							"origin": [-4.45, 9.5, -0.25],
@@ -2697,7 +2697,7 @@
 				},
 				{
 					"name": "bottom_foot",
-					"parent": "mech_right",
+					"parent": "spring",
 					"pivot": [-2.2, 0, 0],
 					"cubes": [
 						{

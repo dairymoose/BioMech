@@ -6,8 +6,8 @@ import java.util.List;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
+import com.dairymoose.biomech.item.anim.SpringLoadedLeggingsDispatcher;
 
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -18,16 +18,17 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class SpringLoadedLeggingsArmor extends ArmorBase {
 
+	public SpringLoadedLeggingsDispatcher dispatcher;
+	
 	public SpringLoadedLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 5;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Leggings;
+		this.dispatcher = new SpringLoadedLeggingsDispatcher();
 	}
 
 	@Override
@@ -37,6 +38,20 @@ public class SpringLoadedLeggingsArmor extends ArmorBase {
 			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
 			if (armorItems.contains(BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
+					CompoundTag tag = stack.getOrCreateTag();
+					if (player.level().isClientSide) {
+						if (tag != null && tag.contains("BounceTicks")) {
+							int ticks = tag.getInt("BounceTicks");
+							--ticks;
+							if (ticks == 0) {
+								BioMech.clientSideItemAnimation(stack, this.dispatcher.INERT_COMMAND.cmd);
+								tag.remove("BounceTicks");
+							} else {
+								tag.putInt("BounceTicks", ticks);
+							}
+						}
+					}
+					
 					HandActiveStatus has = BioMech.handActiveMap.get(player.getUUID());
 					if (has != null) {
 						if (!level.isClientSide) {
@@ -46,7 +61,6 @@ public class SpringLoadedLeggingsArmor extends ArmorBase {
 							}
 						}
 						
-						CompoundTag tag = stack.getOrCreateTag();
 						if (has.jumpActive) {
 							int jumpsLeft;
 							if (!tag.contains("JumpsLeft")) {

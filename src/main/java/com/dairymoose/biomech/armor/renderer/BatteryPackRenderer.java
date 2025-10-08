@@ -1,26 +1,23 @@
 package com.dairymoose.biomech.armor.renderer;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.item.anim.SpringLoadedLeggingsAnimator;
 
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererConfig;
 import net.minecraft.resources.ResourceLocation;
 
-public class SpringLoadedLeggingsRenderer extends AzArmorRenderer {
+public class BatteryPackRenderer extends AzArmorRenderer {
     private static final ResourceLocation GEO = ResourceLocation.fromNamespaceAndPath(
         BioMech.MODID,
-        "geo/item/spring_loaded_leggings.geo.json"
+        "geo/item/battery_pack.geo.json"
     );
 
     private static final ResourceLocation TEX = ResourceLocation.fromNamespaceAndPath(
     	BioMech.MODID,
-        "textures/item/spring_loaded_leggings.png"
+        "textures/item/battery_pack.png"
     );
 
-    public SpringLoadedLeggingsRenderer() {
-        super(AzArmorRendererConfig.builder(GEO, TEX)
-        		.setAnimatorProvider(SpringLoadedLeggingsAnimator::new)
-        		.build());
+    public BatteryPackRenderer() {
+        super(AzArmorRendererConfig.builder(GEO, TEX).build());
     }
 }

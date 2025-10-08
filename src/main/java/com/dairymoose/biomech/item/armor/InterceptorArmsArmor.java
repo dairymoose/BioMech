@@ -75,17 +75,19 @@ public class InterceptorArmsArmor extends ArmorBase {
 						dodgedProjectileSet.remove(entity);
 						
 						CompoundTag tag = stack.getOrCreateTag();
-						int ticks = 10;
-						if (tag.contains("DodgeTicks")) {
-							ticks = tag.getInt("DodgeTicks");
-						}
-						--ticks;
-						if (ticks <= 0) {
-							tag.remove("DodgeTicks");
-							BioMech.clientSideItemAnimation(stack, this.dispatcher.PASSIVE_COMMAND.cmd);
-						} else {
-							tag.putInt("DodgeTicks", ticks);
-							BioMech.clientSideItemAnimation(stack, this.dispatcher.DEFLECT_COMMAND.cmd);
+						if (player.level().isClientSide) {
+							int ticks = 5;
+							if (tag.contains("DodgeTicks")) {
+								ticks = tag.getInt("DodgeTicks");
+							}
+							--ticks;
+							if (ticks <= 0) {
+								tag.remove("DodgeTicks");
+								BioMech.clientSideItemAnimation(stack, this.dispatcher.PASSIVE_COMMAND.cmd);
+							} else {
+								tag.putInt("DodgeTicks", ticks);
+								BioMech.clientSideItemAnimation(stack, this.dispatcher.DEFLECT_COMMAND.cmd);
+							}
 						}
 					} else {
 						BioMech.clientSideItemAnimation(stack, this.dispatcher.PASSIVE_COMMAND.cmd);

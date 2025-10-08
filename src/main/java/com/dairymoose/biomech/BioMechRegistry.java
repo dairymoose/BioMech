@@ -6,6 +6,7 @@ import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.BackJetpackArmor;
 import com.dairymoose.biomech.item.armor.BackScubaTankArmor;
+import com.dairymoose.biomech.item.armor.BatteryPackArmor;
 import com.dairymoose.biomech.item.armor.BuzzsawLeftArmArmor;
 import com.dairymoose.biomech.item.armor.BuzzsawRightArmArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechChestArmor;
@@ -149,6 +150,8 @@ public class BioMechRegistry {
 	//POWER MECH
 	
 	public static RegistryObject<Item> ITEM_INTERCEPTOR_ARMS = BioMech.ITEMS.register("interceptor_arms", () -> new InterceptorArmsArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_BATTERY_PACK = BioMech.ITEMS.register("battery_pack", () -> new BatteryPackArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_BACK_SCUBA_TANK = BioMech.ITEMS.register("back_scuba_tank", () -> new BackScubaTankArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	

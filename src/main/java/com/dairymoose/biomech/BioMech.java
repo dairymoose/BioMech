@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.armor.renderer.BackJetpackRenderer;
 import com.dairymoose.biomech.armor.renderer.BackScubaTankRenderer;
+import com.dairymoose.biomech.armor.renderer.BatteryPackRenderer;
 import com.dairymoose.biomech.armor.renderer.BuzzsawLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.BuzzsawRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechArmorRenderer;
@@ -74,6 +75,7 @@ import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.armor.PowerArmArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
+import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.BuzzsawItemRenderer;
 import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
@@ -180,7 +182,6 @@ import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
@@ -654,6 +655,17 @@ public class BioMech
     			Vec3 delta = player.getDeltaMovement();
     			player.setDeltaMovement(delta.x, 0.0, delta.z);
     		}
+    		
+    		if (player.level().isClientSide) {
+    			BioMechPlayerData playerData = globalPlayerData.get(player.getUUID());
+        		if (playerData != null) {
+        			if (playerData.getForSlot(MechPart.Leggings).itemStack.getItem() instanceof SpringLoadedLeggingsArmor legs) {
+        				BioMech.clientSideItemAnimation(playerData.getForSlot(MechPart.Leggings).itemStack, legs.dispatcher.INERT_COMMAND.cmd);
+        				playerData.getForSlot(MechPart.Leggings).itemStack.getOrCreateTag().putInt("BounceTicks", 10);
+        				BioMech.clientSideItemAnimation(playerData.getForSlot(MechPart.Leggings).itemStack, legs.dispatcher.BOUNCE_COMMAND.cmd);
+        			}
+        		}
+    		}
     	}
     }
     
@@ -895,7 +907,7 @@ public class BioMech
 	        	}
 	    	}
     	} catch (Exception e) {
-    		BioMech.LOGGER.error("Error playing client-side animation: " + e);
+    		BioMech.LOGGER.error("Error playing client-side animation: " + e, e);
     	}
     	//AzItemStackDispatchCommandPacket packet = new AzItemStackDispatchCommandPacket(itemStack.getTag().getUUID("az_id"), command);
 		//packet.handle();
@@ -1693,6 +1705,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(GatlingRightArmRenderer::new, BioMechRegistry.ITEM_GATLING_ARM.get());
         	AzArmorRendererRegistry.register(GatlingLeftArmRenderer::new, BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(InterceptorArmsRenderer::new, BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
+        	AzArmorRendererRegistry.register(BatteryPackRenderer::new, BioMechRegistry.ITEM_BATTERY_PACK.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
@@ -1735,6 +1748,7 @@ public class BioMech
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_BUZZSAW_ARM.get(), BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_GATLING_ARM.get(), BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
+        	AzIdentityRegistry.register(BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
         	//------ Arms / Animated ------
         	
         	
