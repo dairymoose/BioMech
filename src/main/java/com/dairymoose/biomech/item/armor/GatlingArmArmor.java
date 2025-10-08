@@ -80,7 +80,8 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 		double damageFalloffFactor = 1.0;
 		double distTo = player.distanceTo(living);
 		
-		damageFalloffFactor = Math.min(1.0, Math.max(gatlingMinFalloff, 1.0/Math.log10(distTo*0.50)));
+		//as distTo multiplier is decreased, falloff also decreases
+		damageFalloffFactor = Math.min(1.0, Math.max(gatlingMinFalloff, 1.0/Math.log10(distTo*0.60)));
 		
 		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*drillDamage*miningPower);
 		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), damageMult*gatlingDamage*miningPower/20.0f);
@@ -125,7 +126,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 	
 	@Override
 	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec) {
-		double vecScale = 0.55;
+		double vecScale = 0.60;
 		Vec3 loc = startLoc.add(viewVec.scale(vecScale));
 		
 		player.level().addParticle((ParticleOptions) BioMechRegistry.PARTICLE_TYPE_MUZZLE_FLASH.get(), loc.x, loc.y, loc.z,

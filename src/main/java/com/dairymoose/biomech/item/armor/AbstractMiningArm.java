@@ -305,7 +305,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						Entity entityTarget = entityTargetMap.get(player);
 						if (entityTarget == null) {
 							HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
-									(e) -> (e instanceof LivingEntity) && !e.isSpectator(),
+									(e) -> (e instanceof LivingEntity && !((LivingEntity)e).isDeadOrDying()) && !e.isRemoved() && !e.isSpectator(),
 									player.getBlockReach() * blockReachMult);
 							
 							if (hitResult instanceof BlockHitResult bhr) {

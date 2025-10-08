@@ -1098,18 +1098,6 @@ public class BioMech
         	}
 		}
 	}
-    
-	public static double firstPersonDistX1 = 0.25;
-	public static double firstPersonDistX2 = 0.25;
-	@SubscribeEvent
-	public void onScroll(InputEvent.MouseScrollingEvent event) {
-		if (event.getScrollDelta() > 0.0) {
-			firstPersonDistX1 += 0.05;
-		} else {
-			firstPersonDistX1 -= 0.05;
-		}
-		BioMech.LOGGER.info("firstPersonDistX=" + firstPersonDistX1);
-	}
 	
 	public static ItemStack currentRenderItemStackContext = null;
 	
