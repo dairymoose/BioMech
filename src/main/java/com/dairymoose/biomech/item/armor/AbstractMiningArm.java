@@ -172,7 +172,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						player.setYBodyRot(player.getYHeadRot());
 
 						HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
-								(e) -> (e instanceof LivingEntity) && !e.isSpectator(),
+								(e) -> (e instanceof LivingEntity && !((LivingEntity)e).isDeadOrDying()) && !e.isRemoved() && !e.isSpectator(),
 								player.getBlockReach() * blockReachMult);
 
 						double handMult = 1.0;
