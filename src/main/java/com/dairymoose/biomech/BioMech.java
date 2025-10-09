@@ -907,7 +907,7 @@ public class BioMech
     	}
     	
     	if (itemStack == null) {
-    		BioMech.LOGGER.error("itemStack was null for command: " + command);
+    		BioMech.LOGGER.debug("itemStack was null for command: " + command);
     		return;
     	}
     	
@@ -918,10 +918,10 @@ public class BioMech
 	        	if (anim != null) {
 	        		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
 	        	} else {
-	        		BioMech.LOGGER.error("anim was null for itemStack: " + itemStack + " with tag=" + itemStack.getTag().getUUID(AzureLib.ITEM_UUID_TAG));
+	        		BioMech.LOGGER.debug("anim was null for itemStack: " + itemStack + " with tag=" + itemStack.getTag().getUUID(AzureLib.ITEM_UUID_TAG));
 	        	}
 	    	} else {
-	    		BioMech.LOGGER.error("missing az_id UUID tag for itemStack: " + itemStack);
+	    		BioMech.LOGGER.debug("missing az_id UUID tag for itemStack: " + itemStack);
 	    	}
     	} catch (Exception e) {
     		BioMech.LOGGER.error("Error playing client-side animation: " + e, e);
@@ -1017,7 +1017,7 @@ public class BioMech
 	    	if (playerData != null) {
 	    		SlottedItem headSlot = playerData.getForSlot(MechPart.Head);
 	    		if (headSlot.itemStack.getItem() instanceof PowerHelmetArmor power) {
-	    			float powerCritChance = 0.33f;
+	    			float powerCritChance = power.getCriticalStrikeBoost();
 	    			double rnd = Math.random();
 	    			if (rnd < powerCritChance) {
 	    				event.setResult(Result.ALLOW);
@@ -1191,6 +1191,9 @@ public class BioMech
 	
 	public static boolean hideMainHandWhileInactive = false;
     public static boolean hideOffHandWhileInactive = false;
+    
+    public static boolean requireModifierKeyForArmUsage = true;
+    
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents
@@ -1355,7 +1358,6 @@ public class BioMech
     		return null;
     	}
     	
-    	public static boolean requireModifierKeyForArmUsage = true;
     	//boolean rightArmActive = false;
     	//boolean leftArmActive = false;
     	@SubscribeEvent

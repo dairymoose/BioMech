@@ -31,10 +31,10 @@
 	"item.biomech.hovertech_leggings": "§5Hovertech Leggings§0",
 	"item.biomech.hovertech_leggings.tooltip1": "Causes the user to hover above the ground, rendering ground effects harmless and increasing jump height by 1 block.",
 	"item.biomech.hovertech_leggings.tooltip2": "Also grants the wearer slowfall during falls.",
-	"item.biomech.hovertech_leggings.tooltip3": "Press alt to toggle on/off.  Crouch to temporarily disable.",
+	"item.biomech.hovertech_leggings.tooltip3": "Press {alt} to toggle on/off.  Crouch to temporarily disable.",
 
 	"item.biomech.drill_arm": "§5Drill Arm§0",
-	"item.biomech.drill_arm.tooltip1": "Hold alt+mouse click to activate.",
+	"item.biomech.drill_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
 	"item.biomech.drill_arm.tooltip2": "Hold to mine any pickaxe-mineable block.",
 	"item.biomech.drill_arm.tooltip3": "Mines in a 3x3 area (pickaxe blocks only).",
 	
@@ -42,9 +42,9 @@
 	"item.biomech.power_arm.tooltip1": "Increases attack damage by 2 when wielding a weapon.",
 
 	"item.biomech.mining_laser_arm": "§5Mining Laser Arm§0",
-	"item.biomech.mining_laser_arm.tooltip1": "Hold alt+mouse click to activate.",
+	"item.biomech.mining_laser_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
 	"item.biomech.mining_laser_arm.tooltip2": "Hold to mine any pickaxe-mineable block.",
-	"item.biomech.mining_laser_arm.tooltip3": "The longer you hold, the stronger it becomes (max 12 seconds - up to 6x faster).",
+	"item.biomech.mining_laser_arm.tooltip3": "The longer you hold, the stronger it is (max 12 seconds - up to 6x faster).",
 	
 	"item.biomech.lavastride_leggings": "§5Lavastride Leggings§0",
 	"item.biomech.lavastride_leggings.tooltip1": "Allows the user to walk on the surface of lava.",
@@ -54,7 +54,7 @@
 	"item.biomech.power_chest.tooltip1": "Once every 30 seconds, reduces the damage of the next incoming direct damage attack by 50%.",
 
 	"item.biomech.power_helmet": "§5Power Helmet§0",
-	"item.biomech.power_helmet.tooltip1": "Non-critical attacks have a 33% chance to instead be a critical strike.",
+	"item.biomech.power_helmet.tooltip1": "Non-critical attacks have a {crit_boost}% chance to instead be a critical strike.",
 
 	"item.biomech.back_scuba_tank": "§5Scuba Tank§0",
 	"item.biomech.back_scuba_tank.tooltip1": "Automatically consumes energy while underwater.",
@@ -83,46 +83,46 @@
 	
 	// *** IRON MECH
 	"item.biomech.iron_mech_head": "Iron Mech Head",
-	"item.biomech.iron_mech_head.tooltip1": "3% of incoming damage is absorbed by suit energy.",
+	"item.biomech.iron_mech_head.tooltip1": "{dr}% of incoming damage is absorbed by suit energy.",
 	"item.biomech.iron_mech_head.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.iron_mech_head.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
+	"item.biomech.iron_mech_head.tooltip3": "Absorbed damage harms suit energy at a {absorb_energy_harm}x multiplier.",
 	
 	"item.biomech.iron_mech_chestplate": "Iron Mech Chestplate",
-	"item.biomech.iron_mech_chestplate.tooltip1": "4% of incoming damage is absorbed by suit energy.",
+	"item.biomech.iron_mech_chestplate.tooltip1": "{dr}% of incoming damage is absorbed by suit energy.",
 	"item.biomech.iron_mech_chestplate.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.iron_mech_chestplate.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
+	"item.biomech.iron_mech_chestplate.tooltip3": "Absorbed damage harms suit energy at a {absorb_energy_harm}x multiplier.",
 	
 	"item.biomech.iron_mech_legs": "Iron Mech Legs",
-	"item.biomech.iron_mech_legs.tooltip1": "4% of incoming damage is absorbed by suit energy.",
+	"item.biomech.iron_mech_legs.tooltip1": "{dr}% of incoming damage is absorbed by suit energy.",
 	"item.biomech.iron_mech_legs.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.iron_mech_legs.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
+	"item.biomech.iron_mech_legs.tooltip3": "Absorbed damage harms suit energy at a {absorb_energy_harm}x multiplier.",
 	
 	"item.biomech.iron_mech_arm": "Iron Mech Arm",
-	"item.biomech.iron_mech_arm.tooltip1": "2% of incoming damage is absorbed by suit energy.",
+	"item.biomech.iron_mech_arm.tooltip1": "{dr}% of incoming damage is absorbed by suit energy.",
 	"item.biomech.iron_mech_arm.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.iron_mech_arm.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
+	"item.biomech.iron_mech_arm.tooltip3": "Absorbed damage harms suit energy at a {absorb_energy_harm}x multiplier.",
 	// IRON MECH ***
 	
 	// *** DIAMOND MECH
 	"item.biomech.diamond_mech_head": "Diamond Mech Head",
-	"item.biomech.diamond_mech_head.tooltip1": "4% of incoming damage is absorbed by suit energy.",
+	"item.biomech.diamond_mech_head.tooltip1": "{dr}% of incoming damage is absorbed by suit energy.",
 	"item.biomech.diamond_mech_head.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.diamond_mech_head.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
+	"item.biomech.diamond_mech_head.tooltip3": "Absorbed damage harms suit energy at a {absorb_energy_harm}x multiplier.",
 	
 	"item.biomech.diamond_mech_chestplate": "Diamond Mech Chestplate",
-	"item.biomech.diamond_mech_chestplate.tooltip1": "6% of incoming damage is absorbed by suit energy.",
+	"item.biomech.diamond_mech_chestplate.tooltip1": "{dr}% of incoming damage is absorbed by suit energy.",
 	"item.biomech.diamond_mech_chestplate.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.diamond_mech_chestplate.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
+	"item.biomech.diamond_mech_chestplate.tooltip3": "Absorbed damage harms suit energy at a {absorb_energy_harm}x multiplier.",
 	
 	"item.biomech.diamond_mech_legs": "Diamond Mech Legs",
-	"item.biomech.diamond_mech_legs.tooltip1": "5% of incoming damage is absorbed by suit energy.",
+	"item.biomech.diamond_mech_legs.tooltip1": "{dr}% of incoming damage is absorbed by suit energy.",
 	"item.biomech.diamond_mech_legs.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.diamond_mech_legs.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
+	"item.biomech.diamond_mech_legs.tooltip3": "Absorbed damage harms suit energy at a {absorb_energy_harm}x multiplier.",
 	
 	"item.biomech.diamond_mech_arm": "Diamond Mech Arm",
-	"item.biomech.diamond_mech_arm.tooltip1": "3% of incoming damage is absorbed by suit energy.",
+	"item.biomech.diamond_mech_arm.tooltip1": "{dr}% of incoming damage is absorbed by suit energy.",
 	"item.biomech.diamond_mech_arm.tooltip2": "No damage reduction if the suit is out of energy.",
-	"item.biomech.diamond_mech_arm.tooltip3": "Absorbed damage harms suit energy at a 20x multiplier.",
+	"item.biomech.diamond_mech_arm.tooltip3": "Absorbed damage harms suit energy at a {absorb_energy_harm}x multiplier.",
 	// DIAMOND MECH ***
 	
 	"item.biomech.night_vision_visor": "§5Night Vision Visor§0",
@@ -133,31 +133,31 @@
 	
 	"item.biomech.pipe_mech_body": "§5Pipe Mech Body§0",
 	"item.biomech.pipe_mech_body.tooltip1": "Your body is extremely thin.",
-	"item.biomech.pipe_mech_body.tooltip2": "You have a 5% chance to outright avoid direct damage attacks.",
+	"item.biomech.pipe_mech_body.tooltip2": "You have a {avoid}% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_body.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
 	"item.biomech.pipe_mech_legs": "§5Pipe Mech Legs§0",
 	"item.biomech.pipe_mech_legs.tooltip1": "Your legs are extremely thin.",
-	"item.biomech.pipe_mech_legs.tooltip2": "You have a 4% chance to outright avoid direct damage attacks.",
+	"item.biomech.pipe_mech_legs.tooltip2": "You have a {avoid}% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_legs.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
 	"item.biomech.pipe_mech_head": "§5Pipe Mech Head§0",
 	"item.biomech.pipe_mech_head.tooltip1": "Your head is extremely thin.",
-	"item.biomech.pipe_mech_head.tooltip2": "You have a 4% chance to outright avoid direct damage attacks.",
+	"item.biomech.pipe_mech_head.tooltip2": "You have a {avoid}% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_head.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
 	"item.biomech.pipe_mech_arm": "§5Pipe Mech Arm§0",
 	"item.biomech.pipe_mech_arm.tooltip1": "Your arm is extremely thin.",
-	"item.biomech.pipe_mech_arm.tooltip2": "You have a 2% chance to outright avoid direct damage attacks.",
+	"item.biomech.pipe_mech_arm.tooltip2": "You have a {avoid}% chance to outright avoid direct damage attacks.",
 	"item.biomech.pipe_mech_arm.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
 	"item.biomech.buzzsaw_arm": "§5Buzzsaw Arm§0",
-	"item.biomech.buzzsaw_arm.tooltip1": "Hold alt+mouse click to activate.",
+	"item.biomech.buzzsaw_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
 	"item.biomech.buzzsaw_arm.tooltip2": "Hold to mine any axe-mineable block.",
 	"item.biomech.buzzsaw_arm.tooltip3": "Mines in a 3x3 area (axe blocks only).",
 	
 	"item.biomech.gatling_arm": "§5Gatling Arm§0",
-	"item.biomech.gatling_arm.tooltip1": "Hold alt+mouse click to activate.",
+	"item.biomech.gatling_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
 	"item.biomech.gatling_arm.tooltip2": "Consumes energy while active.",
 	
 	"item.biomech.interceptor_arms": "§5Interceptor Arms§0",
@@ -166,7 +166,7 @@
 	"item.biomech.interceptor_arms.tooltip3": "§5The power of the sun in the palm of your hand.§0",
 	
 	"item.biomech.digger_arm": "§5Digger Arm§0",
-	"item.biomech.digger_arm.tooltip1": "Hold alt+mouse click to activate.",
+	"item.biomech.digger_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
 	"item.biomech.digger_arm.tooltip2": "Hold to mine any shovel-mineable block.",
 	"item.biomech.digger_arm.tooltip3": "Mines in a 3x3 area (shovel blocks only).",
 	

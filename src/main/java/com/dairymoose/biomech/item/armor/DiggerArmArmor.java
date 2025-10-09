@@ -46,7 +46,7 @@ public abstract class DiggerArmArmor extends AbstractMiningArm {
 	
 	@Override
 	protected void playSound(Player player, int useTicks, boolean didHit) {
-		float volume = 1.1f;
+		float volume = 0.7f;
 		float pitch = 1.0f;
 		if (didHit) {
 			//player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_SHOVEL_DIG.get(), SoundSource.PLAYERS, volume, pitch, false);

@@ -86,6 +86,7 @@ public class InterceptorArmsArmor extends ArmorBase {
 								BioMech.clientSideItemAnimation(stack, this.dispatcher.PASSIVE_COMMAND.cmd);
 							} else {
 								tag.putInt("DodgeTicks", ticks);
+								BioMech.clientSideItemAnimation(stack, this.dispatcher.PASSIVE_COMMAND.cmd);
 								BioMech.clientSideItemAnimation(stack, this.dispatcher.DEFLECT_COMMAND.cmd);
 							}
 						}

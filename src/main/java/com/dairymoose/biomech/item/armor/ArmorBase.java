@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMech.ClientModEvents;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.item.anim.MiningLaserDispatcher;
@@ -58,6 +59,7 @@ public class ArmorBase extends ArmorItem {
 	protected float projectileAvoidPct = 0.0f;
 	protected float damageAvoidPct = 0.0f;
 	protected float damageAbsorbPct = 0.0f;
+	protected float criticalStrikeBoost = 0.0f;
 	
 	public ArmorBase(ArmorMaterial material, Type type, Properties props) {
 		super(NOTHING_MATERIAL, type, props);
@@ -71,6 +73,10 @@ public class ArmorBase extends ArmorItem {
 		return false;
 	}
 
+	public float getCriticalStrikeBoost() {
+		return this.criticalStrikeBoost;
+	}
+	
 	public float getProjectileAvoidPercent() {
 		return this.projectileAvoidPct;
 	}
@@ -134,6 +140,28 @@ public class ArmorBase extends ArmorItem {
 		return InteractionResultHolder.pass(p_40396_.getItemInHand(p_40397_));
 	}
 	
+	private String replaceTooltips(String input) {
+		if (input == null)
+			return null;
+		if (input.length() <= 0)
+			return input;
+		
+		String replaced = input;
+		
+		NumberFormat nf = new DecimalFormat("#.#");
+		replaced = replaced.replaceAll("\\{alt\\}", ClientModEvents.HOTKEY_ENABLE_ARM_FUNCTION.getKey().getDisplayName().getString());
+		replaced = replaced.replaceAll("\\{lmb\\}", ClientModEvents.HOTKEY_RIGHT_ARM.getKey().getDisplayName().getString());
+		replaced = replaced.replaceAll("\\{rmb\\}", ClientModEvents.HOTKEY_LEFT_ARM.getKey().getDisplayName().getString());
+		replaced = replaced.replaceAll("Left Button", "Left Mouse-Click");
+		replaced = replaced.replaceAll("Right Button", "Right Mouse-Click");
+		replaced = replaced.replaceAll("\\{dr\\}", nf.format(100.0f*this.getDamageAbsorbPercent()));
+		replaced = replaced.replaceAll("\\{avoid\\}", nf.format(100.0f*this.getDamageAvoidPercent()));
+		replaced = replaced.replaceAll("\\{absorb_energy_harm\\}", nf.format(IronMechChestArmor.energyDamageMultiplier));
+		replaced = replaced.replaceAll("\\{crit_boost\\}", nf.format(100.0f*this.getCriticalStrikeBoost()));
+		
+		return replaced;
+	}
+	
 	@Override
 	public void appendHoverText(ItemStack stack, Level level, List<Component> comp, TooltipFlag flags) {
 		super.appendHoverText(stack, level, comp, flags);
@@ -169,14 +197,17 @@ public class ArmorBase extends ArmorItem {
 		MutableComponent t1 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip1", "");
 		MutableComponent t2 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip2", "");
 		MutableComponent t3 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip3", "");
-		if (!"".equals(t1.getString())) {
-			comp.add(t1);
+		String t1Text = this.replaceTooltips(t1.getString());
+		if (!"".equals(t1Text)) {
+			comp.add(Component.literal(t1Text));
 		}
-		if (!"".equals(t2.getString())) {
-			comp.add(t2);
+		String t2Text = this.replaceTooltips(t2.getString());
+		if (!"".equals(t2Text)) {
+			comp.add(Component.literal(t2Text));
 		}
-		if (!"".equals(t3.getString())) {
-			comp.add(t3);
+		String t3Text = this.replaceTooltips(t3.getString());
+		if (!"".equals(t3Text)) {
+			comp.add(Component.literal(t3Text));
 		}
 	}
 	
