@@ -903,6 +903,7 @@ public class BioMech
     public static void clientSideItemAnimation(ItemStack itemStack, AzCommand command) {
     	if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
     		BioMech.LOGGER.debug("skip animation on server side: " + itemStack);
+    		return;
     	}
     	
     	if (itemStack == null) {
