@@ -20,6 +20,7 @@ public class PowerHelmetArmor extends ArmorBase {
 		this.suitEnergy = 10;
 		this.alwaysHidePlayerHat = false;
 		this.mechPart = MechPart.Head;
+		this.criticalStrikeBoost = 0.33f;
 	}
 
 	@Override
