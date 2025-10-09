@@ -11,6 +11,7 @@ import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
@@ -22,29 +23,35 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 
-public class ServerboundMiningArmEntityTargetPacket implements Packet<ServerGamePacketListener> {
-	private int entityId;
+public class ServerboundMiningArmBlockTargetPacket implements Packet<ServerGamePacketListener> {
+	private boolean hasBlockTarget;
+	private BlockPos target;
 
-	public ServerboundMiningArmEntityTargetPacket() {
+	public ServerboundMiningArmBlockTargetPacket() {
 	}
 	
-	public ServerboundMiningArmEntityTargetPacket(FriendlyByteBuf buffer) {
+	public ServerboundMiningArmBlockTargetPacket(FriendlyByteBuf buffer) {
 		this.read(buffer);
 	}
 
-	public ServerboundMiningArmEntityTargetPacket(Entity entity) {
-		if (entity == null)
-			this.entityId = -1;
+	public ServerboundMiningArmBlockTargetPacket(BlockPos target) {
+		if (target == null)
+			this.hasBlockTarget = false;
 		else
-			this.entityId = entity.getId();
+			this.hasBlockTarget = true;
+		this.target = target;
 	}
 
 	public void read(FriendlyByteBuf byteBuf) {
-		this.entityId = byteBuf.readInt();
+		this.hasBlockTarget = byteBuf.readBoolean();
+		if (hasBlockTarget)
+			this.target = byteBuf.readBlockPos();
 	}
 
 	public void write(FriendlyByteBuf byteBuf) {
-		byteBuf.writeInt(entityId);
+		byteBuf.writeBoolean(hasBlockTarget);
+		if (hasBlockTarget)
+			byteBuf.writeBlockPos(target);
 	}
 
 	public void handle(Supplier<NetworkEvent.Context> ctx) {
@@ -61,17 +68,13 @@ public class ServerboundMiningArmEntityTargetPacket implements Packet<ServerGame
 			ServerGamePacketListenerImpl serverHandler = (ServerGamePacketListenerImpl)packetListener;
 			Level world = serverHandler.player.level();
 			if (world != null) {
-				Entity entity = null;
-				if (this.entityId != -1) {
-					entity = world.getEntity(this.entityId);
+				if (hasBlockTarget) {
+					AbstractMiningArm.blockTargetMap.put(serverHandler.player, target);
+					AbstractMiningArm.entityTargetMap.remove(serverHandler.player);
 				}
-				
-				if (entity != null) {
-					AbstractMiningArm.entityTargetMap.put(serverHandler.player, entity);
+				else {
 					AbstractMiningArm.blockTargetMap.remove(serverHandler.player);
 				}
-				else
-					AbstractMiningArm.entityTargetMap.remove(serverHandler.player);
 			}
 		}
 	}

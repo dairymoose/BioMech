@@ -48,7 +48,7 @@
 			"bones": {
 				"buzzsaw": {
 					"rotation": {
-						"vector": [0, 0, "query.anim_time*5"]
+						"vector": [0, 0, "query.anim_time*30"]
 					}
 				}
 			}

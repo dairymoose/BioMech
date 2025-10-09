@@ -1,32 +1,37 @@
 {
-  "laser_loop": {
-    "category": "block",
-    "subtitle": "entity.subtitle.laser_loop",
-    "sounds": [ "biomech:item/laser_loop" ]
-  },
-  "mining_drill": {
-      "category": "block",
-      "subtitle": "entity.subtitle.mining_drill",
-      "sounds": [ "biomech:item/mining_drill" ]
+    "laser_loop": {
+        "category": "block",
+        "subtitle": "entity.subtitle.laser_loop",
+        "sounds": ["biomech:item/laser_loop"]
     },
-  "buzzsaw_loop": {
-      "category": "block",
-      "subtitle": "entity.subtitle.buzzsaw_loop",
-      "sounds": [ "biomech:item/buzzsaw_loop" ]
+    "mining_drill": {
+        "category": "block",
+        "subtitle": "entity.subtitle.mining_drill",
+        "sounds": ["biomech:item/mining_drill"]
     },
-  "gatling_spin_up": {
-    "category": "block",
-    "subtitle": "entity.subtitle.gatling_spin_up",
-    "sounds": [ "biomech:item/gatling_spin_up" ]
-  },
-  "gatling_firing": {
-      "category": "block",
-      "subtitle": "entity.subtitle.gatling_firing",
-      "sounds": [ "biomech:item/gatling_firing" ]
+    "buzzsaw_loop": {
+        "category": "block",
+        "subtitle": "entity.subtitle.buzzsaw_loop",
+        "sounds": ["biomech:item/buzzsaw_loop"]
     },
-  "jetpack_loop": {
-      "category": "block",
-      "subtitle": "entity.subtitle.jetpack_loop",
-      "sounds": [ "biomech:item/jetpack_loop" ]
+    "gatling_spin_up": {
+        "category": "block",
+        "subtitle": "entity.subtitle.gatling_spin_up",
+        "sounds": ["biomech:item/gatling_spin_up"]
+    },
+    "gatling_firing": {
+        "category": "block",
+        "subtitle": "entity.subtitle.gatling_firing",
+        "sounds": ["biomech:item/gatling_firing"]
+    },
+    "jetpack_loop": {
+        "category": "block",
+        "subtitle": "entity.subtitle.jetpack_loop",
+        "sounds": ["biomech:item/jetpack_loop"]
+    },
+    "shovel_dig": {
+        "category": "block",
+        "subtitle": "entity.subtitle.shovel_dig",
+        "sounds": ["biomech:item/shovel_dig"]
     }
 }

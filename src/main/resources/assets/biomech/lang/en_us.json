@@ -18,6 +18,7 @@
 	"entity.subtitle.buzzsaw_loop": "Buzzsaw Buzzes",
 	"entity.subtitle.gatling_spin_up": "Gatling Spins Up",
 	"entity.subtitle.gatling_firing": "Gatling Fires",
+	"entity.subtitle.shovel_dig": "Digger Digs",
 	
 	"item.biomech.biomech_activator": "BioMech Activator",
 	"item.biomech.biomech_deactivator": "BioMech Deactivator",
@@ -163,6 +164,11 @@
 	"item.biomech.interceptor_arms.tooltip1": "Grants a 50% chance to automatically deflect incoming projectiles.",
 	"item.biomech.interceptor_arms.tooltip2": "If deflection occurs, you will lose 5 suit energy.",
 	"item.biomech.interceptor_arms.tooltip3": "§5The power of the sun in the palm of your hand.§0",
+	
+	"item.biomech.digger_arm": "§5Digger Arm§0",
+	"item.biomech.digger_arm.tooltip1": "Hold alt+mouse click to activate.",
+	"item.biomech.digger_arm.tooltip2": "Hold to mine any shovel-mineable block.",
+	"item.biomech.digger_arm.tooltip3": "Mines in a 3x3 area (shovel blocks only).",
 	
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",

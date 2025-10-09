@@ -14,6 +14,8 @@ import com.dairymoose.biomech.item.armor.DiamondMechHeadArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechLeftArmArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechLegsArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechRightArmArmor;
+import com.dairymoose.biomech.item.armor.DiggerLeftArmArmor;
+import com.dairymoose.biomech.item.armor.DiggerRightArmArmor;
 import com.dairymoose.biomech.item.armor.DrillLeftArmArmor;
 import com.dairymoose.biomech.item.armor.DrillRightArmArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
@@ -95,6 +97,7 @@ public class BioMechRegistry {
 	public static RegistryObject<SoundEvent> SOUND_EVENT_BUZZSAW_LOOP = BioMech.SOUNDS.register("buzzsaw_loop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "buzzsaw_loop")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_GATLING_SPIN_UP = BioMech.SOUNDS.register("gatling_spin_up", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "gatling_spin_up")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_GATLING_FIRING = BioMech.SOUNDS.register("gatling_firing", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "gatling_firing")));
+	public static RegistryObject<SoundEvent> SOUND_EVENT_SHOVEL_DIG = BioMech.SOUNDS.register("shovel_dig", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "shovel_dig")));
 	
 	public static final ResourceKey<DamageType> BIOMECH_ABSORB = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "biomech_absorb"));
 	
@@ -159,6 +162,8 @@ public class BioMechRegistry {
 	
 	public static RegistryObject<Item> ITEM_DRILL_ARM = BioMech.ITEMS.register("drill_arm", () -> new DrillRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
+	public static RegistryObject<Item> ITEM_DIGGER_ARM = BioMech.ITEMS.register("digger_arm", () -> new DiggerRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	
 	public static RegistryObject<Item> ITEM_BUZZSAW_ARM = BioMech.ITEMS.register("buzzsaw_arm", () -> new BuzzsawRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_GATLING_ARM = BioMech.ITEMS.register("gatling_arm", () -> new GatlingRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
@@ -167,6 +172,7 @@ public class BioMechRegistry {
 	
 	public static RegistryObject<Item> ITEM_LAVASTRIDE_LEGGINGS = BioMech.ITEMS.register("lavastride_leggings", () -> new LavastrideLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	
+	public static RegistryObject<Item> ITEM_DIGGER_LEFT_ARM = BioMech.ITEMS.register("left_digger_arm", () -> new DiggerLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_GATLING_LEFT_ARM = BioMech.ITEMS.register("left_gatling_arm", () -> new GatlingLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_BUZZSAW_LEFT_ARM = BioMech.ITEMS.register("left_buzzsaw_arm", () -> new BuzzsawLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_DRILL_LEFT_ARM = BioMech.ITEMS.register("left_drill_arm", () -> new DrillLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));

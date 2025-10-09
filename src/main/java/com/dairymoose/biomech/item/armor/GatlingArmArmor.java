@@ -126,7 +126,8 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 	
 	@Override
 	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec) {
-		double vecScale = 0.60;
+		//double vecScale = 0.60;
+		double vecScale = 0.0;
 		Vec3 loc = startLoc.add(viewVec.scale(vecScale));
 		
 		player.level().addParticle((ParticleOptions) BioMechRegistry.PARTICLE_TYPE_MUZZLE_FLASH.get(), loc.x, loc.y, loc.z,

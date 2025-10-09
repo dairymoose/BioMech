@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
@@ -26,6 +27,9 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 	private float xMouse;
 	private float yMouse;
 
+	private boolean visibilityMatrix[] = {true, true, true, true, true, true};
+	private MechPart[] mechParts = { MechPart.Back, MechPart.Head, MechPart.RightArm, MechPart.Chest, MechPart.LeftArm, MechPart.Leggings };
+	
 	@Override
 	protected void init() {
 		super.init();
@@ -53,12 +57,22 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 		int leggingsButtonX = this.leftPos + 68;
 		int leggingsButtonY = this.topPos + 70;
 
-		MechPart[] mechParts = { MechPart.Back, MechPart.Head, MechPart.RightArm, MechPart.Chest, MechPart.LeftArm, MechPart.Leggings };
 		int[] buttonStartX = { backButtonX, headButtonX, leftHandButtonX, chestButtonX, rightHandButtonX,
 				leggingsButtonX };
 		int[] buttonStartY = { backButtonY, headButtonY, leftHandButtonY, chestButtonY, rightHandButtonY,
 				leggingsButtonY };
 
+		BioMechPlayerData playerData = BioMech.globalPlayerData
+				.get(Minecraft.getInstance().player.getUUID());
+		if (playerData != null) {
+			for (int i=0; i<mechParts.length; ++i) {
+				SlottedItem slottedItem = playerData.getForSlot(mechParts[i]);
+				if (slottedItem != null) {
+					visibilityMatrix[i] = slottedItem.visible;
+				}
+			}
+		}
+		
 		class IntHolder {
 			int counter;
 		}
@@ -78,13 +92,19 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 								SlottedItem slottedItem = playerData.getForSlot(thisPart);
 								if (slottedItem != null) {
 									slottedItem.visible = !slottedItem.visible;
+									
+									for (int i=0; i<mechParts.length; ++i) {
+										if (mechParts[i] == thisPart) {
+											visibilityMatrix[i] = slottedItem.visible;
+										}
+									}
 								}
 							}
 							// send updated playerData to server
 						}
 
 					});
-
+			
 			this.addRenderableWidget(imageButton);
 			++intHolder.counter;
 		}
@@ -112,12 +132,20 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 		}
 	}
 	
-	public void render(GuiGraphics p_282918_, int p_282102_, int p_282423_, float p_282621_) {
-		this.renderBackground(p_282918_);
-		super.render(p_282918_, p_282102_, p_282423_, p_282621_);
-		this.renderSlotIcons(p_282918_, p_282621_, p_282102_, p_282423_);
-		this.renderTooltip(p_282918_, p_282102_, p_282423_);
+	public void render(GuiGraphics gui, int p_282102_, int p_282423_, float p_282621_) {
+		this.renderBackground(gui);
+		super.render(gui, p_282102_, p_282423_, p_282621_);
+		this.renderSlotIcons(gui, p_282621_, p_282102_, p_282423_);
+		this.renderTooltip(gui, p_282102_, p_282423_);
 
+		for (int i=0; i<this.children().size(); ++i) {
+			ScreenRectangle rect = this.children().get(i).getRectangle();
+			if (!visibilityMatrix[i]) {
+				//cover the eye with a gray blotch when the BioMech part is hidden
+				gui.blit(GUI_LOCATION, rect.left() + 6, rect.top() + 3, SLOT_TEXTURE_START_X, SLOT_TEXTURE_START_Y, 4, 4);
+			}
+		}
+		
 		this.xMouse = (float) p_282102_;
 		this.yMouse = (float) p_282423_;
 	}

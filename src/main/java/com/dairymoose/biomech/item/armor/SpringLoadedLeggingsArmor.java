@@ -31,6 +31,7 @@ public class SpringLoadedLeggingsArmor extends ArmorBase {
 		this.dispatcher = new SpringLoadedLeggingsDispatcher();
 	}
 
+	public static int JUMP_BOOST_POWER_LEVEL = 1;
 	@Override
 	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
@@ -57,7 +58,7 @@ public class SpringLoadedLeggingsArmor extends ArmorBase {
 						if (!level.isClientSide) {
 							MobEffectInstance jumpBoost = living.getEffect(MobEffects.JUMP);
 							if (jumpBoost == null || jumpBoost.endsWithin(10)) {
-								living.addEffect(new MobEffectInstance(MobEffects.JUMP, 40, 0, false, false, false));
+								living.addEffect(new MobEffectInstance(MobEffects.JUMP, 40, JUMP_BOOST_POWER_LEVEL, false, false, false));
 							}
 						}
 						

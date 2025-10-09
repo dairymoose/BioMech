@@ -27,6 +27,8 @@ import com.dairymoose.biomech.armor.renderer.DiamondMechHeadRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechLegsRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DiggerLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DiggerRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.DrillLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.DrillRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.ElytraMechChestplateRenderer;
@@ -79,6 +81,7 @@ import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.BuzzsawItemRenderer;
 import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
+import com.dairymoose.biomech.item.renderer.DiggerArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.DrillItemRenderer;
 import com.dairymoose.biomech.item.renderer.GatlingItemRenderer;
 import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
@@ -91,6 +94,7 @@ import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundProjectileDodgePacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
+import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmBlockTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket;
 import com.dairymoose.biomech.particle.InstantSmokeParticle;
@@ -196,6 +200,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -318,6 +323,7 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMobilityTreadsPacket.class, ServerboundMobilityTreadsPacket::write, ServerboundMobilityTreadsPacket::new, ServerboundMobilityTreadsPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMiningArmEntityTargetPacket.class, ServerboundMiningArmEntityTargetPacket::write, ServerboundMiningArmEntityTargetPacket::new, ServerboundMiningArmEntityTargetPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundProjectileDodgePacket.class, ClientboundProjectileDodgePacket::write, ClientboundProjectileDodgePacket::new, ClientboundProjectileDodgePacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMiningArmBlockTargetPacket.class, ServerboundMiningArmBlockTargetPacket::write, ServerboundMiningArmBlockTargetPacket::new, ServerboundMiningArmBlockTargetPacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -895,16 +901,26 @@ public class BioMech
 
     //AzureLib bug: dispatcher doesn't work client side because it uses AzAnimatorAccessor instead of AzIdentifiableItemStackAnimatorCache
     public static void clientSideItemAnimation(ItemStack itemStack, AzCommand command) {
+    	if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
+    		BioMech.LOGGER.debug("skip animation on server side: " + itemStack);
+    	}
+    	
     	if (itemStack == null) {
+    		BioMech.LOGGER.error("itemStack was null for command: " + command);
     		return;
     	}
     	
     	try {
-	    	if (itemStack.getOrCreateTag().contains(AzureLib.ITEM_UUID_TAG)) {
+	    	if (itemStack.getTag() != null && itemStack.getOrCreateTag().contains(AzureLib.ITEM_UUID_TAG)) {
 	    		AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
+	    		//AzAnimator<ItemStack> anim = AzIdentifiableItemStackAnimatorCache.getInstance().getOrNull(itemStack.getTag().getUUID(AzureLib.ITEM_UUID_TAG));
 	        	if (anim != null) {
 	        		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
+	        	} else {
+	        		BioMech.LOGGER.error("anim was null for itemStack: " + itemStack + " with tag=" + itemStack.getTag().getUUID(AzureLib.ITEM_UUID_TAG));
 	        	}
+	    	} else {
+	    		BioMech.LOGGER.error("missing az_id UUID tag for itemStack: " + itemStack);
 	    	}
     	} catch (Exception e) {
     		BioMech.LOGGER.error("Error playing client-side animation: " + e, e);
@@ -1079,7 +1095,7 @@ public class BioMech
 					if (dai.hasAnyProjectileAvoid) {
 						if (!player.level().isClientSide) {
 							if (playerData.getSuitEnergy() >= PipeMechBodyArmor.energyLostFromAvoidAttack) {
-								if (event.getSource().getEntity() instanceof Projectile && PipeMechBodyArmor.avoidDirectAttack(InterceptorArmsArmor.getProjectileAvoidPct(player), event.getSource(), event.getAmount(), player)) {
+								if (event.getSource().getDirectEntity() instanceof Projectile && PipeMechBodyArmor.avoidDirectAttack(InterceptorArmsArmor.getProjectileAvoidPct(player), event.getSource(), event.getAmount(), player)) {
 									//call internalSpendSuitEnergy directly because this code does not ever run twice - it only runs on server-side whether it's CLIENT or DEDICATED_SERVER
 									playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
 									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + InterceptorArmsArmor.getProjectileAvoidPct(player));
@@ -1706,6 +1722,8 @@ public class BioMech
         	AzArmorRendererRegistry.register(GatlingLeftArmRenderer::new, BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(InterceptorArmsRenderer::new, BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
         	AzArmorRendererRegistry.register(BatteryPackRenderer::new, BioMechRegistry.ITEM_BATTERY_PACK.get());
+        	AzArmorRendererRegistry.register(DiggerRightArmRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
+        	AzArmorRendererRegistry.register(DiggerLeftArmRenderer::new, BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
@@ -1740,6 +1758,7 @@ public class BioMech
         	AzItemRendererRegistry.register(PipeMechArmItemRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
         	AzItemRendererRegistry.register(IronMechArmItemRenderer::new, BioMechRegistry.ITEM_IRON_MECH_ARM.get());
         	AzItemRendererRegistry.register(DiamondMechArmItemRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_ARM.get());
+        	AzItemRendererRegistry.register(DiggerArmItemRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
         	//------ Arm items - render item display ------
         	
         	//------ Arms / Animated ------
@@ -1749,6 +1768,7 @@ public class BioMech
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_GATLING_ARM.get(), BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
+        	AzIdentityRegistry.register(BioMechRegistry.ITEM_DIGGER_ARM.get(), BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
         	//------ Arms / Animated ------
         	
         	

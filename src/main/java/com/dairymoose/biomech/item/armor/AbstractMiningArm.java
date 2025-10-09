@@ -11,6 +11,7 @@ import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
+import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmBlockTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTargetPacket;
 
 import net.minecraft.client.CameraType;
@@ -88,6 +89,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 	protected boolean onlyMinesMatchingBlocks = false;
 	protected boolean originMustMatchToolToMineArea = true;
 	
+	private static final boolean serverEverChecksBlockHits = false;
 	private static final boolean serverEverChecksEntityHits = false;
 	
 	protected int soundTickPeriod = 3;
@@ -115,9 +117,10 @@ public abstract class AbstractMiningArm extends ArmorBase {
 	protected abstract void miningAnimation(ItemStack itemStack);
 	protected abstract void thirdPersonStartUsingAnimation(ItemStack itemStack);
 	protected abstract void thirdPersonMiningAnimation(ItemStack itemStack);
+
+	private Object previousClientTarget = null;
 	
-	private Entity clientEntityTarget = null;
-	
+	public static Map<Player, BlockPos> blockTargetMap = new ConcurrentHashMap<>();
 	public static Map<Player, Entity> entityTargetMap = new ConcurrentHashMap<>();
 	
 	@SuppressWarnings("deprecation")
@@ -219,6 +222,8 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						Vec3 viewVecOffset = player.getViewVector(1.0f).scale(particleDistance);
 						Vec3 startLoc = player.position().add(viewVecOffset).add(
 								new Vec3(xComp, particleStartY, zComp));
+						//our rendering is off by 1 tick, add delta movement to account for this
+						startLoc.add(player.getDeltaMovement());
 						
 						if (player.isLocalPlayer() && cc.isFirstPerson) {
 							//the particles line up in 3rd person but look very wrong in first person
@@ -242,7 +247,8 @@ public abstract class AbstractMiningArm extends ArmorBase {
 							
 							//positioned next to the player, we'll look in the exact same direction as the player, but slightly lower
 							startLoc = player.getEyePosition().add(xComp, 0.0, zComp).add(new Vec3(xComp3, yComp3, zComp3));
-									//.add(new Vec3(xComp3, yComp3, zComp3));
+							//our rendering is off by 1 tick, add delta movement to account for this
+							startLoc.add(player.getDeltaMovement());
 							
 							viewVec = new Vec3(0.0, 0.0, 0.0);
 						}
@@ -255,6 +261,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						}
 						this.onSpawnParticles(player, startLoc, endLoc, useTicks, viewVec);
 
+						BlockPos newBlockTarget = null;
 						Entity newEntityTarget = null;
 						
 						float miningPower = this.getMiningPower(useTicks);
@@ -280,16 +287,30 @@ public abstract class AbstractMiningArm extends ArmorBase {
 									}
 								}
 							}
+							
+							newBlockTarget = pos;
 						} else if (hitResult instanceof EntityHitResult ehr) {
 							didHit = true;
 							
 							newEntityTarget = ehr.getEntity();
 						}
 						
-						if (newEntityTarget != clientEntityTarget) {
-							BioMechNetwork.INSTANCE.sendToServer(new ServerboundMiningArmEntityTargetPacket(newEntityTarget));
-							clientEntityTarget = newEntityTarget;
+						if (newBlockTarget != null) {
+							//our hitscan yielded a block
+							
+							if (previousClientTarget != newBlockTarget) {
+								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMiningArmBlockTargetPacket(newBlockTarget));
+								previousClientTarget = newBlockTarget;
+							}
+						} else if (newEntityTarget != null) {
+							//our hitscan yielded an entity
+							
+							if (previousClientTarget != newEntityTarget) {
+								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMiningArmEntityTargetPacket(newEntityTarget));
+								previousClientTarget = newEntityTarget;
+							}
 						}
+						
 						
 						if (player.tickCount % soundTickPeriod == 0) {
 							playSound(player, useTicks, didHit);
@@ -302,6 +323,7 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						
 						float miningPower = this.getMiningPower(useTicks);
 						
+						BlockPos blockTarget = blockTargetMap.get(player);
 						Entity entityTarget = entityTargetMap.get(player);
 						if (entityTarget == null) {
 							HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
@@ -309,11 +331,8 @@ public abstract class AbstractMiningArm extends ArmorBase {
 									player.getBlockReach() * blockReachMult);
 							
 							if (hitResult instanceof BlockHitResult bhr) {
-								BlockState blockState = player.level().getBlockState(bhr.getBlockPos());
-								
-								if (!blockState.isAir() && !blockState.getFluidState().isSource()) {
-									didHit = true;
-									mineAllBlocks(dbpMap, player, miningPower, bhr);
+								if (serverEverChecksBlockHits) {
+									blockTarget = bhr.getBlockPos();
 								}
 							} else if (hitResult instanceof EntityHitResult ehr) {
 								if (serverEverChecksEntityHits) {
@@ -329,6 +348,17 @@ public abstract class AbstractMiningArm extends ArmorBase {
 								if (!living.isInvulnerable() && !living.isDeadOrDying()) {
 									dealEntityDamage(player, bothHandsActive, miningPower, living);
 								}
+								
+								if (living.isDeadOrDying() || living.isRemoved()) {
+									entityTargetMap.remove(player);
+								}
+							}
+						} else if (blockTarget != null) {
+							BlockState blockState = player.level().getBlockState(blockTarget);
+							
+							if (!blockState.isAir() && !blockState.getFluidState().isSource()) {
+								didHit = true;
+								mineAllBlocks(dbpMap, player, miningPower, blockTarget);
 							}
 						}
 						
@@ -362,18 +392,18 @@ public abstract class AbstractMiningArm extends ArmorBase {
 			} else {
 				if (thirdPersonItemStack.getTag() != null && thirdPersonItemStack.getTag().contains("useTicks")) {
 					thirdPersonItemStack.getTag().putInt("useTicks", 0);
-					if (player.level().isClientSide) {
-						this.passiveAnimation(itemStack);
-					}
+				}
+				if (player.level().isClientSide) {
+					this.passiveAnimation(itemStack);
 				}
 			}
 		}
 	}
 
-	private void mineAllBlocks(Map<Player, DestroyBlockProgressList> destroyBlockProgressMap, Player player, float miningPower, BlockHitResult bhr) {
+	private void mineAllBlocks(Map<Player, DestroyBlockProgressList> destroyBlockProgressMap, Player player, float miningPower, BlockPos blockTarget) {
 		DestroyBlockProgressList dbpList = destroyBlockProgressMap.computeIfAbsent(player,
 				(p) -> new DestroyBlockProgressList());
-		BlockPos origin = bhr.getBlockPos();
+		BlockPos origin = blockTarget;
 		int xDiff = xSize/2;
 		int yDiff = ySize/2;
 		int zDiff = zSize/2;
@@ -471,14 +501,16 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						|| armorItems.contains(BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get()) || slotId == -1) {
 					if (entity instanceof LivingEntity living && !living.isSpectator()) {
 						if (level.isClientSide) {
-							if (player.getMainHandItem().isEmpty()
-									&& stack.getItem() instanceof MiningLaserRightArmArmor) {
-								this.passiveAnimation(stack);
-							} else if (player.getOffhandItem().isEmpty()
-									&& stack.getItem() instanceof MiningLaserLeftArmArmor) {
-								this.passiveAnimation(stack);
-							} else {
-								this.inertAnimation(stack);
+							if (stack.getItem() instanceof ArmorBase base) {
+								if (player.getMainHandItem().isEmpty()
+										&& base.mechPart == MechPart.RightArm) {
+									this.passiveAnimation(stack);
+								} else if (player.getOffhandItem().isEmpty()
+										&& base.mechPart == MechPart.LeftArm) {
+									this.passiveAnimation(stack);
+								} else {
+									this.inertAnimation(stack);
+								}
 							}
 						}
 					}
