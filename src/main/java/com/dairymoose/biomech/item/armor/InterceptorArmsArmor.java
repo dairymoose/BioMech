@@ -71,7 +71,10 @@ public class InterceptorArmsArmor extends ArmorBase {
 			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
 			if (armorItems.contains(BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living) {
-					if ((stack.getTag() != null && stack.getTag().contains("DodgeTicks")) || dodgedProjectileSet.contains(entity)) {
+					boolean setHasEntity = dodgedProjectileSet.contains(entity);
+					if ((stack.getTag() != null && stack.getTag().contains("DodgeTicks")) || setHasEntity) {
+						if (setHasEntity)
+							BioMech.clientSideItemAnimation(stack, this.dispatcher.PASSIVE_COMMAND.cmd);
 						dodgedProjectileSet.remove(entity);
 						
 						CompoundTag tag = stack.getOrCreateTag();
@@ -86,7 +89,6 @@ public class InterceptorArmsArmor extends ArmorBase {
 								BioMech.clientSideItemAnimation(stack, this.dispatcher.PASSIVE_COMMAND.cmd);
 							} else {
 								tag.putInt("DodgeTicks", ticks);
-								BioMech.clientSideItemAnimation(stack, this.dispatcher.PASSIVE_COMMAND.cmd);
 								BioMech.clientSideItemAnimation(stack, this.dispatcher.DEFLECT_COMMAND.cmd);
 							}
 						}

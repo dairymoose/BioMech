@@ -911,6 +911,10 @@ public class BioMech
     		return;
     	}
     	
+    	if (itemStack.isEmpty()) {
+    		return;
+    	}
+    	
     	try {
 	    	if (itemStack.getTag() != null && itemStack.getOrCreateTag().contains(AzureLib.ITEM_UUID_TAG)) {
 	    		AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
