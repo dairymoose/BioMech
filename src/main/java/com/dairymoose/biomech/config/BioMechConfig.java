@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.item.armor.GatlingArmArmor;
+import com.dairymoose.biomech.item.armor.OpticsUnitArmor;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -91,6 +92,11 @@ public class BioMechConfig {
 					BioMech.requireModifierKeyForArmUsage = BioMechConfig.CLIENT.requireModifierKeyToActivateHands.get().booleanValue();
 					BioMech.hideMainHandWhileInactive = BioMechConfig.CLIENT.hideMainHandWhileNotInUse.get().booleanValue();
 					BioMech.hideOffHandWhileInactive = BioMechConfig.CLIENT.hideOffHandWhileNotInUse.get().booleanValue();
+					
+					OpticsUnitArmor.unopenedChestsOnly = BioMechConfig.CLIENT.opticsUnitHighlightsUnopenedChestsOnly.get().booleanValue();
+					BioMech.ClientModEvents.opticsUnitZoomEnabled = BioMechConfig.CLIENT.opticsUnitAllowZoomIn.get().booleanValue();
+					OpticsUnitArmor.canEverHighlightSpawners = BioMechConfig.CLIENT.opticsUnitCanEverHighlightSpawners.get().booleanValue();
+					OpticsUnitArmor.canEverHighlightChests = BioMechConfig.CLIENT.opticsUnitCanEverHighlightChests.get().booleanValue();
 				}
 				};});
 

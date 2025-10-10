@@ -9,6 +9,12 @@ public class BioMechClientConfig {
 	public final ForgeConfigSpec.BooleanValue requireEmptyHandsToActivateBioMechHands;
 	public final ForgeConfigSpec.BooleanValue hideMainHandWhileNotInUse;
 	public final ForgeConfigSpec.BooleanValue hideOffHandWhileNotInUse;
+	
+	public final ForgeConfigSpec.BooleanValue opticsUnitHighlightsUnopenedChestsOnly;
+	public final ForgeConfigSpec.BooleanValue opticsUnitCanEverHighlightSpawners;
+	public final ForgeConfigSpec.BooleanValue opticsUnitCanEverHighlightChests;
+	public final ForgeConfigSpec.BooleanValue opticsUnitAllowZoomIn;
+	
 	public final ConfigValue<Double> showEnergySuitGuiThreshold;
 	//public final ConfigValue<Double> energySuitGuiOpacity;
 	public final ConfigValue<Double> energySuitGuiXScale;
@@ -24,10 +30,20 @@ public class BioMechClientConfig {
 	
 	public BioMechClientConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("first_person");
-		this.requireModifierKeyToActivateHands = builder.comment("requireModifierKeyToActivateHands").translation("config.biomech.requireModifierKeyToActivateHands").define("requireModifierKeyToActivateHands", true);
 		this.hideMainHandWhileNotInUse = builder.comment("hideMainHandWhileNotInUse").translation("config.biomech.hideMainHandWhileNotInUse").define("hideMainHandWhileNotInUse", false);
 		this.hideOffHandWhileNotInUse = builder.comment("hideOffHandWhileNotInUse").translation("config.biomech.hideOffHandWhileNotInUse").define("hideOffHandWhileNotInUse", false);
+		builder.pop();
+		
+		builder.push("input");
+		this.requireModifierKeyToActivateHands = builder.comment("requireModifierKeyToActivateHands").translation("config.biomech.requireModifierKeyToActivateHands").define("requireModifierKeyToActivateHands", true);
 		this.requireEmptyHandsToActivateBioMechHands = builder.comment("requireEmptyHandsToActivateBioMechHands").translation("config.biomech.requireEmptyHandsToActivateBioMechHands").define("requireEmptyHandsToActivateBioMechHands", false);
+		builder.pop();
+		
+		builder.push("items");
+		this.opticsUnitHighlightsUnopenedChestsOnly = builder.comment("opticsUnitHighlightsUnopenedChestsOnly").translation("config.biomech.opticsUnitHighlightsUnopenedChestsOnly").define("opticsUnitHighlightsUnopenedChestsOnly", true);
+		this.opticsUnitCanEverHighlightSpawners = builder.comment("opticsUnitCanEverHighlightSpawners").translation("config.biomech.opticsUnitCanEverHighlightSpawners").define("opticsUnitCanEverHighlightSpawners", true);
+		this.opticsUnitCanEverHighlightChests = builder.comment("opticsUnitCanEverHighlightChests").translation("config.biomech.opticsUnitCanEverHighlightChests").define("opticsUnitCanEverHighlightChests", true);
+		this.opticsUnitAllowZoomIn = builder.comment("opticsUnitAllowZoomIn").translation("config.biomech.opticsUnitAllowZoomIn").define("opticsUnitAllowZoomIn", true);
 		builder.pop();
 		
 		builder.push("gui");

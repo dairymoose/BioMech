@@ -34,6 +34,7 @@ import com.dairymoose.biomech.item.armor.MiningLaserLeftArmArmor;
 import com.dairymoose.biomech.item.armor.MiningLaserRightArmArmor;
 import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
 import com.dairymoose.biomech.item.armor.NightVisionVisorArmor;
+import com.dairymoose.biomech.item.armor.OpticsUnitArmor;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.armor.PipeMechHeadArmor;
 import com.dairymoose.biomech.item.armor.PipeMechLeftArmArmor;
@@ -151,6 +152,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_POWER_LEGGINGS = BioMech.ITEMS.register("power_leggings", () -> new PowerLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_POWER_ARM = BioMech.ITEMS.register("power_arm", () -> new PowerRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	//POWER MECH
+	
+	public static RegistryObject<Item> ITEM_OPTICS_UNIT = BioMech.ITEMS.register("optics_unit", () -> new OpticsUnitArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_INTERCEPTOR_ARMS = BioMech.ITEMS.register("interceptor_arms", () -> new InterceptorArmsArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	

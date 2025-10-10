@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.UUID;
 
@@ -46,6 +47,7 @@ import com.dairymoose.biomech.armor.renderer.MiningLaserLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.MiningLaserRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.MobilityTreadsRenderer;
 import com.dairymoose.biomech.armor.renderer.NightVisionVisorRenderer;
+import com.dairymoose.biomech.armor.renderer.OpticsUnitRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechBodyRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechHeadRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechLeftArmRenderer;
@@ -74,6 +76,7 @@ import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MechPartUtil;
 import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
+import com.dairymoose.biomech.item.armor.OpticsUnitArmor;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.armor.PowerArmArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
@@ -106,7 +109,9 @@ import com.dairymoose.biomech.particle.ThickestLaserParticle;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 
@@ -128,8 +133,14 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.OutlineBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderStateShard.DepthTestStateShard;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -159,9 +170,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
@@ -171,10 +184,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ComputeFovModifierEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.InputEvent.MouseScrollingEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -185,10 +201,14 @@ import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.LivingDestroyBlockEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -202,6 +222,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.network.PlayMessages.OpenContainer;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -387,55 +408,6 @@ public class BioMech
     }
     
     @SubscribeEvent
-    public void onFovEvent(ComputeFovModifierEvent event) {
-    	BioMechPlayerData playerData = BioMech.globalPlayerData.get(event.getPlayer().getUUID());
-		if (playerData != null) {
-			ItemStack itemStack = playerData.getForSlot(MechPart.Leggings).itemStack;
-			if (itemStack.getItem() instanceof MobilityTreadsArmor armor) {
-				float fovMod = 1.f + (MobilityTreadsArmor.SPEED_BOOST_SLOW + 1) * 0.1f;
-				if (MobilityTreadsArmor.localPlayerSpeedBoosting) {
-					fovMod = 1.f + (MobilityTreadsArmor.SPEED_BOOST_FAST + 1) * 0.1f;
-				}
-				
-				float calcFov = event.getNewFovModifier();
-				//try to avoid altering FOV but allow other legitimate FOV sources
-				float fovAccountingForSpeed = (event.getNewFovModifier() / fovMod);
-				if (fovAccountingForSpeed <= 1.182f) {
-					calcFov = 1.0f;
-				} else {
-					BioMech.LOGGER.info("adjust fov=" + fovAccountingForSpeed);
-				}
-				
-				//BioMech.LOGGER.info("fov calc=" + calcFov + " vs " + event.getNewFovModifier());
-				event.setNewFovModifier(calcFov);
-			}
-			
-			boolean enableGatlingZoom = false;
-			if (enableGatlingZoom) {
-				HandActiveStatus has = handActiveMap.get(event.getPlayer().getUUID());
-				if (has != null) {
-					boolean gatlingZoom = false;
-					if (has.rightHandActive) {
-						SlottedItem mainHand = playerData.getForSlot(MechPart.RightArm);
-						if (mainHand.itemStack.getItem() instanceof GatlingArmArmor gat) {
-							gatlingZoom = true;
-						}
-					} else if (has.leftHandActive) {
-						SlottedItem mainHand = playerData.getForSlot(MechPart.LeftArm);
-						if (mainHand.itemStack.getItem() instanceof GatlingArmArmor gat) {
-							gatlingZoom = true;
-						}
-					}
-					
-					if (gatlingZoom) {
-						event.setNewFovModifier(event.getNewFovModifier()/1.2f);
-					}
-				}
-			}
-		}
-	}
-    
-    @SubscribeEvent
     public void onCommand(RegisterCommandsEvent event) {
 		BioMechCommand.register(event.getDispatcher());
 	}
@@ -465,6 +437,7 @@ public class BioMech
 		lootBioMechInChest = null;
 		lootItemsToAdd.clear();
 		lootPoolChances.clear();
+		outlinedSpawners.clear();
     }
     
     private static TagKey<Item> pickaxeBlockTag = ForgeRegistries.ITEMS.tags().createTagKey(new ResourceLocation("minecraft", "pickaxes"));
@@ -1198,6 +1171,16 @@ public class BioMech
     
     public static boolean requireModifierKeyForArmUsage = true;
     
+    public enum OutlinerType {
+    	SPAWNER,
+    	CHEST
+    }
+    public static class OutlinedSpawnerInfo {
+		public BlockPos pos;
+		public OutlinerType type;
+	}
+	public static List<OutlinedSpawnerInfo> outlinedSpawners = new ArrayList<>();
+    
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents
@@ -1249,7 +1232,175 @@ public class BioMech
         		}
     		}
     	}
-
+    	
+    	@SubscribeEvent
+    	public void onOpenChest(PlayerInteractEvent.RightClickBlock event) {
+    		Player player = event.getEntity();
+			if (player.level().isClientSide && player.isLocalPlayer()) {
+				BlockPos pos = event.getPos();
+				BlockEntity blockEntity = player.level().getBlockEntity(pos);
+				if (blockEntity instanceof RandomizableContainerBlockEntity rnd) {
+					if (!outlinedSpawners.isEmpty()) {
+						synchronized (outlinedSpawners) {
+							List<OutlinedSpawnerInfo> toRemove = new ArrayList<>();
+							for (OutlinedSpawnerInfo info : outlinedSpawners) {
+								if (info.pos != null && info.pos.equals(pos)) {
+									toRemove.add(info);
+								}
+							}
+							for (OutlinedSpawnerInfo info : toRemove) {
+								//remove golden chest outline if we just opened it
+	            				outlinedSpawners.remove(info);
+	            				OpticsUnitArmor.capturedSpawners.remove(info.pos);
+	            			}
+						}
+					}
+				}
+			}
+    	}
+    	
+    	//same as LINE but with NO_DEPTH_TEST
+    	public static RenderType BIOMECH_LINE = RenderType.create("biomech_line", DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 256, false, false, RenderType.CompositeState.builder().setDepthTestState(RenderStateShard.NO_DEPTH_TEST).setShaderState(RenderType.RENDERTYPE_LINES_SHADER).setLineState(new RenderStateShard.LineStateShard(OptionalDouble.empty())).setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING).setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY).setOutputState(RenderType.ITEM_ENTITY_TARGET).setWriteMaskState(RenderType.COLOR_DEPTH_WRITE).setCullState(RenderType.NO_CULL).createCompositeState(false));
+    	@SubscribeEvent
+    	public void onRenderWorld(RenderLevelStageEvent event) {
+    		if (Minecraft.getInstance().player == null)
+    			return;
+    		
+    		if (event.getStage() == Stage.AFTER_SOLID_BLOCKS) {
+    			if (!outlinedSpawners.isEmpty()) {
+        			synchronized (outlinedSpawners) {
+        				List<OutlinedSpawnerInfo> toRemove = new ArrayList<>();
+        				for (OutlinedSpawnerInfo info : outlinedSpawners) {
+            				if (Minecraft.getInstance().player.distanceToSqr(info.pos.getCenter()) > (OpticsUnitArmor.XZ_SIZE*OpticsUnitArmor.XZ_SIZE)) {
+            					toRemove.add(info);
+            					continue;
+            				}
+            				event.getPoseStack().pushPose();
+            				Vec3 camPos = event.getCamera().getPosition();
+                    		event.getPoseStack().translate(-camPos.x, -camPos.y, -camPos.z);
+                    		OutlineBufferSource outlineBuffer = Minecraft.getInstance().renderBuffers().outlineBufferSource();
+                    		float r = 1.0f;
+                    		float g = 1.0f;
+                    		float b = 1.0f;
+                    		if (info.type == OutlinerType.CHEST) {
+                    			r = 1.0f;
+                    			g = 0.84f;
+                    			b = 0.0f;
+                    		}
+                    		float a = 0.5f;
+                    		Vec3 loc = info.pos.getCenter().add(-0.5, -0.5, -0.5);
+                    		float boxSize = 1.0f;
+                    		LevelRenderer.renderLineBox(event.getPoseStack(), outlineBuffer.getBuffer(BIOMECH_LINE), loc.x, loc.y, loc.z, loc.x+boxSize, loc.y+boxSize, loc.z+boxSize, r, g, b, a);
+                    		event.getPoseStack().popPose();
+            			}
+            			for (OutlinedSpawnerInfo info : toRemove) {
+            				outlinedSpawners.remove(info);
+            				OpticsUnitArmor.capturedSpawners.remove(info.pos);
+            			}
+					}
+        		}
+    		}
+    	}
+    	
+    	@SubscribeEvent
+        public void onScrollEvent(MouseScrollingEvent event) {
+    		BioMechPlayerData playerData = BioMech.globalPlayerData.get(Minecraft.getInstance().player.getUUID());
+    		if (playerData != null) {
+    			ItemStack headStack = playerData.getForSlot(MechPart.Head).itemStack;
+    			if (headStack.getItem() instanceof OpticsUnitArmor armor) {
+    				if (localPlayerHoldingAlt) {
+    					event.setCanceled(true);
+    					maxOpticZoom += event.getScrollDelta();
+    					if (maxOpticZoom < 0.0f) {
+    						maxOpticZoom = 0.0f;
+    					} else if (maxOpticZoom > 9.0f) {
+    						maxOpticZoom = 9.0f;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	
+    	public static boolean opticsUnitZoomEnabled = true;
+    	private static float MAX_OPTIC_ZOOM_DEFAULT = 4.0f;
+    	private static float maxOpticZoom = MAX_OPTIC_ZOOM_DEFAULT;
+    	private static float opticsZoomProgress = 0.0f;
+    	@SubscribeEvent
+        public void onFovEvent(ComputeFovModifierEvent event) {
+        	BioMechPlayerData playerData = BioMech.globalPlayerData.get(event.getPlayer().getUUID());
+    		if (playerData != null) {
+    			if (opticsUnitZoomEnabled) {
+    				ItemStack headStack = playerData.getForSlot(MechPart.Head).itemStack;
+        			if (headStack.getItem() instanceof OpticsUnitArmor armor) {
+        				float zoomMod = 0.0f;
+        				float fovPerTick = 0.34f;
+        				if (localPlayerHoldingAlt) {
+        					opticsZoomProgress += fovPerTick;
+        				} else {
+        					opticsZoomProgress -= fovPerTick;
+        				}
+        				if (opticsZoomProgress < 0.0f)
+        					opticsZoomProgress = 0.0f;
+        				else if (opticsZoomProgress > 1.0f)
+        					opticsZoomProgress = 1.0f;
+        				zoomMod = 1.0f + (opticsZoomProgress * maxOpticZoom);
+        				
+        				if (zoomMod > 1.0f) {
+        					float calcFov = event.getNewFovModifier()/zoomMod;
+        					BioMech.LOGGER.info("adjust fov to=" + calcFov + " with progress=" + opticsZoomProgress + " and zoomMod=" + zoomMod);
+        					event.setNewFovModifier(calcFov);
+        					return;
+        				} else if (opticsZoomProgress == 0.0f) {
+        					maxOpticZoom = MAX_OPTIC_ZOOM_DEFAULT;
+        				}
+        			}
+        		}
+    			
+    			ItemStack itemStack = playerData.getForSlot(MechPart.Leggings).itemStack;
+    			if (itemStack.getItem() instanceof MobilityTreadsArmor armor) {
+    				float fovMod = 1.f + (MobilityTreadsArmor.SPEED_BOOST_SLOW + 1) * 0.1f;
+    				if (MobilityTreadsArmor.localPlayerSpeedBoosting) {
+    					fovMod = 1.f + (MobilityTreadsArmor.SPEED_BOOST_FAST + 1) * 0.1f;
+    				}
+    				
+    				float calcFov = event.getNewFovModifier();
+    				//try to avoid altering FOV but allow other legitimate FOV sources
+    				float fovAccountingForSpeed = (event.getNewFovModifier() / fovMod);
+    				if (fovAccountingForSpeed <= 1.182f) {
+    					calcFov = 1.0f;
+    				} else {
+    					BioMech.LOGGER.info("adjust fov=" + fovAccountingForSpeed);
+    				}
+    				
+    				//BioMech.LOGGER.info("fov calc=" + calcFov + " vs " + event.getNewFovModifier());
+    				event.setNewFovModifier(calcFov);
+    			}
+    			
+    			boolean enableGatlingZoom = false;
+    			if (enableGatlingZoom) {
+    				HandActiveStatus has = handActiveMap.get(event.getPlayer().getUUID());
+    				if (has != null) {
+    					boolean gatlingZoom = false;
+    					if (has.rightHandActive) {
+    						SlottedItem mainHand = playerData.getForSlot(MechPart.RightArm);
+    						if (mainHand.itemStack.getItem() instanceof GatlingArmArmor gat) {
+    							gatlingZoom = true;
+    						}
+    					} else if (has.leftHandActive) {
+    						SlottedItem mainHand = playerData.getForSlot(MechPart.LeftArm);
+    						if (mainHand.itemStack.getItem() instanceof GatlingArmArmor gat) {
+    							gatlingZoom = true;
+    						}
+    					}
+    					
+    					if (gatlingZoom) {
+    						event.setNewFovModifier(event.getNewFovModifier()/1.2f);
+    					}
+    				}
+    			}
+    		}
+    	}
+    	
     	private ResourceLocation GUI_SUIT_ENERGY_LOCATION = new ResourceLocation(MODID, "textures/gui/suit_energy.png");
     	private int GUI_SUIT_ENERGY_TEX_SIZE = 32;
     	private int GUI_SUIT_ENERGY_BORDER_HEIGHT = 8;
@@ -1731,6 +1882,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(BatteryPackRenderer::new, BioMechRegistry.ITEM_BATTERY_PACK.get());
         	AzArmorRendererRegistry.register(DiggerRightArmRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
         	AzArmorRendererRegistry.register(DiggerLeftArmRenderer::new, BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
+        	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
@@ -1768,7 +1920,7 @@ public class BioMech
         	AzItemRendererRegistry.register(DiggerArmItemRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
         	//------ Arm items - render item display ------
         	
-        	//------ Arms / Animated ------
+        	//------ All Animated ------
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_MINING_LASER_ARM.get(), BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_DRILL_ARM.get(), BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_BUZZSAW_ARM.get(), BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
@@ -1776,7 +1928,7 @@ public class BioMech
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
         	AzIdentityRegistry.register(BioMechRegistry.ITEM_DIGGER_ARM.get(), BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
-        	//------ Arms / Animated ------
+        	//------ All Animated ------
         	
         	
         	
