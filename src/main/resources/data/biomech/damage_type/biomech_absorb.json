@@ -1,4 +1,5 @@
 {
+  //zero-cooldown armor-ignoring attack damage
   "exhaustion": 0.0,
   "message_id": "biomech_absorb",
   "scaling": "when_caused_by_living_non_player"

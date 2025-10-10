@@ -77,6 +77,7 @@
 	"item.biomech.mobility_treads": "§5Mobility Treads§0",
 	"item.biomech.mobility_treads.tooltip1": "Grants increased movement speed.",
 	"item.biomech.mobility_treads.tooltip2": "Speed increases even more after 5 seconds of forward motion.",
+	"item.biomech.mobility_treads.tooltip3": "§6I don't want to just survive, I want to live!",
 	
 	"item.biomech.elytra_mech_chestplate": "§5Elytra Mech Chestplate§0",
 	"item.biomech.elytra_mech_chestplate.tooltip1": "Grants elytra flight.",
@@ -171,7 +172,7 @@
 	"item.biomech.interceptor_arms.tooltip3": "§6The power of the sun in the palm of your hand.§0",
 	
 	"item.biomech.heros_headpiece": "§5Hero's Headpiece§0",
-	"item.biomech.heros_headpiece.tooltip1": "Overall damage increased by 15% when an enemy is within 3 blocks of you.",
+	"item.biomech.heros_headpiece.tooltip1": "Overall damage done increased by {near_damage_boost}% when an enemy is within {nearby_enemy_range} blocks of you.",
 	"item.biomech.heros_headpiece.tooltip2": "Take 50% reduced damage from explosions.",
 	"item.biomech.heros_headpiece.tooltip3": "§6No following.§0",
 	

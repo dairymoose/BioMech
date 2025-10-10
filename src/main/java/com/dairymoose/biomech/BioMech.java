@@ -161,7 +161,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -892,7 +891,7 @@ public class BioMech
 	        	if (anim != null) {
 	        		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
 	        	} else {
-	        		BioMech.LOGGER.debug("anim was null for itemStack: " + itemStack + " with tag=" + itemStack.getTag().getUUID(AzureLib.ITEM_UUID_TAG));
+	        		BioMech.LOGGER.trace("anim was null for itemStack: " + itemStack + " with tag=" + itemStack.getTag().getUUID(AzureLib.ITEM_UUID_TAG));
 	        	}
 	    	} else {
 	    		BioMech.LOGGER.debug("missing az_id UUID tag for itemStack: " + itemStack);
@@ -1010,6 +1009,11 @@ public class BioMech
 					BioMechPlayerData playerData = null;
 		        	playerData = globalPlayerData.get(player.getUUID());
 		        	if (playerData != null) {
+		        		DamageAbsorbInfo dai = new DamageAbsorbInfo();
+		        		List<SlottedItem> slottedItems = playerData.getAllSlots();
+		        		getDamageAbsorbStats(dai, slottedItems);
+		        		//BioMech.LOGGER.info("damage done: " + event.getAmount() + " to entity " + event.getEntity());
+		        		
 		        		MechPart[] parts = { MechPart.RightArm, MechPart.LeftArm };
 		        		for (MechPart part : parts) {
 		        			ItemStack itemStack = playerData.getForSlot(part).itemStack;
@@ -1022,6 +1026,7 @@ public class BioMech
 			        			if (!active) {
 			        				if (!event.getEntity().isDeadOrDying() && !event.getEntity().isInvulnerable() && event.getEntity().attackable() && event.getEntity().invulnerableTime <= 0) {
 			        					tag.putBoolean("ActiveArm", true);
+			        					BioMech.LOGGER.debug("apply bonus damage of: " + 2.0f);
 					        			event.getEntity().hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), 2.0f);
 					        			event.getEntity().invulnerableTime = 0;
 					        			event.getEntity().hurtDuration = 0;
@@ -1032,17 +1037,26 @@ public class BioMech
 			        		}
 		        		}
 		        		
-		        		ItemStack itemStack = playerData.getForSlot(MechPart.Head).itemStack;
-		        		if (itemStack.getItem() instanceof HerosHeadpieceArmor head) {
+		        		if (dai.hasAnyNearbyDamageBoost) {
 		        			boolean active = false;
-		        			CompoundTag tag = itemStack.getOrCreateTag();
-		        			if (tag.contains("DamageBoosting")) {
-		        				active = tag.getBoolean("DamageBoosting");
+		        			for (SlottedItem slotted : slottedItems) {
+		        				ItemStack itemStack = slotted.itemStack;
+				        		if (itemStack.getItem() instanceof ArmorBase base) {
+				        			if (base.getNearbyEnemyDamageBoost() > 0.0f) {
+				        				CompoundTag tag = itemStack.getTag();
+					        			if (tag != null && tag.contains(HerosHeadpieceArmor.TAG_DAMAGE_BOOSTING)) {
+					        				if (tag.getBoolean(HerosHeadpieceArmor.TAG_DAMAGE_BOOSTING)) {
+					        					active = true;
+					        				}
+					        			}
+				        			}
+				        		}
 		        			}
 		        			if (active) {
+		        				float boostPct = HerosHeadpieceArmor.getTotalNearbyDamageBoostPct(player);
 		        				if (!event.getEntity().isDeadOrDying() && !event.getEntity().isInvulnerable() && event.getEntity().attackable() && event.getEntity().invulnerableTime <= 0) {
-		        					BioMech.LOGGER.info("apply bonus damage of: " + (event.getAmount() * 0.15f));
-				        			event.getEntity().hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), event.getAmount() * 0.15f);
+		        					//BioMech.LOGGER.debug("apply bonus damage of: " + (event.getAmount() * boostPct));
+				        			event.getEntity().hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), event.getAmount() * boostPct);
 				        			event.getEntity().invulnerableTime = 0;
 				        			event.getEntity().hurtDuration = 0;
 			        				event.getEntity().hurtTime = 0;
@@ -1111,6 +1125,8 @@ public class BioMech
 		boolean hasAnyDamageAbsorb = false;
 		boolean hasAnyDamageAvoid = false;
 		boolean hasAnyProjectileAvoid = false;
+		boolean hasAnyNearbyDamageBoost = false;
+		boolean hasExplosionDamageReduction = false;
 	}
 	//this event only fires on the server
 	//LivingHurtEvent - damage before armor/magic mitigation
@@ -1155,10 +1171,16 @@ public class BioMech
 					}
 				}
 				
-				if (event.getSource().type() == player.level().damageSources().explosion(null).type()) {
-					BioMech.LOGGER.info("explosion damage: " + event.getAmount());
-					if (IronMechChestArmor.absorbDirectAttack(playerData, 0.50f, event.getSource(), event.getAmount(), player, true)) {
-						event.setCanceled(true);
+				if (dai.hasExplosionDamageReduction) {
+					float explosionDr = HerosHeadpieceArmor.getTotalExplosionDamageReduction(player);
+					
+					DamageType genericExplosion = player.level().damageSources().explosion(null, null).type();
+					DamageType playerExplosion = player.level().damageSources().explosion(player, player).type();
+					if (event.getSource().type() == genericExplosion || event.getSource().type() == playerExplosion) {
+						BioMech.LOGGER.debug("explosion damage taken: " + event.getAmount());
+						if (IronMechChestArmor.absorbDirectAttack(playerData, explosionDr, event.getSource(), event.getAmount(), player, false)) {
+							event.setCanceled(true);
+						}
 					}
 				}
         	}
@@ -1177,6 +1199,12 @@ public class BioMech
 					}
 					if (base.getProjectileAvoidPercent() > 0.0f) {
 						dai.hasAnyProjectileAvoid = true;
+					}
+					if (base.getNearbyEnemyDamageBoost() > 0.0f) {
+						dai.hasAnyNearbyDamageBoost = true;
+					}
+					if (base.getExplosionDamageReduction() > 0.0f) {
+						dai.hasExplosionDamageReduction = true;
 					}
 				}
 			}

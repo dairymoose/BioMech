@@ -19,7 +19,6 @@ import com.dairymoose.biomech.item.armor.DiggerRightArmArmor;
 import com.dairymoose.biomech.item.armor.DrillLeftArmArmor;
 import com.dairymoose.biomech.item.armor.DrillRightArmArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
-import com.dairymoose.biomech.item.armor.GatlingArmArmor;
 import com.dairymoose.biomech.item.armor.GatlingLeftArmArmor;
 import com.dairymoose.biomech.item.armor.GatlingRightArmArmor;
 import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
@@ -116,8 +115,6 @@ public class BioMechRegistry {
 	
 	public static RegistryObject<Item> ITEM_SPIDER_WALKERS = BioMech.ITEMS.register("spider_walkers", () -> new SpiderWalkersArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	
-	public static RegistryObject<Item> ITEM_MOBILITY_TREADS = BioMech.ITEMS.register("mobility_treads", () -> new MobilityTreadsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
-	
 	public static RegistryObject<Item> ITEM_ELYTRA_MECH_CHESTPLATE = BioMech.ITEMS.register("elytra_mech_chestplate", () -> new ElytraMechChestplateArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_HOVERTECH_LEGGINGS = BioMech.ITEMS.register("hovertech_leggings", () -> new HovertechLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
@@ -154,9 +151,14 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_POWER_ARM = BioMech.ITEMS.register("power_arm", () -> new PowerRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	//POWER MECH
 	
+	//HERO SET
 	public static RegistryObject<Item> ITEM_HEROS_HEADPIECE = BioMech.ITEMS.register("heros_headpiece", () -> new HerosHeadpieceArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
+	//HERO SET
 	
+	//LOAD LIFTER SET
 	public static RegistryObject<Item> ITEM_OPTICS_UNIT = BioMech.ITEMS.register("optics_unit", () -> new OpticsUnitArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_MOBILITY_TREADS = BioMech.ITEMS.register("mobility_treads", () -> new MobilityTreadsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
+	//LOAD LIFTER SET
 	
 	public static RegistryObject<Item> ITEM_INTERCEPTOR_ARMS = BioMech.ITEMS.register("interceptor_arms", () -> new InterceptorArmsArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
