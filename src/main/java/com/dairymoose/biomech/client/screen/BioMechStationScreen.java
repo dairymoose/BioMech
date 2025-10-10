@@ -16,6 +16,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -108,8 +109,25 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 			this.addRenderableWidget(imageButton);
 			++intHolder.counter;
 		}
+		
+		if (this.getMenu().containerId == -1) {
+			int x = this.leftPos + 87;
+			int y = this.topPos + 7;
+			int buttonWidth = 9;
+			int buttonHeight = 9;
+			int texStartX = 194;
+			int texStartY = 18;
+			ImageButton inventoryButton = new ImageButton(x, y,
+					buttonWidth, buttonHeight, texStartX, texStartY,
+					buttonHeight, GUI_LOCATION, 256, 256, new Button.OnPress() {
+						@Override
+						public void onPress(Button btn) {
+							Minecraft.getInstance().setScreen(new InventoryScreen(Minecraft.getInstance().player));
+						}
 
-		// this.addRenderableWidget(headVisibilityButton);
+					});
+			this.addRenderableWidget(inventoryButton);
+		}
 	}
 
 	public BioMechStationScreen(BioMechStationMenu p_98798_, Inventory p_98799_, Component p_98800_) {
@@ -132,17 +150,19 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 		}
 	}
 	
+	public static int TEX_DARK_X = 4;
+	public static int TEX_DARK_Y = 170;
 	public void render(GuiGraphics gui, int p_282102_, int p_282423_, float p_282621_) {
 		this.renderBackground(gui);
 		super.render(gui, p_282102_, p_282423_, p_282621_);
 		this.renderSlotIcons(gui, p_282621_, p_282102_, p_282423_);
 		this.renderTooltip(gui, p_282102_, p_282423_);
 
-		for (int i=0; i<this.children().size(); ++i) {
+		for (int i=0; i<visibilityMatrix.length; ++i) {
 			ScreenRectangle rect = this.children().get(i).getRectangle();
 			if (!visibilityMatrix[i]) {
 				//cover the eye with a gray blotch when the BioMech part is hidden
-				gui.blit(GUI_LOCATION, rect.left() + 6, rect.top() + 3, SLOT_TEXTURE_START_X, SLOT_TEXTURE_START_Y, 4, 4);
+				gui.blit(GUI_LOCATION, rect.left() + 6, rect.top() + 3, TEX_DARK_X, TEX_DARK_Y, 4, 4);
 			}
 		}
 		

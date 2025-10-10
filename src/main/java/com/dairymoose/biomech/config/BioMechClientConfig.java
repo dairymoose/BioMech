@@ -16,7 +16,6 @@ public class BioMechClientConfig {
 	public final ForgeConfigSpec.BooleanValue opticsUnitAllowZoomIn;
 	
 	public final ConfigValue<Double> showEnergySuitGuiThreshold;
-	//public final ConfigValue<Double> energySuitGuiOpacity;
 	public final ConfigValue<Double> energySuitGuiXScale;
 	public final ConfigValue<Double> energySuitGuiYScale;
 	public final ConfigValue<Double> energySuitGuiXPos;
@@ -27,6 +26,10 @@ public class BioMechClientConfig {
 	public final ConfigValue<Double> suitEnergyTextYScale;
 	
 	public final ForgeConfigSpec.BooleanValue showEnergyDrainRate;
+	
+	public final ForgeConfigSpec.BooleanValue showBioMechInventoryButton;
+	public final ForgeConfigSpec.IntValue bioMechInventoryButtonX;
+	public final ForgeConfigSpec.IntValue bioMechInventoryButtonY;
 	
 	public BioMechClientConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("first_person");
@@ -47,8 +50,13 @@ public class BioMechClientConfig {
 		builder.pop();
 		
 		builder.push("gui");
+		this.showBioMechInventoryButton = builder.comment("showBioMechInventoryButton").translation("config.biomech.showBioMechInventoryButton").define("showBioMechInventoryButton", true);
+		this.bioMechInventoryButtonX = builder.comment("bioMechInventoryButtonX").translation("config.biomech.bioMechInventoryButtonX").defineInRange("bioMechInventoryButtonX", 77, 0, 255);
+		this.bioMechInventoryButtonY = builder.comment("bioMechInventoryButtonY").translation("config.biomech.bioMechInventoryButtonY").defineInRange("bioMechInventoryButtonY", 7, 0, 255);
+		builder.pop();
+		
+		builder.push("gui");
 		this.showEnergySuitGuiThreshold = builder.comment("showEnergySuitGuiThreshold").translation("config.biomech.showEnergySuitGuiThreshold").defineInRange("showEnergySuitGuiThreshold", 0.9999, 0.0, 1.0);
-		//this.energySuitGuiOpacity = builder.comment("energySuitGuiOpacity").translation("config.biomech.energySuitGuiOpacity").defineInRange("energySuitGuiOpacity", 0.75, 0.0, 1.0);
 		this.energySuitGuiXScale = builder.comment("energySuitGuiXScale").translation("config.biomech.energySuitGuiXScale").defineInRange("energySuitGuiXScale", 1.25, 0.0, 5.0);
 		this.energySuitGuiYScale = builder.comment("energySuitGuiYScale").translation("config.biomech.energySuitGuiYScale").defineInRange("energySuitGuiYScale", 1.25, 0.0, 5.0);
 		this.energySuitGuiXPos = builder.comment("energySuitGuiXPos").translation("config.biomech.energySuitGuiXPos").defineInRange("energySuitGuiXPos", 0.29, 0.0, 1.0);

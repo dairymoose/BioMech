@@ -129,7 +129,13 @@ import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
 import mod.azure.azurelib.rewrite.render.item.AzItemRendererRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -192,6 +198,7 @@ import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
@@ -1264,6 +1271,37 @@ public class BioMech
     		for (KeyMapping mapping : allKeyMappings) {
 				event.register(mapping);
 			}
+        }
+    	
+    	public static boolean inventoryButtonVisible = true;
+    	public static int inventoryButtonScreenX = 77;
+    	public static int inventoryButtonScreenY = 7;
+    	private static final ResourceLocation GUI_LOCATION = ResourceLocation.fromNamespaceAndPath(BioMech.MODID,
+    			"textures/gui/biomech_station.png");
+    	@SuppressWarnings("unchecked")
+		@SubscribeEvent
+        public void onScreenOpen(ScreenEvent.Init.Post event) {
+        	if (event.getScreen() instanceof InventoryScreen screen) {
+        		if (inventoryButtonVisible) {
+        			int x = screen.getGuiLeft() + inventoryButtonScreenX;
+            		int y = screen.getGuiTop() + inventoryButtonScreenY;
+            		int buttonWidth = 9;
+            		int buttonHeight = 9;
+            		int texStartX = 194;
+            		int texStartY = 0;
+            		ImageButton imageButton = new ImageButton(x, y,
+            				buttonWidth, buttonHeight, texStartX, texStartY,
+            				buttonHeight, GUI_LOCATION, 256, 256, new Button.OnPress() {
+        						@Override
+        						public void onPress(Button btn) {
+        							Minecraft.getInstance().setScreen(new BioMechStationScreen(new BioMechStationMenu(-1, Minecraft.getInstance().player.getInventory()), Minecraft.getInstance().player.getInventory(), Component.literal("BioMech")));
+        						}
+
+        					});
+            		screen.renderables.add(imageButton);
+            		((List)screen.children()).add(imageButton);
+        		}
+        	}
         }
     	
     	@SubscribeEvent

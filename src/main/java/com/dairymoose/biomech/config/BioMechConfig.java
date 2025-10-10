@@ -97,6 +97,10 @@ public class BioMechConfig {
 					BioMech.ClientModEvents.opticsUnitZoomEnabled = BioMechConfig.CLIENT.opticsUnitAllowZoomIn.get().booleanValue();
 					OpticsUnitArmor.canEverHighlightSpawners = BioMechConfig.CLIENT.opticsUnitCanEverHighlightSpawners.get().booleanValue();
 					OpticsUnitArmor.canEverHighlightChests = BioMechConfig.CLIENT.opticsUnitCanEverHighlightChests.get().booleanValue();
+					
+					BioMech.ClientModEvents.inventoryButtonVisible = BioMechConfig.CLIENT.showBioMechInventoryButton.get().booleanValue();
+					BioMech.ClientModEvents.inventoryButtonScreenX = BioMechConfig.CLIENT.bioMechInventoryButtonX.get();
+					BioMech.ClientModEvents.inventoryButtonScreenY = BioMechConfig.CLIENT.bioMechInventoryButtonY.get();
 				}
 				};});
 
