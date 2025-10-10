@@ -35,6 +35,7 @@ import com.dairymoose.biomech.armor.renderer.DrillRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.ElytraMechChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.GatlingLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.GatlingRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.HerosHeadpieceRenderer;
 import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.InterceptorArmsRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechChestplateRenderer;
@@ -70,6 +71,7 @@ import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.GatlingArmArmor;
+import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
@@ -136,7 +138,6 @@ import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderStateShard.DepthTestStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -160,6 +161,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -170,7 +172,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -201,14 +202,11 @@ import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingDestroyBlockEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
-import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -222,7 +220,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.PlayMessages.OpenContainer;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -1034,6 +1031,24 @@ public class BioMech
 			        			}
 			        		}
 		        		}
+		        		
+		        		ItemStack itemStack = playerData.getForSlot(MechPart.Head).itemStack;
+		        		if (itemStack.getItem() instanceof HerosHeadpieceArmor head) {
+		        			boolean active = false;
+		        			CompoundTag tag = itemStack.getOrCreateTag();
+		        			if (tag.contains("DamageBoosting")) {
+		        				active = tag.getBoolean("DamageBoosting");
+		        			}
+		        			if (active) {
+		        				if (!event.getEntity().isDeadOrDying() && !event.getEntity().isInvulnerable() && event.getEntity().attackable() && event.getEntity().invulnerableTime <= 0) {
+		        					BioMech.LOGGER.info("apply bonus damage of: " + (event.getAmount() * 0.15f));
+				        			event.getEntity().hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), event.getAmount() * 0.15f);
+				        			event.getEntity().invulnerableTime = 0;
+				        			event.getEntity().hurtDuration = 0;
+			        				event.getEntity().hurtTime = 0;
+		        				}
+		        			}
+		        		}
 		        	}
 				}
 			}			
@@ -1102,7 +1117,7 @@ public class BioMech
 	//LivingDamageEvent - damage after armor/magic mitigation
 	//event incoming damage is reduced by mitigation from armor
 	@SubscribeEvent
-	public void onPlayerDamage(final LivingDamageEvent event) {
+	public void onPlayerDamageTaken(final LivingDamageEvent event) {
 		if (!(event.getEntity() instanceof Player player)) {
 			//BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
 		}
@@ -1137,6 +1152,13 @@ public class BioMech
 							//BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getAmount() + " of type: " + event.getSource() + ", energyLeft=" + playerData.getSuitEnergy());
 							event.setCanceled(true);
 						}
+					}
+				}
+				
+				if (event.getSource().type() == player.level().damageSources().explosion(null).type()) {
+					BioMech.LOGGER.info("explosion damage: " + event.getAmount());
+					if (IronMechChestArmor.absorbDirectAttack(playerData, 0.50f, event.getSource(), event.getAmount(), player, true)) {
+						event.setCanceled(true);
 					}
 				}
         	}
@@ -1347,7 +1369,7 @@ public class BioMech
         				
         				if (zoomMod > 1.0f) {
         					float calcFov = event.getNewFovModifier()/zoomMod;
-        					BioMech.LOGGER.info("adjust fov to=" + calcFov + " with progress=" + opticsZoomProgress + " and zoomMod=" + zoomMod);
+        					//BioMech.LOGGER.info("adjust fov to=" + calcFov + " with progress=" + opticsZoomProgress + " and zoomMod=" + zoomMod);
         					event.setNewFovModifier(calcFov);
         					return;
         				} else if (opticsZoomProgress == 0.0f) {
@@ -1369,7 +1391,7 @@ public class BioMech
     				if (fovAccountingForSpeed <= 1.182f) {
     					calcFov = 1.0f;
     				} else {
-    					BioMech.LOGGER.info("adjust fov=" + fovAccountingForSpeed);
+    					//BioMech.LOGGER.info("adjust fov=" + fovAccountingForSpeed);
     				}
     				
     				//BioMech.LOGGER.info("fov calc=" + calcFov + " vs " + event.getNewFovModifier());
@@ -1883,6 +1905,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(DiggerRightArmRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
         	AzArmorRendererRegistry.register(DiggerLeftArmRenderer::new, BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());
+        	AzArmorRendererRegistry.register(HerosHeadpieceRenderer::new, BioMechRegistry.ITEM_HEROS_HEADPIECE.get());
         	
         	//IRON MECH
         	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());

@@ -44,6 +44,7 @@
 	"item.biomech.optics_unit": "§5Optics Unit§0",
 	"item.biomech.optics_unit.tooltip1": "Hold {alt} to zoom in.",
 	"item.biomech.optics_unit.tooltip2": "Also highlights nearby spawners and treasure chests.",
+	"item.biomech.optics_unit.tooltip3": "§6I don't want to just survive, I want to live!",
 	
 	"item.biomech.mining_laser_arm": "§5Mining Laser Arm§0",
 	"item.biomech.mining_laser_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
@@ -167,7 +168,12 @@
 	"item.biomech.interceptor_arms": "§5Interceptor Arms§0",
 	"item.biomech.interceptor_arms.tooltip1": "Grants a 50% chance to automatically deflect incoming projectiles.",
 	"item.biomech.interceptor_arms.tooltip2": "If deflection occurs, you will lose 5 suit energy.",
-	"item.biomech.interceptor_arms.tooltip3": "§5The power of the sun in the palm of your hand.§0",
+	"item.biomech.interceptor_arms.tooltip3": "§6The power of the sun in the palm of your hand.§0",
+	
+	"item.biomech.heros_headpiece": "§5Hero's Headpiece§0",
+	"item.biomech.heros_headpiece.tooltip1": "Overall damage increased by 15% when an enemy is within 3 blocks of you.",
+	"item.biomech.heros_headpiece.tooltip2": "Take 50% reduced damage from explosions.",
+	"item.biomech.heros_headpiece.tooltip3": "§6No following.§0",
 	
 	"item.biomech.digger_arm": "§5Digger Arm§0",
 	"item.biomech.digger_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",

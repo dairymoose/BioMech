@@ -22,6 +22,7 @@ import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.GatlingArmArmor;
 import com.dairymoose.biomech.item.armor.GatlingLeftArmArmor;
 import com.dairymoose.biomech.item.armor.GatlingRightArmArmor;
+import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
@@ -152,6 +153,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_POWER_LEGGINGS = BioMech.ITEMS.register("power_leggings", () -> new PowerLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_POWER_ARM = BioMech.ITEMS.register("power_arm", () -> new PowerRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	//POWER MECH
+	
+	public static RegistryObject<Item> ITEM_HEROS_HEADPIECE = BioMech.ITEMS.register("heros_headpiece", () -> new HerosHeadpieceArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_OPTICS_UNIT = BioMech.ITEMS.register("optics_unit", () -> new OpticsUnitArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
 	
