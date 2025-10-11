@@ -1046,7 +1046,7 @@ public class BioMech
 			        			if (!active) {
 			        				if (!event.getEntity().isDeadOrDying() && !event.getEntity().isInvulnerable() && event.getEntity().attackable() && event.getEntity().invulnerableTime <= 0) {
 			        					tag.putBoolean("ActiveArm", true);
-			        					BioMech.LOGGER.debug("apply bonus damage of: " + 2.0f);
+			        					BioMech.LOGGER.debug("apply bonus damage of: " + 1.0f);
 					        			event.getEntity().hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), 2.0f);
 					        			event.getEntity().invulnerableTime = 0;
 					        			event.getEntity().hurtDuration = 0;

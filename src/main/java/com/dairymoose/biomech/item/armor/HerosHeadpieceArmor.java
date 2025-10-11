@@ -17,7 +17,7 @@ public class HerosHeadpieceArmor extends HerosArmorBase {
 		this.alwaysHidePlayerHat = false;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Head;
-		this.nearbyEnemyDamageBoost = 0.05f;
+		this.nearbyEnemyDamageBoost = 0.06f;
 		this.explosionDamageReduction = 0.30f;
 	}
 	

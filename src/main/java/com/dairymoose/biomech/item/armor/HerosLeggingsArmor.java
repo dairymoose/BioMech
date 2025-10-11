@@ -10,7 +10,7 @@ public class HerosLeggingsArmor extends HerosArmorBase {
 		this.alwaysHidePlayerHat = false;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Leggings;
-		this.nearbyEnemyDamageBoost = 0.03f;
+		this.nearbyEnemyDamageBoost = 0.04f;
 		this.explosionDamageReduction = 0.08f;
 	}
 
