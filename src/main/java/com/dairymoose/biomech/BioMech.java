@@ -705,6 +705,17 @@ public class BioMech
 						event.player.setItemSlot(EquipmentSlot.CHEST, elytraItemStackC);
 					}
 				}
+				
+				if (!(playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof OpticsUnitArmor armor)) {
+					if (event.player.level().isClientSide) {
+						if (!outlinedSpawners.isEmpty()) {
+							synchronized(outlinedSpawners) {
+								outlinedSpawners.clear();
+								OpticsUnitArmor.capturedSpawners.clear();
+							}
+						}
+					}
+				}
     		}
     	}
     	if (event.phase == TickEvent.Phase.END) {
