@@ -17,7 +17,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class PortableStorageUnitScreen extends AbstractContainerScreen<PortableStorageUnitMenu> {
 	private static final ResourceLocation GUI_LOCATION = ResourceLocation.fromNamespaceAndPath(BioMech.MODID,
-			"textures/gui/storage_unit_" + BioMechPlayerData.PORTABLE_STORAGE_UNIT_CAPACITY + ".png");
+			"textures/gui/storage_unit_" + BioMechPlayerData.PORTABLE_STORAGE_UNIT_CAPACITY_NO_CRAFTER + (BioMechPlayerData.storageUnitHasCraftingTable ? "c" : "") + ".png");
 
 	@Override
 	protected void init() {
@@ -28,6 +28,9 @@ public class PortableStorageUnitScreen extends AbstractContainerScreen<PortableS
 	public PortableStorageUnitScreen(PortableStorageUnitMenu p_98798_, Inventory p_98799_, Component p_98800_) {
 		super(p_98798_, p_98799_, Component.empty());
 		this.imageHeight = 220;
+		if (BioMechPlayerData.storageUnitHasCraftingTable) {
+			this.imageHeight += 23;
+		}
 		this.inventoryLabelX = 999;
 		this.inventoryLabelY = this.imageHeight - 94;
 	}

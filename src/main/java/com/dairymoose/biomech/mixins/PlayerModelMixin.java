@@ -89,10 +89,6 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 			} else if (legSlot.itemStack.getItem() instanceof MobilityTreadsArmor armor) {
 				if (legSlot.visible) {
 					if (living.isControlledByLocalInstance()) {
-						if (BioMech.originalBobView == null) {
-							BioMech.originalBobView = Minecraft.getInstance().options.bobView().get();
-						}
-						//Minecraft.getInstance().options.bobView().set(false);
 						Minecraft.getInstance().player.oBob = 0.0f;
             			Minecraft.getInstance().player.bob = 0.0f;
 					}
@@ -106,14 +102,6 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 					//normal leg walking forward-and-back
 					this.rightLeg.xRot = 0.0f;
 					this.leftLeg.xRot = 0.0f;
-				} else {
-					if (living.isControlledByLocalInstance()) {
-						BioMech.resetBobView();
-					}
-				}
-			} else {
-				if (living.isControlledByLocalInstance()) {
-					BioMech.resetBobView();
 				}
 			}
 			

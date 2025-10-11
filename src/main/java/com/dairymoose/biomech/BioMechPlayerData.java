@@ -26,7 +26,10 @@ public class BioMechPlayerData {
 	public SlottedItem rightArm = new SlottedItem(MechPart.RightArm);
 	public SlottedItem back = new SlottedItem(MechPart.Back);
 	
-	public static final int PORTABLE_STORAGE_UNIT_CAPACITY = 63;
+	public static boolean storageUnitHasCraftingTable = true;
+	//public static final int PORTABLE_STORAGE_UNIT_CAPACITY = 63;
+	public static final int PORTABLE_STORAGE_UNIT_CAPACITY_NO_CRAFTER = 45;
+	public static final int PORTABLE_STORAGE_UNIT_CAPACITY = PORTABLE_STORAGE_UNIT_CAPACITY_NO_CRAFTER + (storageUnitHasCraftingTable ? 10 : 0);
 	public NonNullList<ItemStack> portableStorageUnitItems = NonNullList.withSize(BioMechPlayerData.PORTABLE_STORAGE_UNIT_CAPACITY, ItemStack.EMPTY);
 	
 	public float suitEnergyPerSecBaseline = 3.0f;

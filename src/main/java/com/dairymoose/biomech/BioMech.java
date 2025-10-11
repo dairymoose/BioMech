@@ -207,6 +207,7 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
@@ -232,6 +233,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
@@ -428,24 +430,9 @@ public class BioMech
     {
         AzureLib.initialize();
     }
-   
-    @SuppressWarnings("deprecation")
-	public static void resetBobView() {
-    	DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
-			@Override
-			public void run() {
-				if (originalBobView != null) {
-		    		Minecraft.getInstance().options.bobView().set(originalBobView);
-		    		BioMech.originalBobView = null;
-		    	}
-			}});
-    	
-    }
-    
-    public static Boolean originalBobView = null;
+
     @SubscribeEvent
     public void onStopServer(ServerStoppedEvent event) {
-    	BioMech.resetBobView();
 		lootBioMechInChest = null;
 		lootItemsToAdd.clear();
 		lootPoolChances.clear();
