@@ -18,54 +18,6 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
-import com.dairymoose.biomech.armor.renderer.BackJetpackRenderer;
-import com.dairymoose.biomech.armor.renderer.BackScubaTankRenderer;
-import com.dairymoose.biomech.armor.renderer.BatteryPackRenderer;
-import com.dairymoose.biomech.armor.renderer.BuzzsawLeftArmRenderer;
-import com.dairymoose.biomech.armor.renderer.BuzzsawRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.DiamondMechArmorRenderer;
-import com.dairymoose.biomech.armor.renderer.DiamondMechHeadRenderer;
-import com.dairymoose.biomech.armor.renderer.DiamondMechLeftArmRenderer;
-import com.dairymoose.biomech.armor.renderer.DiamondMechLegsRenderer;
-import com.dairymoose.biomech.armor.renderer.DiamondMechRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.DiggerLeftArmRenderer;
-import com.dairymoose.biomech.armor.renderer.DiggerRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.DrillLeftArmRenderer;
-import com.dairymoose.biomech.armor.renderer.DrillRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.ElytraMechChestplateRenderer;
-import com.dairymoose.biomech.armor.renderer.GatlingLeftArmRenderer;
-import com.dairymoose.biomech.armor.renderer.GatlingRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.HerosChestplateRenderer;
-import com.dairymoose.biomech.armor.renderer.HerosHeadpieceRenderer;
-import com.dairymoose.biomech.armor.renderer.HerosLeftArmRenderer;
-import com.dairymoose.biomech.armor.renderer.HerosLeggingsRenderer;
-import com.dairymoose.biomech.armor.renderer.HerosRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
-import com.dairymoose.biomech.armor.renderer.InterceptorArmsRenderer;
-import com.dairymoose.biomech.armor.renderer.IronMechChestplateRenderer;
-import com.dairymoose.biomech.armor.renderer.IronMechHeadRenderer;
-import com.dairymoose.biomech.armor.renderer.IronMechLeftArmRenderer;
-import com.dairymoose.biomech.armor.renderer.IronMechLegsRenderer;
-import com.dairymoose.biomech.armor.renderer.IronMechRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.LavastrideLeggingsRenderer;
-import com.dairymoose.biomech.armor.renderer.MiningLaserLeftArmRenderer;
-import com.dairymoose.biomech.armor.renderer.MiningLaserRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.MobilityTreadsRenderer;
-import com.dairymoose.biomech.armor.renderer.NightVisionVisorRenderer;
-import com.dairymoose.biomech.armor.renderer.OpticsUnitRenderer;
-import com.dairymoose.biomech.armor.renderer.PipeMechBodyRenderer;
-import com.dairymoose.biomech.armor.renderer.PipeMechHeadRenderer;
-import com.dairymoose.biomech.armor.renderer.PipeMechLeftArmRenderer;
-import com.dairymoose.biomech.armor.renderer.PipeMechLegsRenderer;
-import com.dairymoose.biomech.armor.renderer.PipeMechRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.PortableStorageUnitRenderer;
-import com.dairymoose.biomech.armor.renderer.PowerChestRenderer;
-import com.dairymoose.biomech.armor.renderer.PowerHelmetRenderer;
-import com.dairymoose.biomech.armor.renderer.PowerLeftArmRenderer;
-import com.dairymoose.biomech.armor.renderer.PowerLeggingsRenderer;
-import com.dairymoose.biomech.armor.renderer.PowerRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.SpiderWalkersRenderer;
-import com.dairymoose.biomech.armor.renderer.SpringLoadedLeggingsRenderer;
 import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.client.screen.PortableStorageUnitScreen;
@@ -90,19 +42,8 @@ import com.dairymoose.biomech.item.armor.PortableStorageUnitArmor;
 import com.dairymoose.biomech.item.armor.PowerArmArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
-import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
-import com.dairymoose.biomech.item.renderer.BuzzsawItemRenderer;
-import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
-import com.dairymoose.biomech.item.renderer.DiggerArmItemRenderer;
-import com.dairymoose.biomech.item.renderer.DrillItemRenderer;
-import com.dairymoose.biomech.item.renderer.GatlingItemRenderer;
-import com.dairymoose.biomech.item.renderer.HerosArmItemRenderer;
-import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
-import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
-import com.dairymoose.biomech.item.renderer.PipeMechArmItemRenderer;
-import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
+import com.dairymoose.biomech.item.armor.TeleportationCrystalArmor;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
-import com.dairymoose.biomech.menu.PortableStorageUnitMenu;
 import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundProjectileDodgePacket;
@@ -112,6 +53,7 @@ import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmBlockTarget
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundOpenPortableStorageUnitPacket;
+import com.dairymoose.biomech.packet.serverbound.ServerboundTeleportationCrystalPacket;
 import com.dairymoose.biomech.particle.InstantSmokeParticle;
 import com.dairymoose.biomech.particle.LaserParticle;
 import com.dairymoose.biomech.particle.MaxLaserParticle;
@@ -130,18 +72,15 @@ import com.mojang.math.Axis;
 import mod.azure.azurelib.AzureLib;
 import mod.azure.azurelib.rewrite.animation.AzAnimator;
 import mod.azure.azurelib.rewrite.animation.AzAnimatorAccessor;
-import mod.azure.azurelib.rewrite.animation.cache.AzIdentityRegistry;
 import mod.azure.azurelib.rewrite.animation.dispatch.AzDispatchSide;
 import mod.azure.azurelib.rewrite.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorModel;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
-import mod.azure.azurelib.rewrite.render.item.AzItemRendererRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -156,10 +95,10 @@ import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -170,6 +109,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -207,7 +147,6 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
@@ -215,6 +154,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.PlayerTickEvent;
+import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -233,7 +173,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.registries.DeferredRegister;
@@ -359,6 +298,7 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundProjectileDodgePacket.class, ClientboundProjectileDodgePacket::write, ClientboundProjectileDodgePacket::new, ClientboundProjectileDodgePacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMiningArmBlockTargetPacket.class, ServerboundMiningArmBlockTargetPacket::write, ServerboundMiningArmBlockTargetPacket::new, ServerboundMiningArmBlockTargetPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundOpenPortableStorageUnitPacket.class, ServerboundOpenPortableStorageUnitPacket::write, ServerboundOpenPortableStorageUnitPacket::new, ServerboundOpenPortableStorageUnitPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundTeleportationCrystalPacket.class, ServerboundTeleportationCrystalPacket::write, ServerboundTeleportationCrystalPacket::new, ServerboundTeleportationCrystalPacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -437,6 +377,14 @@ public class BioMech
 		lootItemsToAdd.clear();
 		lootPoolChances.clear();
 		outlinedSpawners.clear();
+    }
+    
+    public static int currentServerTick = 0;
+    @SubscribeEvent
+    public void onServerTick(ServerTickEvent event) {
+    	if (event.phase == TickEvent.Phase.START) {
+    		++currentServerTick;
+    	}
     }
     
     private static TagKey<Item> pickaxeBlockTag = ForgeRegistries.ITEMS.tags().createTagKey(new ResourceLocation("minecraft", "pickaxes"));
@@ -1132,6 +1080,7 @@ public class BioMech
 		}
 	}
 
+	public static int holdingTeleportTicks = 0;
 	//damage avoidance is put here so that we can cancel knockbacks/etc
 	@SubscribeEvent
 	public void onPlayerDamageBeforeMitigation(final LivingAttackEvent event) {
@@ -1180,6 +1129,12 @@ public class BioMech
 						}
 					}
 	        	}
+			}
+		} else {
+			if (event.getEntity() instanceof Player player) {
+				if (player.isLocalPlayer()) {
+					holdingTeleportTicks = 0;
+				}
 			}
 		}
 	}
@@ -1544,6 +1499,11 @@ public class BioMech
     				}
     			}
     		}
+    		
+    		if (holdingTeleportTicks > 0) {
+    			float fovMod = 1.0f + 0.25f * holdingTeleportTicks/TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS;
+    			event.setNewFovModifier(event.getNewFovModifier()*fovMod);
+    		}
     	}
     	
     	private ResourceLocation GUI_SUIT_ENERGY_LOCATION = new ResourceLocation(MODID, "textures/gui/suit_energy.png");
@@ -1686,6 +1646,28 @@ public class BioMech
             					while (HOTKEY_OPEN_PSU.consumeClick());
             					BioMechNetwork.INSTANCE.sendToServer(new ServerboundOpenPortableStorageUnitPacket());
             				}
+            				if (playerData.getForSlot(MechPart.Back).itemStack.getItem() instanceof TeleportationCrystalArmor tele) {
+            					while (HOTKEY_OPEN_PSU.consumeClick());
+            					
+            					++holdingTeleportTicks;
+            					
+            					float pitch = 1.0f + 0.8f * (float)holdingTeleportTicks/TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS;
+            					Minecraft.getInstance().player.playSound(SoundEvents.ALLAY_DEATH, 0.2f, pitch);
+            					if (Minecraft.getInstance().player.tickCount % 2 == 0) {
+            						int particleCount = 6;
+            						for (int i=0; i<particleCount; ++i) {
+                						Vec3 loc = Minecraft.getInstance().player.position().add(new Vec3(2.0 * (Math.random() - 0.5), 1.3 + 0.25 * Math.random(), 2.0 * (Math.random() - 0.5)));
+                            			Minecraft.getInstance().player.level().addParticle(ParticleTypes.ELECTRIC_SPARK, loc.x, loc.y, loc.z, 0.0f, 0.0f, 0.0f);
+                					}
+            					}
+            					
+            					if (holdingTeleportTicks >= TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS) {
+            						holdingTeleportTicks = 0;
+            						BioMechNetwork.INSTANCE.sendToServer(new ServerboundTeleportationCrystalPacket());
+            					}
+            				}
+            			} else {
+            				holdingTeleportTicks = 0;
             			}
             			
             			if (requireModifierKeyForArmUsage) {
@@ -2006,102 +1988,7 @@ public class BioMech
 		@SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
-        	//"bone" is null error?  The .geo file is missing from geo.item package
-        	AzArmorRendererRegistry.register(HovertechLeggingsRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
-        	AzArmorRendererRegistry.register(PowerLeggingsRenderer::new, BioMechRegistry.ITEM_POWER_LEGGINGS.get());
-        	AzArmorRendererRegistry.register(LavastrideLeggingsRenderer::new, BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get());
-        	AzArmorRendererRegistry.register(PowerChestRenderer::new, BioMechRegistry.ITEM_POWER_CHEST.get());
-        	AzArmorRendererRegistry.register(PowerRightArmRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
-        	AzArmorRendererRegistry.register(PowerLeftArmRenderer::new, BioMechRegistry.ITEM_POWER_LEFT_ARM.get());
-        	AzArmorRendererRegistry.register(PowerHelmetRenderer::new, BioMechRegistry.ITEM_POWER_HELMET.get());
-        	AzArmorRendererRegistry.register(MiningLaserRightArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
-        	AzArmorRendererRegistry.register(MiningLaserLeftArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
-        	AzArmorRendererRegistry.register(BackScubaTankRenderer::new, BioMechRegistry.ITEM_BACK_SCUBA_TANK.get());
-        	AzArmorRendererRegistry.register(BackJetpackRenderer::new, BioMechRegistry.ITEM_BACK_JETPACK.get());
-        	AzArmorRendererRegistry.register(SpiderWalkersRenderer::new, BioMechRegistry.ITEM_SPIDER_WALKERS.get());
-        	AzArmorRendererRegistry.register(NightVisionVisorRenderer::new, BioMechRegistry.ITEM_NIGHT_VISION_VISOR.get());
-        	AzArmorRendererRegistry.register(SpringLoadedLeggingsRenderer::new, BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
-        	AzArmorRendererRegistry.register(MobilityTreadsRenderer::new, BioMechRegistry.ITEM_MOBILITY_TREADS.get());
-        	AzArmorRendererRegistry.register(ElytraMechChestplateRenderer::new, BioMechRegistry.ITEM_ELYTRA_MECH_CHESTPLATE.get());
-        	AzArmorRendererRegistry.register(DrillRightArmRenderer::new, BioMechRegistry.ITEM_DRILL_ARM.get());
-        	AzArmorRendererRegistry.register(DrillLeftArmRenderer::new, BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
-        	AzArmorRendererRegistry.register(BuzzsawRightArmRenderer::new, BioMechRegistry.ITEM_BUZZSAW_ARM.get());
-        	AzArmorRendererRegistry.register(BuzzsawLeftArmRenderer::new, BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
-        	AzArmorRendererRegistry.register(GatlingRightArmRenderer::new, BioMechRegistry.ITEM_GATLING_ARM.get());
-        	AzArmorRendererRegistry.register(GatlingLeftArmRenderer::new, BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
-        	AzArmorRendererRegistry.register(InterceptorArmsRenderer::new, BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
-        	AzArmorRendererRegistry.register(BatteryPackRenderer::new, BioMechRegistry.ITEM_BATTERY_PACK.get());
-        	AzArmorRendererRegistry.register(DiggerRightArmRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
-        	AzArmorRendererRegistry.register(DiggerLeftArmRenderer::new, BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
-        	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());
-        	AzArmorRendererRegistry.register(PortableStorageUnitRenderer::new, BioMechRegistry.ITEM_PORTABLE_STORAGE_UNIT.get());
-        	
-        	//HERO
-        	AzArmorRendererRegistry.register(HerosHeadpieceRenderer::new, BioMechRegistry.ITEM_HEROS_HEADPIECE.get());
-        	AzArmorRendererRegistry.register(HerosChestplateRenderer::new, BioMechRegistry.ITEM_HEROS_CHESTPLATE.get());
-        	AzArmorRendererRegistry.register(HerosLeggingsRenderer::new, BioMechRegistry.ITEM_HEROS_LEGGINGS.get());
-        	AzArmorRendererRegistry.register(HerosRightArmRenderer::new, BioMechRegistry.ITEM_HEROS_ARM.get());
-        	AzArmorRendererRegistry.register(HerosLeftArmRenderer::new, BioMechRegistry.ITEM_HEROS_LEFT_ARM.get());
-        	//HERO
-        	
-        	//IRON MECH
-        	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
-        	AzArmorRendererRegistry.register(IronMechChestplateRenderer::new, BioMechRegistry.ITEM_IRON_MECH_CHESTPLATE.get());
-        	AzArmorRendererRegistry.register(IronMechLegsRenderer::new, BioMechRegistry.ITEM_IRON_MECH_LEGS.get());
-        	AzArmorRendererRegistry.register(IronMechRightArmRenderer::new, BioMechRegistry.ITEM_IRON_MECH_ARM.get());
-        	AzArmorRendererRegistry.register(IronMechLeftArmRenderer::new, BioMechRegistry.ITEM_IRON_MECH_LEFT_ARM.get());
-        	//IRON MECH
-        	
-        	//DIAMOND MECH
-        	AzArmorRendererRegistry.register(DiamondMechHeadRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_HEAD.get());
-        	AzArmorRendererRegistry.register(DiamondMechArmorRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_CHESTPLATE.get());
-        	AzArmorRendererRegistry.register(DiamondMechLegsRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_LEGS.get());
-        	AzArmorRendererRegistry.register(DiamondMechRightArmRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_ARM.get());
-        	AzArmorRendererRegistry.register(DiamondMechLeftArmRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_LEFT_ARM.get());
-        	//DIAMOND MECH
-        	
-        	//PIPE MECH
-        	AzArmorRendererRegistry.register(PipeMechHeadRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_HEAD.get());
-        	AzArmorRendererRegistry.register(PipeMechBodyRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_BODY.get());
-        	AzArmorRendererRegistry.register(PipeMechLegsRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEGS.get());
-        	AzArmorRendererRegistry.register(PipeMechRightArmRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
-        	AzArmorRendererRegistry.register(PipeMechLeftArmRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEFT_ARM.get());
-        	//PIPE MECH
-        	
-        	//------ Arm items - render item display / right arm only ------
-        	AzItemRendererRegistry.register(GatlingItemRenderer::new, BioMechRegistry.ITEM_GATLING_ARM.get());
-        	AzItemRendererRegistry.register(BuzzsawItemRenderer::new, BioMechRegistry.ITEM_BUZZSAW_ARM.get());
-        	AzItemRendererRegistry.register(DrillItemRenderer::new, BioMechRegistry.ITEM_DRILL_ARM.get());
-        	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
-        	AzItemRendererRegistry.register(PowerArmItemRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
-        	AzItemRendererRegistry.register(PipeMechArmItemRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
-        	AzItemRendererRegistry.register(IronMechArmItemRenderer::new, BioMechRegistry.ITEM_IRON_MECH_ARM.get());
-        	AzItemRendererRegistry.register(DiamondMechArmItemRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_ARM.get());
-        	AzItemRendererRegistry.register(DiggerArmItemRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
-        	AzItemRendererRegistry.register(HerosArmItemRenderer::new, BioMechRegistry.ITEM_HEROS_ARM.get());
-        	//------ Arm items - render item display / right arm only ------
-        	
-        	//------ All Animated ------
-        	AzIdentityRegistry.register(BioMechRegistry.ITEM_MINING_LASER_ARM.get(), BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
-        	AzIdentityRegistry.register(BioMechRegistry.ITEM_DRILL_ARM.get(), BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
-        	AzIdentityRegistry.register(BioMechRegistry.ITEM_BUZZSAW_ARM.get(), BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
-        	AzIdentityRegistry.register(BioMechRegistry.ITEM_GATLING_ARM.get(), BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
-        	AzIdentityRegistry.register(BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
-        	AzIdentityRegistry.register(BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
-        	AzIdentityRegistry.register(BioMechRegistry.ITEM_DIGGER_ARM.get(), BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
-        	//------ All Animated ------
-        	
-        	
-        	
-        	
-        	//------
-        	
-        	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
-        	MenuScreens.register(BioMechRegistry.MENU_TYPE_PORTABLE_STORAGE_UNIT.get(), PortableStorageUnitScreen::new);
-        	
-        	//BioMech Station only
-        	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
-        	//BioMech Station only
+        	BioMechClientSetup.doClientSetup(event);
         }
         
     }

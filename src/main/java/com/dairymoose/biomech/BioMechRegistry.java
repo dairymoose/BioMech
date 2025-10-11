@@ -52,6 +52,7 @@ import com.dairymoose.biomech.item.armor.PowerLeggingsArmor;
 import com.dairymoose.biomech.item.armor.PowerRightArmArmor;
 import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
+import com.dairymoose.biomech.item.armor.TeleportationCrystalArmor;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
 import com.dairymoose.biomech.menu.PortableStorageUnitMenu;
 
@@ -170,6 +171,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_OPTICS_UNIT = BioMech.ITEMS.register("optics_unit", () -> new OpticsUnitArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_MOBILITY_TREADS = BioMech.ITEMS.register("mobility_treads", () -> new MobilityTreadsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	//LOAD LIFTER SET
+	
+	public static RegistryObject<Item> ITEM_TELEPORTATION_CRYSTAL = BioMech.ITEMS.register("teleportation_crystal", () -> new TeleportationCrystalArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_PORTABLE_STORAGE_UNIT = BioMech.ITEMS.register("portable_storage_unit", () -> new PortableStorageUnitArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	

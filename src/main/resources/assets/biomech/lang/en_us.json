@@ -34,20 +34,25 @@
 	"item.biomech.hovertech_leggings.tooltip3": "Press {alt} to toggle on/off.  Crouch to temporarily disable.",
 
 	"item.biomech.drill_arm": "§5Drill Arm§0",
-	"item.biomech.drill_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
+	"item.biomech.drill_arm.tooltip1": "Hold '{alt}+{lmb}' to activate.",
 	"item.biomech.drill_arm.tooltip2": "Hold to mine any pickaxe-mineable block.",
 	"item.biomech.drill_arm.tooltip3": "Mines in a 3x3 area (pickaxe blocks only).",
 	
 	"item.biomech.power_arm": "§5Power Arm§0",
 	"item.biomech.power_arm.tooltip1": "Increases attack damage by 1 when wielding a weapon.",
 
+	"item.biomech.teleportation_crystal": "§5Teleportation Crystal§0",
+	"item.biomech.teleportation_crystal.tooltip1": "Hold '{psu}' for {teleport_hold_time} seconds to teleport home.",
+	"item.biomech.teleportation_crystal.tooltip2": "After teleporting home, use again (within {teleport_back_time} minutes) to teleport back to where you teleported from.",
+	"item.biomech.teleportation_crystal.tooltip3": "Taking damage will interrupt the teleport.",
+	
 	"item.biomech.optics_unit": "§5Optics Unit§0",
 	"item.biomech.optics_unit.tooltip1": "Hold {alt} to zoom in.",
 	"item.biomech.optics_unit.tooltip2": "Also highlights nearby spawners and treasure chests.",
 	"item.biomech.optics_unit.tooltip3": "§6I don't want to just survive, I want to live!",
 	
 	"item.biomech.mining_laser_arm": "§5Mining Laser Arm§0",
-	"item.biomech.mining_laser_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
+	"item.biomech.mining_laser_arm.tooltip1": "Hold '{alt}+{lmb}' to activate.",
 	"item.biomech.mining_laser_arm.tooltip2": "Hold to mine any pickaxe-mineable block.",
 	"item.biomech.mining_laser_arm.tooltip3": "The longer you hold, the stronger it is (max {mining_laser_max_time} seconds - up to {mining_laser_max_power}x faster).",
 	
@@ -73,7 +78,7 @@
 	
 	"item.biomech.portable_storage_unit": "§5Portable Storage Unit§0",
 	"item.biomech.portable_storage_unit.tooltip1": "Provides additional inventory space.",
-	"item.biomech.portable_storage_unit.tooltip2": "Press {psu} to open",
+	"item.biomech.portable_storage_unit.tooltip2": "Press '{psu}' to open",
 	
 	"item.biomech.battery_pack": "§5Battery Pack§0",
 	"item.biomech.battery_pack.tooltip1": "Grants suit energy regeneration.",
@@ -87,7 +92,7 @@
 	"item.biomech.elytra_mech_chestplate.tooltip1": "Grants elytra flight.",
 	
 	"item.biomech.spider_walkers": "§5Spider Walkers§0",
-	"item.biomech.spider_walkers.tooltip1": "Hold alt while walking into a wall to activate.",
+	"item.biomech.spider_walkers.tooltip1": "Hold {alt} while walking into a wall to activate.",
 	"item.biomech.spider_walkers.tooltip2": "Climbs walls while active.  Can be used while falling to grip a nearby wall.",
 	"item.biomech.spider_walkers.tooltip3": "Costs a small amount of suit energy while active.",
 	
@@ -162,12 +167,12 @@
 	"item.biomech.pipe_mech_arm.tooltip3": "If damage is avoided, you will lose 5 suit energy.",
 	
 	"item.biomech.buzzsaw_arm": "§5Buzzsaw Arm§0",
-	"item.biomech.buzzsaw_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
+	"item.biomech.buzzsaw_arm.tooltip1": "Hold '{alt}+{lmb}' to activate.",
 	"item.biomech.buzzsaw_arm.tooltip2": "Hold to mine any axe-mineable block.",
 	"item.biomech.buzzsaw_arm.tooltip3": "Mines in a 3x3 area (axe blocks only).",
 	
 	"item.biomech.gatling_arm": "§5Gatling Arm§0",
-	"item.biomech.gatling_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
+	"item.biomech.gatling_arm.tooltip1": "Hold '{alt}+{lmb}' to activate.",
 	"item.biomech.gatling_arm.tooltip2": "Consumes energy while active.",
 	
 	"item.biomech.interceptor_arms": "§5Interceptor Arms§0",
@@ -198,7 +203,7 @@
 	// HERO ***
 	
 	"item.biomech.digger_arm": "§5Digger Arm§0",
-	"item.biomech.digger_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
+	"item.biomech.digger_arm.tooltip1": "Hold '{alt}+{lmb}' to activate.",
 	"item.biomech.digger_arm.tooltip2": "Hold to mine any shovel-mineable block.",
 	"item.biomech.digger_arm.tooltip3": "Mines in a 3x3 area (shovel blocks only).",
 	

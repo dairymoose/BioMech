@@ -10,6 +10,8 @@ import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
+import com.dairymoose.biomech.item.anim.DrillDispatcher;
+import com.dairymoose.biomech.item.anim.TeleportationCrystalDispatcher;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -23,14 +25,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-public class BatteryPackArmor extends ArmorBase {
+public class TeleportationCrystalArmor extends ArmorBase {
 
-	public BatteryPackArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public final TeleportationCrystalDispatcher dispatcher;
+	public static int TELEPORT_HOLD_TIME_TICKS = 4*20;
+	
+	public TeleportationCrystalArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
-		this.suitEnergy = 50;
-		this.suitEnergyPerSec = 2.0f;
+		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Back;
+		this.dispatcher = new TeleportationCrystalDispatcher();
 	}
 
 	@Override
@@ -38,8 +43,9 @@ public class BatteryPackArmor extends ArmorBase {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
 			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
-			if (armorItems.contains(BioMechRegistry.ITEM_BATTERY_PACK.get()) || slotId == -1) {
+			if (armorItems.contains(BioMechRegistry.ITEM_TELEPORTATION_CRYSTAL.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living) {
+					BioMech.clientSideItemAnimation(stack, this.dispatcher.PASSIVE_COMMAND.cmd);
 				}
 			}
 		}

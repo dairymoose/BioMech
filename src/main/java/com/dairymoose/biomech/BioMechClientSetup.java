@@ -1,0 +1,175 @@
+package com.dairymoose.biomech;
+
+import com.dairymoose.biomech.armor.renderer.BackJetpackRenderer;
+import com.dairymoose.biomech.armor.renderer.BackScubaTankRenderer;
+import com.dairymoose.biomech.armor.renderer.BatteryPackRenderer;
+import com.dairymoose.biomech.armor.renderer.BuzzsawLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.BuzzsawRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DiamondMechArmorRenderer;
+import com.dairymoose.biomech.armor.renderer.DiamondMechHeadRenderer;
+import com.dairymoose.biomech.armor.renderer.DiamondMechLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DiamondMechLegsRenderer;
+import com.dairymoose.biomech.armor.renderer.DiamondMechRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DiggerLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DiggerRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DrillLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.DrillRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.ElytraMechChestplateRenderer;
+import com.dairymoose.biomech.armor.renderer.GatlingLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.GatlingRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.HerosChestplateRenderer;
+import com.dairymoose.biomech.armor.renderer.HerosHeadpieceRenderer;
+import com.dairymoose.biomech.armor.renderer.HerosLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.HerosLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.HerosRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.InterceptorArmsRenderer;
+import com.dairymoose.biomech.armor.renderer.IronMechChestplateRenderer;
+import com.dairymoose.biomech.armor.renderer.IronMechHeadRenderer;
+import com.dairymoose.biomech.armor.renderer.IronMechLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.IronMechLegsRenderer;
+import com.dairymoose.biomech.armor.renderer.IronMechRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.LavastrideLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.MiningLaserLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.MiningLaserRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.MobilityTreadsRenderer;
+import com.dairymoose.biomech.armor.renderer.NightVisionVisorRenderer;
+import com.dairymoose.biomech.armor.renderer.OpticsUnitRenderer;
+import com.dairymoose.biomech.armor.renderer.PipeMechBodyRenderer;
+import com.dairymoose.biomech.armor.renderer.PipeMechHeadRenderer;
+import com.dairymoose.biomech.armor.renderer.PipeMechLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.PipeMechLegsRenderer;
+import com.dairymoose.biomech.armor.renderer.PipeMechRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.PortableStorageUnitRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerChestRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerHelmetRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.PowerRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.SpiderWalkersRenderer;
+import com.dairymoose.biomech.armor.renderer.SpringLoadedLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.TeleportationCrystalRenderer;
+import com.dairymoose.biomech.client.screen.BioMechStationScreen;
+import com.dairymoose.biomech.client.screen.PortableStorageUnitScreen;
+import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
+import com.dairymoose.biomech.item.renderer.BuzzsawItemRenderer;
+import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
+import com.dairymoose.biomech.item.renderer.DiggerArmItemRenderer;
+import com.dairymoose.biomech.item.renderer.DrillItemRenderer;
+import com.dairymoose.biomech.item.renderer.GatlingItemRenderer;
+import com.dairymoose.biomech.item.renderer.HerosArmItemRenderer;
+import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
+import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
+import com.dairymoose.biomech.item.renderer.PipeMechArmItemRenderer;
+import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
+
+import mod.azure.azurelib.rewrite.animation.cache.AzIdentityRegistry;
+import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
+import mod.azure.azurelib.rewrite.render.item.AzItemRendererRegistry;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+
+public class BioMechClientSetup {
+
+	public static void doClientSetup(FMLClientSetupEvent event) {
+		//"bone" is null error?  The .geo file is missing from geo.item package
+    	AzArmorRendererRegistry.register(HovertechLeggingsRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
+    	AzArmorRendererRegistry.register(PowerLeggingsRenderer::new, BioMechRegistry.ITEM_POWER_LEGGINGS.get());
+    	AzArmorRendererRegistry.register(LavastrideLeggingsRenderer::new, BioMechRegistry.ITEM_LAVASTRIDE_LEGGINGS.get());
+    	AzArmorRendererRegistry.register(PowerChestRenderer::new, BioMechRegistry.ITEM_POWER_CHEST.get());
+    	AzArmorRendererRegistry.register(PowerRightArmRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
+    	AzArmorRendererRegistry.register(PowerLeftArmRenderer::new, BioMechRegistry.ITEM_POWER_LEFT_ARM.get());
+    	AzArmorRendererRegistry.register(PowerHelmetRenderer::new, BioMechRegistry.ITEM_POWER_HELMET.get());
+    	AzArmorRendererRegistry.register(MiningLaserRightArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
+    	AzArmorRendererRegistry.register(MiningLaserLeftArmRenderer::new, BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
+    	AzArmorRendererRegistry.register(BackScubaTankRenderer::new, BioMechRegistry.ITEM_BACK_SCUBA_TANK.get());
+    	AzArmorRendererRegistry.register(BackJetpackRenderer::new, BioMechRegistry.ITEM_BACK_JETPACK.get());
+    	AzArmorRendererRegistry.register(SpiderWalkersRenderer::new, BioMechRegistry.ITEM_SPIDER_WALKERS.get());
+    	AzArmorRendererRegistry.register(NightVisionVisorRenderer::new, BioMechRegistry.ITEM_NIGHT_VISION_VISOR.get());
+    	AzArmorRendererRegistry.register(SpringLoadedLeggingsRenderer::new, BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
+    	AzArmorRendererRegistry.register(MobilityTreadsRenderer::new, BioMechRegistry.ITEM_MOBILITY_TREADS.get());
+    	AzArmorRendererRegistry.register(ElytraMechChestplateRenderer::new, BioMechRegistry.ITEM_ELYTRA_MECH_CHESTPLATE.get());
+    	AzArmorRendererRegistry.register(DrillRightArmRenderer::new, BioMechRegistry.ITEM_DRILL_ARM.get());
+    	AzArmorRendererRegistry.register(DrillLeftArmRenderer::new, BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
+    	AzArmorRendererRegistry.register(BuzzsawRightArmRenderer::new, BioMechRegistry.ITEM_BUZZSAW_ARM.get());
+    	AzArmorRendererRegistry.register(BuzzsawLeftArmRenderer::new, BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
+    	AzArmorRendererRegistry.register(GatlingRightArmRenderer::new, BioMechRegistry.ITEM_GATLING_ARM.get());
+    	AzArmorRendererRegistry.register(GatlingLeftArmRenderer::new, BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
+    	AzArmorRendererRegistry.register(InterceptorArmsRenderer::new, BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
+    	AzArmorRendererRegistry.register(BatteryPackRenderer::new, BioMechRegistry.ITEM_BATTERY_PACK.get());
+    	AzArmorRendererRegistry.register(DiggerRightArmRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
+    	AzArmorRendererRegistry.register(DiggerLeftArmRenderer::new, BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
+    	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());
+    	AzArmorRendererRegistry.register(PortableStorageUnitRenderer::new, BioMechRegistry.ITEM_PORTABLE_STORAGE_UNIT.get());
+    	AzArmorRendererRegistry.register(TeleportationCrystalRenderer::new, BioMechRegistry.ITEM_TELEPORTATION_CRYSTAL.get());
+    	
+    	//HERO
+    	AzArmorRendererRegistry.register(HerosHeadpieceRenderer::new, BioMechRegistry.ITEM_HEROS_HEADPIECE.get());
+    	AzArmorRendererRegistry.register(HerosChestplateRenderer::new, BioMechRegistry.ITEM_HEROS_CHESTPLATE.get());
+    	AzArmorRendererRegistry.register(HerosLeggingsRenderer::new, BioMechRegistry.ITEM_HEROS_LEGGINGS.get());
+    	AzArmorRendererRegistry.register(HerosRightArmRenderer::new, BioMechRegistry.ITEM_HEROS_ARM.get());
+    	AzArmorRendererRegistry.register(HerosLeftArmRenderer::new, BioMechRegistry.ITEM_HEROS_LEFT_ARM.get());
+    	//HERO
+    	
+    	//IRON MECH
+    	AzArmorRendererRegistry.register(IronMechHeadRenderer::new, BioMechRegistry.ITEM_IRON_MECH_HEAD.get());
+    	AzArmorRendererRegistry.register(IronMechChestplateRenderer::new, BioMechRegistry.ITEM_IRON_MECH_CHESTPLATE.get());
+    	AzArmorRendererRegistry.register(IronMechLegsRenderer::new, BioMechRegistry.ITEM_IRON_MECH_LEGS.get());
+    	AzArmorRendererRegistry.register(IronMechRightArmRenderer::new, BioMechRegistry.ITEM_IRON_MECH_ARM.get());
+    	AzArmorRendererRegistry.register(IronMechLeftArmRenderer::new, BioMechRegistry.ITEM_IRON_MECH_LEFT_ARM.get());
+    	//IRON MECH
+    	
+    	//DIAMOND MECH
+    	AzArmorRendererRegistry.register(DiamondMechHeadRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_HEAD.get());
+    	AzArmorRendererRegistry.register(DiamondMechArmorRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_CHESTPLATE.get());
+    	AzArmorRendererRegistry.register(DiamondMechLegsRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_LEGS.get());
+    	AzArmorRendererRegistry.register(DiamondMechRightArmRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_ARM.get());
+    	AzArmorRendererRegistry.register(DiamondMechLeftArmRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_LEFT_ARM.get());
+    	//DIAMOND MECH
+    	
+    	//PIPE MECH
+    	AzArmorRendererRegistry.register(PipeMechHeadRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_HEAD.get());
+    	AzArmorRendererRegistry.register(PipeMechBodyRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_BODY.get());
+    	AzArmorRendererRegistry.register(PipeMechLegsRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEGS.get());
+    	AzArmorRendererRegistry.register(PipeMechRightArmRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
+    	AzArmorRendererRegistry.register(PipeMechLeftArmRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_LEFT_ARM.get());
+    	//PIPE MECH
+    	
+    	//------ Arm items - render item display / right arm only ------
+    	AzItemRendererRegistry.register(GatlingItemRenderer::new, BioMechRegistry.ITEM_GATLING_ARM.get());
+    	AzItemRendererRegistry.register(BuzzsawItemRenderer::new, BioMechRegistry.ITEM_BUZZSAW_ARM.get());
+    	AzItemRendererRegistry.register(DrillItemRenderer::new, BioMechRegistry.ITEM_DRILL_ARM.get());
+    	AzItemRendererRegistry.register(MiningLaserItemRenderer::new, BioMechRegistry.ITEM_MINING_LASER_ARM.get());
+    	AzItemRendererRegistry.register(PowerArmItemRenderer::new, BioMechRegistry.ITEM_POWER_ARM.get());
+    	AzItemRendererRegistry.register(PipeMechArmItemRenderer::new, BioMechRegistry.ITEM_PIPE_MECH_ARM.get());
+    	AzItemRendererRegistry.register(IronMechArmItemRenderer::new, BioMechRegistry.ITEM_IRON_MECH_ARM.get());
+    	AzItemRendererRegistry.register(DiamondMechArmItemRenderer::new, BioMechRegistry.ITEM_DIAMOND_MECH_ARM.get());
+    	AzItemRendererRegistry.register(DiggerArmItemRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
+    	AzItemRendererRegistry.register(HerosArmItemRenderer::new, BioMechRegistry.ITEM_HEROS_ARM.get());
+    	//------ Arm items - render item display / right arm only ------
+    	
+    	//------ All Animated ------
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_MINING_LASER_ARM.get(), BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_DRILL_ARM.get(), BioMechRegistry.ITEM_DRILL_LEFT_ARM.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_BUZZSAW_ARM.get(), BioMechRegistry.ITEM_BUZZSAW_LEFT_ARM.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_GATLING_ARM.get(), BioMechRegistry.ITEM_GATLING_LEFT_ARM.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_DIGGER_ARM.get(), BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_TELEPORTATION_CRYSTAL.get());
+    	//------ All Animated ------
+    	
+    	
+    	
+    	
+    	//------
+    	
+    	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
+    	MenuScreens.register(BioMechRegistry.MENU_TYPE_PORTABLE_STORAGE_UNIT.get(), PortableStorageUnitScreen::new);
+    	
+    	//BioMech Station only
+    	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
+    	//BioMech Station only
+	}
+	
+}

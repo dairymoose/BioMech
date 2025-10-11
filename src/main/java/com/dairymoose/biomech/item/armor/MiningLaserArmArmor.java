@@ -26,7 +26,7 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArm {
 		this.hidePlayerModel = true;
 		this.dispatcher = new MiningLaserDispatcher();
 		
-		this.minSpeedMult = 2.5f;
+		this.minSpeedMult = 2.7f;
 		this.maxSpeedMult = minSpeedMult * MAX_POWER;
 	}
 

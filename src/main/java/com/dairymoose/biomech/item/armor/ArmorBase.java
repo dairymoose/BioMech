@@ -10,6 +10,7 @@ import com.dairymoose.biomech.BioMech.ClientModEvents;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.item.anim.MiningLaserDispatcher;
+import com.dairymoose.biomech.packet.serverbound.ServerboundTeleportationCrystalPacket;
 
 import mod.azure.azurelib.AzureLib;
 import mod.azure.azurelib.rewrite.animation.AzAnimator;
@@ -159,25 +160,29 @@ public class ArmorBase extends ArmorItem {
 		
 		String replaced = input;
 		
-		NumberFormat nf = new DecimalFormat("#.#");
-		replaced = replaced.replaceAll("\\{alt\\}", ClientModEvents.HOTKEY_ENABLE_ARM_FUNCTION.getKey().getDisplayName().getString());
-		if (mousingOverLeftArm)
-			replaced = replaced.replaceAll("\\{lmb\\}", ClientModEvents.HOTKEY_LEFT_ARM.getKey().getDisplayName().getString());
-		else
-			replaced = replaced.replaceAll("\\{lmb\\}", ClientModEvents.HOTKEY_RIGHT_ARM.getKey().getDisplayName().getString());
-		replaced = replaced.replaceAll("\\{rmb\\}", ClientModEvents.HOTKEY_LEFT_ARM.getKey().getDisplayName().getString());
-		replaced = replaced.replaceAll("Left Button", "Left Mouse-Click");
-		replaced = replaced.replaceAll("Right Button", "Right Mouse-Click");
-		replaced = replaced.replaceAll("\\{dr\\}", nf.format(100.0f*this.getDamageAbsorbPercent()));
-		replaced = replaced.replaceAll("\\{avoid\\}", nf.format(100.0f*this.getDamageAvoidPercent()));
-		replaced = replaced.replaceAll("\\{absorb_energy_harm\\}", nf.format(IronMechChestArmor.energyDamageMultiplier));
-		replaced = replaced.replaceAll("\\{crit_boost\\}", nf.format(100.0f*this.getCriticalStrikeBoost()));
-		replaced = replaced.replaceAll("\\{near_damage_boost\\}", nf.format(100.0f*this.getNearbyEnemyDamageBoost()));
-		replaced = replaced.replaceAll("\\{nearby_enemy_range\\}", nf.format(HerosHeadpieceArmor.nearbyEnemiesDiameter));
-		replaced = replaced.replaceAll("\\{explosion_dr\\}", nf.format(100.0f*this.getExplosionDamageReduction()));
-		replaced = replaced.replaceAll("\\{psu\\}", ClientModEvents.HOTKEY_OPEN_PSU.getKey().getDisplayName().getString());
-		replaced = replaced.replaceAll("\\{mining_laser_max_time\\}", nf.format(MiningLaserArmArmor.SECONDS_UNTIL_MAX_LASER));
-		replaced = replaced.replaceAll("\\{mining_laser_max_power\\}", nf.format(MiningLaserArmArmor.MAX_POWER));
+		if (input.contains("{")) {
+			NumberFormat nf = new DecimalFormat("#.#");
+			replaced = replaced.replaceAll("\\{alt\\}", ClientModEvents.HOTKEY_ENABLE_ARM_FUNCTION.getKey().getDisplayName().getString());
+			if (mousingOverLeftArm)
+				replaced = replaced.replaceAll("\\{lmb\\}", ClientModEvents.HOTKEY_LEFT_ARM.getKey().getDisplayName().getString());
+			else
+				replaced = replaced.replaceAll("\\{lmb\\}", ClientModEvents.HOTKEY_RIGHT_ARM.getKey().getDisplayName().getString());
+			replaced = replaced.replaceAll("\\{rmb\\}", ClientModEvents.HOTKEY_LEFT_ARM.getKey().getDisplayName().getString());
+			replaced = replaced.replaceAll("Left Button", "Left Mouse-Click");
+			replaced = replaced.replaceAll("Right Button", "Right Mouse-Click");
+			replaced = replaced.replaceAll("\\{dr\\}", nf.format(100.0f*this.getDamageAbsorbPercent()));
+			replaced = replaced.replaceAll("\\{avoid\\}", nf.format(100.0f*this.getDamageAvoidPercent()));
+			replaced = replaced.replaceAll("\\{absorb_energy_harm\\}", nf.format(IronMechChestArmor.energyDamageMultiplier));
+			replaced = replaced.replaceAll("\\{crit_boost\\}", nf.format(100.0f*this.getCriticalStrikeBoost()));
+			replaced = replaced.replaceAll("\\{near_damage_boost\\}", nf.format(100.0f*this.getNearbyEnemyDamageBoost()));
+			replaced = replaced.replaceAll("\\{nearby_enemy_range\\}", nf.format(HerosHeadpieceArmor.nearbyEnemiesDiameter));
+			replaced = replaced.replaceAll("\\{explosion_dr\\}", nf.format(100.0f*this.getExplosionDamageReduction()));
+			replaced = replaced.replaceAll("\\{psu\\}", ClientModEvents.HOTKEY_OPEN_PSU.getKey().getDisplayName().getString());
+			replaced = replaced.replaceAll("\\{mining_laser_max_time\\}", nf.format(MiningLaserArmArmor.SECONDS_UNTIL_MAX_LASER));
+			replaced = replaced.replaceAll("\\{mining_laser_max_power\\}", nf.format(MiningLaserArmArmor.MAX_POWER));
+			replaced = replaced.replaceAll("\\{teleport_hold_time\\}", nf.format(TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS/20.0f));
+			replaced = replaced.replaceAll("\\{teleport_back_time\\}", nf.format(ServerboundTeleportationCrystalPacket.MINUTES_ALLOWED_TO_TELEPORT_BACK));
+		}
 		
 		return replaced;
 	}

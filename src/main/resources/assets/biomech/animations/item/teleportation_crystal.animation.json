@@ -1,0 +1,19 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.teleportation_crystal.passive": {
+			"loop": true,
+			"bones": {
+				"crystal": {
+					"rotation": {
+						"vector": [0, "query.anim_time*20", 0]
+					},
+					"position": {
+						"vector": [0, "0.5*Math.sin(query.anim_time*60)", 0]
+					}
+				}
+			}
+		}
+	},
+	"azurelib_format_version": 2
+}
