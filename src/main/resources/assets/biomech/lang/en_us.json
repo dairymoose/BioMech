@@ -78,7 +78,7 @@
 	
 	"item.biomech.portable_storage_unit": "§5Portable Storage Unit§0",
 	"item.biomech.portable_storage_unit.tooltip1": "Provides additional inventory space.",
-	"item.biomech.portable_storage_unit.tooltip2": "Press '{psu}' to open",
+	"item.biomech.portable_storage_unit.tooltip2": "Press '{psu}' to open.",
 	
 	"item.biomech.battery_pack": "§5Battery Pack§0",
 	"item.biomech.battery_pack.tooltip1": "Grants suit energy regeneration.",
