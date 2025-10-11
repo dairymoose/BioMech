@@ -1897,7 +1897,7 @@ public class BioMech
         		    					if (itemStackToRender.getItem() instanceof ArmorBase base) {
         		    						Item leftArmItem = base.getLeftArmItem();
         		    						if (leftArmItem != null) {
-        		    							if (slottedItem.leftArmItemStack.isEmpty()) {
+        		    							if (slottedItem.leftArmItemStack == null || !slottedItem.leftArmItemStack.is(leftArmItem)) {
         		    								slottedItem.leftArmItemStack = new ItemStack(leftArmItem);
         		    							}
         		    							itemStackToRender = slottedItem.leftArmItemStack;
