@@ -123,10 +123,10 @@ public class ServerboundTeleportationCrystalPacket implements Packet<ServerGameP
 									if (teleportLevel != null && teleportDestination != null) {
 										BioMech.LOGGER.debug("Teleport to: " + teleportDestination + " for player=" + serverHandler.player);
 										
-	            						int particleCount = 12;
+	            						int particleCount = 15;
 	            						for (int i=0; i<particleCount; ++i) {
 	                						Vec3 loc = serverHandler.player.position().add(new Vec3(2.0 * (Math.random() - 0.5), 1.3 + 0.25 * Math.random(), 2.0 * (Math.random() - 0.5)));
-	                						serverHandler.player.level().addParticle(ParticleTypes.ELECTRIC_SPARK, loc.x, loc.y, loc.z, 0.0f, 0.0f, 0.0f);
+	                						level.sendParticles(ParticleTypes.ELECTRIC_SPARK, loc.x, loc.y, loc.z, 1, 0.0f, 0.0f, 0.0f, 1.0f);
 	                					}
 										
 										sp.teleportTo(teleportLevel, teleportDestination.x, teleportDestination.y, teleportDestination.z, player.getYRot(), player.getXRot());
