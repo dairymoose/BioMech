@@ -61,7 +61,7 @@ public class ServerboundOpenPortableStorageUnitPacket implements Packet<ServerGa
 	public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
 		BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 		if (playerData != null) {
-			if (playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof PortableStorageUnitArmor psu) {
+			if (playerData.getForSlot(MechPart.Back).itemStack.getItem() instanceof PortableStorageUnitArmor psu) {
 				return new PortableStorageUnitMenu(containerId, inventory, new PlayerDataContainer(playerData));
 			}
 		}
