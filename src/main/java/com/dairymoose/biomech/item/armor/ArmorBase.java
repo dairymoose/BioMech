@@ -150,6 +150,7 @@ public class ArmorBase extends ArmorItem {
 		return InteractionResultHolder.pass(p_40396_.getItemInHand(p_40397_));
 	}
 	
+	public static boolean mousingOverLeftArm = false;
 	private String replaceTooltips(String input) {
 		if (input == null)
 			return null;
@@ -160,7 +161,10 @@ public class ArmorBase extends ArmorItem {
 		
 		NumberFormat nf = new DecimalFormat("#.#");
 		replaced = replaced.replaceAll("\\{alt\\}", ClientModEvents.HOTKEY_ENABLE_ARM_FUNCTION.getKey().getDisplayName().getString());
-		replaced = replaced.replaceAll("\\{lmb\\}", ClientModEvents.HOTKEY_RIGHT_ARM.getKey().getDisplayName().getString());
+		if (mousingOverLeftArm)
+			replaced = replaced.replaceAll("\\{lmb\\}", ClientModEvents.HOTKEY_LEFT_ARM.getKey().getDisplayName().getString());
+		else
+			replaced = replaced.replaceAll("\\{lmb\\}", ClientModEvents.HOTKEY_RIGHT_ARM.getKey().getDisplayName().getString());
 		replaced = replaced.replaceAll("\\{rmb\\}", ClientModEvents.HOTKEY_LEFT_ARM.getKey().getDisplayName().getString());
 		replaced = replaced.replaceAll("Left Button", "Left Mouse-Click");
 		replaced = replaced.replaceAll("Right Button", "Right Mouse-Click");
@@ -172,6 +176,8 @@ public class ArmorBase extends ArmorItem {
 		replaced = replaced.replaceAll("\\{nearby_enemy_range\\}", nf.format(HerosHeadpieceArmor.nearbyEnemiesDiameter));
 		replaced = replaced.replaceAll("\\{explosion_dr\\}", nf.format(100.0f*this.getExplosionDamageReduction()));
 		replaced = replaced.replaceAll("\\{psu\\}", ClientModEvents.HOTKEY_OPEN_PSU.getKey().getDisplayName().getString());
+		replaced = replaced.replaceAll("\\{mining_laser_max_time\\}", nf.format(MiningLaserArmArmor.SECONDS_UNTIL_MAX_LASER));
+		replaced = replaced.replaceAll("\\{mining_laser_max_power\\}", nf.format(MiningLaserArmArmor.MAX_POWER));
 		
 		return replaced;
 	}

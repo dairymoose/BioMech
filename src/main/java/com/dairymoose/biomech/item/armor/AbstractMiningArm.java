@@ -63,7 +63,6 @@ public abstract class AbstractMiningArm extends ArmorBase {
 		public static float progressMax = 100.0f;
 	}
 
-	public int SECONDS_UNTIL_MAX_LASER = 12;
 	protected float minSpeedMult = 2.5f;
 	protected float maxSpeedMult = minSpeedMult * 6.0f;
 	protected double blockReachMult = 1.6;

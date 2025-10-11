@@ -3,6 +3,7 @@ package com.dairymoose.biomech.client.screen;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
 
@@ -168,6 +169,19 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 		
 		this.xMouse = (float) p_282102_;
 		this.yMouse = (float) p_282423_;
+		
+		//update left-arm tooltip to show the correct hotkey
+		Slot leftArmSlot = this.getMenu().getSlotForMechPart(MechPart.LeftArm);
+		int tooltipMargin = 3;
+		int xStart = -tooltipMargin + this.leftPos + leftArmSlot.x;
+		int yStart = -tooltipMargin + this.topPos + leftArmSlot.y;
+		boolean xMatch = this.xMouse >= xStart && this.xMouse <= (xStart + SLOT_ICON_WIDTH + tooltipMargin);
+		boolean yMatch = this.yMouse >= yStart && this.yMouse <= (yStart + SLOT_ICON_HEIGHT + tooltipMargin);
+		if (xMatch && yMatch) {
+			ArmorBase.mousingOverLeftArm = true;
+		} else {
+			ArmorBase.mousingOverLeftArm = false;
+		}
 	}
 
 	protected void renderBg(GuiGraphics p_281616_, float p_282737_, int p_281678_, int p_281465_) {

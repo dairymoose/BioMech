@@ -17,6 +17,9 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArm {
 
 	public final MiningLaserDispatcher dispatcher;
 
+	public static float SECONDS_UNTIL_MAX_LASER = 12.0f;
+	public static float MAX_POWER = 8.0f;
+	
 	public MiningLaserArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
@@ -24,7 +27,7 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArm {
 		this.dispatcher = new MiningLaserDispatcher();
 		
 		this.minSpeedMult = 2.5f;
-		this.maxSpeedMult = minSpeedMult * 6.0f;
+		this.maxSpeedMult = minSpeedMult * MAX_POWER;
 	}
 
 	public static float laserDamageAtMaxPower = 6.0f;

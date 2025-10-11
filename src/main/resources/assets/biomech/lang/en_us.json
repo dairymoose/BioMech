@@ -49,7 +49,7 @@
 	"item.biomech.mining_laser_arm": "§5Mining Laser Arm§0",
 	"item.biomech.mining_laser_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",
 	"item.biomech.mining_laser_arm.tooltip2": "Hold to mine any pickaxe-mineable block.",
-	"item.biomech.mining_laser_arm.tooltip3": "The longer you hold, the stronger it is (max 12 seconds - up to 6x faster).",
+	"item.biomech.mining_laser_arm.tooltip3": "The longer you hold, the stronger it is (max {mining_laser_max_time} seconds - up to {mining_laser_max_power}x faster).",
 	
 	"item.biomech.lavastride_leggings": "§5Lavastride Leggings§0",
 	"item.biomech.lavastride_leggings.tooltip1": "Allows the user to walk on the surface of lava.",
