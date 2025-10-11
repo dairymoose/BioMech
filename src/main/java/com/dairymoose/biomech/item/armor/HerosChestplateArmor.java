@@ -11,7 +11,7 @@ public class HerosChestplateArmor extends HerosArmorBase {
 		this.alwaysHidePlayerHat = false;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Chest;
-		this.nearbyEnemyDamageBoost = 0.05f;
+		this.nearbyEnemyDamageBoost = 0.06f;
 		this.explosionDamageReduction = 0.08f;
 	}
 
