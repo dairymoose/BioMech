@@ -3,12 +3,11 @@ package com.dairymoose.biomech.packet.serverbound;
 import java.util.function.Supplier;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
-import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.PlayerDataContainer;
+import com.dairymoose.biomech.item.armor.MechPart;
+import com.dairymoose.biomech.item.armor.PortableStorageUnitArmor;
 import com.dairymoose.biomech.menu.PortableStorageUnitMenu;
-import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -17,14 +16,11 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 public class ServerboundOpenPortableStorageUnitPacket implements Packet<ServerGamePacketListener>, MenuProvider {
 	public ServerboundOpenPortableStorageUnitPacket() {
@@ -65,7 +61,9 @@ public class ServerboundOpenPortableStorageUnitPacket implements Packet<ServerGa
 	public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
 		BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 		if (playerData != null) {
-			return new PortableStorageUnitMenu(containerId, inventory, new PlayerDataContainer(playerData));
+			if (playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof PortableStorageUnitArmor psu) {
+				return new PortableStorageUnitMenu(containerId, inventory, new PlayerDataContainer(playerData));
+			}
 		}
 		return null;
 	}
