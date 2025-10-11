@@ -171,6 +171,7 @@ public class ArmorBase extends ArmorItem {
 		replaced = replaced.replaceAll("\\{near_damage_boost\\}", nf.format(100.0f*this.getNearbyEnemyDamageBoost()));
 		replaced = replaced.replaceAll("\\{nearby_enemy_range\\}", nf.format(HerosHeadpieceArmor.nearbyEnemiesDiameter));
 		replaced = replaced.replaceAll("\\{explosion_dr\\}", nf.format(100.0f*this.getExplosionDamageReduction()));
+		replaced = replaced.replaceAll("\\{psu\\}", ClientModEvents.HOTKEY_OPEN_PSU.getKey().getDisplayName().getString());
 		
 		return replaced;
 	}

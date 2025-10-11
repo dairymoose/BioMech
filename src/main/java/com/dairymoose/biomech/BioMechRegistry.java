@@ -44,6 +44,7 @@ import com.dairymoose.biomech.item.armor.PipeMechHeadArmor;
 import com.dairymoose.biomech.item.armor.PipeMechLeftArmArmor;
 import com.dairymoose.biomech.item.armor.PipeMechLegsArmor;
 import com.dairymoose.biomech.item.armor.PipeMechRightArmArmor;
+import com.dairymoose.biomech.item.armor.PortableStorageUnitArmor;
 import com.dairymoose.biomech.item.armor.PowerChestArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.armor.PowerLeftArmArmor;
@@ -52,6 +53,7 @@ import com.dairymoose.biomech.item.armor.PowerRightArmArmor;
 import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
+import com.dairymoose.biomech.menu.PortableStorageUnitMenu;
 
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -86,6 +88,8 @@ public class BioMechRegistry {
 	public static RegistryObject<BlockEntityType<BioMechStationBlockEntity>> BLOCK_ENTITY_BIOMECH_STATION = BioMech.BLOCK_ENTITY_TYPES.register("biomech_station", () -> BioMechStationBlockEntity.BIOMECH_STATION_BLOCK_ENTITY);
 	
 	public static RegistryObject<MenuType> MENU_TYPE_BIOMECH_STATION = BioMech.MENUS.register("biomech_station_menu", () -> new MenuType(BioMechStationMenu::new, FeatureFlags.DEFAULT_FLAGS));
+	
+	public static RegistryObject<MenuType> MENU_TYPE_PORTABLE_STORAGE_UNIT = BioMech.MENUS.register("portable_storage_unit_menu", () -> new MenuType(PortableStorageUnitMenu::new, FeatureFlags.DEFAULT_FLAGS));
 	
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_LASER = BioMech.PARTICLES.register("laser", () -> new SimpleParticleType(false));
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_THICKER_LASER = BioMech.PARTICLES.register("thicker_laser", () -> new SimpleParticleType(false));
@@ -166,6 +170,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_OPTICS_UNIT = BioMech.ITEMS.register("optics_unit", () -> new OpticsUnitArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_MOBILITY_TREADS = BioMech.ITEMS.register("mobility_treads", () -> new MobilityTreadsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	//LOAD LIFTER SET
+	
+	public static RegistryObject<Item> ITEM_PORTABLE_STORAGE_UNIT = BioMech.ITEMS.register("portable_storage_unit", () -> new PortableStorageUnitArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_INTERCEPTOR_ARMS = BioMech.ITEMS.register("interceptor_arms", () -> new InterceptorArmsArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	

@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
@@ -25,6 +25,9 @@ public class BioMechPlayerData {
 	public SlottedItem leftArm = new SlottedItem(MechPart.LeftArm);
 	public SlottedItem rightArm = new SlottedItem(MechPart.RightArm);
 	public SlottedItem back = new SlottedItem(MechPart.Back);
+	
+	public static final int PORTABLE_STORAGE_UNIT_CAPACITY = 63;
+	public NonNullList<ItemStack> portableStorageUnitItems = NonNullList.withSize(BioMechPlayerData.PORTABLE_STORAGE_UNIT_CAPACITY, ItemStack.EMPTY);
 	
 	public float suitEnergyPerSecBaseline = 3.0f;
 	
@@ -270,9 +273,9 @@ public class BioMechPlayerData {
 		return data;
 	}
 	
-	@Override
-	public String toString() {
-		CompoundTag compound = BioMechPlayerData.serialize(this);
-		return NbtUtils.prettyPrint(compound);
-	}
+//	@Override
+//	public String toString() {
+//		CompoundTag compound = BioMechPlayerData.serialize(this);
+//		return NbtUtils.prettyPrint(compound);
+//	}
 }

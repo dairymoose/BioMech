@@ -58,6 +58,7 @@ import com.dairymoose.biomech.armor.renderer.PipeMechHeadRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechLegsRenderer;
 import com.dairymoose.biomech.armor.renderer.PipeMechRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.PortableStorageUnitRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerChestRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerHelmetRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerLeftArmRenderer;
@@ -67,6 +68,7 @@ import com.dairymoose.biomech.armor.renderer.SpiderWalkersRenderer;
 import com.dairymoose.biomech.armor.renderer.SpringLoadedLeggingsRenderer;
 import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
+import com.dairymoose.biomech.client.screen.PortableStorageUnitScreen;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
 import com.dairymoose.biomech.config.BioMechServerConfig;
@@ -84,6 +86,7 @@ import com.dairymoose.biomech.item.armor.MechPartUtil;
 import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
 import com.dairymoose.biomech.item.armor.OpticsUnitArmor;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
+import com.dairymoose.biomech.item.armor.PortableStorageUnitArmor;
 import com.dairymoose.biomech.item.armor.PowerArmArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
@@ -99,6 +102,7 @@ import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PipeMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
+import com.dairymoose.biomech.menu.PortableStorageUnitMenu;
 import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundProjectileDodgePacket;
@@ -107,6 +111,7 @@ import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmBlockTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket;
+import com.dairymoose.biomech.packet.serverbound.ServerboundOpenPortableStorageUnitPacket;
 import com.dairymoose.biomech.particle.InstantSmokeParticle;
 import com.dairymoose.biomech.particle.LaserParticle;
 import com.dairymoose.biomech.particle.MaxLaserParticle;
@@ -154,6 +159,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -350,6 +356,7 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMiningArmEntityTargetPacket.class, ServerboundMiningArmEntityTargetPacket::write, ServerboundMiningArmEntityTargetPacket::new, ServerboundMiningArmEntityTargetPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundProjectileDodgePacket.class, ClientboundProjectileDodgePacket::write, ClientboundProjectileDodgePacket::new, ClientboundProjectileDodgePacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMiningArmBlockTargetPacket.class, ServerboundMiningArmBlockTargetPacket::write, ServerboundMiningArmBlockTargetPacket::new, ServerboundMiningArmBlockTargetPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundOpenPortableStorageUnitPacket.class, ServerboundOpenPortableStorageUnitPacket::write, ServerboundOpenPortableStorageUnitPacket::new, ServerboundOpenPortableStorageUnitPacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -848,7 +855,12 @@ public class BioMech
     @SubscribeEvent
     public void onLoadPlayerEvent(final PlayerEvent.LoadFromFile event)
     {
-        File modDataFile = event.getPlayerFile("biomech");
+        loadBioMechFile(event);
+        loadPortableStorageUnitFile(event);
+    }
+
+	private void loadBioMechFile(final PlayerEvent.LoadFromFile event) {
+		File modDataFile = event.getPlayerFile("biomech");
 
         if (modDataFile.exists()) {
         	try {
@@ -861,12 +873,42 @@ public class BioMech
         } else {
         	LOGGER.info("BioMech file does not exist for player " + event.getEntity().getDisplayName().getString());
         }
-    }
+	}
+	
+	private void loadPortableStorageUnitFile(final PlayerEvent.LoadFromFile event) {
+		File modDataFile = event.getPlayerFile("portable_storage_unit");
+
+        if (modDataFile.exists()) {
+        	try {
+        		BioMechPlayerData playerData = globalPlayerData.get(event.getEntity().getUUID());
+        		
+        		if (playerData != null) {
+        			CompoundTag compound = NbtIo.read(modDataFile);
+                    PortableStorageUnitArmor.deserialize(playerData, compound);
+                    LOGGER.debug("Load portable_storage_unit player data for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath() + ": " + compound.getAsString());
+        		}
+            } catch (Exception e) {
+                LOGGER.error("Error loading portable_storage_unit data for " + event.getEntity().getDisplayName().getString() + ": " + e.getMessage(), e);
+            }
+        } else {
+        	LOGGER.info("portable_storage_unit file does not exist for player " + event.getEntity().getDisplayName().getString());
+        }
+	}
     
     @SubscribeEvent
     public void onSavePlayerEvent(final PlayerEvent.SaveToFile event)
     {
-        File modDataFile = event.getPlayerFile("biomech");
+        saveBioMechFile(event);
+        savePortableStorageUnitFile(event);
+        
+        if (pendingCleanupPlayers.contains(event.getEntity().getUUID())) {
+        	globalPlayerData.remove(event.getEntity().getUUID());
+        	pendingCleanupPlayers.remove(event.getEntity().getUUID());
+        }
+    }
+
+	private void saveBioMechFile(final PlayerEvent.SaveToFile event) {
+		File modDataFile = event.getPlayerFile("biomech");
 
         try {
         	BioMechPlayerData playerData = null;
@@ -881,12 +923,26 @@ public class BioMech
         } catch (Exception e) {
             LOGGER.error("Error saving player data for " + event.getEntity().getDisplayName().getString() + ": " + e.getMessage(), e);
         }
-        
-        if (pendingCleanupPlayers.contains(event.getEntity().getUUID())) {
-        	globalPlayerData.remove(event.getEntity().getUUID());
-        	pendingCleanupPlayers.remove(event.getEntity().getUUID());
+	}
+	
+	private void savePortableStorageUnitFile(final PlayerEvent.SaveToFile event) {
+		File modDataFile = event.getPlayerFile("portable_storage_unit");
+
+        try {
+        	BioMechPlayerData playerData = null;
+        	playerData = globalPlayerData.get(event.getEntity().getUUID());
+        	if (playerData != null) {
+    			CompoundTag root = PortableStorageUnitArmor.serialize(playerData);
+    			//LOGGER.debug("root is: " + NbtUtils.prettyPrint(root));
+    			NbtIo.write(root, modDataFile);
+        		LOGGER.debug("Saved portable_storage_unit data for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath());
+        	} else {
+        		LOGGER.info("Player data was null while saving for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath());
+        	}
+        } catch (Exception e) {
+            LOGGER.error("Error saving portable_storage_unit data for " + event.getEntity().getDisplayName().getString() + ": " + e.getMessage(), e);
         }
-    }
+	}
 
     //AzureLib bug: dispatcher doesn't work client side because it uses AzAnimatorAccessor instead of AzIdentifiableItemStackAnimatorCache
     public static void clientSideItemAnimation(ItemStack itemStack, AzCommand command) {
@@ -1266,6 +1322,7 @@ public class BioMech
     	public static final KeyMapping HOTKEY_ENABLE_ARM_FUNCTION = new KeyMapping("key.hold_to_enable", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.categories.biomech");
     	public static final KeyMapping HOTKEY_RIGHT_ARM = new KeyMapping("key.right_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_LEFT, "key.categories.biomech");
     	public static final KeyMapping HOTKEY_LEFT_ARM = new KeyMapping("key.left_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_RIGHT, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_OPEN_PSU = new KeyMapping("key.psu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U, "key.categories.biomech");
     	
         public static final List<KeyMapping> allKeyMappings = List.of(HOTKEY_RIGHT_ARM, HOTKEY_LEFT_ARM, HOTKEY_ENABLE_ARM_FUNCTION);
 
@@ -1614,8 +1671,6 @@ public class BioMech
     		return null;
     	}
     	
-    	//boolean rightArmActive = false;
-    	//boolean leftArmActive = false;
     	@SubscribeEvent
         public void onClientTick(final ClientTickEvent event) {
         	if (event.phase == TickEvent.Phase.START) {
@@ -1637,6 +1692,14 @@ public class BioMech
                 			localPlayerHoldingAlt = HOTKEY_ENABLE_ARM_FUNCTION.isDown();
                 			BioMech.localPlayerJumping = Minecraft.getInstance().player.input.jumping;
                 		}
+            			
+            			if (HOTKEY_OPEN_PSU.isDown()) {
+            				int tickDiff = Minecraft.getInstance().player.tickCount - PortableStorageUnitScreen.exitTick;
+            				if (tickDiff >= 3 && playerData.getForSlot(MechPart.Back).itemStack.getItem() instanceof PortableStorageUnitArmor psu) {
+            					while (HOTKEY_OPEN_PSU.consumeClick());
+            					BioMechNetwork.INSTANCE.sendToServer(new ServerboundOpenPortableStorageUnitPacket());
+            				}
+            			}
             			
             			if (requireModifierKeyForArmUsage) {
                 			if (HOTKEY_ENABLE_ARM_FUNCTION.isDown()) {
@@ -1984,6 +2047,7 @@ public class BioMech
         	AzArmorRendererRegistry.register(DiggerRightArmRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
         	AzArmorRendererRegistry.register(DiggerLeftArmRenderer::new, BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
         	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());
+        	AzArmorRendererRegistry.register(PortableStorageUnitRenderer::new, BioMechRegistry.ITEM_PORTABLE_STORAGE_UNIT.get());
         	
         	//HERO
         	AzArmorRendererRegistry.register(HerosHeadpieceRenderer::new, BioMechRegistry.ITEM_HEROS_HEADPIECE.get());
@@ -2046,6 +2110,7 @@ public class BioMech
         	//------
         	
         	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
+        	MenuScreens.register(BioMechRegistry.MENU_TYPE_PORTABLE_STORAGE_UNIT.get(), PortableStorageUnitScreen::new);
         	
         	//BioMech Station only
         	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());

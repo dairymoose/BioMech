@@ -14,7 +14,9 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class ClientboundUpdateSlottedItemPacket implements Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> {
 	private UUID uuid;
@@ -56,9 +58,19 @@ public class ClientboundUpdateSlottedItemPacket implements Packet<net.minecraft.
 			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
 				@Override
 				public void run() {
+					BioMech.LOGGER.info("do check");
 					net.minecraft.client.multiplayer.ClientPacketListener clientHandler = (net.minecraft.client.multiplayer.ClientPacketListener)handler;
-					BioMechPlayerData playerData = BioMechPlayerData.deserialize(playerDataTag);
-					BioMech.globalPlayerData.put(uuid, playerData);
+					try {
+						BioMechPlayerData playerData = BioMechPlayerData.deserialize(playerDataTag);
+						
+						//in singleplayer the globalPlayerData is shared between client + server - if we overwrite this we lose the items in the backpack (they are not serialized)
+						BioMech.LOGGER.info("is SP?" + (ServerLifecycleHooks.getCurrentServer()));
+						if (ServerLifecycleHooks.getCurrentServer() == null || !ServerLifecycleHooks.getCurrentServer().isSingleplayer()) {
+							BioMech.globalPlayerData.put(uuid, playerData);
+						}
+					} catch (Exception e) {
+						BioMech.LOGGER.error("Failed to deserialize data", e);
+					}
 				}
 				};});
 		}

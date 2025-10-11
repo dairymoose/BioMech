@@ -71,6 +71,10 @@
 	"item.biomech.back_jetpack.tooltip2": "Consumes energy while active.",
 	"item.biomech.back_jetpack.tooltip3": "Provides vertical thrust.  If an elytra is active, provides forward thrust.",
 	
+	"item.biomech.portable_storage_unit": "§5Portable Storage Unit§0",
+	"item.biomech.portable_storage_unit.tooltip1": "Provides additional inventory space.",
+	"item.biomech.portable_storage_unit.tooltip2": "Press {psu} to open",
+	
 	"item.biomech.battery_pack": "§5Battery Pack§0",
 	"item.biomech.battery_pack.tooltip1": "Grants suit energy regeneration.",
 	
@@ -201,6 +205,7 @@
 	"key.hold_to_enable": "Hold to Enable BioMech Arms",
 	"key.right_arm": "Use Right Arm",
 	"key.left_arm": "Use Left Arm",
+	"key.psu": "Open Portable Storage Unit",
 	"key.categories.biomech": "BioMech",
 	
 	"advancements.biomech.give_yourself_a_hand.title": "Give Yourself a Hand",
