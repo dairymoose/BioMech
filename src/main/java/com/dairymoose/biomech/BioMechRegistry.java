@@ -7,52 +7,55 @@ import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.BackJetpackArmor;
 import com.dairymoose.biomech.item.armor.BackScubaTankArmor;
 import com.dairymoose.biomech.item.armor.BatteryPackArmor;
-import com.dairymoose.biomech.item.armor.BuzzsawLeftArmArmor;
-import com.dairymoose.biomech.item.armor.BuzzsawRightArmArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechChestArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechHeadArmor;
-import com.dairymoose.biomech.item.armor.DiamondMechLeftArmArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechLegsArmor;
-import com.dairymoose.biomech.item.armor.DiamondMechRightArmArmor;
-import com.dairymoose.biomech.item.armor.DiggerLeftArmArmor;
-import com.dairymoose.biomech.item.armor.DiggerRightArmArmor;
-import com.dairymoose.biomech.item.armor.DrillLeftArmArmor;
-import com.dairymoose.biomech.item.armor.DrillRightArmArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
-import com.dairymoose.biomech.item.armor.GatlingLeftArmArmor;
-import com.dairymoose.biomech.item.armor.GatlingRightArmArmor;
 import com.dairymoose.biomech.item.armor.HerosChestplateArmor;
 import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
-import com.dairymoose.biomech.item.armor.HerosLeftArmArmor;
 import com.dairymoose.biomech.item.armor.HerosLeggingsArmor;
-import com.dairymoose.biomech.item.armor.HerosRightArmArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.IronMechHeadArmor;
-import com.dairymoose.biomech.item.armor.IronMechLeftArmArmor;
 import com.dairymoose.biomech.item.armor.IronMechLegsArmor;
-import com.dairymoose.biomech.item.armor.IronMechRightArmArmor;
 import com.dairymoose.biomech.item.armor.LavastrideLeggingsArmor;
-import com.dairymoose.biomech.item.armor.MiningLaserLeftArmArmor;
-import com.dairymoose.biomech.item.armor.MiningLaserRightArmArmor;
+import com.dairymoose.biomech.item.armor.LoadLifterChassisArmor;
 import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
 import com.dairymoose.biomech.item.armor.NightVisionVisorArmor;
 import com.dairymoose.biomech.item.armor.OpticsUnitArmor;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.armor.PipeMechHeadArmor;
-import com.dairymoose.biomech.item.armor.PipeMechLeftArmArmor;
 import com.dairymoose.biomech.item.armor.PipeMechLegsArmor;
-import com.dairymoose.biomech.item.armor.PipeMechRightArmArmor;
 import com.dairymoose.biomech.item.armor.PortableStorageUnitArmor;
 import com.dairymoose.biomech.item.armor.PowerChestArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
-import com.dairymoose.biomech.item.armor.PowerLeftArmArmor;
 import com.dairymoose.biomech.item.armor.PowerLeggingsArmor;
-import com.dairymoose.biomech.item.armor.PowerRightArmArmor;
 import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.item.armor.TeleportationCrystalArmor;
+import com.dairymoose.biomech.item.armor.arm.BuzzsawLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.BuzzsawRightArmArmor;
+import com.dairymoose.biomech.item.armor.arm.DiamondMechLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.DiamondMechRightArmArmor;
+import com.dairymoose.biomech.item.armor.arm.DiggerLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.DiggerRightArmArmor;
+import com.dairymoose.biomech.item.armor.arm.DrillLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.DrillRightArmArmor;
+import com.dairymoose.biomech.item.armor.arm.GatlingLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.GatlingRightArmArmor;
+import com.dairymoose.biomech.item.armor.arm.HerosLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.HerosRightArmArmor;
+import com.dairymoose.biomech.item.armor.arm.IronMechLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.IronMechRightArmArmor;
+import com.dairymoose.biomech.item.armor.arm.LoadLifterLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.LoadLifterRightArmArmor;
+import com.dairymoose.biomech.item.armor.arm.MiningLaserLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.MiningLaserRightArmArmor;
+import com.dairymoose.biomech.item.armor.arm.PipeMechLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.PipeMechRightArmArmor;
+import com.dairymoose.biomech.item.armor.arm.PowerLeftArmArmor;
+import com.dairymoose.biomech.item.armor.arm.PowerRightArmArmor;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
 import com.dairymoose.biomech.menu.PortableStorageUnitMenu;
 
@@ -169,7 +172,9 @@ public class BioMechRegistry {
 	
 	//LOAD LIFTER SET
 	public static RegistryObject<Item> ITEM_OPTICS_UNIT = BioMech.ITEMS.register("optics_unit", () -> new OpticsUnitArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_LOAD_LIFTER_CHASSIS = BioMech.ITEMS.register("load_lifter_chassis", () -> new LoadLifterChassisArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_MOBILITY_TREADS = BioMech.ITEMS.register("mobility_treads", () -> new MobilityTreadsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_LOAD_LIFTER_ARM = BioMech.ITEMS.register("load_lifter_arm", () -> new LoadLifterRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	//LOAD LIFTER SET
 	
 	public static RegistryObject<Item> ITEM_TELEPORTATION_CRYSTAL = BioMech.ITEMS.register("teleportation_crystal", () -> new TeleportationCrystalArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
@@ -196,6 +201,7 @@ public class BioMechRegistry {
 	
 	public static RegistryObject<Item> ITEM_LAVASTRIDE_LEGGINGS = BioMech.ITEMS.register("lavastride_leggings", () -> new LavastrideLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	
+	public static RegistryObject<Item> ITEM_LOAD_LIFTER_LEFT_ARM = BioMech.ITEMS.register("left_load_lifter_arm", () -> new LoadLifterLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_HEROS_LEFT_ARM = BioMech.ITEMS.register("left_heros_arm", () -> new HerosLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_DIGGER_LEFT_ARM = BioMech.ITEMS.register("left_digger_arm", () -> new DiggerLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_GATLING_LEFT_ARM = BioMech.ITEMS.register("left_gatling_arm", () -> new GatlingLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));

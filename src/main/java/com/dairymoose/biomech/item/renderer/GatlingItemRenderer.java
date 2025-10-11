@@ -1,8 +1,8 @@
 package com.dairymoose.biomech.item.renderer;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.armor.renderer.BuzzsawRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.GatlingRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.arm.BuzzsawRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.arm.GatlingRightArmRenderer;
 import com.dairymoose.biomech.item.anim.BuzzsawAnimator;
 import com.dairymoose.biomech.item.anim.GatlingAnimator;
 

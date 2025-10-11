@@ -1,7 +1,7 @@
 package com.dairymoose.biomech.item.renderer;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.armor.renderer.DiggerRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.arm.DiggerRightArmRenderer;
 import com.dairymoose.biomech.item.anim.DiggerAnimator;
 import com.dairymoose.biomech.item.anim.DrillAnimator;
 

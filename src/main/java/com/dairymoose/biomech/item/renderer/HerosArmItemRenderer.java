@@ -1,8 +1,8 @@
 package com.dairymoose.biomech.item.renderer;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.armor.renderer.DrillRightArmRenderer;
-import com.dairymoose.biomech.armor.renderer.HerosRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.arm.DrillRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.arm.HerosRightArmRenderer;
 import com.dairymoose.biomech.item.anim.DrillAnimator;
 
 import mod.azure.azurelib.rewrite.render.item.AzItemRenderer;

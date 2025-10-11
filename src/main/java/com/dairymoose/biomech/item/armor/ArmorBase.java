@@ -10,6 +10,7 @@ import com.dairymoose.biomech.BioMech.ClientModEvents;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.item.anim.MiningLaserDispatcher;
+import com.dairymoose.biomech.item.armor.arm.MiningLaserArmArmor;
 import com.dairymoose.biomech.packet.serverbound.ServerboundTeleportationCrystalPacket;
 
 import mod.azure.azurelib.AzureLib;

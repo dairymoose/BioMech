@@ -1,7 +1,7 @@
 package com.dairymoose.biomech.item.renderer;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.armor.renderer.IronMechRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.arm.IronMechRightArmRenderer;
 
 import mod.azure.azurelib.rewrite.render.item.AzItemRenderer;
 import mod.azure.azurelib.rewrite.render.item.AzItemRendererConfig;

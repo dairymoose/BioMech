@@ -1,0 +1,83 @@
+package com.dairymoose.biomech.item.armor.arm;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechPlayerData;
+import com.dairymoose.biomech.BioMechRegistry;
+import com.dairymoose.biomech.HandActiveStatus;
+import com.dairymoose.biomech.item.anim.MiningLaserDispatcher;
+import com.dairymoose.biomech.item.armor.ArmorBase;
+import com.dairymoose.biomech.item.armor.MechPart;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.registries.ForgeRegistries;
+
+public abstract class DiamondMechArmArmor extends ArmorBase {
+
+	public DiamondMechArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+		super(p_40386_, p_266831_, p_40388_);
+		this.suitEnergy = 12;
+		this.hidePlayerModel = true;
+		this.damageAbsorbPct = 0.03f;
+		this.addToLootTable = false;
+	}
+
+	@Override
+	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick,
+			boolean bothHandsInactive, boolean bothHandsActive) {
+
+	}
+
+	@Override
+	public Item getLeftArmItem() {
+		return BioMechRegistry.ITEM_DIAMOND_MECH_LEFT_ARM.get();
+	}
+
+	@Override
+	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isLeftArm) {
+		if (entity instanceof Player player) {
+			HandActiveStatus has = BioMech.handActiveMap.get(player.getUUID());
+
+			if (has != null && (!has.leftHandActive && isLeftArm || !has.rightHandActive && !isLeftArm)) {
+				// this.dispatcher.mining(player, stack);
+				List<Item> armorItems = new ArrayList<Item>();
+				player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+				if (armorItems.contains(BioMechRegistry.ITEM_DIAMOND_MECH_ARM.get())
+						|| armorItems.contains(BioMechRegistry.ITEM_DIAMOND_MECH_LEFT_ARM.get()) || slotId == -1) {
+					if (entity instanceof LivingEntity living && !living.isSpectator()) {
+
+					}
+				}
+			}
+		}
+	}
+
+}

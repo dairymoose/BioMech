@@ -28,7 +28,6 @@ import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
-import com.dairymoose.biomech.item.armor.GatlingArmArmor;
 import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
@@ -39,10 +38,11 @@ import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
 import com.dairymoose.biomech.item.armor.OpticsUnitArmor;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.armor.PortableStorageUnitArmor;
-import com.dairymoose.biomech.item.armor.PowerArmArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.item.armor.TeleportationCrystalArmor;
+import com.dairymoose.biomech.item.armor.arm.GatlingArmArmor;
+import com.dairymoose.biomech.item.armor.arm.PowerArmArmor;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
 import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
@@ -201,7 +201,7 @@ import net.minecraftforge.registries.RegistryObject;
  * <Arm Specific>: Copy right_arm .geo.json file to _item.geo.json
  * <Arm Specific / Animated>: Add animation in animations.item package
  * <Arm Specific>: Export display settings and put it models.item
- * Add localization ("pipe_mech_arm" and "pipe_mech_left_arm")
+ * Add localization ("pipe_mech_arm")
  * Add renderer in armor.renderer package (PipeMechRightArmRenderer & PipeMechLeftArmRenderer)
  * Add ArmorBase class in item.armor package (PipeMechArmArmor & PipeMechRightArmArmor & PipeMechLeftArmArmor)
  * Add new armor to BioMechRegistry (right & left arms)
