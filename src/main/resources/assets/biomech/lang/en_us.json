@@ -171,10 +171,27 @@
 	"item.biomech.interceptor_arms.tooltip2": "If deflection occurs, you will lose 5 suit energy.",
 	"item.biomech.interceptor_arms.tooltip3": "§6The power of the sun in the palm of your hand.§0",
 	
+	// *** HERO
 	"item.biomech.heros_headpiece": "§5Hero's Headpiece§0",
 	"item.biomech.heros_headpiece.tooltip1": "Overall damage done increased by {near_damage_boost}% when an enemy is within {nearby_enemy_range} blocks of you.",
-	"item.biomech.heros_headpiece.tooltip2": "Take 50% reduced damage from explosions.",
+	"item.biomech.heros_headpiece.tooltip2": "Take {explosion_dr}% reduced damage from explosions.",
 	"item.biomech.heros_headpiece.tooltip3": "§6No following.§0",
+	
+	"item.biomech.heros_leggings": "§5Hero's Leggings§0",
+	"item.biomech.heros_leggings.tooltip1": "Overall damage done increased by {near_damage_boost}% when an enemy is within {nearby_enemy_range} blocks of you.",
+	"item.biomech.heros_leggings.tooltip2": "Take {explosion_dr}% reduced damage from explosions.",
+	"item.biomech.heros_leggings.tooltip3": "§6No following.§0",
+	
+	"item.biomech.heros_chestplate": "§5Hero's Chestplate§0",
+	"item.biomech.heros_chestplate.tooltip1": "Overall damage done increased by {near_damage_boost}% when an enemy is within {nearby_enemy_range} blocks of you.",
+	"item.biomech.heros_chestplate.tooltip2": "Take {explosion_dr}% reduced damage from explosions.",
+	"item.biomech.heros_chestplate.tooltip3": "§6No following.§0",
+	
+	"item.biomech.heros_arm": "§5Hero's Arm§0",
+	"item.biomech.heros_arm.tooltip1": "Overall damage done increased by {near_damage_boost}% when an enemy is within {nearby_enemy_range} blocks of you.",
+	"item.biomech.heros_arm.tooltip2": "Take {explosion_dr}% reduced damage from explosions.",
+	"item.biomech.heros_arm.tooltip3": "§6No following.§0",
+	// HERO ***
 	
 	"item.biomech.digger_arm": "§5Digger Arm§0",
 	"item.biomech.digger_arm.tooltip1": "Hold ({alt}+{lmb}) to activate.",

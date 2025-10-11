@@ -21,7 +21,11 @@ import com.dairymoose.biomech.item.armor.DrillRightArmArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.GatlingLeftArmArmor;
 import com.dairymoose.biomech.item.armor.GatlingRightArmArmor;
+import com.dairymoose.biomech.item.armor.HerosChestplateArmor;
 import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
+import com.dairymoose.biomech.item.armor.HerosLeftArmArmor;
+import com.dairymoose.biomech.item.armor.HerosLeggingsArmor;
+import com.dairymoose.biomech.item.armor.HerosRightArmArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
@@ -153,6 +157,9 @@ public class BioMechRegistry {
 	
 	//HERO SET
 	public static RegistryObject<Item> ITEM_HEROS_HEADPIECE = BioMech.ITEMS.register("heros_headpiece", () -> new HerosHeadpieceArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_HEROS_CHESTPLATE = BioMech.ITEMS.register("heros_chestplate", () -> new HerosChestplateArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_HEROS_LEGGINGS = BioMech.ITEMS.register("heros_leggings", () -> new HerosLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_HEROS_ARM = BioMech.ITEMS.register("heros_arm", () -> new HerosRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	//HERO SET
 	
 	//LOAD LIFTER SET
@@ -180,6 +187,7 @@ public class BioMechRegistry {
 	
 	public static RegistryObject<Item> ITEM_LAVASTRIDE_LEGGINGS = BioMech.ITEMS.register("lavastride_leggings", () -> new LavastrideLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	
+	public static RegistryObject<Item> ITEM_HEROS_LEFT_ARM = BioMech.ITEMS.register("left_heros_arm", () -> new HerosLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_DIGGER_LEFT_ARM = BioMech.ITEMS.register("left_digger_arm", () -> new DiggerLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_GATLING_LEFT_ARM = BioMech.ITEMS.register("left_gatling_arm", () -> new GatlingLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_BUZZSAW_LEFT_ARM = BioMech.ITEMS.register("left_buzzsaw_arm", () -> new BuzzsawLeftArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));

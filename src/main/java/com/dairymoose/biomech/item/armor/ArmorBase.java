@@ -170,6 +170,7 @@ public class ArmorBase extends ArmorItem {
 		replaced = replaced.replaceAll("\\{crit_boost\\}", nf.format(100.0f*this.getCriticalStrikeBoost()));
 		replaced = replaced.replaceAll("\\{near_damage_boost\\}", nf.format(100.0f*this.getNearbyEnemyDamageBoost()));
 		replaced = replaced.replaceAll("\\{nearby_enemy_range\\}", nf.format(HerosHeadpieceArmor.nearbyEnemiesDiameter));
+		replaced = replaced.replaceAll("\\{explosion_dr\\}", nf.format(100.0f*this.getExplosionDamageReduction()));
 		
 		return replaced;
 	}
