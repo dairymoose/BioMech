@@ -228,8 +228,8 @@ dependencies {
 
     implementation fg.deobf("curse.maven:kotlin-for-forge-351264:5402061")
     implementation fg.deobf("curse.maven:fzzy-config-1005914:6843463")
-    //implementation fg.deobf("curse.maven:emi-580555:6420945")
-    //implementation fg.deobf("curse.maven:emi-loot-681783:6449092")
+    implementation fg.deobf("curse.maven:emi-580555:6420945")
+    implementation fg.deobf("curse.maven:emi-loot-681783:6449092")
 
     implementation fg.deobf("curse.maven:spark-361579:4738952")
     implementation fg.deobf("curse.maven:tagtooltips-899941:6407506")
