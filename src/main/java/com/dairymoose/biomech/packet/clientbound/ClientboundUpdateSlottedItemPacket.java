@@ -58,13 +58,11 @@ public class ClientboundUpdateSlottedItemPacket implements Packet<net.minecraft.
 			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
 				@Override
 				public void run() {
-					BioMech.LOGGER.info("do check");
 					net.minecraft.client.multiplayer.ClientPacketListener clientHandler = (net.minecraft.client.multiplayer.ClientPacketListener)handler;
 					try {
 						BioMechPlayerData playerData = BioMechPlayerData.deserialize(playerDataTag);
 						
 						//in singleplayer the globalPlayerData is shared between client + server - if we overwrite this we lose the items in the backpack (they are not serialized)
-						BioMech.LOGGER.info("is SP?" + (ServerLifecycleHooks.getCurrentServer()));
 						if (ServerLifecycleHooks.getCurrentServer() == null || !ServerLifecycleHooks.getCurrentServer().isSingleplayer()) {
 							BioMech.globalPlayerData.put(uuid, playerData);
 						}
