@@ -1322,9 +1322,9 @@ public class BioMech
     	public static final KeyMapping HOTKEY_ENABLE_ARM_FUNCTION = new KeyMapping("key.hold_to_enable", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.categories.biomech");
     	public static final KeyMapping HOTKEY_RIGHT_ARM = new KeyMapping("key.right_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_LEFT, "key.categories.biomech");
     	public static final KeyMapping HOTKEY_LEFT_ARM = new KeyMapping("key.left_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_RIGHT, "key.categories.biomech");
-    	public static final KeyMapping HOTKEY_OPEN_PSU = new KeyMapping("key.psu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_U, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_OPEN_PSU = new KeyMapping("key.psu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, "key.categories.biomech");
     	
-        public static final List<KeyMapping> allKeyMappings = List.of(HOTKEY_RIGHT_ARM, HOTKEY_LEFT_ARM, HOTKEY_ENABLE_ARM_FUNCTION);
+        public static final List<KeyMapping> allKeyMappings = List.of(HOTKEY_RIGHT_ARM, HOTKEY_LEFT_ARM, HOTKEY_ENABLE_ARM_FUNCTION, HOTKEY_OPEN_PSU);
 
         @SubscribeEvent
         public static void onRegisterParticle(RegisterParticleProvidersEvent event) {
