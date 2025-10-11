@@ -44,7 +44,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 		this.particlePerpendicularDistanceFirstPerson = 0.42;
 		
 		this.particleYThirdPerson = 1.44;
-		this.particleDistanceFromPlayerThirdPerson = 0.25;
+		this.particleDistanceFromPlayerThirdPerson = 0.85;
 		this.particlePerpendicularDistanceThirdPerson = 0.35;
 	}
 
@@ -81,7 +81,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArm {
 		double distTo = player.distanceTo(living);
 		
 		//as distTo multiplier is decreased, falloff also decreases
-		damageFalloffFactor = Math.min(1.0, Math.max(gatlingMinFalloff, 1.0/Math.log10(distTo*0.60)));
+		damageFalloffFactor = Math.min(1.0, Math.max(gatlingMinFalloff, 1.0/Math.log10(distTo*0.70)));
 		
 		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*drillDamage*miningPower);
 		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), damageMult*gatlingDamage*miningPower/20.0f);

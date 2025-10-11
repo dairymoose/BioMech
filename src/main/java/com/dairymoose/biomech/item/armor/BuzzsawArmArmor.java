@@ -27,7 +27,7 @@ public abstract class BuzzsawArmArmor extends AbstractMiningArm {
 		this.blockReachMult = 1.0;
 		this.energyPerSecMiss = 0.0f;
 		
-		this.minSpeedMult = 4.0f;
+		this.minSpeedMult = 4.2f;
 		this.maxSpeedMult = minSpeedMult;
 		
 		this.xSize = 3;
