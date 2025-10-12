@@ -1871,9 +1871,26 @@ public class BioMech
                     			Minecraft.getInstance().player.bob = 0.0f;
                 			}
 
+                			InteractionHand renderHand = event.getHand();
+                			InteractionHand nonRenderedHand = null;
+                			boolean renderMirroredMainHandOnly = false;
+                			if (renderMirroredMainHandOnly) {
+                				//while this makes animation perfectly symmetrical, the lighting on the off-hand looks wrong
+                				renderHand = InteractionHand.MAIN_HAND;
+                    			nonRenderedHand = InteractionHand.OFF_HAND;
+                    			if (event.getHand() == nonRenderedHand) {
+                    				event.getPoseStack().pushPose();
+                    				event.getPoseStack().scale(-1.0f, 1.0f, 1.0f);
+                    			}
+                			}
                 			ItemInHandRenderer iihr = new ItemInHandRenderer(Minecraft.getInstance(), Minecraft.getInstance().getEntityRenderDispatcher(), Minecraft.getInstance().getItemRenderer());
-                			iihr.renderArmWithItem(Minecraft.getInstance().player, event.getPartialTick(), event.getInterpolatedPitch(), event.getHand(), 
+                			iihr.renderArmWithItem(Minecraft.getInstance().player, event.getPartialTick(), event.getInterpolatedPitch(), renderHand, 
                 					event.getSwingProgress(), newRenderItem, event.getEquipProgress(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight());
+                			if (renderMirroredMainHandOnly) {
+                				if (event.getHand() == nonRenderedHand) {
+                					event.getPoseStack().popPose();
+                				}
+                			}
                 		}
                 	}
             	}
