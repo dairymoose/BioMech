@@ -39,6 +39,7 @@ public class LoadLifterChassisArmor extends ArmorBase {
 		this.mechPart = MechPart.Chest;
 		this.armDistance = 7.0f;
 		this.hpBoostAmount = 3.0f;
+		this.backArmorTranslation = 0.25;
 	}
 	
 	@Override

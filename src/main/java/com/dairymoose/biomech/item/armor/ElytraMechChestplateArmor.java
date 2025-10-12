@@ -31,6 +31,7 @@ public class ElytraMechChestplateArmor extends ArmorBase {
 		this.suitEnergy = 80;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Chest;
+		this.backArmorTranslation = 0.195;
 	}
 
 	public static boolean jetpackPreviouslyActive = false;

@@ -75,6 +75,7 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 					this.leftArm.x = base.getArmDistance();
 				}
 			}
+			
 			SlottedItem legSlot = playerData.getForSlot(MechPart.Leggings);
 			if (legSlot.itemStack.getItem() instanceof SpiderWalkersArmor armor) {
 				if (legSlot.visible) {

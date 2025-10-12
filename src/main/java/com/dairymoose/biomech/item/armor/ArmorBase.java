@@ -57,6 +57,7 @@ public class ArmorBase extends ArmorItem {
 	protected float suitEnergyPerSec = 0.0f;
 	private static ArmorMaterial NOTHING_MATERIAL = new NothingMaterial();
 	protected float armDistance = 5.0f;
+	protected double backArmorTranslation = 0.0f;
 	protected float hpBoostAmount = 0.0f;
 	protected float xpBoostAmount = 0.0f;
 	
@@ -77,6 +78,10 @@ public class ArmorBase extends ArmorItem {
 	
 	public boolean onPlayerDamageTaken(DamageSource damageSource, float amount, ItemStack itemStack, Player player, MechPart handPart) {
 		return false;
+	}
+	
+	public double getBackArmorTranslation() {
+		return this.backArmorTranslation;
 	}
 	
 	public float getXpBoostAmount() {

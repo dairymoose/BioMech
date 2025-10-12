@@ -33,6 +33,7 @@ public class IronMechChestArmor extends ArmorBase {
 		this.armDistance = 8.0f;
 		this.addToLootTable = false;
 		this.damageAbsorbPct = 0.04f;
+		this.backArmorTranslation = 0.1;
 	}
 
 	public static float energyDamageMultiplier = 20.0f;

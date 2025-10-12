@@ -1988,11 +1988,21 @@ public class BioMech
             		    			
         		    				poseStack.pushPose();
         		    				HandActiveStatus has = handActiveMap.computeIfAbsent(event.getEntity().getUUID(), (uuid) -> new HandActiveStatus());
+        		    				//arms respond to player pitch while active
         		    				if (slottedItem.mechPart == MechPart.RightArm && has.rightHandActive) {
         		    					poseStack.mulPose(Axis.XP.rotationDegrees(renderEntity.getXRot()));
         		    				} else if (slottedItem.mechPart == MechPart.LeftArm && has.leftHandActive) {
         		    					poseStack.mulPose(Axis.XP.rotationDegrees(renderEntity.getXRot()));
         		    				}
+        		    				
+        		    				//adjust back location if the chest is too large
+        		    				if (slottedItem.mechPart == MechPart.Back && slottedItem.visible && !slottedItem.itemStack.isEmpty()) {
+        		    					SlottedItem slottedChest = playerData.getForSlot(MechPart.Chest);
+        		    					if (slottedChest.visible && slottedChest.itemStack.getItem() instanceof ArmorBase base) {
+        		    						poseStack.translate(0.0, 0.0, base.getBackArmorTranslation());
+        		    					}
+        		    				}
+        		    				
         		    				BioMech.currentRenderItemStackContext = itemStackToRender;
                         		    hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, equipmentSlot, event.getPackedLight(), armorModel);
                         		    BioMech.currentRenderItemStackContext = null;

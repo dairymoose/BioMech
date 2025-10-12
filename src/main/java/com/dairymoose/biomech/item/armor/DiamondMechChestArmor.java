@@ -24,6 +24,7 @@ public class DiamondMechChestArmor extends ArmorBase {
 		this.armDistance = 8.0f;
 		this.addToLootTable = false;
 		this.damageAbsorbPct = 0.06f;
+		this.backArmorTranslation = 0.10;
 	}
 
 	@Override

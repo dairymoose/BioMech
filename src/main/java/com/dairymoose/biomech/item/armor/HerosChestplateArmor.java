@@ -13,6 +13,7 @@ public class HerosChestplateArmor extends HerosArmorBase {
 		this.mechPart = MechPart.Chest;
 		this.nearbyEnemyDamageBoost = 0.06f;
 		this.explosionDamageReduction = 0.08f;
+		this.backArmorTranslation = 0.1;
 	}
 
 }
