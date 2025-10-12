@@ -6,9 +6,9 @@ import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.HandActiveStatus;
-import com.dairymoose.biomech.item.armor.AbstractMiningArm;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
+import com.dairymoose.biomech.item.armor.arm.AbstractMiningArm;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 
 import net.minecraft.core.BlockPos;

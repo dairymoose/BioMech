@@ -3,10 +3,12 @@ package com.dairymoose.biomech;
 import com.dairymoose.biomech.armor.renderer.BackJetpackRenderer;
 import com.dairymoose.biomech.armor.renderer.BackScubaTankRenderer;
 import com.dairymoose.biomech.armor.renderer.BatteryPackRenderer;
+import com.dairymoose.biomech.armor.renderer.CpuRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechArmorRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechHeadRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechLegsRenderer;
 import com.dairymoose.biomech.armor.renderer.ElytraMechChestplateRenderer;
+import com.dairymoose.biomech.armor.renderer.GasMaskRenderer;
 import com.dairymoose.biomech.armor.renderer.HerosChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.HerosHeadpieceRenderer;
 import com.dairymoose.biomech.armor.renderer.HerosLeggingsRenderer;
@@ -104,6 +106,8 @@ public class BioMechClientSetup {
     	AzArmorRendererRegistry.register(DiggerLeftArmRenderer::new, BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
     	AzArmorRendererRegistry.register(PortableStorageUnitRenderer::new, BioMechRegistry.ITEM_PORTABLE_STORAGE_UNIT.get());
     	AzArmorRendererRegistry.register(TeleportationCrystalRenderer::new, BioMechRegistry.ITEM_TELEPORTATION_CRYSTAL.get());
+    	AzArmorRendererRegistry.register(CpuRenderer::new, BioMechRegistry.ITEM_CPU.get());
+    	AzArmorRendererRegistry.register(GasMaskRenderer::new, BioMechRegistry.ITEM_GAS_MASK.get());
     	
     	//LOAD LIFTER
     	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());

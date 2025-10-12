@@ -7,10 +7,12 @@ import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.BackJetpackArmor;
 import com.dairymoose.biomech.item.armor.BackScubaTankArmor;
 import com.dairymoose.biomech.item.armor.BatteryPackArmor;
+import com.dairymoose.biomech.item.armor.CpuArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechChestArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechHeadArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechLegsArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
+import com.dairymoose.biomech.item.armor.GasMaskArmor;
 import com.dairymoose.biomech.item.armor.HerosChestplateArmor;
 import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
 import com.dairymoose.biomech.item.armor.HerosLeggingsArmor;
@@ -176,6 +178,10 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_MOBILITY_TREADS = BioMech.ITEMS.register("mobility_treads", () -> new MobilityTreadsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_LOAD_LIFTER_ARM = BioMech.ITEMS.register("load_lifter_arm", () -> new LoadLifterRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	//LOAD LIFTER SET
+	
+	public static RegistryObject<Item> ITEM_CPU = BioMech.ITEMS.register("cpu", () -> new CpuArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_GAS_MASK = BioMech.ITEMS.register("gas_mask", () -> new GasMaskArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_TELEPORTATION_CRYSTAL = BioMech.ITEMS.register("teleportation_crystal", () -> new TeleportationCrystalArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	

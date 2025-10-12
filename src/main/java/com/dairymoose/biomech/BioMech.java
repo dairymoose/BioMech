@@ -27,7 +27,9 @@ import com.dairymoose.biomech.config.BioMechServerConfig;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.armor.ArmorBase;
+import com.dairymoose.biomech.item.armor.CpuArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
+import com.dairymoose.biomech.item.armor.GasMaskArmor;
 import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
@@ -115,6 +117,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -161,10 +164,12 @@ import net.minecraftforge.event.TickEvent.ServerTickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.eventbus.api.Event.Result;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -216,7 +221,6 @@ import net.minecraftforge.registries.RegistryObject;
  */
 //TODO: 
 //	Add missing crafting recipes
-//	Back: Battery Pack
 //	Chest: Behemoth (full set?) hulkbuster theme
 //	Head: Creeper, Enderman
 //	Arm: Extendo-Arm (block reach +2, entity reach +0.5)
@@ -225,16 +229,13 @@ import net.minecraftforge.registries.RegistryObject;
 //	Back: shield projector?
 //	Legs: unicycle
 //	Legs: skies
-//	head: wall-e spyglass
 //	claptrap suit?
 //	Arm: flamethrower
-//	Arm: gatling
 //	Arm: shield
 //	Arm: Claw arms
 //	Robocop outfit?
 //	Terminator outfit?
 //	Wall-E outfit?
-//	Iron giant outfit?
 //	I robot Outfit?
 //	Back: stimpack that injects buff for energy cost
 //	Back: healing fluid that heals when holding hotkey, taking energy - cannot move while healing
@@ -387,6 +388,39 @@ public class BioMech
     public void onServerTick(ServerTickEvent event) {
     	if (event.phase == TickEvent.Phase.START) {
     		++currentServerTick;
+    	}
+    }
+    
+    @SubscribeEvent
+    public void onAcquireStatus(MobEffectEvent.Applicable event) {
+    	if (event.getEffectInstance().getEffect() == MobEffects.POISON) {
+    		BioMechPlayerData playerData = BioMech.globalPlayerData.get(event.getEntity().getUUID());
+    		if (playerData != null) {
+    			if (playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof GasMaskArmor armor) {
+    				event.setResult(Result.DENY);
+    			}
+    		}
+    	}
+    }
+    
+    private boolean givingXp = false;
+    @SubscribeEvent
+    public void onAcquireExperience(PlayerXpEvent.XpChange event) {
+    	if (!givingXp) {
+    		Player player = event.getEntity();
+    		BioMechPlayerData playerData = BioMech.globalPlayerData.get(event.getEntity().getUUID());
+    		if (playerData != null) {
+    			if (playerData.getForSlot(MechPart.Back).itemStack.getItem() instanceof CpuArmor armor) {
+    				if (armor.getXpBoostAmount() > 0.0f) {
+    					int bonusXp = (int)(event.getAmount() * armor.getXpBoostAmount());
+    					if (bonusXp > 0) {
+    						givingXp = true;
+    						player.giveExperiencePoints(bonusXp);
+    						givingXp = false;
+    					}
+    				}
+    			}
+    		}
     	}
     }
     

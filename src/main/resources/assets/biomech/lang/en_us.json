@@ -78,6 +78,12 @@
 	"item.biomech.battery_pack": "§5Battery Pack§0",
 	"item.biomech.battery_pack.tooltip1": "Grants suit energy regeneration.",
 	
+	"item.biomech.cpu": "§5CPU§0",
+	"item.biomech.cpu.tooltip1": "Grants {xp_boost}% bonus experience from all sources.",
+		
+	"item.biomech.gas_mask": "§5Gas Mask§0",
+	"item.biomech.gas_mask.tooltip1": "Grants poison immunity.",
+	
 	// *** LOAD LIFTER
 	"item.biomech.optics_unit": "§5Optics Unit§0",
 	"item.biomech.optics_unit.tooltip1": "Hold {alt} to zoom in.",

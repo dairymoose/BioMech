@@ -3,7 +3,6 @@ package com.dairymoose.biomech.item.armor.arm;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.item.anim.GatlingDispatcher;
-import com.dairymoose.biomech.item.armor.AbstractMiningArm;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.sounds.SoundSource;

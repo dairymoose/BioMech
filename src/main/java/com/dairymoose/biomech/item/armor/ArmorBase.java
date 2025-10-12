@@ -58,6 +58,7 @@ public class ArmorBase extends ArmorItem {
 	private static ArmorMaterial NOTHING_MATERIAL = new NothingMaterial();
 	protected float armDistance = 5.0f;
 	protected float hpBoostAmount = 0.0f;
+	protected float xpBoostAmount = 0.0f;
 	
 	protected float projectileAvoidPct = 0.0f;
 	protected float damageAvoidPct = 0.0f;
@@ -77,7 +78,11 @@ public class ArmorBase extends ArmorItem {
 	public boolean onPlayerDamageTaken(DamageSource damageSource, float amount, ItemStack itemStack, Player player, MechPart handPart) {
 		return false;
 	}
-
+	
+	public float getXpBoostAmount() {
+		return this.xpBoostAmount;
+	}
+	
 	public float getHpBoostAmount() {
 		return this.hpBoostAmount;
 	}
@@ -189,6 +194,7 @@ public class ArmorBase extends ArmorItem {
 			replaced = replaced.replaceAll("\\{teleport_hold_time\\}", nf.format(TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS/20.0f));
 			replaced = replaced.replaceAll("\\{teleport_back_time\\}", nf.format(ServerboundTeleportationCrystalPacket.MINUTES_ALLOWED_TO_TELEPORT_BACK));
 			replaced = replaced.replaceAll("\\{hp_boost\\}", nf.format(this.getHpBoostAmount()));
+			replaced = replaced.replaceAll("\\{xp_boost\\}", nf.format(100.0f*this.getXpBoostAmount()));
 		}
 		
 		return replaced;

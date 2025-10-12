@@ -1,4 +1,4 @@
-package com.dairymoose.biomech.item.armor;
+package com.dairymoose.biomech.item.armor.arm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +11,8 @@ import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
+import com.dairymoose.biomech.item.armor.ArmorBase;
+import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmBlockTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTargetPacket;
 
@@ -502,10 +504,10 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						if (level.isClientSide) {
 							if (stack.getItem() instanceof ArmorBase base) {
 								if (player.getMainHandItem().isEmpty()
-										&& base.mechPart == MechPart.RightArm) {
+										&& base.getMechPart() == MechPart.RightArm) {
 									this.passiveAnimation(stack);
 								} else if (player.getOffhandItem().isEmpty()
-										&& base.mechPart == MechPart.LeftArm) {
+										&& base.getMechPart() == MechPart.LeftArm) {
 									this.passiveAnimation(stack);
 								} else {
 									this.inertAnimation(stack);
