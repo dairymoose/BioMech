@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.dairymoose.biomech.BioMechRegistry;
-import com.dairymoose.biomech.TransientModifiers;
+import com.dairymoose.biomech.PermanentModifiers;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 
@@ -47,10 +47,10 @@ public abstract class LoadLifterArmArmor extends ArmorBase {
 			String boostText = null;
 			
 			if (handPart == MechPart.RightArm) {
-				booster = TransientModifiers.rightArmHpBoost;
+				booster = PermanentModifiers.rightArmHpBoost;
 				boostText = "hp_boost_right_arm"; 
 			} else {
-				booster = TransientModifiers.leftArmHpBoost;
+				booster = PermanentModifiers.leftArmHpBoost;
 				boostText = "hp_boost_left_arm";
 			}
 			
@@ -58,7 +58,7 @@ public abstract class LoadLifterArmArmor extends ArmorBase {
 				AttributeInstance inst = player.getAttribute(Attributes.MAX_HEALTH);
 				AttributeModifier thisBoost = inst.getModifier(booster);
 				if (thisBoost == null)
-					inst.addTransientModifier(new AttributeModifier(booster, boostText, this.hpBoostAmount, Operation.ADDITION));
+					inst.addPermanentModifier(new AttributeModifier(booster, boostText, this.hpBoostAmount, Operation.ADDITION));
 			}
 		}
 	}

@@ -10,7 +10,7 @@ import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
-import com.dairymoose.biomech.TransientModifiers;
+import com.dairymoose.biomech.PermanentModifiers;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -50,9 +50,9 @@ public class LoadLifterChassisArmor extends ArmorBase {
 				if (entity instanceof LivingEntity living) {
 					if (!level.isClientSide) {
 						AttributeInstance inst = living.getAttribute(Attributes.MAX_HEALTH);
-						AttributeModifier thisBoost = inst.getModifier(TransientModifiers.chestHpBoost);
+						AttributeModifier thisBoost = inst.getModifier(PermanentModifiers.chestHpBoost);
 						if (thisBoost == null)
-							inst.addTransientModifier(new AttributeModifier(TransientModifiers.chestHpBoost, "hp_boost_chest", this.hpBoostAmount, Operation.ADDITION));
+							inst.addPermanentModifier(new AttributeModifier(PermanentModifiers.chestHpBoost, "hp_boost_chest", this.hpBoostAmount, Operation.ADDITION));
 					}
 				}
 			}

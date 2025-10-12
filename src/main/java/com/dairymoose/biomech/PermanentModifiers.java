@@ -2,7 +2,7 @@ package com.dairymoose.biomech;
 
 import java.util.UUID;
 
-public class TransientModifiers {
+public class PermanentModifiers {
 
 	public static UUID chestHpBoost = UUID.fromString("0159a613-6579-4584-90e2-9fbdf1edb82a");
 	public static UUID rightArmHpBoost = UUID.fromString("215daa36-4634-485d-b4ae-3642877bce02");

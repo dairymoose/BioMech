@@ -621,7 +621,7 @@ public class BioMech
     			playerData.tickEnergy(event.player);
     			tickInventoryForPlayer(event.player, playerData);
     			tickHandsForPlayer(event.player, playerData);
-    			removeTransientModifiers(event.player, playerData);
+    			removePermanentModifiers(event.player, playerData);
     			
     			HandActiveStatus has = BioMech.handActiveMap.get(event.player.getUUID());
     			checkForMidairJump(event.player, has);
@@ -777,7 +777,7 @@ public class BioMech
 		}
 	}
 	
-	private void removeTransientModifiers(final Player player, BioMechPlayerData playerData) {
+	private void removePermanentModifiers(final Player player, BioMechPlayerData playerData) {
 		List<SlottedItem> slottedItems = playerData.getAllSlots();
 		for (SlottedItem slotted : slottedItems) {
 			AttributeInstance inst = player.getAttribute(Attributes.MAX_HEALTH);
@@ -792,11 +792,11 @@ public class BioMech
 				if (!keep) {
 					AttributeModifier existing = null;
 					if (slotted.mechPart == MechPart.Chest) {
-						existing = inst.getModifier(TransientModifiers.chestHpBoost);
+						existing = inst.getModifier(PermanentModifiers.chestHpBoost);
 					} else if (slotted.mechPart == MechPart.RightArm) {
-						existing = inst.getModifier(TransientModifiers.rightArmHpBoost);
+						existing = inst.getModifier(PermanentModifiers.rightArmHpBoost);
 					} else if (slotted.mechPart == MechPart.LeftArm) {
-						existing = inst.getModifier(TransientModifiers.leftArmHpBoost);
+						existing = inst.getModifier(PermanentModifiers.leftArmHpBoost);
 					}
 					
 					if (existing != null) {
