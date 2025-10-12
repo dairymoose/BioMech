@@ -117,6 +117,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.inventory.MenuType;
@@ -618,6 +621,7 @@ public class BioMech
     			playerData.tickEnergy(event.player);
     			tickInventoryForPlayer(event.player, playerData);
     			tickHandsForPlayer(event.player, playerData);
+    			removeTransientModifiers(event.player, playerData);
     			
     			HandActiveStatus has = BioMech.handActiveMap.get(event.player.getUUID());
     			checkForMidairJump(event.player, has);
@@ -769,6 +773,41 @@ public class BioMech
 								
 				ItemStack tickingItem = getThirdPersonArmItemStack(playerData, slotted.mechPart);
 				tickingItem.inventoryTick(player.level(), player, -1, slotted.mechPart == MechPart.LeftArm);
+			}
+		}
+	}
+	
+	private void removeTransientModifiers(final Player player, BioMechPlayerData playerData) {
+		List<SlottedItem> slottedItems = playerData.getAllSlots();
+		for (SlottedItem slotted : slottedItems) {
+			AttributeInstance inst = player.getAttribute(Attributes.MAX_HEALTH);
+			if (inst != null) {
+				boolean keep = false;
+				if (slotted.itemStack.getItem() instanceof ArmorBase base) {
+					if (base.getHpBoostAmount() > 0.0f) {
+						keep = true;
+					}
+				}
+				
+				if (!keep) {
+					AttributeModifier existing = null;
+					if (slotted.mechPart == MechPart.Chest) {
+						existing = inst.getModifier(TransientModifiers.chestHpBoost);
+					} else if (slotted.mechPart == MechPart.RightArm) {
+						existing = inst.getModifier(TransientModifiers.rightArmHpBoost);
+					} else if (slotted.mechPart == MechPart.LeftArm) {
+						existing = inst.getModifier(TransientModifiers.leftArmHpBoost);
+					}
+					
+					if (existing != null) {
+						BioMech.LOGGER.debug("remove modifier: " + existing);
+						inst.removeModifier(existing);
+						if (player.getHealth() > player.getMaxHealth()) {
+							BioMech.LOGGER.debug("reset hp from: " + player.getHealth() + " to " + player.getMaxHealth());
+							player.setHealth(player.getMaxHealth());
+						}
+					}
+				}
 			}
 		}
 	}

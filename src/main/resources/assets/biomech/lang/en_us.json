@@ -85,14 +85,12 @@
 	"item.biomech.optics_unit.tooltip3": "§6I don't want to survive, I want to live!",
 	
 	"item.biomech.load_lifter_chassis": "§5Load Lifter Chassis§0",
-	"item.biomech.load_lifter_chassis.tooltip1": "TBD.",
-	"item.biomech.load_lifter_chassis.tooltip2": "TBD.",
-	"item.biomech.load_lifter_chassis.tooltip3": "§6I don't want to survive, I want to live!",
+	"item.biomech.load_lifter_chassis.tooltip1": "While equipped, increases your maximum hp by {hp_boost}.",
+	"item.biomech.load_lifter_chassis.tooltip2": "§6I don't want to survive, I want to live!",
 	
 	"item.biomech.load_lifter_arm": "§5Load Lifter Arm§0",
-	"item.biomech.load_lifter_arm.tooltip1": "TBD.",
-	"item.biomech.load_lifter_arm.tooltip2": "TBD.",
-	"item.biomech.load_lifter_arm.tooltip3": "§6I don't want to survive, I want to live!",
+	"item.biomech.load_lifter_arm.tooltip1": "While equipped, increases your maximum hp by {hp_boost}.",
+	"item.biomech.load_lifter_arm.tooltip2": "§6I don't want to survive, I want to live!",
 	
 	"item.biomech.mobility_treads": "§5Mobility Treads§0",
 	"item.biomech.mobility_treads.tooltip1": "Grants increased movement speed.",

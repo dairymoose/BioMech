@@ -10,12 +10,19 @@ import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
+import com.dairymoose.biomech.TransientModifiers;
 
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
@@ -31,8 +38,9 @@ public class LoadLifterChassisArmor extends ArmorBase {
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Chest;
 		this.armDistance = 7.0f;
+		this.hpBoostAmount = 3.0f;
 	}
-
+	
 	@Override
 	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
@@ -40,6 +48,12 @@ public class LoadLifterChassisArmor extends ArmorBase {
 			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
 			if (armorItems.contains(BioMechRegistry.ITEM_LOAD_LIFTER_CHASSIS.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living) {
+					if (!level.isClientSide) {
+						AttributeInstance inst = living.getAttribute(Attributes.MAX_HEALTH);
+						AttributeModifier thisBoost = inst.getModifier(TransientModifiers.chestHpBoost);
+						if (thisBoost == null)
+							inst.addTransientModifier(new AttributeModifier(TransientModifiers.chestHpBoost, "hp_boost_chest", this.hpBoostAmount, Operation.ADDITION));
+					}
 				}
 			}
 		}

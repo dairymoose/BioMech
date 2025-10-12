@@ -57,6 +57,7 @@ public class ArmorBase extends ArmorItem {
 	protected float suitEnergyPerSec = 0.0f;
 	private static ArmorMaterial NOTHING_MATERIAL = new NothingMaterial();
 	protected float armDistance = 5.0f;
+	protected float hpBoostAmount = 0.0f;
 	
 	protected float projectileAvoidPct = 0.0f;
 	protected float damageAvoidPct = 0.0f;
@@ -77,6 +78,10 @@ public class ArmorBase extends ArmorItem {
 		return false;
 	}
 
+	public float getHpBoostAmount() {
+		return this.hpBoostAmount;
+	}
+	
 	public float getExplosionDamageReduction() {
 		return this.explosionDamageReduction;
 	}
@@ -183,6 +188,7 @@ public class ArmorBase extends ArmorItem {
 			replaced = replaced.replaceAll("\\{mining_laser_max_power\\}", nf.format(MiningLaserArmArmor.MAX_POWER));
 			replaced = replaced.replaceAll("\\{teleport_hold_time\\}", nf.format(TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS/20.0f));
 			replaced = replaced.replaceAll("\\{teleport_back_time\\}", nf.format(ServerboundTeleportationCrystalPacket.MINUTES_ALLOWED_TO_TELEPORT_BACK));
+			replaced = replaced.replaceAll("\\{hp_boost\\}", nf.format(this.getHpBoostAmount()));
 		}
 		
 		return replaced;
