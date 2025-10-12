@@ -47,11 +47,11 @@ public abstract class LoadLifterArmArmor extends ArmorBase {
 			String boostText = null;
 			
 			if (handPart == MechPart.RightArm) {
-				booster = PermanentModifiers.rightArmHpBoost;
-				boostText = "hp_boost_right_arm"; 
+				booster = PermanentModifiers.rightArmBoost;
+				boostText = "hboost_right_arm"; 
 			} else {
-				booster = PermanentModifiers.leftArmHpBoost;
-				boostText = "hp_boost_left_arm";
+				booster = PermanentModifiers.leftArmBoost;
+				boostText = "boost_left_arm";
 			}
 			
 			if (booster != null && boostText != null) {

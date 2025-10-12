@@ -50,9 +50,9 @@ public class LoadLifterChassisArmor extends ArmorBase {
 				if (entity instanceof LivingEntity living) {
 					if (!level.isClientSide) {
 						AttributeInstance inst = living.getAttribute(Attributes.MAX_HEALTH);
-						AttributeModifier thisBoost = inst.getModifier(PermanentModifiers.chestHpBoost);
+						AttributeModifier thisBoost = inst.getModifier(PermanentModifiers.chestBoost);
 						if (thisBoost == null)
-							inst.addPermanentModifier(new AttributeModifier(PermanentModifiers.chestHpBoost, "hp_boost_chest", this.hpBoostAmount, Operation.ADDITION));
+							inst.addPermanentModifier(new AttributeModifier(PermanentModifiers.chestBoost, "boost_chest", this.hpBoostAmount, Operation.ADDITION));
 					}
 				}
 			}

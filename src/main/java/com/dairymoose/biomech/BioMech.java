@@ -792,11 +792,11 @@ public class BioMech
 				if (!keep) {
 					AttributeModifier existing = null;
 					if (slotted.mechPart == MechPart.Chest) {
-						existing = inst.getModifier(PermanentModifiers.chestHpBoost);
+						existing = inst.getModifier(PermanentModifiers.chestBoost);
 					} else if (slotted.mechPart == MechPart.RightArm) {
-						existing = inst.getModifier(PermanentModifiers.rightArmHpBoost);
+						existing = inst.getModifier(PermanentModifiers.rightArmBoost);
 					} else if (slotted.mechPart == MechPart.LeftArm) {
-						existing = inst.getModifier(PermanentModifiers.leftArmHpBoost);
+						existing = inst.getModifier(PermanentModifiers.leftArmBoost);
 					}
 					
 					if (existing != null) {
