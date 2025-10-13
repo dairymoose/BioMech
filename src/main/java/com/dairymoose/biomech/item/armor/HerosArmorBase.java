@@ -3,6 +3,7 @@ package com.dairymoose.biomech.item.armor;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 
 import net.minecraft.world.entity.Entity;
@@ -26,7 +27,7 @@ public class HerosArmorBase extends ArmorBase {
 	public static String TAG_DAMAGE_BOOSTING = "DamageBoosting";
 	
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
 			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
