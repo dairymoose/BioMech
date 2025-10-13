@@ -9,11 +9,13 @@ import java.util.stream.Collectors;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class BioMechPlayerData {
@@ -79,11 +81,34 @@ public class BioMechPlayerData {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
 	public int getTicksSinceLastEnergyUsage(Player player) {
-		return player.tickCount - lastUsedEnergyTick;
+		class TickCountHolder {
+			int tickCount;
+		}
+		TickCountHolder tch = new TickCountHolder();
+		tch.tickCount = player.tickCount;
+		DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
+			@Override
+			public void run() {
+				//player.tickCount is different on server side and client side in single-player
+				//if we're on a CLIENT we'll always use the client tickCount (to make single-player work correctly)
+				if (player.isLocalPlayer()) {
+					tch.tickCount = Minecraft.getInstance().player.tickCount;
+					if (tch.tickCount == 1) {
+						//tickCount will be reset to 1 if the player respawns
+						lastUsedEnergyTick = 1;
+					}
+					BioMech.LOGGER.info("set tick count to local-player count: " + tch.tickCount + " vs lastUsedEnergyTick=" + lastUsedEnergyTick);
+				}
+			}});
+		
+		return tch.tickCount - lastUsedEnergyTick;
 	}
 	
 	public int remainingTicksForEnergyRegen(Player player) {
+		if (!player.level().isClientSide)
+			BioMech.LOGGER.info("ticks since last usage=" + this.getTicksSinceLastEnergyUsage(player));
 		return Math.max(0, ticksRequiredToRegenEnergy - this.getTicksSinceLastEnergyUsage(player));
 	}
 	
@@ -98,6 +123,7 @@ public class BioMechPlayerData {
 	
 	public void internalSpendSuitEnergy(Player player, float amount) {
 		this.lastUsedEnergyTick = player.tickCount;
+		BioMech.LOGGER.info("set lastUsedEnergyTick to " + lastUsedEnergyTick);
 		this.suitEnergy -= amount;
 		if (this.suitEnergy < 0.0f)
 			this.suitEnergy = 0.0f;

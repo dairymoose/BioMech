@@ -61,8 +61,10 @@ public class ClientboundEnergySyncPacket implements Packet<net.minecraft.network
 					if (playerData != null) {
 						playerData.suitEnergyMax = suitEnergyMax;
 						playerData.setSuitEnergy(suitEnergy);
-						if (remainingTicksForEnergyRegen > 0)
+						if (remainingTicksForEnergyRegen > 0) {
 							playerData.lastUsedEnergyTick = Minecraft.getInstance().player.tickCount - (BioMechPlayerData.ticksRequiredToRegenEnergy - remainingTicksForEnergyRegen);
+							BioMech.LOGGER.info("set last used tick to " + playerData.lastUsedEnergyTick + " with tickCount=" + Minecraft.getInstance().player.tickCount + ", with server remainingTicksForEnergyRegen=" + remainingTicksForEnergyRegen);
+						}
 					}
 				}
 				};});

@@ -1340,6 +1340,17 @@ public class BioMech
     
     // disabling items logic ***
 	
+    public static float getBackVerticalTranslation(Item item) {
+    	if (item instanceof ArmorBase base) {
+    		float backVerticalTranslation;
+    		float armDiff = base.getArmY() - 2.0f;
+    		backVerticalTranslation = 0.10f * armDiff;
+    		return backVerticalTranslation;
+    	}
+    	
+    	return 0.0f;
+	}
+    
 	public static ItemStack currentRenderItemStackContext = null;
 	
 	public static boolean localPlayerJumping = false;
@@ -2078,8 +2089,7 @@ public class BioMech
         		    						float backVerticalTranslation = 0.0f;
         		    						if (base.getArmY() != 2.0f) {
         		    							//if the arms have been moved up, we need to move the back-piece up too, or it will look wrong
-        		    							float armDiff = base.getArmY() - 2.0f;
-        		    							backVerticalTranslation = 0.10f * armDiff;
+        		    							backVerticalTranslation = getBackVerticalTranslation(base);
         		    						}
         		    						poseStack.translate(0.0, backVerticalTranslation, base.getBackArmorTranslation());
         		    					}

@@ -166,6 +166,8 @@ public class JetpackArmor extends ArmorBase {
 									}
 									
 									float particleY = 0.6f;
+									//offset for armors that are too vertically big
+									particleY -= BioMech.getBackVerticalTranslation(playerData.getForSlot(MechPart.Chest).itemStack.getItem());
 									float particleDepth = -0.27f;
 									
 									float smokeYOffset = 0.12f;
