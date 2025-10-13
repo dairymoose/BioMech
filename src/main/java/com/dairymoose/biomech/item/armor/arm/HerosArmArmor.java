@@ -13,7 +13,7 @@ public class HerosArmArmor extends HerosArmorBase {
 		this.suitEnergy = 8;
 		this.alwaysHidePlayerHat = false;
 		this.hidePlayerModel = true;
-		this.nearbyEnemyDamageBoost = 0.03f;
+		this.nearbyEnemyDamageBoost = 0.05f;
 		this.explosionDamageReduction = 0.02f;
 	}
 	

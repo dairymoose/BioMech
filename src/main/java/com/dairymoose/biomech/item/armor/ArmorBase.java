@@ -56,6 +56,8 @@ public class ArmorBase extends ArmorItem {
 	protected float explosionDamageReduction = 0.0f;
 	protected float absorbedDamageEnergyMult = 20.0f;
 	
+	public boolean configDisabled = false;
+	
 	public ArmorBase(ArmorMaterial material, Type type, Properties props) {
 		super(NOTHING_MATERIAL, type, props);
 	}
@@ -222,6 +224,9 @@ public class ArmorBase extends ArmorItem {
 	@Override
 	public void appendHoverText(ItemStack stack, Level level, List<Component> comp, TooltipFlag flags) {
 		super.appendHoverText(stack, level, comp, flags);
+		if (configDisabled) {
+			comp.add(Component.literal("Disabled by config"));
+		}
 		if (level != null && level.isClientSide && Minecraft.getInstance().screen instanceof BioMechStationScreen) {
 			comp.add(Component.translatable("item.biomech.generic.tooltip2"));
 		}
