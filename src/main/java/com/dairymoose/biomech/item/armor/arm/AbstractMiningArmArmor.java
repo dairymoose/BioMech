@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.item.armor.ArmorBase;
@@ -44,9 +45,9 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public abstract class AbstractMiningArm extends ArmorBase {
+public abstract class AbstractMiningArmArmor extends ArmorBase {
 
-	public AbstractMiningArm(ArmorMaterial material, Type type, Properties props) {
+	public AbstractMiningArmArmor(ArmorMaterial material, Type type, Properties props) {
 		super(material, type, props);
 	}
 	
@@ -490,27 +491,27 @@ public abstract class AbstractMiningArm extends ArmorBase {
 	protected abstract void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec);
 
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isLeftArm) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isLeftArm) {
 		if (entity instanceof Player player) {
 			HandActiveStatus has = BioMech.handActiveMap.get(player.getUUID());
 
 			if (has != null && (!has.leftHandActive && isLeftArm || !has.rightHandActive && !isLeftArm)) {
 				// this.dispatcher.mining(player, stack);
 				List<Item> armorItems = new ArrayList<Item>();
-				player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+				player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(armorItemStack.getItem()));
 				if (armorItems.contains(BioMechRegistry.ITEM_MINING_LASER_ARM.get())
 						|| armorItems.contains(BioMechRegistry.ITEM_MINING_LASER_LEFT_ARM.get()) || slotId == -1) {
 					if (entity instanceof LivingEntity living && !living.isSpectator()) {
 						if (level.isClientSide) {
-							if (stack.getItem() instanceof ArmorBase base) {
+							if (itemStack.getItem() instanceof ArmorBase base) {
 								if (player.getMainHandItem().isEmpty()
 										&& base.getMechPart() == MechPart.RightArm) {
-									this.passiveAnimation(stack);
+									this.passiveAnimation(itemStack);
 								} else if (player.getOffhandItem().isEmpty()
 										&& base.getMechPart() == MechPart.LeftArm) {
-									this.passiveAnimation(stack);
+									this.passiveAnimation(itemStack);
 								} else {
-									this.inertAnimation(stack);
+									this.inertAnimation(itemStack);
 								}
 							}
 						}

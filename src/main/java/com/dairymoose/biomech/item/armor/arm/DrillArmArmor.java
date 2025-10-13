@@ -12,7 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
-public abstract class DrillArmArmor extends AbstractMiningArm {
+public abstract class DrillArmArmor extends AbstractMiningArmArmor {
 
 	public final DrillDispatcher dispatcher;
 

@@ -13,7 +13,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 
-public abstract class MiningLaserArmArmor extends AbstractMiningArm {
+public abstract class MiningLaserArmArmor extends AbstractMiningArmArmor {
 
 	public final MiningLaserDispatcher dispatcher;
 

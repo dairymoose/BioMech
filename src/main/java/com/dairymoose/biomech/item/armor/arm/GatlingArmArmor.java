@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.Vec3;
 
-public abstract class GatlingArmArmor extends AbstractMiningArm {
+public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 
 	public final GatlingDispatcher dispatcher;
 

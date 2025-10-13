@@ -8,7 +8,7 @@ import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
-import com.dairymoose.biomech.item.armor.arm.AbstractMiningArm;
+import com.dairymoose.biomech.item.armor.arm.AbstractMiningArmArmor;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 
 import net.minecraft.network.FriendlyByteBuf;
@@ -67,11 +67,11 @@ public class ServerboundMiningArmEntityTargetPacket implements Packet<ServerGame
 				}
 				
 				if (entity != null) {
-					AbstractMiningArm.entityTargetMap.put(serverHandler.player, entity);
-					AbstractMiningArm.blockTargetMap.remove(serverHandler.player);
+					AbstractMiningArmArmor.entityTargetMap.put(serverHandler.player, entity);
+					AbstractMiningArmArmor.blockTargetMap.remove(serverHandler.player);
 				}
 				else
-					AbstractMiningArm.entityTargetMap.remove(serverHandler.player);
+					AbstractMiningArmArmor.entityTargetMap.remove(serverHandler.player);
 			}
 		}
 	}
