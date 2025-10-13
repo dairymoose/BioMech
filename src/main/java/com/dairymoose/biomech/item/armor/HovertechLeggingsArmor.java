@@ -41,6 +41,8 @@ public class HovertechLeggingsArmor extends ArmorBase {
 		this.mechPart = MechPart.Leggings;
 	}
 
+	public static boolean particleEnabled = true;
+	
 	boolean lastAltState = false;
 	boolean toggledOn = true;
 	double pickupRadiusScale = 2.0f;
@@ -107,11 +109,13 @@ public class HovertechLeggingsArmor extends ArmorBase {
 									}
 									if (slottedItem.visible && entity.tickCount % 4 == 0) {
 										if (!player.isSwimming() & !player.isFallFlying()) {
-											int pCount = (int) (Math.random() * 5.0);
-											for (int i = 0; i < pCount; ++i) {
-												level.addParticle(ParticleTypes.ASH,
-														player.getX() + (Math.random() - .5) * 0.6, player.getY() - 0.1,
-														player.getZ() + (Math.random() - .5) * 0.6, 0.0, -1.2, 0.0);
+											if (particleEnabled) {
+												int pCount = (int) (Math.random() * 5.0);
+												for (int i = 0; i < pCount; ++i) {
+													level.addParticle(ParticleTypes.ASH,
+															player.getX() + (Math.random() - .5) * 0.6, player.getY() - 0.1,
+															player.getZ() + (Math.random() - .5) * 0.6, 0.0, -1.2, 0.0);
+												}
 											}
 										}
 									}

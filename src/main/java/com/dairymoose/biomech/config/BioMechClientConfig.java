@@ -33,6 +33,11 @@ public class BioMechClientConfig {
 	
 	public final ForgeConfigSpec.BooleanValue enableRepulsorLiftParticle;
 	
+	public final ForgeConfigSpec.BooleanValue enableJetpackFlameParticle;
+	public final ForgeConfigSpec.BooleanValue enableJetpackSmokeParticle;
+	public final ForgeConfigSpec.BooleanValue enableJetpackSound;
+	public final ForgeConfigSpec.BooleanValue enableHovertechParticle;
+	
 	public BioMechClientConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("first_person");
 		this.hideMainHandWhileNotInUse = builder.comment("hideMainHandWhileNotInUse").translation("config.biomech.hideMainHandWhileNotInUse").define("hideMainHandWhileNotInUse", false);
@@ -50,6 +55,10 @@ public class BioMechClientConfig {
 		this.opticsUnitCanEverHighlightChests = builder.comment("opticsUnitCanEverHighlightChests").translation("config.biomech.opticsUnitCanEverHighlightChests").define("opticsUnitCanEverHighlightChests", true);
 		this.opticsUnitAllowZoomIn = builder.comment("opticsUnitAllowZoomIn").translation("config.biomech.opticsUnitAllowZoomIn").define("opticsUnitAllowZoomIn", true);
 		this.enableRepulsorLiftParticle = builder.comment("enableRepulsorLiftParticle").translation("config.biomech.enableRepulsorLiftParticle").define("enableRepulsorLiftParticle", true);
+		this.enableJetpackFlameParticle = builder.comment("enableJetpackFlameParticle").translation("config.biomech.enableJetpackFlameParticle").define("enableJetpackFlameParticle", true);
+		this.enableJetpackSmokeParticle = builder.comment("enableJetpackSmokeParticle").translation("config.biomech.enableJetpackSmokeParticle").define("enableJetpackSmokeParticle", true);
+		this.enableJetpackSound = builder.comment("enableJetpackSound").translation("config.biomech.enableJetpackSound").define("enableJetpackSound", true);
+		this.enableHovertechParticle = builder.comment("enableHovertechParticle").translation("config.biomech.enableHovertechParticle").define("enableHovertechParticle", true);
 		builder.pop();
 		
 		builder.push("gui");
@@ -72,3 +81,4 @@ public class BioMechClientConfig {
 	}
 	
 }
+

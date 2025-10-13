@@ -43,6 +43,10 @@ public class JetpackArmor extends ArmorBase {
 	public static float yPerTickStage2 = 0.092f;
 	public static float fallFlyingBoost = 0.095f;
 	
+	public static boolean flameParticleEnabled = true;
+	public static boolean smokeParticleEnabled = true;
+	public static boolean soundEnabled = true;
+	
 	public static Map<UUID, Double> lastY = new HashMap<>();
 	@Override
 	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
@@ -196,18 +200,24 @@ public class JetpackArmor extends ArmorBase {
 										Vec3 smokeLoc = loc.add(new Vec3(smokeDepthOffset * xComp, smokeYOffset, smokeDepthOffset * zComp));
 										
 										if (!isFlyingOrSwimming || player.tickCount % 2 == 0) {
-											player.level().addParticle((ParticleOptions) BioMechRegistry.PARTICLE_TYPE_INSTANT_SMOKE.get(), smokeLoc.x, smokeLoc.y, smokeLoc.z,
-													0.0f, 0.0f, 0.0f);
+											if (smokeParticleEnabled) {
+												player.level().addParticle((ParticleOptions) BioMechRegistry.PARTICLE_TYPE_INSTANT_SMOKE.get(), smokeLoc.x, smokeLoc.y, smokeLoc.z,
+														0.0f, 0.0f, 0.0f);
+											}
 										}
 										
 										if (player.tickCount % 2 == 0) {
-											player.level().addParticle(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z,
-													0.0f, -0.4f, 0.0f);
+											if (flameParticleEnabled) {
+												player.level().addParticle(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z,
+														0.0f, -0.4f, 0.0f);
+											}
 										}
 										if (player.tickCount % 5 == 0) {
 											float volume = 0.6f;
 											float pitch = 1.0f; 
-											player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_JETPACK_LOOP.get(), SoundSource.PLAYERS, volume, pitch, false);
+											if (soundEnabled) {
+												player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_JETPACK_LOOP.get(), SoundSource.PLAYERS, volume, pitch, false);
+											}
 										}
 									}
 								}
