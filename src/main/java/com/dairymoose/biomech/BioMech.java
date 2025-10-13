@@ -2018,12 +2018,30 @@ public class BioMech
         		    				}
             		    			
         		    				poseStack.pushPose();
-        		    				HandActiveStatus has = handActiveMap.computeIfAbsent(event.getEntity().getUUID(), (uuid) -> new HandActiveStatus());
+        		    				HandActiveStatus has = handActiveMap.computeIfAbsent(event.getEntity().
+        		    						getUUID(), (uuid) -> new HandActiveStatus());
+        		    				boolean isHandTranslation = false;
         		    				//arms respond to player pitch while active
         		    				if (slottedItem.mechPart == MechPart.RightArm && has.rightHandActive) {
+        		    					isHandTranslation = true;
         		    					poseStack.mulPose(Axis.XP.rotationDegrees(renderEntity.getXRot()));
         		    				} else if (slottedItem.mechPart == MechPart.LeftArm && has.leftHandActive) {
+        		    					isHandTranslation = true;
         		    					poseStack.mulPose(Axis.XP.rotationDegrees(renderEntity.getXRot()));
+        		    				}
+        		    				if (isHandTranslation) {
+        		    					SlottedItem chestSlot = playerData.getForSlot(MechPart.Chest);
+            		    				if (chestSlot.itemStack.getItem() instanceof ArmorBase base) {
+            		    					if (chestSlot.visible) {
+            		    						if (base.getArmY() != 2.0f) {
+                		    						float armDiff = -(base.getArmY() - 2.0f);
+                		    						float xRotPct = Math.abs(renderEntity.getXRot())/90.0f;
+                		    						//arm is floating behind the body when aiming directly upwards (in third person view)
+                		    						//
+                		    						poseStack.translate(0.0, 0.05*armDiff*xRotPct, 0.0);
+                		    					}
+            		    					}
+            		    				}
         		    				}
         		    				
         		    				//adjust back location if the chest is too large
