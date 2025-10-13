@@ -24,9 +24,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-public class BackJetpackArmor extends ArmorBase {
+public class JetpackArmor extends ArmorBase {
 
-	public BackJetpackArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public JetpackArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 20;
 		this.hidePlayerModel = true;
@@ -49,7 +49,7 @@ public class BackJetpackArmor extends ArmorBase {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
 			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
-			if (armorItems.contains(BioMechRegistry.ITEM_BACK_JETPACK.get()) || slotId == -1) {
+			if (armorItems.contains(BioMechRegistry.ITEM_JETPACK.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living) {
 					HandActiveStatus has = BioMech.handActiveMap.get(player.getUUID());
 					if (has != null) {

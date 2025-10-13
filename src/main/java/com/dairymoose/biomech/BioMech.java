@@ -21,6 +21,7 @@ import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.client.screen.PortableStorageUnitScreen;
+import com.dairymoose.biomech.config.BioMechCommonConfig;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
 import com.dairymoose.biomech.config.BioMechServerConfig;
@@ -156,6 +157,7 @@ import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -466,28 +468,21 @@ public class BioMech
 		String lootTag;
 		Float lootChance;
 		String lootTablePath;
-		boolean gotValueFromConfig = false;
+		boolean gotValueFromConfig = true;
 	}
 	
 	List<AddToLootPool> lootPoolChances = new ArrayList<>();
     @SubscribeEvent
     public void onAlterLootTable(LootTableLoadEvent event) {
     	
-    	if (lootBioMechInChest == null) {
-    		File file = BioMechConfig.getBiomechEarlyConfigFile();
-    		CompoundTag tag = null;
-    		try {
-    			tag = NbtIo.read(file);
-    		} catch (IOException e) {
-    			BioMech.LOGGER.error("Failed to read early config file biomech.cfg");
-    		}
-    		
-    		lootBioMechInChest = (float) BioMechServerConfig.defaultChestLootChance;
-    		lootBioMechInMineshaft = (float) BioMechServerConfig.defaultMineshaftLootChance;
-    		lootBioMechInDungeon = (float) BioMechServerConfig.defaultDungeonLootChance;
-    		lootBioMechInAncientCity = (float) BioMechServerConfig.defaultDungeonLootChance;
-    		lootBioMechInShipwreck = (float) BioMechServerConfig.defaultDungeonLootChance;
-    		lootBioMechInNetherFortress = (float) BioMechServerConfig.defaultDungeonLootChance;
+    	if (lootBioMechInChest == null) {    		
+    		lootBioMechInChest = BioMechConfig.COMMON.lootBioMechInChest.get().floatValue();
+    		lootBioMechInMineshaft = BioMechConfig.COMMON.lootBioMechInMineshaft.get().floatValue();
+    		lootBioMechInDungeon = BioMechConfig.COMMON.lootBioMechInDungeon.get().floatValue();
+    		lootBioMechInAncientCity = BioMechConfig.COMMON.lootBioMechInAncientCity.get().floatValue();
+    		lootBioMechInShipwreck = BioMechConfig.COMMON.lootBioMechInShipwreck.get().floatValue();
+    		lootBioMechInNetherFortress = BioMechConfig.COMMON.lootBioMechInNetherFortress.get().floatValue();
+    		boolean addElytraChestToLootPool = BioMechConfig.COMMON.elytraMechChestplateCanBeLooted.get().booleanValue();
     		
     		{
     			AddToLootPool atlp = new AddToLootPool();
@@ -531,42 +526,30 @@ public class BioMech
     			atlp.lootTablePath = "chests/nether_bridge";
     			lootPoolChances.add(atlp);
     		}
-
-    		boolean addElytraChestToLootPool = true;
-    		if (tag != null) {
-    			for (AddToLootPool atlp : lootPoolChances) {
-    				if (tag.contains(atlp.lootTag)) {
-        				atlp.lootChance = (float) tag.getDouble(atlp.lootTag);
-        				BioMech.LOGGER.info("Got " + atlp.lootTag + " value of " + atlp.lootChance + " from file");
-        				atlp.gotValueFromConfig = true;
-    				}
-    			}
-    			
-    			addElytraChestToLootPool = tag.getBoolean("ElytraMechChestplateCanBeLooted");
-    		}
     		
-    		for (AddToLootPool atlp : lootPoolChances) {
-				if (!atlp.gotValueFromConfig) {
-					BioMech.LOGGER.info("Using default lootBioMechInChest value of " + atlp.lootChance);
-				}
-			}
-    		
+    		List<String> disabled = BioMech.getDisabledConfigItems();
     		Field[] allFields = BioMechRegistry.class.getDeclaredFields();
 			for (Field f : allFields) {
 				if (f.getType() == RegistryObject.class) {
 					try {
 						RegistryObject value = (RegistryObject) f.get(null);
 						if (value != null) {
-							if (value.get() instanceof ArmorBase ab) {
-								if (ab.shouldAddToLootTable()) {
+							if (value.get() instanceof ArmorBase base) {
+								if (base.shouldAddToLootTable()) {
 									boolean shouldAdd = true;
-									if (ab instanceof ElytraMechChestplateArmor armor) {
+									if (base instanceof ElytraMechChestplateArmor armor) {
 										if (!addElytraChestToLootPool) {
 											shouldAdd = false;
 										}
 									}
+									
+									boolean isDisabled = BioMech.isDisabledByConfig(base, disabled);
+									if (isDisabled) {
+										shouldAdd = false;
+									}
+									
 									if (shouldAdd) {
-										lootItemsToAdd.add(ab);
+										lootItemsToAdd.add(base);
 										LOGGER.debug("Added loot is: " + value.get());
 									}
 								}
@@ -1312,6 +1295,50 @@ public class BioMech
 			}
 		}
 	}
+
+	// *** disabling items logic
+	private static String transformConfigOrRegistryKey(String input) {
+		String enableText = "enable";
+		String lootingText = "Looting";
+		if (input.startsWith(enableText) && input.endsWith(lootingText)) {
+			input = input.substring(enableText.length(), input.length() - lootingText.length());
+		}
+    	return input.replaceAll("_", "").toLowerCase();
+    }
+    
+    private static List<String> getDisabledConfigItems() {
+    	List<String> disabled = new ArrayList<>();
+    	
+    	Field[] fields = BioMechCommonConfig.class.getDeclaredFields();
+		for (Field field : fields) {
+			String fieldName = field.getName();
+			if (fieldName!= null && fieldName.startsWith("enable") && fieldName.endsWith("Looting")) {
+				try {
+					BooleanValue bv = (BooleanValue) field.get(BioMechConfig.COMMON);
+					if (bv.get() == Boolean.FALSE) {
+						String transformed = transformConfigOrRegistryKey(fieldName);
+						disabled.add(transformed);
+					}
+				} catch (Exception e) {
+					BioMech.LOGGER.error("Error getting disabled config items", e);
+				}
+			}
+		}
+		
+		return disabled;
+    }
+    
+    private static boolean isDisabledByConfig(Item item, List<String> disabledList) {
+    	String registryKey = ForgeRegistries.ITEMS.getKey(item).getPath();
+    	String transformed = transformConfigOrRegistryKey(registryKey);
+    	if (disabledList.contains(transformed)) {
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
+    // disabling items logic ***
 	
 	public static ItemStack currentRenderItemStackContext = null;
 	
@@ -2048,7 +2075,13 @@ public class BioMech
         		    				if (slottedItem.mechPart == MechPart.Back && slottedItem.visible && !slottedItem.itemStack.isEmpty()) {
         		    					SlottedItem slottedChest = playerData.getForSlot(MechPart.Chest);
         		    					if (slottedChest.visible && slottedChest.itemStack.getItem() instanceof ArmorBase base) {
-        		    						poseStack.translate(0.0, 0.0, base.getBackArmorTranslation());
+        		    						float backVerticalTranslation = 0.0f;
+        		    						if (base.getArmY() != 2.0f) {
+        		    							//if the arms have been moved up, we need to move the back-piece up too, or it will look wrong
+        		    							float armDiff = base.getArmY() - 2.0f;
+        		    							backVerticalTranslation = 0.10f * armDiff;
+        		    						}
+        		    						poseStack.translate(0.0, backVerticalTranslation, base.getBackArmorTranslation());
         		    					}
         		    				}
         		    				
@@ -2116,11 +2149,37 @@ public class BioMech
         	}
         }
         
+        private static void markItemTooltipsAsDisabled() {
+        	List<String> disabled = BioMech.getDisabledConfigItems();
+        	
+        	Field[] allFields = BioMechRegistry.class.getDeclaredFields();
+			for (Field f : allFields) {
+				if (f.getType() == RegistryObject.class) {
+					try {
+						RegistryObject value = (RegistryObject) f.get(null);
+						if (value != null) {
+							if (value.get() instanceof ArmorBase base) {
+								if (base.shouldAddToLootTable()) {
+									if (BioMech.isDisabledByConfig(base, disabled)) {
+										base.setDisabled(true);
+									}
+								}
+							}
+						}
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						LOGGER.error("Error registering items with creative tab", e);
+					}
+				}
+			}
+        }
+        
         @SuppressWarnings("unchecked")
 		@SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event)
         {
         	BioMechClientSetup.doClientSetup(event);
+        	
+        	markItemTooltipsAsDisabled();
         }
         
     }

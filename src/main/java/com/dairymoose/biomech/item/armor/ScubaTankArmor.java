@@ -17,9 +17,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public class BackScubaTankArmor extends ArmorBase {
+public class ScubaTankArmor extends ArmorBase {
 
-	public BackScubaTankArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public ScubaTankArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
@@ -35,7 +35,7 @@ public class BackScubaTankArmor extends ArmorBase {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
 			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
-			if (armorItems.contains(BioMechRegistry.ITEM_BACK_SCUBA_TANK.get()) || slotId == -1) {
+			if (armorItems.contains(BioMechRegistry.ITEM_SCUBA_TANK.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living) {
 					BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 					if (living.isUnderWater() && !living.isSpectator()) {

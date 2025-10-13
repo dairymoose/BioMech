@@ -27,7 +27,7 @@ public class ColossusChestplateArmor extends ArmorBase {
 		float headAdjust = 1.5f;
 		this.armY = 2.0f - upwardsDist;
 		this.headY = -upwardsDist - headAdjust;
-		this.backArmorTranslation = 0.09;
+		this.backArmorTranslation = 0.12;
 		
 		this.damageAbsorbPct = 0.10f;
 		this.absorbedDamageEnergyMult = 15.0f;

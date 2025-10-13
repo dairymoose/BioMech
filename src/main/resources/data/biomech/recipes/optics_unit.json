@@ -1,29 +1,29 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " i ",
-    "#z#",
+    " a ",
+    "#b#",
     "   "
   ],
   "key": {
     "#": {
       "item": "biomech:biomech_scrap_block"
     },
-	"i": {
-      "item": "minecraft:fermented_spider_eye"
+	"b": {
+      "item": "minecraft:iron_helmet"
     },
-	"z": {
+	"a": {
 	  "item": "minecraft:iron_block"
 	}
   },
   "result": {
-    "item": "biomech:spider_walkers",
+    "item": "biomech:optics_unit",
     "count": 1
   },
   "conditions": [
     {
       "type": "biomech:crafting_flag",
-        "crafting_flag": "enableSpiderWalkersCrafting"
+        "crafting_flag": "enableOpticsUnitCrafting"
     }
   ]
 } 

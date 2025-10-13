@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " a ",
+    "#b#",
+    " s "
+  ],
+  "key": {
+    "#": {
+      "item": "biomech:biomech_scrap_block"
+    },
+	"b": {
+      "item": "minecraft:diamond_pickaxe"
+    },
+	"a": {
+	  "item": "minecraft:chain"
+	},
+	"s": {
+	   "item": "minecraft:amethyst_shard"
+	}
+  },
+  "result": {
+    "item": "biomech:mining_laser_arm",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableMiningLaserArmCrafting"
+    }
+  ]
+} 

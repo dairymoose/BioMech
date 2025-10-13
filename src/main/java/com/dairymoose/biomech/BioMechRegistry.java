@@ -4,8 +4,8 @@ import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.block_entity.BioMechStationBlockEntity;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
-import com.dairymoose.biomech.item.armor.BackJetpackArmor;
-import com.dairymoose.biomech.item.armor.BackScubaTankArmor;
+import com.dairymoose.biomech.item.armor.JetpackArmor;
+import com.dairymoose.biomech.item.armor.ScubaTankArmor;
 import com.dairymoose.biomech.item.armor.BatteryPackArmor;
 import com.dairymoose.biomech.item.armor.ColossusChestplateArmor;
 import com.dairymoose.biomech.item.armor.CpuArmor;
@@ -199,9 +199,9 @@ public class BioMechRegistry {
 	
 	public static RegistryObject<Item> ITEM_BATTERY_PACK = BioMech.ITEMS.register("battery_pack", () -> new BatteryPackArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
-	public static RegistryObject<Item> ITEM_BACK_SCUBA_TANK = BioMech.ITEMS.register("back_scuba_tank", () -> new BackScubaTankArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_SCUBA_TANK = BioMech.ITEMS.register("scuba_tank", () -> new ScubaTankArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
-	public static RegistryObject<Item> ITEM_BACK_JETPACK = BioMech.ITEMS.register("back_jetpack", () -> new BackJetpackArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	public static RegistryObject<Item> ITEM_JETPACK = BioMech.ITEMS.register("jetpack", () -> new JetpackArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_DRILL_ARM = BioMech.ITEMS.register("drill_arm", () -> new DrillRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	

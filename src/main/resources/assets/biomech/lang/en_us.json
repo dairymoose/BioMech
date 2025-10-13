@@ -61,15 +61,15 @@
 	"item.biomech.power_helmet": "§5Power Helmet§0",
 	"item.biomech.power_helmet.tooltip1": "Non-critical attacks have a {crit_boost}% chance to instead be a critical strike.",
 
-	"item.biomech.back_scuba_tank": "§5Scuba Tank§0",
-	"item.biomech.back_scuba_tank.tooltip1": "Automatically consumes energy while underwater.",
-	"item.biomech.back_scuba_tank.tooltip2": "While energy holds, you will have air to breath.",
-	"item.biomech.back_scuba_tank.tooltip3": "Prevents energy regeneration while supplying air.",
+	"item.biomech.scuba_tank": "§5Scuba Tank§0",
+	"item.biomech.scuba_tank.tooltip1": "Automatically consumes energy while underwater.",
+	"item.biomech.scuba_tank.tooltip2": "While energy holds, you will have air to breath.",
+	"item.biomech.scuba_tank.tooltip3": "Prevents energy regeneration while supplying air.",
 	
-	"item.biomech.back_jetpack": "§5Jetpack§0",
-	"item.biomech.back_jetpack.tooltip1": "Hold spacebar while airborne to activate.",
-	"item.biomech.back_jetpack.tooltip2": "Consumes energy while active.",
-	"item.biomech.back_jetpack.tooltip3": "Provides vertical thrust.  If an elytra is active, provides forward thrust.",
+	"item.biomech.jetpack": "§5Jetpack§0",
+	"item.biomech.jetpack.tooltip1": "Hold spacebar while airborne to activate.",
+	"item.biomech.jetpack.tooltip2": "Consumes energy while active.",
+	"item.biomech.jetpack.tooltip3": "Provides vertical thrust.  If an elytra is active, provides forward thrust.",
 	
 	"item.biomech.portable_storage_unit": "§5Portable Storage Unit§0",
 	"item.biomech.portable_storage_unit.tooltip1": "Provides additional inventory space.",

@@ -81,6 +81,14 @@ public class ArmorBase extends ArmorItem {
 		;
 	}
 	
+	public boolean isDisabled() {
+		return this.configDisabled;
+	}
+	
+	public void setDisabled(boolean disabled) {
+		this.configDisabled = disabled;
+	}
+	
 	public float getArmY() {
 		return this.armY;
 	}
@@ -230,7 +238,7 @@ public class ArmorBase extends ArmorItem {
 	public void appendHoverText(ItemStack stack, Level level, List<Component> comp, TooltipFlag flags) {
 		super.appendHoverText(stack, level, comp, flags);
 		if (configDisabled) {
-			comp.add(Component.literal("Disabled by config"));
+			comp.add(Component.literal("Looting disabled by config!"));
 		}
 		if (level != null && level.isClientSide && Minecraft.getInstance().screen instanceof BioMechStationScreen) {
 			comp.add(Component.translatable("item.biomech.generic.tooltip2"));

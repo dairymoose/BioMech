@@ -1,29 +1,32 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " i ",
-    "#z#",
-    "   "
+    " a ",
+    "#b#",
+    " e "
   ],
   "key": {
     "#": {
       "item": "biomech:biomech_scrap_block"
     },
-	"i": {
-      "item": "minecraft:fermented_spider_eye"
+	"b": {
+      "item": "minecraft:crossbow"
     },
-	"z": {
-	  "item": "minecraft:iron_block"
+	"a": {
+	  "item": "minecraft:chain"
+	},
+	"e": {
+	   "item": "minecraft:end_stone"
 	}
   },
   "result": {
-    "item": "biomech:spider_walkers",
+    "item": "biomech:gatling_arm",
     "count": 1
   },
   "conditions": [
     {
       "type": "biomech:crafting_flag",
-        "crafting_flag": "enableSpiderWalkersCrafting"
+        "crafting_flag": "enableGatlingArmCrafting"
     }
   ]
 } 

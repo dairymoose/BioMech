@@ -9,12 +9,12 @@ import net.minecraft.resources.ResourceLocation;
 public class BackJetpackRenderer extends AzArmorRenderer {
     private static final ResourceLocation GEO = ResourceLocation.fromNamespaceAndPath(
         BioMech.MODID,
-        "geo/item/back_jetpack.geo.json"
+        "geo/item/jetpack.geo.json"
     );
 
     private static final ResourceLocation TEX = ResourceLocation.fromNamespaceAndPath(
     	BioMech.MODID,
-        "textures/item/back_jetpack.png"
+        "textures/item/jetpack.png"
     );
 
     public BackJetpackRenderer() {

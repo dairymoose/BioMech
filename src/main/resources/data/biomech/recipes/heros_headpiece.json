@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " a ",
+    "#b#",
+    " e "
+  ],
+  "key": {
+    "#": {
+      "item": "biomech:biomech_scrap_block"
+    },
+	"b": {
+      "item": "minecraft:diamond_helmet"
+    },
+	"a": {
+	  "item": "minecraft:gold_block"
+	},
+	"e": {
+	  "item": "minecraft:end_stone"
+	}
+  },
+  "result": {
+    "item": "biomech:heros_headpiece",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableHerosHeadpieceCrafting"
+    }
+  ]
+} 

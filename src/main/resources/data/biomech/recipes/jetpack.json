@@ -1,9 +1,9 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "   ",
-    "#i#",
-    " z "
+    " i ",
+    "#z#",
+    "   "
   ],
   "key": {
     "#": {
@@ -17,7 +17,7 @@
 	}
   },
   "result": {
-    "item": "biomech:back_jetpack",
+    "item": "biomech:jetpack",
     "count": 1
   },
   "conditions": [

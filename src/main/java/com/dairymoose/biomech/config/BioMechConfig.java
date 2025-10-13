@@ -3,6 +3,7 @@ package com.dairymoose.biomech.config;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -71,15 +72,13 @@ public class BioMechConfig {
 			addConfigElement(BioMechConfig.COMMON.enableBioMechActivator);
 			addConfigElement(BioMechConfig.COMMON.enableBioMechDeactivator);
 			
-			addConfigElement(BioMechConfig.COMMON.enableBiomechScrapCrafting);
-			
-			addConfigElement(BioMechConfig.COMMON.enableIronMechArmorCrafting);
-			addConfigElement(BioMechConfig.COMMON.enableDiamondMechArmorCrafting);
-			
-			addConfigElement(BioMechConfig.COMMON.enableSpiderWalkersCrafting);
-			addConfigElement(BioMechConfig.COMMON.enableScubaTankCrafting);
-			addConfigElement(BioMechConfig.COMMON.enableJetpackCrafting);
-			addConfigElement(BioMechConfig.COMMON.enableElytraMechChestplateCrafting);
+			Field[] fields = BioMechCommonConfig.class.getDeclaredFields();
+			for (Field field : fields) {
+				String fieldName = field.getName();
+				if (fieldName!= null && fieldName.startsWith("enable") && fieldName.endsWith("Crafting")) {
+					addConfigElement((BooleanValue) field.get(BioMechConfig.COMMON));
+				}
+			}
 			
 			BioMechStationBlock.configWalkToBioMechStation = BioMechConfig.COMMON.walkToBioMechStation.get().booleanValue();
 			BioMech.alwaysAllowMechArmUsage = !BioMechConfig.CLIENT.requireEmptyHandsToActivateBioMechHands.get().booleanValue();
@@ -107,44 +106,9 @@ public class BioMechConfig {
 				}
 				};});
 
-			File f = getBiomechEarlyConfigFile();
-			CompoundTag tag = new CompoundTag();
-			tag.putDouble("lootBioMechInChest", BioMechConfig.SERVER.lootBioMechInChest.get());
-			tag.putDouble("lootBioMechInMineshaft", BioMechConfig.SERVER.lootBioMechInMineshaft.get());
-			tag.putDouble("lootBioMechInDungeon", BioMechConfig.SERVER.lootBioMechInDungeon.get());
-			tag.putDouble("lootBioMechInAncientCity", BioMechConfig.SERVER.lootBioMechInAncientCity.get());
-			tag.putDouble("lootBioMechInShipwreck", BioMechConfig.SERVER.lootBioMechInShipwreck.get());
-			tag.putDouble("lootBioMechInNetherFortress", BioMechConfig.SERVER.lootBioMechInNetherFortress.get());
-			tag.putBoolean("ElytraMechChestplateCanBeLooted", BioMechConfig.SERVER.elytraMechChestplateCanBeLooted.get().booleanValue());
-			BioMech.LOGGER.debug("[BioMech]: Save global loot chance: " + BioMechConfig.SERVER.lootBioMechInChest.get());
-			BioMech.LOGGER.debug("[BioMech]: Save mineshaft loot chance: " + BioMechConfig.SERVER.lootBioMechInMineshaft.get());
-			BioMech.LOGGER.debug("[BioMech]: Save dungeon loot chance: " + BioMechConfig.SERVER.lootBioMechInDungeon.get());
-			BioMech.LOGGER.debug("[BioMech]: Save ancient_city loot chance: " + BioMechConfig.SERVER.lootBioMechInAncientCity.get());
-			BioMech.LOGGER.debug("[BioMech]: Save shipwreck loot chance: " + BioMechConfig.SERVER.lootBioMechInShipwreck.get());
-			BioMech.LOGGER.debug("[BioMech]: Save nether fortress loot chance: " + BioMechConfig.SERVER.lootBioMechInNetherFortress.get());
-			BioMech.LOGGER.debug("[BioMech]: Save elytra chestplate loot flag: " + BioMechConfig.SERVER.elytraMechChestplateCanBeLooted.get());
-			NbtIo.write(tag, f);
-			
 		} catch (Exception ex) {
 			BioMech.LOGGER.error("Error initializing config", ex);
 		}
-	}
-	
-	public static File getBiomechEarlyConfigFile() {
-		File f = new File("biomech.cfg");
-		if (!f.exists()) {
-			try {
-				if (f.createNewFile()) {
-					return f;
-				}
-			} catch (IOException e) {
-				BioMech.LOGGER.error("Error creating biomech.cfg", e);
-			}
-		} else {
-			return f;
-		}
-		
-		return null;
 	}
 	
 //	@SubscribeEvent

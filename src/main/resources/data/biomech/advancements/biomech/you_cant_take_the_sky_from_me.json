@@ -1,7 +1,7 @@
 {
     "display": {
         "icon": {
-            "item": "biomech:back_jetpack"
+            "item": "biomech:jetpack"
         },
         "title": {
             "translate": "advancements.biomech.you_cant_take_the_sky_from_me.title"

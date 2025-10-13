@@ -1,8 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    " i ",
-    "#z#",
+    " s ",
+    "#i#",
     "   "
   ],
   "key": {
@@ -10,20 +10,20 @@
       "item": "biomech:biomech_scrap_block"
     },
 	"i": {
-      "item": "minecraft:fermented_spider_eye"
+      "tag": "forge:ingots/iron"
     },
-	"z": {
-	  "item": "minecraft:iron_block"
+	"s": {
+	  "item": "minecraft:barrel"
 	}
   },
   "result": {
-    "item": "biomech:spider_walkers",
+    "item": "biomech:portable_storage_unit",
     "count": 1
   },
   "conditions": [
     {
       "type": "biomech:crafting_flag",
-        "crafting_flag": "enableSpiderWalkersCrafting"
+        "crafting_flag": "enablePortableStorageUnitCrafting"
     }
   ]
 } 

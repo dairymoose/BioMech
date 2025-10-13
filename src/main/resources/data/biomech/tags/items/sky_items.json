@@ -1,7 +1,7 @@
 {
   "replace": false,
   "values": [
-	 "biomech:back_jetpack",
+	 "biomech:jetpack",
 	 "biomech:elytra_mech_chestplate"
   ]
 }
