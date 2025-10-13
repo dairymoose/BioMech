@@ -105,7 +105,7 @@ public class HovertechLeggingsArmor extends ArmorBase {
 										living.setDeltaMovement(living.getDeltaMovement().with(Axis.Y,
 												Math.max(-maxFloatDeltaAdjustment, distToTargetY)));
 									}
-									if (entity.tickCount % 4 == 0) {
+									if (slottedItem.visible && entity.tickCount % 4 == 0) {
 										int pCount = (int) (Math.random() * 5.0);
 										for (int i = 0; i < pCount; ++i) {
 											level.addParticle(ParticleTypes.ASH,
