@@ -34,10 +34,31 @@ public class IronMechChestArmor extends ArmorBase {
 		this.backArmorTranslation = 0.1;
 	}
 
-	public static float energyDamageMultiplier = 20.0f;
+	public static float getAverageAbsorbedDamageEnergyMult(Player player) {
+		float absorbMultTotal = 0.0f;
+		
+		int absorbItems = 0;
+		BioMechPlayerData playerData = null;
+    	playerData = BioMech.globalPlayerData.get(player.getUUID());
+    	if (playerData != null) {
+    		List<SlottedItem> slottedItems = playerData.getAllSlots();
+			for (SlottedItem slotted : slottedItems) {
+				if (!slotted.itemStack.isEmpty()) {
+					if (slotted.itemStack.getItem() instanceof ArmorBase base) {
+						if (base.damageAbsorbPct > 0.0f) {
+							absorbMultTotal += base.absorbedDamageEnergyMult;
+							++absorbItems;
+						}
+					}
+				}
+			}
+    	}
+    	
+    	return absorbMultTotal/absorbItems;
+	}
 	
-	public static float getEnergyDamageForAttack(float damageMitigated) {
-		float energyDamage = damageMitigated * energyDamageMultiplier;
+	public static float getEnergyDamageForAttack(float damageMitigated, float absorbedDamageMult) {
+		float energyDamage = damageMitigated * absorbedDamageMult;
 		return energyDamage;
 	}
 	
@@ -51,7 +72,7 @@ public class IronMechChestArmor extends ArmorBase {
 		return damageAfterMitigation;
 	}
 	
-	public static boolean absorbDirectAttack(BioMechPlayerData playerData, float absorbPct, DamageSource damageSource, float amount, Player player, boolean consumesEnergy) {
+	public static boolean absorbDirectAttack(BioMechPlayerData playerData, float absorbedDamageMult, float absorbPct, DamageSource damageSource, float amount, Player player, boolean consumesEnergy) {
 		if (!damageSource.getMsgId().equals(player.level().damageSources().source(BioMechRegistry.BIOMECH_ABSORB).getMsgId()) && PipeMechBodyArmor.damageSourceIsDirect(damageSource, player)) {
 			float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, amount);
 			float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(amount, damageMitigated);
@@ -63,7 +84,7 @@ public class IronMechChestArmor extends ArmorBase {
 				//this case only occurs if the damage would immediately kill the player - but we predicted they should be saved instead
 				player.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_ABSORB), damageAfterMitigation);
 				BioMech.LOGGER.debug("inflict: " + damageAfterMitigation + " damage, avoid killing blow with Absorb, damage source was: " + damageSource + " with amount=" + amount + " unmitigatedHp=" + unmitigatedPredictedHp + ", mitigated=" + mitigatedPredictedHp + "/currentHp=" + player.getHealth());
-				float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
+				float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated, absorbedDamageMult);
 				if (consumesEnergy) {
 					playerData.spendSuitEnergy(player, energyDamage);
 					if (player instanceof ServerPlayer sp) {
@@ -73,7 +94,7 @@ public class IronMechChestArmor extends ArmorBase {
 
 				return true;
 			} else {
-				float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
+				float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated, absorbedDamageMult);
 				//damage is only processed here on server side
 				if (consumesEnergy) {
 					if (playerData != null) {

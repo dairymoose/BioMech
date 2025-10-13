@@ -43,6 +43,7 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 			if (chestSlot.itemStack.getItem() instanceof ArmorBase base) {
 				if (chestSlot.visible) {
 					//defaults:
+//					HumanoidModel.setupAnim():
 //					this.rightArm.z = 0.0F;
 //				    this.rightArm.x = -5.0F;
 //				    this.leftArm.z = 0.0F;
@@ -72,6 +73,12 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 //						this.rightArm.y = 2.0F;
 //					}
 
+					if (base.getHeadY() != 0.0f) {
+						this.head.y = base.getHeadY();
+						if (this.crouching) {
+							this.head.y += 4.2f;
+						}
+					}
 					this.rightArm.x = -base.getArmDistance();
 					this.leftArm.x = base.getArmDistance();
 				}

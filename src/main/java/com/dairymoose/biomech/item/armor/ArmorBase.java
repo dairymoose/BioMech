@@ -41,6 +41,7 @@ public class ArmorBase extends ArmorItem {
 	protected float suitEnergyPerSec = 0.0f;
 	private static ArmorMaterial NOTHING_MATERIAL = new NothingMaterial();
 	protected float armDistance = 5.0f;
+	protected float headY = 0.0f;
 	protected double backArmorTranslation = 0.0f;
 	protected float hpBoostAmount = 0.0f;
 	protected float xpBoostAmount = 0.0f;
@@ -53,6 +54,7 @@ public class ArmorBase extends ArmorItem {
 	protected float criticalStrikeBoost = 0.0f;
 	protected float nearbyEnemyDamageBoost = 0.0f;
 	protected float explosionDamageReduction = 0.0f;
+	protected float absorbedDamageEnergyMult = 20.0f;
 	
 	public ArmorBase(ArmorMaterial material, Type type, Properties props) {
 		super(NOTHING_MATERIAL, type, props);
@@ -74,6 +76,14 @@ public class ArmorBase extends ArmorItem {
 	
 	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		;
+	}
+	
+	public float getHeadY() {
+		return this.headY;
+	}
+	
+	public float getAbsorbedDamageEnergyMult() {
+		return this.absorbedDamageEnergyMult;
 	}
 	
 	public float getViewBobArmSwayModifier() {
@@ -192,7 +202,7 @@ public class ArmorBase extends ArmorItem {
 			replaced = replaced.replaceAll("Right Button", "Right Mouse-Click");
 			replaced = replaced.replaceAll("\\{dr\\}", nf.format(100.0f*this.getDamageAbsorbPercent()));
 			replaced = replaced.replaceAll("\\{avoid\\}", nf.format(100.0f*this.getDamageAvoidPercent()));
-			replaced = replaced.replaceAll("\\{absorb_energy_harm\\}", nf.format(IronMechChestArmor.energyDamageMultiplier));
+			replaced = replaced.replaceAll("\\{absorb_energy_harm\\}", nf.format(this.getAbsorbedDamageEnergyMult()));
 			replaced = replaced.replaceAll("\\{crit_boost\\}", nf.format(100.0f*this.getCriticalStrikeBoost()));
 			replaced = replaced.replaceAll("\\{near_damage_boost\\}", nf.format(100.0f*this.getNearbyEnemyDamageBoost()));
 			replaced = replaced.replaceAll("\\{nearby_enemy_range\\}", nf.format(HerosHeadpieceArmor.nearbyEnemiesDiameter));

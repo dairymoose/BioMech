@@ -3,6 +3,7 @@ package com.dairymoose.biomech;
 import com.dairymoose.biomech.armor.renderer.BackJetpackRenderer;
 import com.dairymoose.biomech.armor.renderer.BackScubaTankRenderer;
 import com.dairymoose.biomech.armor.renderer.BatteryPackRenderer;
+import com.dairymoose.biomech.armor.renderer.ColossusChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.CpuRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechArmorRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechHeadRenderer;
@@ -110,6 +111,7 @@ public class BioMechClientSetup {
     	AzArmorRendererRegistry.register(CpuRenderer::new, BioMechRegistry.ITEM_CPU.get());
     	AzArmorRendererRegistry.register(GasMaskRenderer::new, BioMechRegistry.ITEM_GAS_MASK.get());
     	AzArmorRendererRegistry.register(RepulsorLiftRenderer::new, BioMechRegistry.ITEM_REPULSOR_LIFT.get());
+    	AzArmorRendererRegistry.register(ColossusChestplateRenderer::new, BioMechRegistry.ITEM_COLOSSUS_CHESTPLATE.get());
     	
     	//LOAD LIFTER
     	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());

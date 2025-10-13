@@ -1259,13 +1259,14 @@ public class BioMech
 					}
 				}
 				
+				float damageAbsorbEnergyHarmAverage = IronMechChestArmor.getAverageAbsorbedDamageEnergyMult(player);
 				if (dai.hasAnyDamageAbsorb) {
 					float absorbPct = IronMechChestArmor.getTotalDamageAbsorbPct(player);
 					float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, event.getAmount());
 					float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(event.getAmount(), damageMitigated);
-					float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated);
+					float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated, damageAbsorbEnergyHarmAverage);
 					if (playerData.getSuitEnergy() >= energyDamage) {
-						if (IronMechChestArmor.absorbDirectAttack(playerData, absorbPct, event.getSource(), event.getAmount(), player, true)) {
+						if (IronMechChestArmor.absorbDirectAttack(playerData, damageAbsorbEnergyHarmAverage, absorbPct, event.getSource(), event.getAmount(), player, true)) {
 							//BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getAmount() + " of type: " + event.getSource() + ", energyLeft=" + playerData.getSuitEnergy());
 							event.setCanceled(true);
 						}
@@ -1279,7 +1280,7 @@ public class BioMech
 					DamageType playerExplosion = player.level().damageSources().explosion(player, player).type();
 					if (event.getSource().type() == genericExplosion || event.getSource().type() == playerExplosion) {
 						BioMech.LOGGER.debug("explosion damage taken: " + event.getAmount());
-						if (IronMechChestArmor.absorbDirectAttack(playerData, explosionDr, event.getSource(), event.getAmount(), player, false)) {
+						if (IronMechChestArmor.absorbDirectAttack(playerData, damageAbsorbEnergyHarmAverage, explosionDr, event.getSource(), event.getAmount(), player, false)) {
 							event.setCanceled(true);
 						}
 					}
