@@ -264,6 +264,7 @@ public class ArmorBase extends ArmorItem {
 		MutableComponent t1 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip1", "");
 		MutableComponent t2 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip2", "");
 		MutableComponent t3 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip3", "");
+		MutableComponent t4 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip4", "");
 		String t1Text = this.replaceTooltips(t1.getString());
 		if (!"".equals(t1Text)) {
 			comp.add(Component.literal(t1Text));
@@ -275,6 +276,10 @@ public class ArmorBase extends ArmorItem {
 		String t3Text = this.replaceTooltips(t3.getString());
 		if (!"".equals(t3Text)) {
 			comp.add(Component.literal(t3Text));
+		}
+		String t4Text = this.replaceTooltips(t4.getString());
+		if (!"".equals(t4Text)) {
+			comp.add(Component.literal(t4Text));
 		}
 	}
 	

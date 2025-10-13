@@ -86,6 +86,7 @@
 	"item.biomech.colossus_chestplate.tooltip1": "{dr}% of incoming damage is absorbed by suit energy.",
 	"item.biomech.colossus_chestplate.tooltip2": "No damage reduction if the suit is out of energy.",
 	"item.biomech.colossus_chestplate.tooltip3": "Absorbed damage harms suit energy at a {absorb_energy_harm}x multiplier.",
+	"item.biomech.colossus_chestplate.tooltip4": "§6The truth is... I am Iron Man.§0",
 	
 	"item.biomech.cpu": "§5CPU§0",
 	"item.biomech.cpu.tooltip1": "Grants {xp_boost}% bonus experience from all sources.",

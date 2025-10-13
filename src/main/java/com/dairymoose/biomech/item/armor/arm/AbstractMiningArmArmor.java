@@ -196,10 +196,17 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						double particleDistance = particleDistanceFromPlayerThirdPerson;
 						double perpendicularDist = particlePerpendicularDistanceThirdPerson;
 						
-						if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ArmorBase ab) {
-							if (ab.getArmDistance() > 5.0f && playerData.getForSlot(MechPart.Chest).visible) {
-								//wide chest armors displace the arms
-								perpendicularDist *= 0.93f * ab.getArmDistance() / 5.0f;
+						if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ArmorBase base) {
+							if (playerData.getForSlot(MechPart.Chest).visible) {
+								if (base.getArmDistance() > 5.0f) {
+									//wide chest armors displace the arms
+									perpendicularDist *= 0.93f * base.getArmDistance() / 5.0f;
+								}
+								if (base.getArmY() != 2.0f) {
+									float armYDist = base.getArmY() - 2.0f;
+									//tall chest armors displace the arms vertically
+									particleStartY *= 1.0f + (0.044f * -armYDist);
+								}
 							}
 						}
 						
