@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.item.anim.RepulsorLiftDispatcher;
 
@@ -35,16 +36,16 @@ public class RepulsorLiftArmor extends ArmorBase {
 
 	public static Player currentPlayer = null;
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
-			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
 			if (armorItems.contains(BioMechRegistry.ITEM_REPULSOR_LIFT.get()) || slotId == -1) {
 				if (level.isClientSide) {
 					if (!player.isSpectator()) {
-						BioMech.clientSideItemAnimation(stack, this.dispatcher.PASSIVE_COMMAND.cmd);
+						BioMech.clientSideItemAnimation(itemStack, this.dispatcher.PASSIVE_COMMAND.cmd);
 						
-						if (player.tickCount % 10 == 0) {
+						if (slottedItem.visible && player.tickCount % 10 == 0) {
 							if (particleEnabled) {
 								ParticleOptions repulsorParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_REPULSOR.get();
 								Vec3 loc = player.position().add(0.0, 0.40, 0.0);

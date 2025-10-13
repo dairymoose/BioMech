@@ -6,14 +6,12 @@ import java.util.List;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
-import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 
-import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -117,10 +115,10 @@ public class IronMechChestArmor extends ArmorBase {
 	}
 	
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
-			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
 			if (armorItems.contains(BioMechRegistry.ITEM_IRON_MECH_CHESTPLATE.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
 					;

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.item.anim.SpringLoadedLeggingsDispatcher;
@@ -33,19 +34,19 @@ public class SpringLoadedLeggingsArmor extends ArmorBase {
 
 	public static int JUMP_BOOST_POWER_LEVEL = 1;
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
-			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
 			if (armorItems.contains(BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
-					CompoundTag tag = stack.getOrCreateTag();
+					CompoundTag tag = itemStack.getOrCreateTag();
 					if (player.level().isClientSide) {
 						if (tag != null && tag.contains("BounceTicks")) {
 							int ticks = tag.getInt("BounceTicks");
 							--ticks;
 							if (ticks == 0) {
-								BioMech.clientSideItemAnimation(stack, this.dispatcher.INERT_COMMAND.cmd);
+								BioMech.clientSideItemAnimation(itemStack, this.dispatcher.INERT_COMMAND.cmd);
 								tag.remove("BounceTicks");
 							} else {
 								tag.putInt("BounceTicks", ticks);

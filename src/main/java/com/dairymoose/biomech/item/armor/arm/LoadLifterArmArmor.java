@@ -4,19 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.PermanentModifiers;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
@@ -64,10 +63,10 @@ public abstract class LoadLifterArmArmor extends ArmorBase {
 	}
 	
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
-			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
 			if (armorItems.contains(BioMechRegistry.ITEM_LOAD_LIFTER_ARM.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living) {
 					

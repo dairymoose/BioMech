@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,10 +31,10 @@ public class BackScubaTankArmor extends ArmorBase {
 	public static float energyPerTick = energyPerSec / 20.0f;
 	public static int AIR_INCREMENT = 3;
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
-			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
 			if (armorItems.contains(BioMechRegistry.ITEM_BACK_SCUBA_TANK.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living) {
 					BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());

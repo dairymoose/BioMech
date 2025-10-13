@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.BioMech.OutlinedSpawnerInfo;
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.BioMechRegistry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
@@ -45,10 +46,10 @@ public class OpticsUnitArmor extends ArmorBase {
 
 	public static Set<BlockPos> capturedSpawners = new HashSet<>();
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
-			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
 			if (armorItems.contains(BioMechRegistry.ITEM_OPTICS_UNIT.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
 					if (player.tickCount % SCAN_TICK_PERIOD == 0) {

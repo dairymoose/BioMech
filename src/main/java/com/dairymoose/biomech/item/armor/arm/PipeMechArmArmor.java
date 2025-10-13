@@ -3,6 +3,7 @@ package com.dairymoose.biomech.item.armor.arm;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
@@ -31,10 +32,10 @@ public abstract class PipeMechArmArmor extends ArmorBase {
 	}
 	
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
-			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
 			if (armorItems.contains(BioMechRegistry.ITEM_POWER_ARM.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
 					;

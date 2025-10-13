@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
 
@@ -44,10 +45,10 @@ public class BackJetpackArmor extends ArmorBase {
 	
 	public static Map<UUID, Double> lastY = new HashMap<>();
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
-			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
 			if (armorItems.contains(BioMechRegistry.ITEM_BACK_JETPACK.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living) {
 					HandActiveStatus has = BioMech.handActiveMap.get(player.getUUID());

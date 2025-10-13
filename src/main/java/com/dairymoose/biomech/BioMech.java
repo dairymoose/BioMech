@@ -808,7 +808,9 @@ public class BioMech
 			if (!slotted.itemStack.isEmpty()) {
 								
 				ItemStack tickingItem = getThirdPersonArmItemStack(playerData, slotted.mechPart);
-				tickingItem.inventoryTick(player.level(), player, -1, slotted.mechPart == MechPart.LeftArm);
+				if (tickingItem.getItem() instanceof ArmorBase base) {
+					base.biomechInventoryTick(slotted, tickingItem, player.level(), player, -1, slotted.mechPart == MechPart.LeftArm);
+				}
 			}
 		}
 	}
@@ -1838,7 +1840,7 @@ public class BioMech
                 	}
                 	if (playerData != null && handPart != null && equipSlot != null) {
                 		if (playerData.getForSlot(MechPart.Leggings).itemStack.getItem() instanceof ArmorBase base) {
-                			if (base.isViewBobDisabled()) {
+                			if (playerData.getForSlot(MechPart.Leggings).visible && base.isViewBobDisabled()) {
                 				//disable view bob for mobility treads
                     			Minecraft.getInstance().player.oBob = 0.0f;
                     			Minecraft.getInstance().player.bob = 0.0f;

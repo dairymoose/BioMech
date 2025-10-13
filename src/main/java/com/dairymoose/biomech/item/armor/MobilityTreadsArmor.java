@@ -3,17 +3,12 @@ package com.dairymoose.biomech.item.armor;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechNetwork;
-import com.dairymoose.biomech.BioMechPlayerData;
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
-import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction.Axis;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -24,11 +19,8 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class MobilityTreadsArmor extends ArmorBase {
 	
@@ -53,16 +45,16 @@ public class MobilityTreadsArmor extends ArmorBase {
 	
 	@SuppressWarnings("deprecation")
 	@Override
-	public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
 			List<Item> armorItems = new ArrayList<Item>();
-			player.getArmorSlots().forEach((itemStack) -> armorItems.add(itemStack.getItem()));
+			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
 			if (armorItems.contains(BioMechRegistry.ITEM_MOBILITY_TREADS.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
 					if (level.isClientSide) {
 						int lastCollisionTick = 0;
-						if (stack.getTag().contains("LastCollisionTick")) {
-							lastCollisionTick = stack.getTag().getInt("LastCollisionTick");
+						if (itemStack.getTag().contains("LastCollisionTick")) {
+							lastCollisionTick = itemStack.getTag().getInt("LastCollisionTick");
 						}
 						
 						class InputChecker {
@@ -84,7 +76,7 @@ public class MobilityTreadsArmor extends ArmorBase {
 						if (ic.hasBackwardsImpulse) {
 							currentSpeed = -currentSpeed;
 						}
-						stack.getOrCreateTag().putFloat("CurrentSpeed", currentSpeed);
+						itemStack.getOrCreateTag().putFloat("CurrentSpeed", currentSpeed);
 						
 						if (!ic.hasForwardImpulse) {
 							if (requestedSpeedBoost) {
@@ -94,7 +86,7 @@ public class MobilityTreadsArmor extends ArmorBase {
 								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMobilityTreadsPacket(false));
 							}
 							lastCollisionTick = player.tickCount;
-							stack.getTag().putInt("LastCollisionTick", lastCollisionTick);
+							itemStack.getTag().putInt("LastCollisionTick", lastCollisionTick);
 						} else {
 							int tickDiff = player.tickCount - lastCollisionTick;
 							if (!requestedSpeedBoost && tickDiff >= (SECONDS_UNTIL_SPEED_BOOST * TICKS_PER_SEC) && player.onGround()) {
@@ -105,10 +97,10 @@ public class MobilityTreadsArmor extends ArmorBase {
 							}
 						}
 					} else {
-						CompoundTag tag = stack.getOrCreateTag();
+						CompoundTag tag = itemStack.getOrCreateTag();
 						boolean speedBoost = false;
 						if (tag.contains("WantSpeedBoost")) {
-							speedBoost = stack.getOrCreateTag().getBoolean("WantSpeedBoost");
+							speedBoost = itemStack.getOrCreateTag().getBoolean("WantSpeedBoost");
 						}
 						
 						MobEffectInstance speedBuff = player.getEffect(MobEffects.MOVEMENT_SPEED);

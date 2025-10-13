@@ -3,7 +3,6 @@ package com.dairymoose.biomech.item.armor.arm;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.item.anim.DiggerDispatcher;
-import com.dairymoose.biomech.item.anim.DrillDispatcher;
 
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;

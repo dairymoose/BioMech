@@ -3,10 +3,7 @@ package com.dairymoose.biomech.item.armor;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
-import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
