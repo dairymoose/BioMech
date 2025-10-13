@@ -12,6 +12,7 @@ import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
+import com.dairymoose.biomech.item.armor.RepulsorLiftArmor;
 import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
 
 import net.minecraft.client.Minecraft;
@@ -87,22 +88,24 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 					this.rightLeg.xRot = this.rightLeg.xRot/4.0f;
 					this.leftLeg.xRot = this.leftLeg.xRot/4.0f;
 				}
-			} else if (legSlot.itemStack.getItem() instanceof MobilityTreadsArmor armor) {
-				if (legSlot.visible) {
-					if (living.isControlledByLocalInstance()) {
-						Minecraft.getInstance().player.oBob = 0.0f;
-            			Minecraft.getInstance().player.bob = 0.0f;
+			} else if (legSlot.itemStack.getItem() instanceof ArmorBase base) {
+				if (base.isViewBobDisabled()) {
+					if (legSlot.visible) {
+						if (living.isControlledByLocalInstance()) {
+							Minecraft.getInstance().player.oBob = 0.0f;
+	            			Minecraft.getInstance().player.bob = 0.0f;
+						}
+						
+						//greatly reduce arm bob
+						if (this.attackTime == 0.0f && this.swimAmount == 0.0f) {
+							this.rightArm.xRot = this.rightArm.xRot * base.getViewBobArmSwayModifier();
+							this.leftArm.xRot = this.leftArm.xRot * base.getViewBobArmSwayModifier();
+						}
+						
+						//normal leg walking forward-and-back
+						this.rightLeg.xRot = 0.0f;
+						this.leftLeg.xRot = 0.0f;
 					}
-					
-					//greatly reduce arm bob
-					if (this.attackTime == 0.0f && this.swimAmount == 0.0f) {
-						this.rightArm.xRot = this.rightArm.xRot / 7.0f;
-						this.leftArm.xRot = this.leftArm.xRot / 7.0f;
-					}
-					
-					//normal leg walking forward-and-back
-					this.rightLeg.xRot = 0.0f;
-					this.leftLeg.xRot = 0.0f;
 				}
 			}
 			

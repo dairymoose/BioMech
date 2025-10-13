@@ -10,6 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.item.armor.OpticsUnitArmor;
+import com.dairymoose.biomech.item.armor.RepulsorLiftArmor;
 import com.dairymoose.biomech.item.armor.arm.GatlingArmArmor;
 
 import net.minecraft.nbt.CompoundTag;
@@ -101,6 +102,8 @@ public class BioMechConfig {
 					BioMech.ClientModEvents.inventoryButtonVisible = BioMechConfig.CLIENT.showBioMechInventoryButton.get().booleanValue();
 					BioMech.ClientModEvents.inventoryButtonScreenX = BioMechConfig.CLIENT.bioMechInventoryButtonX.get();
 					BioMech.ClientModEvents.inventoryButtonScreenY = BioMechConfig.CLIENT.bioMechInventoryButtonY.get();
+					
+					RepulsorLiftArmor.particleEnabled = BioMechConfig.CLIENT.enableRepulsorLiftParticle.get().booleanValue();
 				}
 				};});
 

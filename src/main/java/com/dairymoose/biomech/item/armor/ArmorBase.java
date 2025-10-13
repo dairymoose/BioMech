@@ -60,6 +60,8 @@ public class ArmorBase extends ArmorItem {
 	protected double backArmorTranslation = 0.0f;
 	protected float hpBoostAmount = 0.0f;
 	protected float xpBoostAmount = 0.0f;
+	protected boolean viewBobDisabled = false;
+	protected float viewBobArmSwayModifier = 1.0f;
 	
 	protected float projectileAvoidPct = 0.0f;
 	protected float damageAvoidPct = 0.0f;
@@ -78,6 +80,14 @@ public class ArmorBase extends ArmorItem {
 	
 	public boolean onPlayerDamageTaken(DamageSource damageSource, float amount, ItemStack itemStack, Player player, MechPart handPart) {
 		return false;
+	}
+	
+	public float getViewBobArmSwayModifier() {
+		return this.viewBobArmSwayModifier;
+	}
+	
+	public boolean isViewBobDisabled() {
+		return this.viewBobDisabled;
 	}
 	
 	public double getBackArmorTranslation() {

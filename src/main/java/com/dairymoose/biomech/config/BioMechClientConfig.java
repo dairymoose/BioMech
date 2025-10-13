@@ -31,6 +31,8 @@ public class BioMechClientConfig {
 	public final ForgeConfigSpec.IntValue bioMechInventoryButtonX;
 	public final ForgeConfigSpec.IntValue bioMechInventoryButtonY;
 	
+	public final ForgeConfigSpec.BooleanValue enableRepulsorLiftParticle;
+	
 	public BioMechClientConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("first_person");
 		this.hideMainHandWhileNotInUse = builder.comment("hideMainHandWhileNotInUse").translation("config.biomech.hideMainHandWhileNotInUse").define("hideMainHandWhileNotInUse", false);
@@ -47,6 +49,7 @@ public class BioMechClientConfig {
 		this.opticsUnitCanEverHighlightSpawners = builder.comment("opticsUnitCanEverHighlightSpawners").translation("config.biomech.opticsUnitCanEverHighlightSpawners").define("opticsUnitCanEverHighlightSpawners", true);
 		this.opticsUnitCanEverHighlightChests = builder.comment("opticsUnitCanEverHighlightChests").translation("config.biomech.opticsUnitCanEverHighlightChests").define("opticsUnitCanEverHighlightChests", true);
 		this.opticsUnitAllowZoomIn = builder.comment("opticsUnitAllowZoomIn").translation("config.biomech.opticsUnitAllowZoomIn").define("opticsUnitAllowZoomIn", true);
+		this.enableRepulsorLiftParticle = builder.comment("enableRepulsorLiftParticle").translation("config.biomech.enableRepulsorLiftParticle").define("enableRepulsorLiftParticle", true);
 		builder.pop();
 		
 		builder.push("gui");

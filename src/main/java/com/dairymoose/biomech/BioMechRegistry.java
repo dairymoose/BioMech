@@ -33,6 +33,7 @@ import com.dairymoose.biomech.item.armor.PortableStorageUnitArmor;
 import com.dairymoose.biomech.item.armor.PowerChestArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.armor.PowerLeggingsArmor;
+import com.dairymoose.biomech.item.armor.RepulsorLiftArmor;
 import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.item.armor.TeleportationCrystalArmor;
@@ -106,6 +107,8 @@ public class BioMechRegistry {
 	
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_MUZZLE_FLASH = BioMech.PARTICLES.register("muzzle_flash", () -> new SimpleParticleType(false));
 	
+	public static RegistryObject<ParticleType> PARTICLE_TYPE_REPULSOR = BioMech.PARTICLES.register("repulsor", () -> new SimpleParticleType(false));
+	
 	public static RegistryObject<SoundEvent> SOUND_EVENT_LASER_LOOP = BioMech.SOUNDS.register("laser_loop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "laser_loop")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_JETPACK_LOOP = BioMech.SOUNDS.register("jetpack_loop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "jetpack_loop")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_MINING_DRILL = BioMech.SOUNDS.register("mining_drill", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "mining_drill")));
@@ -178,6 +181,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_MOBILITY_TREADS = BioMech.ITEMS.register("mobility_treads", () -> new MobilityTreadsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	public static RegistryObject<Item> ITEM_LOAD_LIFTER_ARM = BioMech.ITEMS.register("load_lifter_arm", () -> new LoadLifterRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	//LOAD LIFTER SET
+	
+	public static RegistryObject<Item> ITEM_REPULSOR_LIFT = BioMech.ITEMS.register("repulsor_lift", () -> new RepulsorLiftArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_CPU = BioMech.ITEMS.register("cpu", () -> new CpuArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	

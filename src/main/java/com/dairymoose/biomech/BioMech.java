@@ -41,6 +41,7 @@ import com.dairymoose.biomech.item.armor.OpticsUnitArmor;
 import com.dairymoose.biomech.item.armor.PipeMechBodyArmor;
 import com.dairymoose.biomech.item.armor.PortableStorageUnitArmor;
 import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
+import com.dairymoose.biomech.item.armor.RepulsorLiftArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.item.armor.TeleportationCrystalArmor;
 import com.dairymoose.biomech.item.armor.arm.GatlingArmArmor;
@@ -60,6 +61,7 @@ import com.dairymoose.biomech.particle.InstantSmokeParticle;
 import com.dairymoose.biomech.particle.LaserParticle;
 import com.dairymoose.biomech.particle.MaxLaserParticle;
 import com.dairymoose.biomech.particle.MuzzleFlashParticle;
+import com.dairymoose.biomech.particle.RepulsorParticle;
 import com.dairymoose.biomech.particle.ThickerLaserParticle;
 import com.dairymoose.biomech.particle.ThickestLaserParticle;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -197,7 +199,7 @@ import net.minecraftforge.registries.RegistryObject;
  * Add renderer in armor.renderer package
  * Add ArmorBase class in item.armor package
  * Add new armor to BioMechRegistry
- * Add new renderer/items to bottom of BioMech in onClientSetup (AzArmorRendererRegistry)
+ * Add new renderer/items to BioMech class in BioMechClientSetup (AzArmorRendererRegistry)
  * <Optional>: Add crafting recipe
  * <Optional>: Add tags to mech_part.json
  * 
@@ -1201,6 +1203,12 @@ public class BioMech
 							}
 						}
 					}
+					
+					if (event.getSource() == player.level().damageSources().fall()) {
+						if (playerData.getForSlot(MechPart.Leggings).itemStack.getItem() instanceof RepulsorLiftArmor armor) {
+							event.setCanceled(true);
+						}
+					}
 	        	}
 			}
 		} else {
@@ -1349,6 +1357,7 @@ public class BioMech
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_MAX_LASER.get(), MaxLaserParticle.Provider::new);
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_INSTANT_SMOKE.get(), InstantSmokeParticle.Provider::new);
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_MUZZLE_FLASH.get(), MuzzleFlashParticle.Provider::new);
+        	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_REPULSOR.get(), RepulsorParticle.Provider::new);
         }
         
     	@SubscribeEvent
@@ -1828,10 +1837,12 @@ public class BioMech
                 		currentArmActive = true;
                 	}
                 	if (playerData != null && handPart != null && equipSlot != null) {
-                		if (playerData.getForSlot(MechPart.Leggings).itemStack.getItem() instanceof MobilityTreadsArmor) {
-                			//disable view bob for mobility treads
-                			Minecraft.getInstance().player.oBob = 0.0f;
-                			Minecraft.getInstance().player.bob = 0.0f;
+                		if (playerData.getForSlot(MechPart.Leggings).itemStack.getItem() instanceof ArmorBase base) {
+                			if (base.isViewBobDisabled()) {
+                				//disable view bob for mobility treads
+                    			Minecraft.getInstance().player.oBob = 0.0f;
+                    			Minecraft.getInstance().player.bob = 0.0f;
+                			}
                 		}
                 		
                 		if (!(Minecraft.getInstance().player.getMainHandItem().getItem() instanceof BioMechActivator)) {

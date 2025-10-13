@@ -11,7 +11,8 @@
   //applys to dedicated server and client
   "mixins": [
 	"LivingEntityUpdateFallFlyingMixin", //per-tick checks for continued elytra flight
-	"PlayerFallFlyingMixin" //when trying to initially begin elytra flight
+	"PlayerFallFlyingMixin", //when trying to initially begin elytra flight
+	"EntityMoveMixin" //avoid trigger Block stepOn effects
   ],
   "injectors": {
     "defaultRequire": 1

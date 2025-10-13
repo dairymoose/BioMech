@@ -1,0 +1,16 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.repulsor_lift.passive": {
+			"loop": true,
+			"bones": {
+				"mech_left": {
+					"rotation": {
+						"vector": [0, "query.anim_time*30", 0]
+					}
+				}
+			}
+		}
+	},
+	"azurelib_format_version": 2
+}

@@ -78,6 +78,10 @@
 	"item.biomech.battery_pack": "§5Battery Pack§0",
 	"item.biomech.battery_pack.tooltip1": "Grants suit energy regeneration.",
 	
+	"item.biomech.repulsor_lift": "§5Repulsor Lift§0",
+	"item.biomech.repulsor_lift.tooltip1": "Grants immunity to fall damage.",
+	"item.biomech.repulsor_lift.tooltip2": "Grants immunity to floor effects.",
+	
 	"item.biomech.cpu": "§5CPU§0",
 	"item.biomech.cpu.tooltip1": "Grants {xp_boost}% bonus experience from all sources.",
 		

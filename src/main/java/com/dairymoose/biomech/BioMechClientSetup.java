@@ -29,6 +29,7 @@ import com.dairymoose.biomech.armor.renderer.PortableStorageUnitRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerChestRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerHelmetRenderer;
 import com.dairymoose.biomech.armor.renderer.PowerLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.RepulsorLiftRenderer;
 import com.dairymoose.biomech.armor.renderer.SpiderWalkersRenderer;
 import com.dairymoose.biomech.armor.renderer.SpringLoadedLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.TeleportationCrystalRenderer;
@@ -108,6 +109,7 @@ public class BioMechClientSetup {
     	AzArmorRendererRegistry.register(TeleportationCrystalRenderer::new, BioMechRegistry.ITEM_TELEPORTATION_CRYSTAL.get());
     	AzArmorRendererRegistry.register(CpuRenderer::new, BioMechRegistry.ITEM_CPU.get());
     	AzArmorRendererRegistry.register(GasMaskRenderer::new, BioMechRegistry.ITEM_GAS_MASK.get());
+    	AzArmorRendererRegistry.register(RepulsorLiftRenderer::new, BioMechRegistry.ITEM_REPULSOR_LIFT.get());
     	
     	//LOAD LIFTER
     	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());
@@ -172,6 +174,7 @@ public class BioMechClientSetup {
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_SPRING_LOADED_LEGGINGS.get());
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_DIGGER_ARM.get(), BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_TELEPORTATION_CRYSTAL.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_REPULSOR_LIFT.get());
     	//------ All Animated ------
     	
     	

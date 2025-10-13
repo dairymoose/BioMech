@@ -37,6 +37,9 @@ public class MobilityTreadsArmor extends ArmorBase {
 		this.suitEnergy = 20;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Leggings;
+		
+		this.viewBobDisabled = true;
+		this.viewBobArmSwayModifier = 1/7.0f;
 	}
 
 	public static int SECONDS_UNTIL_SPEED_BOOST = 5;

@@ -196,9 +196,9 @@ public abstract class AbstractMiningArm extends ArmorBase {
 						double perpendicularDist = particlePerpendicularDistanceThirdPerson;
 						
 						if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ArmorBase ab) {
-							if (ab.getArmDistance() > 5.0f) {
+							if (ab.getArmDistance() > 5.0f && playerData.getForSlot(MechPart.Chest).visible) {
 								//wide chest armors displace the arms
-								perpendicularDist *= 0.9f * ab.getArmDistance() / 5.0f;
+								perpendicularDist *= 0.93f * ab.getArmDistance() / 5.0f;
 							}
 						}
 						
