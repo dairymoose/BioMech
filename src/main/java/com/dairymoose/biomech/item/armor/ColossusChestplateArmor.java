@@ -22,9 +22,12 @@ public class ColossusChestplateArmor extends ArmorBase {
 		this.suitEnergyPerSec = 1.0f;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Chest;
-		this.armDistance = 11.5f;
-		this.headY = -1.8f;
-		this.backArmorTranslation = 0.12;
+		this.armDistance = 11.0f;
+		float upwardsDist = 5.5f;
+		float headAdjust = 1.75f;
+		this.armY = 2.0f - upwardsDist;
+		this.headY = -upwardsDist - headAdjust;
+		this.backArmorTranslation = 0.10;
 		
 		this.damageAbsorbPct = 0.10f;
 		this.absorbedDamageEnergyMult = 15.0f;

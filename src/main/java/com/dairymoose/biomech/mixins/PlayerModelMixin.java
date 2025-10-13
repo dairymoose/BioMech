@@ -81,6 +81,13 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 					}
 					this.rightArm.x = -base.getArmDistance();
 					this.leftArm.x = base.getArmDistance();
+					
+					this.rightArm.y = base.getArmY();
+					this.leftArm.y = base.getArmY();
+					if (this.crouching) {
+						this.rightArm.y += 3.2f;
+						this.leftArm.y += 3.2f;
+					}
 				}
 			}
 			
