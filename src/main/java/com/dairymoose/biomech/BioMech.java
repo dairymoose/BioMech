@@ -2037,7 +2037,7 @@ public class BioMech
                 		    						float armDiff = -(base.getArmY() - 2.0f);
                 		    						float xRotPct = Math.abs(renderEntity.getXRot())/90.0f;
                 		    						//arm is floating behind the body when aiming directly upwards (in third person view)
-                		    						//
+                		    						//we'll move it forward slightly
                 		    						poseStack.translate(0.0, 0.05*armDiff*xRotPct, 0.0);
                 		    					}
             		    					}
