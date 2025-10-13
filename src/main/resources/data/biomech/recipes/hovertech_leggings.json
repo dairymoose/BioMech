@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " a ",
+    "#b#",
+    " b "
+  ],
+  "key": {
+    "#": {
+      "item": "biomech:biomech_scrap_block"
+    },
+	"b": {
+      "item": "minecraft:blaze_powder"
+    },
+	"a": {
+	  "item": "minecraft:nether_wart"
+	}
+  },
+  "result": {
+    "item": "biomech:hovertech_leggings",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableHovertechLeggingsCrafting"
+    }
+  ]
+} 
