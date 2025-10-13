@@ -47,11 +47,13 @@ public class RepulsorLiftArmor extends ArmorBase {
 						
 						if (slottedItem.visible && player.tickCount % 10 == 0) {
 							if (particleEnabled) {
-								ParticleOptions repulsorParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_REPULSOR.get();
-								Vec3 loc = player.position().add(0.0, 0.40, 0.0);
-								Vec3 delta = player.getDeltaMovement();
-								RepulsorLiftArmor.currentPlayer = player;
-								player.level().addParticle(repulsorParticle, loc.x, loc.y, loc.z, 0.0, -0.15, 0.0);
+								if (!player.isSwimming() & !player.isFallFlying()) {
+									ParticleOptions repulsorParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_REPULSOR.get();
+									Vec3 loc = player.position().add(0.0, 0.40, 0.0);
+									Vec3 delta = player.getDeltaMovement();
+									RepulsorLiftArmor.currentPlayer = player;
+									player.level().addParticle(repulsorParticle, loc.x, loc.y, loc.z, 0.0, -0.15, 0.0);
+								}
 							}
 						}
 					}

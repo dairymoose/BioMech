@@ -106,11 +106,13 @@ public class HovertechLeggingsArmor extends ArmorBase {
 												Math.max(-maxFloatDeltaAdjustment, distToTargetY)));
 									}
 									if (slottedItem.visible && entity.tickCount % 4 == 0) {
-										int pCount = (int) (Math.random() * 5.0);
-										for (int i = 0; i < pCount; ++i) {
-											level.addParticle(ParticleTypes.ASH,
-													player.getX() + (Math.random() - .5) * 0.6, player.getY() - 0.1,
-													player.getZ() + (Math.random() - .5) * 0.6, 0.0, -1.2, 0.0);
+										if (!player.isSwimming() & !player.isFallFlying()) {
+											int pCount = (int) (Math.random() * 5.0);
+											for (int i = 0; i < pCount; ++i) {
+												level.addParticle(ParticleTypes.ASH,
+														player.getX() + (Math.random() - .5) * 0.6, player.getY() - 0.1,
+														player.getZ() + (Math.random() - .5) * 0.6, 0.0, -1.2, 0.0);
+											}
 										}
 									}
 									if (!level.isClientSide) {
@@ -142,7 +144,6 @@ public class HovertechLeggingsArmor extends ArmorBase {
 									      }
 									}
 								}
-								BioMech.LOGGER.info("set on ground");
 								living.setOnGround(true);
 							} else if (living.isCrouching()) {
 								if (living.getDeltaMovement().y >= -0.08f && living.getDeltaMovement().y <= -0.01) {
