@@ -63,8 +63,8 @@ public class BioMechClientConfig {
 		
 		builder.push("gui");
 		this.showBioMechInventoryButton = builder.comment("showBioMechInventoryButton").translation("config.biomech.showBioMechInventoryButton").define("showBioMechInventoryButton", true);
-		this.bioMechInventoryButtonX = builder.comment("bioMechInventoryButtonX").translation("config.biomech.bioMechInventoryButtonX").defineInRange("bioMechInventoryButtonX", 77, 0, 255);
-		this.bioMechInventoryButtonY = builder.comment("bioMechInventoryButtonY").translation("config.biomech.bioMechInventoryButtonY").defineInRange("bioMechInventoryButtonY", 7, 0, 255);
+		this.bioMechInventoryButtonX = builder.comment("bioMechInventoryButtonX").translation("config.biomech.bioMechInventoryButtonX").defineInRange("bioMechInventoryButtonX", 81, 0, 255);
+		this.bioMechInventoryButtonY = builder.comment("bioMechInventoryButtonY").translation("config.biomech.bioMechInventoryButtonY").defineInRange("bioMechInventoryButtonY", 6, 0, 255);
 		builder.pop();
 		
 		builder.push("gui");
