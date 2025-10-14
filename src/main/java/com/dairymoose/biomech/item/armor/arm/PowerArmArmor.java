@@ -21,6 +21,7 @@ public abstract class PowerArmArmor extends ArmorBase {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 2;
 		this.hidePlayerModel = true;
+		this.flatDamageBoost = 1.0f;
 	}
 
 	@Override

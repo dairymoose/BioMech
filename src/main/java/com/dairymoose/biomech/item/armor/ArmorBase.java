@@ -56,6 +56,7 @@ public class ArmorBase extends ArmorItem {
 	protected float nearbyEnemyDamageBoost = 0.0f;
 	protected float explosionDamageReduction = 0.0f;
 	protected float absorbedDamageEnergyMult = 20.0f;
+	protected float flatDamageBoost = 0.0f;
 	
 	public boolean configDisabled = false;
 	
@@ -87,6 +88,10 @@ public class ArmorBase extends ArmorItem {
 	
 	public void setDisabled(boolean disabled) {
 		this.configDisabled = disabled;
+	}
+	
+	public float getFlatDamageBoost() {
+		return this.flatDamageBoost;
 	}
 	
 	public float getArmY() {
@@ -229,6 +234,7 @@ public class ArmorBase extends ArmorItem {
 			replaced = replaced.replaceAll("\\{teleport_back_time\\}", nf.format(ServerboundTeleportationCrystalPacket.MINUTES_ALLOWED_TO_TELEPORT_BACK));
 			replaced = replaced.replaceAll("\\{hp_boost\\}", nf.format(this.getHpBoostAmount()));
 			replaced = replaced.replaceAll("\\{xp_boost\\}", nf.format(100.0f*this.getXpBoostAmount()));
+			replaced = replaced.replaceAll("\\{flat_damage_boost\\}", nf.format(this.getFlatDamageBoost()));
 		}
 		
 		return replaced;

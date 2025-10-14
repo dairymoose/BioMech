@@ -1082,6 +1082,20 @@ public class BioMech
 		}
 	}
 	
+	private void hurtEntityWithoutInvulnerableFrames(LivingEntity living, Player player, float damage) {
+		int invulnerableTimeBefore = living.invulnerableTime;
+		int hurtDurationBefore = living.hurtDuration;
+		int hurtTimeBefore = living.hurtTime;
+		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), damage);
+		living.invulnerableTime = invulnerableTimeBefore;
+		living.hurtDuration = hurtDurationBefore;
+		living.hurtTime = hurtTimeBefore;
+	}
+	
+	public static boolean damageCanHurtEntity(float damage, LivingEntity living) {
+		return living.invulnerableTime <= 10 || damage >= living.lastHurt;
+	}
+	
 	@SubscribeEvent
 	public void onPlayerDealDamage(LivingAttackEvent event) {
 		if (event.getSource().getDirectEntity() instanceof Player player) {
@@ -1105,13 +1119,14 @@ public class BioMech
 			        				active = tag.getBoolean("ActiveArm");
 			        			}
 			        			if (!active) {
-			        				if (!event.getEntity().isDeadOrDying() && !event.getEntity().isInvulnerable() && event.getEntity().attackable() && event.getEntity().invulnerableTime <= 0) {
+			        				if (!event.getEntity().isDeadOrDying() && !event.getEntity().isInvulnerable() && event.getEntity().attackable() && BioMech.damageCanHurtEntity(event.getAmount(), event.getEntity())) {
 			        					tag.putBoolean("ActiveArm", true);
-			        					BioMech.LOGGER.debug("apply bonus damage of: " + 1.0f);
-					        			event.getEntity().hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), 2.0f);
-					        			event.getEntity().invulnerableTime = 0;
-					        			event.getEntity().hurtDuration = 0;
-				        				event.getEntity().hurtTime = 0;
+			        					BioMech.LOGGER.debug("apply bonus damage of: " + arm.getFlatDamageBoost());
+					        			//event.getEntity().hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), 2.0f);
+					        			//event.getEntity().invulnerableTime = 0;
+					        			//event.getEntity().hurtDuration = 0;
+				        				//event.getEntity().hurtTime = 0;
+				        				this.hurtEntityWithoutInvulnerableFrames(event.getEntity(), player, arm.getFlatDamageBoost());
 					        			tag.putBoolean("ActiveArm", false);
 			        				}
 			        			}
@@ -1135,12 +1150,9 @@ public class BioMech
 		        			}
 		        			if (active) {
 		        				float boostPct = HerosHeadpieceArmor.getTotalNearbyDamageBoostPct(player);
-		        				if (!event.getEntity().isDeadOrDying() && !event.getEntity().isInvulnerable() && event.getEntity().attackable() && event.getEntity().invulnerableTime <= 0) {
+		        				if (!event.getEntity().isDeadOrDying() && !event.getEntity().isInvulnerable() && event.getEntity().attackable() && BioMech.damageCanHurtEntity(event.getAmount(), event.getEntity())) {
 		        					BioMech.LOGGER.debug("apply bonus damage of: " + (event.getAmount() * boostPct));
-				        			event.getEntity().hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), event.getAmount() * boostPct);
-				        			event.getEntity().invulnerableTime = 0;
-				        			event.getEntity().hurtDuration = 0;
-			        				event.getEntity().hurtTime = 0;
+		        					this.hurtEntityWithoutInvulnerableFrames(event.getEntity(), player, event.getAmount() * boostPct);
 		        				}
 		        			}
 		        		}
@@ -1229,7 +1241,7 @@ public class BioMech
 	@SubscribeEvent
 	public void onPlayerDamageTaken(final LivingDamageEvent event) {
 		if (!(event.getEntity() instanceof Player player)) {
-			//BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
+			BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
 		}
 		if (event.getEntity() instanceof Player player) {
 			//BioMech.LOGGER.info("damage to player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());

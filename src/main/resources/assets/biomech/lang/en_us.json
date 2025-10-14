@@ -39,7 +39,7 @@
 	"item.biomech.drill_arm.tooltip3": "Mines in a 3x3 area (pickaxe blocks only).",
 	
 	"item.biomech.power_arm": "§5Power Arm§0",
-	"item.biomech.power_arm.tooltip1": "Increases attack damage by 1 when wielding a weapon.",
+	"item.biomech.power_arm.tooltip1": "Increases attack damage by {flat_damage_boost} when wielding a weapon.",
 
 	"item.biomech.teleportation_crystal": "§5Teleportation Crystal§0",
 	"item.biomech.teleportation_crystal.tooltip1": "Hold '{psu}' for {teleport_hold_time} seconds to teleport home.",
