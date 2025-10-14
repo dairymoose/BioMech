@@ -1167,7 +1167,7 @@ public class BioMech
 					if (dai.hasAnyDamageAvoid) {
 						if (!player.level().isClientSide) {
 							if (playerData.getSuitEnergy() >= PipeMechBodyArmor.energyLostFromAvoidAttack) {
-								if (PipeMechBodyArmor.avoidDirectAttack(PipeMechBodyArmor.getTotalDamageAvoidPct(player), event.getSource(), event.getAmount(), player)) {
+								if (PipeMechBodyArmor.avoidDirectAttack(event.getAmount(), PipeMechBodyArmor.getTotalDamageAvoidPct(player), event.getSource(), event.getAmount(), player)) {
 									//call internalSpendSuitEnergy directly because this code does not ever run twice - it only runs on server-side whether it's CLIENT or DEDICATED_SERVER
 									playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
 									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + PipeMechBodyArmor.getTotalDamageAvoidPct(player));
@@ -1184,7 +1184,7 @@ public class BioMech
 					if (dai.hasAnyProjectileAvoid) {
 						if (!player.level().isClientSide) {
 							if (playerData.getSuitEnergy() >= PipeMechBodyArmor.energyLostFromAvoidAttack) {
-								if (event.getSource().getDirectEntity() instanceof Projectile && PipeMechBodyArmor.avoidDirectAttack(InterceptorArmsArmor.getProjectileAvoidPct(player), event.getSource(), event.getAmount(), player)) {
+								if (event.getSource().getDirectEntity() instanceof Projectile && PipeMechBodyArmor.avoidDirectAttack(event.getAmount(), InterceptorArmsArmor.getProjectileAvoidPct(player), event.getSource(), event.getAmount(), player)) {
 									//call internalSpendSuitEnergy directly because this code does not ever run twice - it only runs on server-side whether it's CLIENT or DEDICATED_SERVER
 									playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
 									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + InterceptorArmsArmor.getProjectileAvoidPct(player));

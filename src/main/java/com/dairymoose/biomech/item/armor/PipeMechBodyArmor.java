@@ -32,13 +32,18 @@ public class PipeMechBodyArmor extends ArmorBase {
 
 	public static float energyLostFromAvoidAttack = 5.0f;
 	
-	public static boolean damageSourceIsDirect(DamageSource damageSource, Player player) {
-		return damageSource.type().effects() == DamageEffects.HURT && damageSource.type() != player.damageSources().magic().type() && damageSource.type() != player.damageSources().fall().type();
+	public static boolean damageSourceIsDirect(float damage, DamageSource damageSource, Player player) {
+		return damageSource.type().effects() == DamageEffects.HURT && 
+					(
+						(damageSource.type() == player.damageSources().magic().type() && damage > 1.0f) || 
+						damageSource.type() != player.damageSources().magic().type()
+					) && 
+				damageSource.type() != player.damageSources().fall().type();
 	}
 	
-	public static boolean avoidDirectAttack(float avoidPct, DamageSource damageSource, float amount, Player player) {
+	public static boolean avoidDirectAttack(float damage, float avoidPct, DamageSource damageSource, float amount, Player player) {
 		//avoid dodging burn ticks + poison ticks
-		if (PipeMechBodyArmor.damageSourceIsDirect(damageSource, player)) {
+		if (PipeMechBodyArmor.damageSourceIsDirect(damage, damageSource, player)) {
 			double rnd = Math.random();
 			if (rnd < avoidPct) {
 				return true;
