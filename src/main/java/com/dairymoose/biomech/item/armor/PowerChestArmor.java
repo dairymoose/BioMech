@@ -37,7 +37,7 @@ public class PowerChestArmor extends ArmorBase {
 	public boolean onPlayerDamageTaken(DamageSource damageSource, float amount, ItemStack itemStack, Player player, MechPart handPart) {
 		boolean cancel = false;
 
-		if (PipeMechBodyArmor.damageSourceIsDirect(damageSource, player) && amount > 0.0f && !player.level().isClientSide) {
+		if (PipeMechBodyArmor.damageSourceIsDirect(amount, damageSource, player) && amount > 0.0f && !player.level().isClientSide) {
 			int lastProc = -1;
 			CompoundTag tag = itemStack.getOrCreateTag();
 			if (tag.contains("LastProc")) {
