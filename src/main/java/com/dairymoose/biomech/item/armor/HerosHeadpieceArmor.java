@@ -22,7 +22,7 @@ public class HerosHeadpieceArmor extends HerosArmorBase {
 	}
 	
 	public static float getTotalNearbyDamageBoostPct(Player player) {
-		float avoidPct = 0.0f;
+		float boostPct = 0.0f;
 		
 		BioMechPlayerData playerData = null;
     	playerData = BioMech.globalPlayerData.get(player.getUUID());
@@ -31,13 +31,13 @@ public class HerosHeadpieceArmor extends HerosArmorBase {
 			for (SlottedItem slotted : slottedItems) {
 				if (!slotted.itemStack.isEmpty()) {
 					if (slotted.itemStack.getItem() instanceof ArmorBase base) {
-						avoidPct += base.getNearbyEnemyDamageBoost();
+						boostPct += base.getNearbyEnemyDamageBoost();
 					}
 				}
 			}
     	}
     	
-    	return avoidPct;
+    	return boostPct;
 	}
 	
 	public static float getTotalExplosionDamageReduction(Player player) {
