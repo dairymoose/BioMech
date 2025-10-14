@@ -3,6 +3,7 @@ package com.dairymoose.biomech.mixins;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
@@ -40,22 +41,27 @@ public abstract class EntityMoveMixin {
 
 	@Redirect(method="move", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/level/block/Block;stepOn(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/entity/Entity;)V",
-            ordinal = -1
+            target = "Lnet/minecraft/world/entity/Entity;onGround()Z",
+            ordinal = 1
             ))
-	public void handleStepOn(Block block, Level level, BlockPos pos, BlockState blockState, Entity entity) {
+	public boolean handleOnGround(Entity entity) {
 		if (entity instanceof Player player) {
 			BioMechPlayerData playerData = BioMech.globalPlayerData.get(entity.getUUID());
 			if (playerData != null) {
+				BlockPos blockpos = entity.getOnPosLegacy();
+		        BlockState blockstate = entity.level().getBlockState(blockpos);
+		        Block block = blockstate.getBlock();
+				
 				boolean hasRepulsor = playerData.getForSlot(MechPart.Leggings).itemStack.getItem() instanceof RepulsorLiftArmor;
 				boolean isLavastrideVsMagma = playerData.getForSlot(MechPart.Leggings).itemStack.getItem() instanceof LavastrideLeggingsArmor && block instanceof MagmaBlock;
 				if (hasRepulsor || isLavastrideVsMagma) {
-					return;
+					return false;
 				}
 			}
 		}
 		
-		block.stepOn(level, pos, blockState, entity);
+		return entity.onGround();
+		//block.stepOn(level, pos, blockState, entity);
 	}
 	
 }
