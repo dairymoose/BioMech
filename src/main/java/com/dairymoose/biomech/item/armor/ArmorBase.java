@@ -57,6 +57,10 @@ public class ArmorBase extends ArmorItem {
 	protected float explosionDamageReduction = 0.0f;
 	protected float absorbedDamageEnergyMult = 20.0f;
 	protected float flatDamageBoost = 0.0f;
+	protected float bonusBlockReach = 0.0f;
+	protected float bonusEntityReach = 0.0f;
+	
+	protected boolean hasAttributeModifier = false;
 	
 	public boolean configDisabled = false;
 	
@@ -64,6 +68,7 @@ public class ArmorBase extends ArmorItem {
 		super(NOTHING_MATERIAL, type, props);
 	}
 	
+	//itemStack is the first person arm itemStack, need to call BioMech.getThirdPersonArmItemStack for 3rd person
 	public void onHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick, boolean bothHandsInactive, boolean bothHandsActive) {
 		
 	}
@@ -78,6 +83,7 @@ public class ArmorBase extends ArmorItem {
 		this.biomechInventoryTick(empty, itemStack, level, entity, slotId, isSelected);
 	}
 	
+	//itemStack is the third person itemStack (i.e., the real itemStack)
 	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		;
 	}
@@ -88,6 +94,18 @@ public class ArmorBase extends ArmorItem {
 	
 	public void setDisabled(boolean disabled) {
 		this.configDisabled = disabled;
+	}
+	
+	public boolean getHasAttributeModifier() {
+		return this.hasAttributeModifier;
+	}
+	
+	public float getBonusBlockReach() {
+		return this.bonusBlockReach;
+	}
+	
+	public float getBonusEntityReach() {
+		return this.bonusEntityReach;
 	}
 	
 	public float getFlatDamageBoost() {
@@ -235,6 +253,8 @@ public class ArmorBase extends ArmorItem {
 			replaced = replaced.replaceAll("\\{hp_boost\\}", nf.format(this.getHpBoostAmount()));
 			replaced = replaced.replaceAll("\\{xp_boost\\}", nf.format(100.0f*this.getXpBoostAmount()));
 			replaced = replaced.replaceAll("\\{flat_damage_boost\\}", nf.format(this.getFlatDamageBoost()));
+			replaced = replaced.replaceAll("\\{bonus_block_reach\\}", nf.format(this.getBonusBlockReach()));
+			replaced = replaced.replaceAll("\\{bonus_entity_reach\\}", nf.format(this.getBonusEntityReach()));
 		}
 		
 		return replaced;

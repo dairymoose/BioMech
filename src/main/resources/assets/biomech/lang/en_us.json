@@ -33,6 +33,10 @@
 	"item.biomech.hovertech_leggings.tooltip2": "Also grants the wearer slowfall during falls.",
 	"item.biomech.hovertech_leggings.tooltip3": "Press {alt} to toggle on/off.  Crouch to temporarily disable.",
 
+	"item.biomech.extendo_arm": "§5Extendo-Arm§0",
+	"item.biomech.extendo_arm.tooltip1": "§9+{bonus_block_reach} Block Reach§0",
+	"item.biomech.extendo_arm.tooltip2": "§9+{bonus_entity_reach} Entity Reach§0",
+	
 	"item.biomech.drill_arm": "§5Drill Arm§0",
 	"item.biomech.drill_arm.tooltip1": "Hold '{alt}+{lmb}' to activate.",
 	"item.biomech.drill_arm.tooltip2": "Hold to mine any pickaxe-mineable block.",

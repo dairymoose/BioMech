@@ -1,0 +1,96 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.extendo_arm.passive": {
+			"loop": "hold_on_last_frame",
+			"bones": {
+				"hand": {
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"extender": {
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				}
+			}
+		},
+		"animation.extendo_arm.walking": {
+			"loop": true,
+			"bones": {
+				"hand": {
+					"position": {
+						"vector": [0, "1.60*-3.8*Math.sin(query.anim_time*900)", 0]
+					}
+				},
+				"extender": {
+					"scale": {
+						"vector": [1, "1+0.60*Math.sin(query.anim_time*900)", 1]
+					}
+				}
+			}
+		},
+		"animation.extendo_arm.passive2": {
+			"loop": "hold_on_last_frame",
+			"bones": {
+				"hand": {
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"extender": {
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				}
+			}
+		},
+		"animation.extendo_arm.walking2": {
+			"loop": true,
+			"bones": {
+				"hand": {
+					"position": {
+						"vector": [0, "1.30*-2.0*Math.sin(query.anim_time*900)", 0]
+					}
+				},
+				"extender": {
+					"scale": {
+						"vector": [1, "1+0.30*Math.sin(query.anim_time*900)", 1]
+					}
+				}
+			}
+		},
+		"animation.extendo_arm.passive3": {
+			"loop": "hold_on_last_frame",
+			"bones": {
+				"hand": {
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"extender": {
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				}
+			}
+		},
+		"animation.extendo_arm.walking3": {
+			"loop": true,
+			"bones": {
+				"hand": {
+					"position": {
+						"vector": [0, "1.30*-2.0*Math.sin(query.anim_time*900)", 0]
+					}
+				},
+				"extender": {
+					"scale": {
+						"vector": [1, "1+0.30*Math.sin(query.anim_time*900)", 1]
+					}
+				}
+			}
+		}
+	},
+	"azurelib_format_version": 2
+}

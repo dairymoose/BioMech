@@ -9,6 +9,7 @@ import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.PermanentModifiers;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
+import com.dairymoose.biomech.item.armor.arm.ArmUtil.BoostInstance;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -29,6 +30,7 @@ public abstract class LoadLifterArmArmor extends ArmorBase {
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
 		this.hpBoostAmount = 1.0f;
+		this.hasAttributeModifier = true;
 	}
 
 	@Override
@@ -42,23 +44,7 @@ public abstract class LoadLifterArmArmor extends ArmorBase {
 		
 		Level level = player.level();
 		if (!level.isClientSide) {
-			UUID booster = null;
-			String boostText = null;
-			
-			if (handPart == MechPart.RightArm) {
-				booster = PermanentModifiers.rightArmBoost;
-				boostText = "hboost_right_arm"; 
-			} else {
-				booster = PermanentModifiers.leftArmBoost;
-				boostText = "boost_left_arm";
-			}
-			
-			if (booster != null && boostText != null) {
-				AttributeInstance inst = player.getAttribute(Attributes.MAX_HEALTH);
-				AttributeModifier thisBoost = inst.getModifier(booster);
-				if (thisBoost == null)
-					inst.addPermanentModifier(new AttributeModifier(booster, boostText, this.hpBoostAmount, Operation.ADDITION));
-			}
+			ArmUtil.attributeBoostPerArm(BoostInstance.INST_1, player, handPart, Attributes.MAX_HEALTH, this.hpBoostAmount, Operation.ADDITION);
 		}
 	}
 	

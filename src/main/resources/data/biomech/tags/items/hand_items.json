@@ -11,6 +11,7 @@
 	 "biomech:drill_arm",
 	 "biomech:pipe_mech_arm",
 	 "biomech:power_arm",
-	 "biomech:mining_laser_arm"
+	 "biomech:mining_laser_arm",
+	 "biomech:extendo_arm"
   ]
 }

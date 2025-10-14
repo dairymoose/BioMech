@@ -2,7 +2,9 @@ package com.dairymoose.biomech.mixins;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
@@ -30,13 +32,24 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 		super(p_170677_);
 	}
 
-	@Redirect(method="setupAnim", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/model/HumanoidModel;setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V",
-            ordinal = -1
-            ))
-	public void handleSetupAnim(HumanoidModel humanoidModel, LivingEntity living, float a, float b, float c, float d, float e) {
-		super.setupAnim(living, a, b, c, d, e);
+	private void copyToSleeves() {
+		PlayerModel model = (PlayerModel)(Object)this;
+		model.leftPants.copyFrom(this.leftLeg);
+		model.rightPants.copyFrom(this.rightLeg);
+		model.leftSleeve.copyFrom(this.leftArm);
+		model.rightSleeve.copyFrom(this.rightArm);
+		model.jacket.copyFrom(this.body);
+	}
+	
+//	@Redirect(method="setupAnim", at = @At(
+//            value = "INVOKE",
+//            target = "Lnet/minecraft/client/model/HumanoidModel;setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V",
+//            ordinal = -1
+//            ))
+	@Inject(method = "setupAnim", at = @At(value = "TAIL"), cancellable = false)
+	//public void handleSetupAnim(HumanoidModel humanoidModel, LivingEntity living, float a, float b, float c, float d, float e) {
+	public void handleSetupAnim(LivingEntity living, float a, float b, float c, float d, float e, CallbackInfo info) {
+		//super.setupAnim(living, a, b, c, d, e);
 		BioMechPlayerData playerData = BioMech.globalPlayerData.get(living.getUUID());
 		if (playerData != null) {
 			SlottedItem chestSlot = playerData.getForSlot(MechPart.Chest);
@@ -145,6 +158,8 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 				this.rightArm.xRot = 0.0f;
 			}
 		}
+		
+		this.copyToSleeves();
 	}
 	
 }

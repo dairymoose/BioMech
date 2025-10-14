@@ -42,6 +42,8 @@ import com.dairymoose.biomech.armor.renderer.arm.DiggerLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.DiggerRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.DrillLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.DrillRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.arm.ExtendoLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.arm.ExtendoRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.GatlingLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.GatlingRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.HerosLeftArmRenderer;
@@ -63,6 +65,7 @@ import com.dairymoose.biomech.item.renderer.BuzzsawItemRenderer;
 import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.DiggerArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.DrillItemRenderer;
+import com.dairymoose.biomech.item.renderer.ExtendoArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.GatlingItemRenderer;
 import com.dairymoose.biomech.item.renderer.HerosArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
@@ -112,6 +115,8 @@ public class BioMechClientSetup {
     	AzArmorRendererRegistry.register(GasMaskRenderer::new, BioMechRegistry.ITEM_GAS_MASK.get());
     	AzArmorRendererRegistry.register(RepulsorLiftRenderer::new, BioMechRegistry.ITEM_REPULSOR_LIFT.get());
     	AzArmorRendererRegistry.register(ColossusChestplateRenderer::new, BioMechRegistry.ITEM_COLOSSUS_CHESTPLATE.get());
+    	AzArmorRendererRegistry.register(ExtendoRightArmRenderer::new, BioMechRegistry.ITEM_EXTENDO_ARM.get());
+    	AzArmorRendererRegistry.register(ExtendoLeftArmRenderer::new, BioMechRegistry.ITEM_EXTENDO_LEFT_ARM.get());
     	
     	//LOAD LIFTER
     	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());
@@ -165,6 +170,7 @@ public class BioMechClientSetup {
     	AzItemRendererRegistry.register(DiggerArmItemRenderer::new, BioMechRegistry.ITEM_DIGGER_ARM.get());
     	AzItemRendererRegistry.register(HerosArmItemRenderer::new, BioMechRegistry.ITEM_HEROS_ARM.get());
     	AzItemRendererRegistry.register(LoadLifterArmItemRenderer::new, BioMechRegistry.ITEM_LOAD_LIFTER_ARM.get());
+    	AzItemRendererRegistry.register(ExtendoArmItemRenderer::new, BioMechRegistry.ITEM_EXTENDO_ARM.get());
     	//------ Arm items - render item display / right arm only ------
     	
     	//------ All Animated ------
@@ -177,6 +183,7 @@ public class BioMechClientSetup {
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_DIGGER_ARM.get(), BioMechRegistry.ITEM_DIGGER_LEFT_ARM.get());
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_TELEPORTATION_CRYSTAL.get());
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_REPULSOR_LIFT.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_EXTENDO_ARM.get(), BioMechRegistry.ITEM_EXTENDO_LEFT_ARM.get());
     	//------ All Animated ------
     	
     	

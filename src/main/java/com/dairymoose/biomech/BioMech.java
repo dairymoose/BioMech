@@ -123,6 +123,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -158,6 +159,7 @@ import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -635,7 +637,7 @@ public class BioMech
     	}
     	
     	if (event.phase == TickEvent.Phase.START) {
-    		if (!event.player.isDeadOrDying()) {
+    		if (!event.player.isDeadOrDying() && !event.player.isSpectator()) {
     			BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
         		if (playerData != null) {
         			if (FMLEnvironment.dist == Dist.CLIENT) {
@@ -811,31 +813,49 @@ public class BioMech
 	private void removePermanentModifiers(final Player player, BioMechPlayerData playerData) {
 		List<SlottedItem> slottedItems = playerData.getAllSlots();
 		for (SlottedItem slotted : slottedItems) {
-			AttributeInstance inst = player.getAttribute(Attributes.MAX_HEALTH);
-			if (inst != null) {
-				boolean keep = false;
-				if (slotted.itemStack.getItem() instanceof ArmorBase base) {
-					if (base.getHpBoostAmount() > 0.0f) {
-						keep = true;
-					}
-				}
-				
-				if (!keep) {
-					AttributeModifier existing = null;
-					if (slotted.mechPart == MechPart.Chest) {
-						existing = inst.getModifier(PermanentModifiers.chestBoost);
-					} else if (slotted.mechPart == MechPart.RightArm) {
-						existing = inst.getModifier(PermanentModifiers.rightArmBoost);
-					} else if (slotted.mechPart == MechPart.LeftArm) {
-						existing = inst.getModifier(PermanentModifiers.leftArmBoost);
+			List<Attribute> supportedAttributes = new ArrayList<>();
+			supportedAttributes.add(Attributes.MAX_HEALTH);
+			supportedAttributes.add(ForgeMod.BLOCK_REACH.get());
+			supportedAttributes.add(ForgeMod.ENTITY_REACH.get());
+			for (Attribute attrib : supportedAttributes) {
+				AttributeInstance inst = player.getAttribute(attrib);
+				if (inst != null) {
+					boolean keep = false;
+					if (slotted.itemStack.getItem() instanceof ArmorBase base) {
+						if (base.getHasAttributeModifier()) {
+							keep = true;
+						}
 					}
 					
-					if (existing != null) {
-						BioMech.LOGGER.debug("remove modifier: " + existing);
-						inst.removeModifier(existing);
-						if (player.getHealth() > player.getMaxHealth()) {
-							BioMech.LOGGER.debug("reset hp from: " + player.getHealth() + " to " + player.getMaxHealth());
-							player.setHealth(player.getMaxHealth());
+					if (!keep) {
+						List<AttributeModifier> toRemove = new ArrayList<>();
+						if (slotted.mechPart == MechPart.Chest) {
+							toRemove.add(inst.getModifier(PermanentModifiers.chestBoost));
+						} else if (slotted.mechPart == MechPart.RightArm) {
+							toRemove.add(inst.getModifier(PermanentModifiers.rightArmBoost));
+							toRemove.add(inst.getModifier(PermanentModifiers.rightArmBoost2));
+						} else if (slotted.mechPart == MechPart.LeftArm) {
+							toRemove.add(inst.getModifier(PermanentModifiers.leftArmBoost));
+							toRemove.add(inst.getModifier(PermanentModifiers.leftArmBoost2));
+						}
+						
+						if (!toRemove.isEmpty()) {
+							boolean removedAnyModifiers = false;
+							for (AttributeModifier mod : toRemove) {
+								if (mod != null) {
+									removedAnyModifiers = true;
+									
+									BioMech.LOGGER.debug("remove modifier: " + mod);
+									inst.removeModifier(mod);
+								}
+							}
+							
+							if (removedAnyModifiers && attrib == Attributes.MAX_HEALTH) {
+								if (player.getHealth() > player.getMaxHealth()) {
+									BioMech.LOGGER.debug("reset hp from: " + player.getHealth() + " to " + player.getMaxHealth());
+									player.setHealth(player.getMaxHealth());
+								}
+							}
 						}
 					}
 				}
@@ -950,6 +970,7 @@ public class BioMech
 	}
 
     //AzureLib bug: dispatcher doesn't work client side because it uses AzAnimatorAccessor instead of AzIdentifiableItemStackAnimatorCache
+	//Cannot invoke "Object.getClass()" because "animatable" is null: The animation file has a problem with it
     public static void clientSideItemAnimation(ItemStack itemStack, AzCommand command) {
     	if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
     		BioMech.LOGGER.debug("skip animation on server side: " + itemStack);
