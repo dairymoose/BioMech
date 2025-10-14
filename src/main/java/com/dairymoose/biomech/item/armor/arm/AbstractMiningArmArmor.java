@@ -156,7 +156,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 
 				boolean didHit = false;
 				if (player.level().isClientSide) {
-					if (useTicks < startUsingTickCount) {
+					if (useTicks <= startUsingTickCount) {
 						if (useTicks == 1) {
 							this.startUsingSound(player);
 						}
@@ -328,7 +328,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 				}
 
 				if (!player.level().isClientSide) {
-					if (active && useTicks >= startUsingTickCount) {
+					if (active && useTicks > startUsingTickCount) {
 						
 						float miningPower = this.getMiningPower(useTicks);
 						
@@ -389,7 +389,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 					}
 				}
 				
-				if (useTicks >= startUsingTickCount) {
+				if (useTicks > startUsingTickCount) {
 					if (didHit) {
 						if (energyPerTick > 0.0f)
 							playerData.spendSuitEnergy(player, energyPerTick);
