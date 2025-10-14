@@ -18,6 +18,7 @@ import com.dairymoose.biomech.item.armor.HerosChestplateArmor;
 import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
 import com.dairymoose.biomech.item.armor.HerosLeggingsArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
+import com.dairymoose.biomech.item.armor.IlluminatorArmor;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.IronMechHeadArmor;
@@ -132,6 +133,8 @@ public class BioMechRegistry {
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_ACTIVATOR = BioMech.ITEMS.register("biomech_activator", () -> new BioMechActivator(new Item.Properties()));
 	public static RegistryObject<Item> ITEM_BIOMECH_DEACTIVATOR = BioMech.ITEMS.register("biomech_deactivator", () -> new BioMechDeactivator(new Item.Properties()));
+	
+	public static RegistryObject<Item> ITEM_ILLUMINATOR = BioMech.ITEMS.register("illuminator", () -> new IlluminatorArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_EXTENDO_ARM = BioMech.ITEMS.register("extendo_arm", () -> new ExtendoRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	

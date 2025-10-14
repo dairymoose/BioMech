@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " i ",
+    "#z#",
+    "   "
+  ],
+  "key": {
+    "#": {
+      "item": "biomech:biomech_scrap_block"
+    },
+	"i": {
+      "tag": "forge:ingots/iron"
+    },
+	"z": {
+	  "item": "minecraft:glowstone"
+	}
+  },
+  "result": {
+    "item": "biomech:illuminator",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableIlluminatorCrafting"
+    }
+  ]
+} 

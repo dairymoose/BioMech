@@ -14,6 +14,7 @@ import com.dairymoose.biomech.armor.renderer.HerosChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.HerosHeadpieceRenderer;
 import com.dairymoose.biomech.armor.renderer.HerosLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.HovertechLeggingsRenderer;
+import com.dairymoose.biomech.armor.renderer.IlluminatorRenderer;
 import com.dairymoose.biomech.armor.renderer.InterceptorArmsRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.IronMechHeadRenderer;
@@ -117,6 +118,7 @@ public class BioMechClientSetup {
     	AzArmorRendererRegistry.register(ColossusChestplateRenderer::new, BioMechRegistry.ITEM_COLOSSUS_CHESTPLATE.get());
     	AzArmorRendererRegistry.register(ExtendoRightArmRenderer::new, BioMechRegistry.ITEM_EXTENDO_ARM.get());
     	AzArmorRendererRegistry.register(ExtendoLeftArmRenderer::new, BioMechRegistry.ITEM_EXTENDO_LEFT_ARM.get());
+    	AzArmorRendererRegistry.register(IlluminatorRenderer::new, BioMechRegistry.ITEM_ILLUMINATOR.get());
     	
     	//LOAD LIFTER
     	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());

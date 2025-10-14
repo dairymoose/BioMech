@@ -226,10 +226,7 @@ import net.minecraftforge.registries.RegistryObject;
  * 
  */
 //TODO: 
-//	Add missing crafting recipes
-//	Chest: Behemoth (full set?) hulkbuster theme
 //	Head: Creeper, Enderman
-//	Arm: Extendo-Arm (block reach +2, entity reach +0.5)
 //	Arm: Grapple/zipline arm
 //	Head: light helmet?
 //	Back: shield projector?
@@ -241,7 +238,6 @@ import net.minecraftforge.registries.RegistryObject;
 //	Arm: Claw arms
 //	Robocop outfit?
 //	Terminator outfit?
-//	Wall-E outfit?
 //	I robot Outfit?
 //	Back: stimpack that injects buff for energy cost
 //	Back: healing fluid that heals when holding hotkey, taking energy - cannot move while healing

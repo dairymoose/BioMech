@@ -36,6 +36,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableHerosHeadpieceCrafting;
 	public final ForgeConfigSpec.BooleanValue enableHerosLeggingsCrafting;
 	public final ForgeConfigSpec.BooleanValue enableHovertechLeggingsCrafting;
+	public final ForgeConfigSpec.BooleanValue enableIlluminatorCrafting;
 	public final ForgeConfigSpec.BooleanValue enableInterceptorArmsCrafting;
 	public final ForgeConfigSpec.BooleanValue enableJetpackCrafting;
 	public final ForgeConfigSpec.BooleanValue enableLavastrideLeggingsCrafting;
@@ -75,6 +76,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableHerosHeadpieceLooting;
 	public final ForgeConfigSpec.BooleanValue enableHerosLeggingsLooting;
 	public final ForgeConfigSpec.BooleanValue enableHovertechLeggingsLooting;
+	public final ForgeConfigSpec.BooleanValue enableIlluminatorLooting;
 	public final ForgeConfigSpec.BooleanValue enableInterceptorArmsLooting;
 	public final ForgeConfigSpec.BooleanValue enableJetpackLooting;
 	public final ForgeConfigSpec.BooleanValue enableLavastrideLeggingsLooting;
@@ -136,6 +138,7 @@ public class BioMechCommonConfig {
 		this.enableHerosHeadpieceCrafting = builder.comment("enableHerosHeadpieceCrafting").translation("config.biomech.enableHerosHeadpieceCrafting").define("enableHerosHeadpieceCrafting", true);
 		this.enableHerosLeggingsCrafting = builder.comment("enableHerosLeggingsCrafting").translation("config.biomech.enableHerosLeggingsCrafting").define("enableHerosLeggingsCrafting", true);
 		this.enableHovertechLeggingsCrafting = builder.comment("enableHovertechLeggingsCrafting").translation("config.biomech.enableHovertechLeggingsCrafting").define("enableHovertechLeggingsCrafting", true);
+		this.enableIlluminatorCrafting = builder.comment("enableIlluminatorCrafting").translation("config.biomech.enableIlluminatorCrafting").define("enableIlluminatorCrafting", true);
 		this.enableInterceptorArmsCrafting = builder.comment("enableInterceptorArmsCrafting").translation("config.biomech.enableInterceptorArmsCrafting").define("enableInterceptorArmsCrafting", true);
 		this.enableJetpackCrafting = builder.comment("enableJetpackCrafting").translation("config.biomech.enableJetpackCrafting").define("enableJetpackCrafting", true);
 		this.enableLavastrideLeggingsCrafting = builder.comment("enableLavastrideLeggingsCrafting").translation("config.biomech.enableLavastrideLeggingsCrafting").define("enableLavastrideLeggingsCrafting", true);
@@ -177,6 +180,7 @@ public class BioMechCommonConfig {
 		this.enableHerosHeadpieceLooting = builder.comment("enableHerosHeadpieceLooting").translation("config.biomech.enableHerosHeadpieceLooting").define("enableHerosHeadpieceLooting", true);
 		this.enableHerosLeggingsLooting = builder.comment("enableHerosLeggingsLooting").translation("config.biomech.enableHerosLeggingsLooting").define("enableHerosLeggingsLooting", true);
 		this.enableHovertechLeggingsLooting = builder.comment("enableHovertechLeggingsLooting").translation("config.biomech.enableHovertechLeggingsLooting").define("enableHovertechLeggingsLooting", true);
+		this.enableIlluminatorLooting = builder.comment("enableIlluminatorLooting").translation("config.biomech.enableIlluminatorLooting").define("enableIlluminatorLooting", true);
 		this.enableInterceptorArmsLooting = builder.comment("enableInterceptorArmsLooting").translation("config.biomech.enableInterceptorArmsLooting").define("enableInterceptorArmsLooting", true);
 		this.enableJetpackLooting = builder.comment("enableJetpackLooting").translation("config.biomech.enableJetpackLooting").define("enableJetpackLooting", true);
 		this.enableLavastrideLeggingsLooting = builder.comment("enableLavastrideLeggingsLooting").translation("config.biomech.enableLavastrideLeggingsLooting").define("enableLavastrideLeggingsLooting", true);
