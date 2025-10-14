@@ -3,7 +3,7 @@
   "pattern": [
     " b ",
     "#a#",
-    "   "
+    " s "
   ],
   "key": {
     "#": {
@@ -14,6 +14,9 @@
     },
 	"a": {
 	  "item": "minecraft:chain"
+	},
+	"s": {
+	  "item": "minecraft:stick"
 	}
   },
   "result": {
