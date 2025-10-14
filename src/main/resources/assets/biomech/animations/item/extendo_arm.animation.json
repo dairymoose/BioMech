@@ -21,12 +21,12 @@
 			"bones": {
 				"hand": {
 					"position": {
-						"vector": [0, "1.60*-3.8*Math.sin(query.anim_time*900)", 0]
+						"vector": [0, "1.40*-2.8*Math.sin(query.anim_time*900)", 0]
 					}
 				},
 				"extender": {
 					"scale": {
-						"vector": [1, "1+0.60*Math.sin(query.anim_time*900)", 1]
+						"vector": [1, "1+0.40*Math.sin(query.anim_time*900)", 1]
 					}
 				}
 			}
