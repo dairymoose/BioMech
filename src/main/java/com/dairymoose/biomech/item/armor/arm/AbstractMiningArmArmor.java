@@ -70,7 +70,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 	protected float maxSpeedMult = minSpeedMult * 6.0f;
 	protected double blockReachMult = 1.6;
 	protected ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
-	public static int START_USING_TICK_COUNT = 5;
+	protected int startUsingTickCount = 5;
 	
 	protected float energyPerSec = 4.0f;
 	protected float energyPerTick;
@@ -156,7 +156,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 
 				boolean didHit = false;
 				if (player.level().isClientSide) {
-					if (useTicks <= START_USING_TICK_COUNT) {
+					if (useTicks < startUsingTickCount) {
 						if (useTicks == 1) {
 							this.startUsingSound(player);
 						}
@@ -328,7 +328,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 				}
 
 				if (!player.level().isClientSide) {
-					if (active && useTicks >= START_USING_TICK_COUNT) {
+					if (active && useTicks >= startUsingTickCount) {
 						
 						float miningPower = this.getMiningPower(useTicks);
 						
@@ -389,12 +389,14 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 					}
 				}
 				
-				if (didHit) {
-					if (energyPerTick > 0.0f)
-						playerData.spendSuitEnergy(player, energyPerTick);
-				} else {
-					if (energyPerTickMiss > 0.0f)
-						playerData.spendSuitEnergy(player, energyPerTickMiss);
+				if (useTicks >= startUsingTickCount) {
+					if (didHit) {
+						if (energyPerTick > 0.0f)
+							playerData.spendSuitEnergy(player, energyPerTick);
+					} else {
+						if (energyPerTickMiss > 0.0f)
+							playerData.spendSuitEnergy(player, energyPerTickMiss);
+					}
 				}
 				
 				

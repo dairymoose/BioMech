@@ -637,6 +637,14 @@ public class BioMech
     	if (event.phase == TickEvent.Phase.START) {
     		BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
     		if (playerData != null) {
+    			if (FMLEnvironment.dist == Dist.CLIENT) {
+    				if (event.player.level().isClientSide) {
+    					++playerData.tickCount;
+    				}
+    			} else {
+    				++playerData.tickCount;
+    			}
+    			
     			playerData.tickEnergy(event.player);
     			tickInventoryForPlayer(event.player, playerData);
     			tickHandsForPlayer(event.player, playerData);
@@ -659,7 +667,7 @@ public class BioMech
     			
 				if (event.player.tickCount % RESYNC_ENERGY_TICK_PERIOD == 0) {
 					if (event.player instanceof ServerPlayer sp) {
-						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
 					}
     			}
 				
@@ -1162,7 +1170,7 @@ public class BioMech
 									playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
 									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + PipeMechBodyArmor.getTotalDamageAvoidPct(player));
 									if (event.getEntity() instanceof ServerPlayer sp) {
-										BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+										BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
 									}
 									event.setCanceled(true);
 									return;
@@ -1179,7 +1187,7 @@ public class BioMech
 									playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
 									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + InterceptorArmsArmor.getProjectileAvoidPct(player));
 									if (event.getEntity() instanceof ServerPlayer sp) {
-										BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+										BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
 										BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), new ClientboundProjectileDodgePacket(player));
 									}
 									event.setCanceled(true);

@@ -88,7 +88,7 @@ public class IronMechChestArmor extends ArmorBase {
 				if (consumesEnergy) {
 					playerData.spendSuitEnergy(player, energyDamage);
 					if (player instanceof ServerPlayer sp) {
-						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
 					}
 				}
 
@@ -102,7 +102,7 @@ public class IronMechChestArmor extends ArmorBase {
 					}
 					
 					if (player instanceof ServerPlayer sp) {
-						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
 					}
 				}
 				//BioMech.LOGGER.debug("heal amount = " + damageMitigated + " from raw damage = " + amount + " with energyDamage=" + energyDamage);

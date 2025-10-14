@@ -15,7 +15,7 @@ import net.minecraftforge.network.NetworkEvent;
 public class ClientboundEnergySyncPacket implements Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> {
 	private float suitEnergy;
 	private float suitEnergyMax;
-	private int remainingTicksForEnergyRegen;
+	private long remainingTicksForEnergyRegen;
 
 	public ClientboundEnergySyncPacket() {
 	}
@@ -24,7 +24,7 @@ public class ClientboundEnergySyncPacket implements Packet<net.minecraft.network
 		this.read(buffer);
 	}
 
-	public ClientboundEnergySyncPacket(float suitEnergy, float suitEnergyMax, int ticksUntilEnergyRegenPossible) {
+	public ClientboundEnergySyncPacket(float suitEnergy, float suitEnergyMax, long ticksUntilEnergyRegenPossible) {
 		this.suitEnergy = suitEnergy;
 		this.suitEnergyMax = suitEnergyMax;
 		this.remainingTicksForEnergyRegen = ticksUntilEnergyRegenPossible;
@@ -33,13 +33,13 @@ public class ClientboundEnergySyncPacket implements Packet<net.minecraft.network
 	public void read(FriendlyByteBuf byteBuf) {
 		this.suitEnergy = byteBuf.readFloat();
 		this.suitEnergyMax = byteBuf.readFloat();
-		this.remainingTicksForEnergyRegen = byteBuf.readInt();
+		this.remainingTicksForEnergyRegen = byteBuf.readLong();
 	}
 
 	public void write(FriendlyByteBuf byteBuf) {
 		byteBuf.writeFloat(suitEnergy);
 		byteBuf.writeFloat(suitEnergyMax);
-		byteBuf.writeInt(remainingTicksForEnergyRegen);
+		byteBuf.writeLong(remainingTicksForEnergyRegen);
 	}
 
 	public void handle(Supplier<NetworkEvent.Context> ctx) {
@@ -62,8 +62,7 @@ public class ClientboundEnergySyncPacket implements Packet<net.minecraft.network
 						playerData.suitEnergyMax = suitEnergyMax;
 						playerData.setSuitEnergy(suitEnergy);
 						if (remainingTicksForEnergyRegen > 0) {
-							playerData.lastUsedEnergyTick = Minecraft.getInstance().player.tickCount - (BioMechPlayerData.ticksRequiredToRegenEnergy - remainingTicksForEnergyRegen);
-							BioMech.LOGGER.info("set last used tick to " + playerData.lastUsedEnergyTick + " with tickCount=" + Minecraft.getInstance().player.tickCount + ", with server remainingTicksForEnergyRegen=" + remainingTicksForEnergyRegen);
+							playerData.lastUsedEnergyTick = playerData.tickCount - (BioMechPlayerData.ticksRequiredToRegenEnergy - remainingTicksForEnergyRegen);
 						}
 					}
 				}

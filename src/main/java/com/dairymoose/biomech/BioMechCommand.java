@@ -36,7 +36,7 @@ public class BioMechCommand {
             if (playerData != null) {
             	playerData.setSuitEnergy(energyValue);
             	if (context.getSource().getEntity() instanceof ServerPlayer sp) {
-            		BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen(sp)));
+            		BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
             	}
             } else {
                 context.getSource().sendSuccess(() -> Component.literal("Could not set energy for player"), true);

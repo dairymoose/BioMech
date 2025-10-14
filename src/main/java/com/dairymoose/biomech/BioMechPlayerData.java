@@ -20,6 +20,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class BioMechPlayerData {
 	public static final int SLOT_COUNT = 6;
+	public long tickCount = 0;
 	
 	public SlottedItem head = new SlottedItem(MechPart.Head);
 	public SlottedItem chest = new SlottedItem(MechPart.Chest);
@@ -41,7 +42,7 @@ public class BioMechPlayerData {
 	public float suitEnergyPerSec = suitEnergyPerSecBaseline;
 	public float suitEnergyPerSecTemporaryModifier = 0.0f;
 	
-	public int lastUsedEnergyTick = -1000;
+	public long lastUsedEnergyTick = -1000;
 	public static final int ticksRequiredToRegenEnergy = 40;
 	
 	public static String SUIT_ENERGY = "SuitEnergy";
@@ -81,36 +82,16 @@ public class BioMechPlayerData {
 		}
 	}
 	
-	@SuppressWarnings("deprecation")
-	public int getTicksSinceLastEnergyUsage(Player player) {
-		class TickCountHolder {
-			int tickCount;
-		}
-		TickCountHolder tch = new TickCountHolder();
-		tch.tickCount = player.tickCount;
-		DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
-			@Override
-			public void run() {
-				//player.tickCount is different on server side and client side in single-player
-				//if we're on a CLIENT we'll always use the client tickCount (to make single-player work correctly)
-				if (player.isLocalPlayer()) {
-					tch.tickCount = Minecraft.getInstance().player.tickCount;
-				}
-			}});
-		
-		if (tch.tickCount == 1) {
-			//tickCount will be reset to 1 if the player respawns
-			lastUsedEnergyTick = 1;
-		}
-		return tch.tickCount - lastUsedEnergyTick;
+	public long getTicksSinceLastEnergyUsage() {
+		return this.tickCount - lastUsedEnergyTick;
 	}
 	
-	public int remainingTicksForEnergyRegen(Player player) {
-		return Math.max(0, ticksRequiredToRegenEnergy - this.getTicksSinceLastEnergyUsage(player));
+	public long remainingTicksForEnergyRegen() {
+		return Math.max(0, ticksRequiredToRegenEnergy - this.getTicksSinceLastEnergyUsage());
 	}
 	
-	public boolean canRegenEnergy(Player player) {
-		int remainingTicks = this.remainingTicksForEnergyRegen(player);
+	public boolean canRegenEnergy() {
+		long remainingTicks = this.remainingTicksForEnergyRegen();
 		if (remainingTicks == 0) {
 			return true;
 		}
@@ -135,8 +116,8 @@ public class BioMechPlayerData {
 		
 	}
 	
-	private void internalTickEnergy(Player player) {
-		if (this.canRegenEnergy(player)) {
+	private void internalTickEnergy() {
+		if (this.canRegenEnergy()) {
 			this.suitEnergy += suitEnergyPerSec/20.0f + suitEnergyPerSecTemporaryModifier/20.0f;
 			if (this.suitEnergy > suitEnergyMax) {
 				this.suitEnergy = suitEnergyMax;
@@ -149,10 +130,11 @@ public class BioMechPlayerData {
 	
 	public void tickEnergy(Player player) {
 		if (FMLEnvironment.dist == Dist.CLIENT) {
-			if (player.level().isClientSide)
-				this.internalTickEnergy(player);
+			if (player.level().isClientSide) {
+				this.internalTickEnergy();
+			}
 		} else {
-			this.internalTickEnergy(player);
+			this.internalTickEnergy();
 		}
 	}
 	
