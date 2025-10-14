@@ -635,60 +635,62 @@ public class BioMech
     	}
     	
     	if (event.phase == TickEvent.Phase.START) {
-    		BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
-    		if (playerData != null) {
-    			if (FMLEnvironment.dist == Dist.CLIENT) {
-    				if (event.player.level().isClientSide) {
-    					++playerData.tickCount;
+    		if (!event.player.isDeadOrDying()) {
+    			BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
+        		if (playerData != null) {
+        			if (FMLEnvironment.dist == Dist.CLIENT) {
+        				if (event.player.level().isClientSide) {
+        					++playerData.tickCount;
+        				}
+        			} else {
+        				++playerData.tickCount;
+        			}
+        			
+        			playerData.tickEnergy(event.player);
+        			tickInventoryForPlayer(event.player, playerData);
+        			tickHandsForPlayer(event.player, playerData);
+        			removePermanentModifiers(event.player, playerData);
+        			
+        			HandActiveStatus has = BioMech.handActiveMap.get(event.player.getUUID());
+        			checkForMidairJump(event.player, has);
+        			
+        			if (event.player.level().isClientSide && event.player.isLocalPlayer()) {
+        				float suitEnergy = playerData.getSuitEnergy();
+        				float oneTickEnergyDiff = suitEnergy - suitEnergyLast; 
+    					suitEnergyDiffSum += oneTickEnergyDiff;
+    					suitEnergyLast = suitEnergy;
+    					
+    					if (playerData.tickCount % TICKS_TO_UPDATE_ENERGY_DIFF == 0) {
+    						BioMech.calcEnergyDiffOnePeriod = suitEnergyDiffSum / ((float)TICKS_TO_UPDATE_ENERGY_DIFF/TICKS_PER_SECOND);
+    						suitEnergyDiffSum = 0.0f;
+    					}
+        			}
+        			
+    				if (playerData.tickCount % RESYNC_ENERGY_TICK_PERIOD == 0) {
+    					if (event.player instanceof ServerPlayer sp) {
+    						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
+    					}
+        			}
+    				
+    				if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ElytraMechChestplateArmor armor) {
+    					if (event.player.level().isClientSide) {
+    						elytraItemStackC.setDamageValue(0);
+    						tempChestItemC = event.player.getItemBySlot(EquipmentSlot.CHEST);
+    						event.player.setItemSlot(EquipmentSlot.CHEST, elytraItemStackC);
+    					}
     				}
-    			} else {
-    				++playerData.tickCount;
-    			}
-    			
-    			playerData.tickEnergy(event.player);
-    			tickInventoryForPlayer(event.player, playerData);
-    			tickHandsForPlayer(event.player, playerData);
-    			removePermanentModifiers(event.player, playerData);
-    			
-    			HandActiveStatus has = BioMech.handActiveMap.get(event.player.getUUID());
-    			checkForMidairJump(event.player, has);
-    			
-    			if (event.player.level().isClientSide && event.player.isLocalPlayer()) {
-    				float suitEnergy = playerData.getSuitEnergy();
-    				float oneTickEnergyDiff = suitEnergy - suitEnergyLast; 
-					suitEnergyDiffSum += oneTickEnergyDiff;
-					suitEnergyLast = suitEnergy;
-					
-					if (Minecraft.getInstance().player.tickCount % TICKS_TO_UPDATE_ENERGY_DIFF == 0) {
-						BioMech.calcEnergyDiffOnePeriod = suitEnergyDiffSum / ((float)TICKS_TO_UPDATE_ENERGY_DIFF/TICKS_PER_SECOND);
-						suitEnergyDiffSum = 0.0f;
-					}
-    			}
-    			
-				if (event.player.tickCount % RESYNC_ENERGY_TICK_PERIOD == 0) {
-					if (event.player instanceof ServerPlayer sp) {
-						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
-					}
-    			}
-				
-				if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ElytraMechChestplateArmor armor) {
-					if (event.player.level().isClientSide) {
-						elytraItemStackC.setDamageValue(0);
-						tempChestItemC = event.player.getItemBySlot(EquipmentSlot.CHEST);
-						event.player.setItemSlot(EquipmentSlot.CHEST, elytraItemStackC);
-					}
-				}
-				
-				if (!(playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof OpticsUnitArmor armor)) {
-					if (event.player.level().isClientSide) {
-						if (!outlinedSpawners.isEmpty()) {
-							synchronized(outlinedSpawners) {
-								outlinedSpawners.clear();
-								OpticsUnitArmor.capturedSpawners.clear();
-							}
-						}
-					}
-				}
+    				
+    				if (!(playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof OpticsUnitArmor armor)) {
+    					if (event.player.level().isClientSide) {
+    						if (!outlinedSpawners.isEmpty()) {
+    							synchronized(outlinedSpawners) {
+    								outlinedSpawners.clear();
+    								OpticsUnitArmor.capturedSpawners.clear();
+    							}
+    						}
+    					}
+    				}
+        		}
     		}
     	}
     	if (event.phase == TickEvent.Phase.END) {
@@ -1658,7 +1660,7 @@ public class BioMech
 						float suitEnergyPct = suitEnergy/playerData.suitEnergyMax;
 						float visibleThreshold = BioMechConfig.CLIENT.showEnergySuitGuiThreshold.get().floatValue();
 						
-						int ticksSinceRecalculate = Minecraft.getInstance().player.tickCount - BioMechStationMenu.RECALCULATE_TICK;
+						long ticksSinceRecalculate = playerData.tickCount - BioMechStationMenu.RECALCULATE_TICK;
 						if (suitEnergyPct <= visibleThreshold || ticksSinceRecalculate <= 100) {
 							float xScaleInv = 1.0f/xScale;
 							float yScaleInv = 1.0f/yScale;
@@ -1784,7 +1786,7 @@ public class BioMech
             					
             					float pitch = 1.0f + 0.8f * (float)holdingTeleportTicks/TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS;
             					Minecraft.getInstance().player.playSound(SoundEvents.ALLAY_DEATH, 0.2f, pitch);
-            					if (Minecraft.getInstance().player.tickCount % 2 == 0) {
+            					if (playerData.tickCount % 2 == 0) {
             						int particleCount = 6;
             						for (int i=0; i<particleCount; ++i) {
                 						Vec3 loc = Minecraft.getInstance().player.position().add(new Vec3(2.0 * (Math.random() - 0.5), 1.3 + 0.25 * Math.random(), 2.0 * (Math.random() - 0.5)));

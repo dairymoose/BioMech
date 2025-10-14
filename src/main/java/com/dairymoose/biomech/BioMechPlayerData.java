@@ -100,7 +100,7 @@ public class BioMechPlayerData {
 	}
 	
 	public void internalSpendSuitEnergy(Player player, float amount) {
-		this.lastUsedEnergyTick = player.tickCount;
+		this.lastUsedEnergyTick = this.tickCount;
 		this.suitEnergy -= amount;
 		if (this.suitEnergy < 0.0f)
 			this.suitEnergy = 0.0f;
