@@ -53,7 +53,7 @@ public class SpiderWalkersArmor extends ArmorBase {
 										playerData.spendSuitEnergy(player, energyPerTick);
 										
 										Vec3 delta = player.getDeltaMovement();
-										player.setDeltaMovement(delta.x, 0.32, delta.z);
+										player.setDeltaMovement(delta.x, 0.35, delta.z);
 										player.resetFallDistance();
 									}
 								} else {
