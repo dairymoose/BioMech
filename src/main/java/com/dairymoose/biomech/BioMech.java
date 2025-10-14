@@ -1262,7 +1262,7 @@ public class BioMech
 	@SubscribeEvent
 	public void onPlayerDamageTaken(final LivingDamageEvent event) {
 		if (!(event.getEntity() instanceof Player player)) {
-			BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
+			//BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
 		}
 		if (event.getEntity() instanceof Player player) {
 			//BioMech.LOGGER.info("damage to player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
