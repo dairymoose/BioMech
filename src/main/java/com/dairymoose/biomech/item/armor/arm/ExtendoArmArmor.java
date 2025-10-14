@@ -58,11 +58,18 @@ public abstract class ExtendoArmArmor extends ArmorBase {
 	class XzInfo {
 		double x;
 		double z;
+		long lastBouncyTick = 0;
 		
 		XzInfo(double x, double z) {
 			this.x = x;
 			this.z = z;
 		}
+	}
+	
+	private static long extraBounceTicks = 6;
+	
+	private boolean playerLocationChanged(Player player, XzInfo info) {
+		return player.getX() != info.x || player.getZ() != info.z;
 	}
 	
 	private Map<UUID, XzInfo> lastXz = new HashMap<>();
@@ -78,7 +85,9 @@ public abstract class ExtendoArmArmor extends ArmorBase {
 
 						if (playerData != null) {
 							XzInfo info = lastXz.get(player.getUUID());
-							if (info != null && (player.getX() != info.x || player.getZ() != info.z)) {
+							if (info != null && (this.playerLocationChanged(player, info) || (playerData.tickCount-info.lastBouncyTick <= extraBounceTicks))) {
+								if (this.playerLocationChanged(player, info))
+									info.lastBouncyTick = playerData.tickCount;
 								info.x = player.getX();
 								info.z = player.getZ();
 								BioMech.clientSideItemAnimation(itemStack, this.dispatcher.WALKING_COMMAND.cmd);
