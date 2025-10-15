@@ -114,7 +114,7 @@ public class JetpackArmor extends ArmorBase {
 												//BioMech.LOGGER.info("yPerTickStageFinal, " + player.getDeltaMovement().y);
 											}
 											if (player.isUnderWater()) {
-												deltaY *= 0.15f;
+												deltaY *= 0.12f;
 											}
 											
 											player.addDeltaMovement(new Vec3(0.0f, deltaY, 0.0f));
