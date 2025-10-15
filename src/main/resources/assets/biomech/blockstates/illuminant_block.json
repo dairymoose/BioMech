@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "biomech:block/illuminant_block"
+    }
+  }
+}

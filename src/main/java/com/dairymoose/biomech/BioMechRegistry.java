@@ -1,9 +1,11 @@
 package com.dairymoose.biomech;
 
 import com.dairymoose.biomech.block.BioMechStationBlock;
+import com.dairymoose.biomech.block.IlluminantBlock;
 import com.dairymoose.biomech.block_entity.BioMechStationBlockEntity;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
+import com.dairymoose.biomech.item.IlluminantBlockItem;
 import com.dairymoose.biomech.item.armor.JetpackArmor;
 import com.dairymoose.biomech.item.armor.ScubaTankArmor;
 import com.dairymoose.biomech.item.armor.BatteryPackArmor;
@@ -95,6 +97,10 @@ public class BioMechRegistry {
 	public static RegistryObject<Block> BLOCK_BIOMECH_STATION = BioMech.BLOCKS.register("biomech_station", () -> new BioMechStationBlock(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(2.0f, 5.0f)));
 	
 	public static RegistryObject<Block> BLOCK_BIOMECH_SCRAP = BioMech.BLOCKS.register("biomech_scrap_block", () -> new Block(BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(2.0f, 5.0f)));
+	
+	public static RegistryObject<Block> BLOCK_ILLUMINANT_BLOCK = BioMech.BLOCKS.register("illuminant_block", () -> new IlluminantBlock(BlockBehaviour.Properties.of()));
+	
+	public static RegistryObject<Item> ITEM_ILLUMINANT_BLOCK = BioMech.ITEMS.register("illuminant_block", () -> new IlluminantBlockItem(BLOCK_ILLUMINANT_BLOCK.get(), new Item.Properties()));
 	
 	public static RegistryObject<BlockEntityType<BioMechStationBlockEntity>> BLOCK_ENTITY_BIOMECH_STATION = BioMech.BLOCK_ENTITY_TYPES.register("biomech_station", () -> BioMechStationBlockEntity.BIOMECH_STATION_BLOCK_ENTITY);
 	

@@ -1,7 +1,6 @@
 package com.dairymoose.biomech;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -24,9 +23,9 @@ import com.dairymoose.biomech.client.screen.PortableStorageUnitScreen;
 import com.dairymoose.biomech.config.BioMechCommonConfig;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
-import com.dairymoose.biomech.config.BioMechServerConfig;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
+import com.dairymoose.biomech.item.IlluminantBlockItem;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.CpuArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
@@ -91,6 +90,7 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.OutlineBufferSource;
@@ -157,9 +157,9 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -340,7 +340,10 @@ public class BioMech
 										shouldAdd = false;
 								} else if (item instanceof RemainingPickaxeItem remain) {
 									shouldAdd = false;
+								} else if (item instanceof IlluminantBlockItem illuminant) {
+									shouldAdd = false;
 								}
+								
 								if (shouldAdd) {
 									LOGGER.debug("Value is: " + item);
 									event.accept(value);
@@ -2227,6 +2230,8 @@ public class BioMech
         public static void onClientSetup(FMLClientSetupEvent event)
         {
         	BioMechClientSetup.doClientSetup(event);
+        	
+        	ItemBlockRenderTypes.setRenderLayer(BioMechRegistry.BLOCK_ILLUMINANT_BLOCK.get(), RenderType.cutout());
         	
         	markItemTooltipsAsDisabled();
         }
