@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.block.IlluminantBlock;
 
@@ -40,6 +42,8 @@ public class IlluminatorArmor extends ArmorBase {
 		public int id = -1;
 	}
 	
+	public static long updateTickPeriod = 1;
+	
 	public static Map<UUID, List<IlluminantInfo>> illuminantMap = new HashMap<>();
 	public static double illuminatorScale = 7.0;
 	public static int illuminatorForwardBlocks = 4;
@@ -53,30 +57,38 @@ public class IlluminatorArmor extends ArmorBase {
 			if (armorItems.contains(BioMechRegistry.ITEM_ILLUMINATOR.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living) {
 					if (level.isClientSide) {
-						List<IlluminantInfo> infos = illuminantMap.computeIfAbsent(player.getUUID(), (uuid) -> new ArrayList<IlluminantInfo>());
-						if (infos.isEmpty()) {
-							int blocksCount = illuminatorForwardBlocks*(illuminatorConeBlocks + 1);
-							for (int i=0; i<blocksCount; ++i) {
-								infos.add(new IlluminantInfo());
-							}
-						}
+						BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
+
+						if (playerData != null) {
 						
-						int currentId = -1;
-						for (int i=0; i<illuminatorForwardBlocks; ++i) {
-							++currentId;
-							
-							double currentScale = illuminatorScale*(i + 1);
-							Vec3 loc = player.getEyePosition().add(player.getViewVector(1.0f).scale(currentScale));
-							recalcIlluminantBlock(level, infos, currentId, player, loc);
-							
-							for (int c=0; c<illuminatorConeBlocks/2; ++c) {
-								Vec3 rightLoc = player.getEyePosition().add(player.getViewVector(1.0f).yRot(Mth.DEG_TO_RAD*coneAngle/(c+1)).scale(currentScale));
-								Vec3 leftLoc = player.getEyePosition().add(player.getViewVector(1.0f).yRot(Mth.DEG_TO_RAD*-coneAngle/(c+1)).scale(currentScale));
-								++currentId;
-								recalcIlluminantBlock(level, infos, currentId, player, rightLoc);
-								++currentId;
-								recalcIlluminantBlock(level, infos, currentId, player, leftLoc);
+							if (playerData.tickCount % updateTickPeriod == 0) {
+								List<IlluminantInfo> infos = illuminantMap.computeIfAbsent(player.getUUID(), (uuid) -> new ArrayList<IlluminantInfo>());
+								if (infos.isEmpty()) {
+									int blocksCount = illuminatorForwardBlocks*(illuminatorConeBlocks + 1);
+									for (int i=0; i<blocksCount; ++i) {
+										infos.add(new IlluminantInfo());
+									}
+								}
+								
+								int currentId = -1;
+								for (int i=0; i<illuminatorForwardBlocks; ++i) {
+									++currentId;
+									
+									double currentScale = illuminatorScale*(i + 1);
+									Vec3 loc = player.getEyePosition().add(player.getViewVector(1.0f).scale(currentScale));
+									recalcIlluminantBlock(level, infos, currentId, player, loc);
+									
+									for (int c=0; c<illuminatorConeBlocks/2; ++c) {
+										Vec3 rightLoc = player.getEyePosition().add(player.getViewVector(1.0f).yRot(Mth.DEG_TO_RAD*coneAngle/(c+1)).scale(currentScale));
+										Vec3 leftLoc = player.getEyePosition().add(player.getViewVector(1.0f).yRot(Mth.DEG_TO_RAD*-coneAngle/(c+1)).scale(currentScale));
+										++currentId;
+										recalcIlluminantBlock(level, infos, currentId, player, rightLoc);
+										++currentId;
+										recalcIlluminantBlock(level, infos, currentId, player, leftLoc);
+									}
+								}
 							}
+							
 						}
 					}
 				}

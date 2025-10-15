@@ -38,6 +38,8 @@ public class BioMechClientConfig {
 	public final ForgeConfigSpec.BooleanValue enableJetpackSound;
 	public final ForgeConfigSpec.BooleanValue enableHovertechParticle;
 	
+	public final ForgeConfigSpec.IntValue illuminatorUpdateLightingTickPeriod;
+	
 	public BioMechClientConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("first_person");
 		this.hideMainHandWhileNotInUse = builder.comment("hideMainHandWhileNotInUse").translation("config.biomech.hideMainHandWhileNotInUse").define("hideMainHandWhileNotInUse", false);
@@ -59,6 +61,7 @@ public class BioMechClientConfig {
 		this.enableJetpackSmokeParticle = builder.comment("enableJetpackSmokeParticle").translation("config.biomech.enableJetpackSmokeParticle").define("enableJetpackSmokeParticle", true);
 		this.enableJetpackSound = builder.comment("enableJetpackSound").translation("config.biomech.enableJetpackSound").define("enableJetpackSound", true);
 		this.enableHovertechParticle = builder.comment("enableHovertechParticle").translation("config.biomech.enableHovertechParticle").define("enableHovertechParticle", true);
+		this.illuminatorUpdateLightingTickPeriod = builder.comment("illuminatorUpdateLightingTickPeriod").translation("config.biomech.illuminatorUpdateLightingTickPeriod").defineInRange("illuminatorUpdateLightingTickPeriod", 1, 1, 40);
 		builder.pop();
 		
 		builder.push("gui");

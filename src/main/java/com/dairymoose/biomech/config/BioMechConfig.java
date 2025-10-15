@@ -11,6 +11,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
+import com.dairymoose.biomech.item.armor.IlluminatorArmor;
 import com.dairymoose.biomech.item.armor.JetpackArmor;
 import com.dairymoose.biomech.item.armor.OpticsUnitArmor;
 import com.dairymoose.biomech.item.armor.RepulsorLiftArmor;
@@ -110,6 +111,8 @@ public class BioMechConfig {
 					JetpackArmor.smokeParticleEnabled = BioMechConfig.CLIENT.enableJetpackSmokeParticle.get().booleanValue();
 					JetpackArmor.soundEnabled = BioMechConfig.CLIENT.enableJetpackSound.get().booleanValue();
 					HovertechLeggingsArmor.particleEnabled = BioMechConfig.CLIENT.enableHovertechParticle.get().booleanValue();
+					
+					IlluminatorArmor.updateTickPeriod = BioMechConfig.CLIENT.illuminatorUpdateLightingTickPeriod.get().intValue();
 				}
 				};});
 
