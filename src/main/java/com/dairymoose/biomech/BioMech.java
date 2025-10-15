@@ -32,6 +32,8 @@ import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.GasMaskArmor;
 import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
+import com.dairymoose.biomech.item.armor.IlluminatorArmor;
+import com.dairymoose.biomech.item.armor.IlluminatorArmor.IlluminantInfo;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
 import com.dairymoose.biomech.item.armor.IronMechChestArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
@@ -651,6 +653,7 @@ public class BioMech
         			tickInventoryForPlayer(event.player, playerData);
         			tickHandsForPlayer(event.player, playerData);
         			removePermanentModifiers(event.player, playerData);
+        			removeIlluminantBlocks(event.player, playerData);
         			
         			HandActiveStatus has = BioMech.handActiveMap.get(event.player.getUUID());
         			checkForMidairJump(event.player, has);
@@ -858,6 +861,21 @@ public class BioMech
 						}
 					}
 				}
+			}
+		}
+	}
+	
+	private void removeIlluminantBlocks(final Player player, BioMechPlayerData playerData) {
+		if (!(playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof IlluminatorArmor armor)) {
+			List<IlluminantInfo> infos = IlluminatorArmor.illuminantMap.get(player.getUUID());
+			if (infos != null && !infos.isEmpty()) {
+				for (IlluminantInfo info : infos) {
+					if (info.pos != null) {
+						IlluminatorArmor.unsetIlluminantBlock(info.id, infos, player.level(), new Vec3(info.pos.getX(), info.pos.getY(), info.pos.getZ()));
+					}
+				}
+				
+				IlluminatorArmor.illuminantMap.remove(player.getUUID());
 			}
 		}
 	}
