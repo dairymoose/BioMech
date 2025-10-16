@@ -1722,6 +1722,11 @@ public class BioMech
     			float fovMod = 1.0f + 0.25f * holdingTeleportTicks/TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS;
     			event.setNewFovModifier(event.getNewFovModifier()*fovMod);
     		}
+    		
+    		DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(event.getPlayer().getUUID());
+        	if (info != null && info.remainingTicks > 0) {
+        		event.setNewFovModifier(1.0f);
+        	}
     	}
     	
     	private ResourceLocation GUI_SUIT_ENERGY_LOCATION = new ResourceLocation(MODID, "textures/gui/suit_energy.png");

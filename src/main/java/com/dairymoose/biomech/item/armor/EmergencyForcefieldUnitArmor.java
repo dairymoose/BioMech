@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
@@ -40,12 +41,13 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 		this.mechPart = MechPart.Chest;
 		
 		this.forceFieldDuration = 5.0f;
-		this.forceFieldCooldown = 90.0f;
+		this.forceFieldCooldown = 10.0f;
 	}
 	
 	public static class DurationInfo {
 		public int remainingTicks = 0;
 		public int cooldownRemaining = 0;
+		public boolean appliedEfect = false;
 	}
 	public static Map<UUID, DurationInfo> durationMap = new HashMap<>();
 	public static int forceFieldDurationTicks;
@@ -55,6 +57,7 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 		forceFieldDurationTicks = (int)(this.forceFieldDuration * 20);
 		forceFieldCooldownTicks = (int)(this.forceFieldCooldown * 20);
 		if (keyIsDown) {
+			BioMech.LOGGER.info("key press");
 			DurationInfo dura = durationMap.computeIfAbsent(player.getUUID(), (uuid) -> new DurationInfo());
 			if (dura.remainingTicks == 0 && dura.cooldownRemaining == 0) {
 				dura.remainingTicks = forceFieldDurationTicks;
@@ -63,6 +66,7 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 				if (dura.remainingTicks <= 0 && dura.cooldownRemaining > 0) {
 					if (player.level().isClientSide) {
 						player.sendSystemMessage(Component.literal("Forcefield Unit is recharging!  Wait " + (int)Math.ceil(dura.cooldownRemaining/20.0f) + " sec"));
+						return;
 					}
 				}
 			}
@@ -94,15 +98,11 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 						}
 					}
 				}
-			} else {
-				if (dura.remainingTicks == forceFieldDurationTicks) {
-					player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, forceFieldDurationTicks, 3, false, false, false));
-					player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, forceFieldDurationTicks, 1, false, false, false));
-					player.setInvulnerable(true);
-				}
 			}
+			
+			this.sendHotkeyToServer(player, keyIsDown, BroadcastType.SEND_TO_ALL_CLIENTS, serverOriginator);
 		}
-		this.sendHotkeyToServer(player, keyIsDown, BroadcastType.SEND_TO_ALL_CLIENTS, serverOriginator);
+		
 		super.onHotkeyPressed(player, playerData, keyIsDown, serverOriginator);
 	}
 	
@@ -116,6 +116,17 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 				if (entity instanceof LivingEntity living) {
 					DurationInfo dura = durationMap.get(player.getUUID());
 					if (dura != null) {
+						if (!level.isClientSide) {
+							if (!dura.appliedEfect) {
+								dura.appliedEfect = true;
+								
+								BioMech.LOGGER.info("new force field");
+								player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, forceFieldDurationTicks, 3, false, false, false));
+								player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, forceFieldDurationTicks, 1, false, false, false));
+								player.setInvulnerable(true);
+							}
+						}
+						
 						if (FMLEnvironment.dist == Dist.CLIENT) {
 							if (level.isClientSide) {
 								--dura.remainingTicks;
