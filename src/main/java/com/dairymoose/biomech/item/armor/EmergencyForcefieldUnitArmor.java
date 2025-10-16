@@ -119,10 +119,9 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 							if (!dura.appliedEfect) {
 								dura.appliedEfect = true;
 								
-								BioMech.LOGGER.info("new force field");
 								player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, forceFieldDurationTicks, 3, false, false, false));
 								player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, forceFieldDurationTicks, 1, false, false, false));
-								player.setInvulnerable(true);
+								//player.setInvulnerable(true);
 							}
 						}
 						
@@ -144,12 +143,14 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 							}
 							
 							if (dura.cooldownRemaining <= 0) {
-								player.sendSystemMessage(Component.literal("Forcefield Unit recharged!"));
+								if (level.isClientSide) {
+									player.sendSystemMessage(Component.literal("Forcefield Unit recharged!"));
+								}
 								durationMap.remove(player.getUUID());
 							}
 						} else {
-							if (player.tickCount % 1 == 0) {
-								float volume = 1.0f;
+							if (player.tickCount % 2 == 0) {
+								float volume = 0.5f;
 								float pitch = 1.0f + 1.0f*(float)(Math.random());
 								player.level().playLocalSound(player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_CLUSTER_STEP, SoundSource.PLAYERS, volume, pitch, false);
 							}

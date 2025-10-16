@@ -119,6 +119,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -164,6 +166,7 @@ import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.data.SoundDefinition.SoundType;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -665,7 +668,7 @@ public class BioMech
         			tickHandsForPlayer(event.player, playerData);
         			removePermanentModifiers(event.player, playerData);
         			removeIlluminantBlocksIfNoArmor(event.player, playerData);
-        			removeInvulnerable(event.player, playerData);
+        			//removeInvulnerable(event.player, playerData);
         			
         			HandActiveStatus has = BioMech.handActiveMap.get(event.player.getUUID());
         			checkForMidairJump(event.player, has);
@@ -1156,7 +1159,7 @@ public class BioMech
 	public void onPlayerDealDamage(LivingAttackEvent event) {
 		if (event.getSource().getDirectEntity() instanceof Player player) {
 			if (!player.level().isClientSide) {
-				DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(Minecraft.getInstance().player.getUUID());
+				DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(player.getUUID());
 	        	if (info != null && info.remainingTicks > 0) {
 	        		event.setCanceled(true);
 	        		return;
@@ -1306,6 +1309,15 @@ public class BioMech
 			//BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
 		}
 		if (event.getEntity() instanceof Player player) {
+			DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(player.getUUID());
+        	if (info != null && info.remainingTicks > 0) {
+        		float volume = 1.5f;
+        		float pitch = 2.0f;
+        		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMBIENT_UNDERWATER_ENTER, SoundSource.PLAYERS, volume, pitch);
+        		event.setCanceled(true);
+        		return;
+        	}
+			
 			//BioMech.LOGGER.info("damage to player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
 			BioMechPlayerData playerData = null;
         	playerData = globalPlayerData.get(event.getEntity().getUUID());

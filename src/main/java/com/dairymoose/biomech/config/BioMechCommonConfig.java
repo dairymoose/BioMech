@@ -28,6 +28,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableDiggerArmCrafting;
 	public final ForgeConfigSpec.BooleanValue enableDrillArmCrafting;
 	public final ForgeConfigSpec.BooleanValue enableElytraMechChestplateCrafting;
+	public final ForgeConfigSpec.BooleanValue enableEmergencyForcefieldUnitCrafting;
 	public final ForgeConfigSpec.BooleanValue enableExtendoArmCrafting;
 	public final ForgeConfigSpec.BooleanValue enableGasMaskCrafting;
 	public final ForgeConfigSpec.BooleanValue enableGatlingArmCrafting;
@@ -68,6 +69,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableDiggerArmLooting;
 	public final ForgeConfigSpec.BooleanValue enableDrillArmLooting;
 	public final ForgeConfigSpec.BooleanValue enableElytraMechChestplateLooting;
+	public final ForgeConfigSpec.BooleanValue enableEmergencyForcefieldUnitLooting;
 	public final ForgeConfigSpec.BooleanValue enableExtendoArmLooting;
 	public final ForgeConfigSpec.BooleanValue enableGasMaskLooting;
 	public final ForgeConfigSpec.BooleanValue enableGatlingArmLooting;
@@ -111,6 +113,8 @@ public class BioMechCommonConfig {
 	
 	public final ForgeConfigSpec.BooleanValue walkToBioMechStation;
 	
+	public final ConfigValue<Double> emergencyForcefieldUnitCooldown;
+	
 	public BioMechCommonConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("crafting");
 		this.enableBioMechStation = builder.comment("enableBioMechStation").translation("config.biomech.enableBioMechStation").define("enableBioMechStation", true);
@@ -130,6 +134,7 @@ public class BioMechCommonConfig {
 		this.enableDiggerArmCrafting = builder.comment("enableDiggerArmCrafting").translation("config.biomech.enableDiggerArmCrafting").define("enableDiggerArmCrafting", true);
 		this.enableDrillArmCrafting = builder.comment("enableDrillArmCrafting").translation("config.biomech.enableDrillArmCrafting").define("enableDrillArmCrafting", true);
 		this.enableElytraMechChestplateCrafting = builder.comment("enableElytraMechChestplateCrafting").translation("config.biomech.enableElytraMechChestplateCrafting").define("enableElytraMechChestplateCrafting", true);
+		this.enableEmergencyForcefieldUnitCrafting = builder.comment("enableEmergencyForcefieldUnitCrafting").translation("config.biomech.enableEmergencyForcefieldUnitCrafting").define("enableEmergencyForcefieldUnitCrafting", true);
 		this.enableExtendoArmCrafting = builder.comment("enableExtendoArmCrafting").translation("config.biomech.enableExtendoArmCrafting").define("enableExtendoArmCrafting", true);
 		this.enableGasMaskCrafting = builder.comment("enableGasMaskCrafting").translation("config.biomech.enableGasMaskCrafting").define("enableGasMaskCrafting", true);
 		this.enableGatlingArmCrafting = builder.comment("enableGatlingArmCrafting").translation("config.biomech.enableGatlingArmCrafting").define("enableGatlingArmCrafting", true);
@@ -172,6 +177,7 @@ public class BioMechCommonConfig {
 		this.enableDiggerArmLooting = builder.comment("enableDiggerArmLooting").translation("config.biomech.enableDiggerArmLooting").define("enableDiggerArmLooting", true);
 		this.enableDrillArmLooting = builder.comment("enableDrillArmLooting").translation("config.biomech.enableDrillArmLooting").define("enableDrillArmLooting", true);
 		this.enableElytraMechChestplateLooting = builder.comment("enableElytraMechChestplateLooting").translation("config.biomech.enableElytraMechChestplateLooting").define("enableElytraMechChestplateLooting", true);
+		this.enableEmergencyForcefieldUnitLooting = builder.comment("enableEmergencyForcefieldUnitLooting").translation("config.biomech.enableEmergencyForcefieldUnitLooting").define("enableEmergencyForcefieldUnitLooting", true);
 		this.enableExtendoArmLooting = builder.comment("enableExtendoArmLooting").translation("config.biomech.enableExtendoArmLooting").define("enableExtendoArmLooting", true);
 		this.enableGasMaskLooting = builder.comment("enableGasMaskLooting").translation("config.biomech.enableGasMaskLooting").define("enableGasMaskLooting", true);
 		this.enableGatlingArmLooting = builder.comment("enableGatlingArmLooting").translation("config.biomech.enableGatlingArmLooting").define("enableGatlingArmLooting", true);
@@ -214,6 +220,10 @@ public class BioMechCommonConfig {
 		this.lootBioMechInShipwreck = builder.comment("lootBioMechInShipwreck").translation("config.biomech.lootBioMechInShipwreck").define("lootBioMechInShipwreck", defaultShipwreckLootChance);
 		this.lootBioMechInNetherFortress = builder.comment("lootBioMechInNetherFortress").translation("config.biomech.lootBioMechInNetherFortress").define("lootBioMechInNetherFortress", defaultNetherFortressLootChance);
 		this.elytraMechChestplateCanBeLooted = builder.comment("elytraMechChestplateCanBeLooted").translation("config.biomech.elytraMechChestplateCanBeLooted").define("elytraMechChestplateCanBeLooted", true);
+		builder.pop();
+		
+		builder.push("items");
+		this.emergencyForcefieldUnitCooldown = builder.comment("emergencyForcefieldUnitCooldown").translation("config.biomech.emergencyForcefieldUnitCooldown").define("emergencyForcefieldUnitCooldown", 90.0);
 		builder.pop();
 		
 		builder.push("biomech_station");

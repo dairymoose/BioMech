@@ -7,6 +7,7 @@
 	 "biomech:gatling_arm",
 	 "biomech:drill_arm",
 	 "biomech:cpu",
+	 "biomech:emergency_forcefield_unit",
 	 "biomech:extendo_arm",
 	 "biomech:gas_mask",
 	 "biomech:repulsor_lift",

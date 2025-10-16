@@ -9,7 +9,9 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.Pair;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.block.BioMechStationBlock;
+import com.dairymoose.biomech.item.armor.EmergencyForcefieldUnitArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
 import com.dairymoose.biomech.item.armor.IlluminatorArmor;
 import com.dairymoose.biomech.item.armor.JetpackArmor;
@@ -88,6 +90,10 @@ public class BioMechConfig {
 			GatlingArmArmor.gatlingDamage = BioMechConfig.SERVER.gatlingDamage.get().floatValue();
 			GatlingArmArmor.gatlingEnergyPerSec = BioMechConfig.SERVER.gatlingEnergyPerSec.get().floatValue();
 			GatlingArmArmor.gatlingMinFalloff = BioMechConfig.SERVER.gatlingMinFalloffFactor.get().floatValue();
+			
+			if (BioMechRegistry.ITEM_EMERGENCY_FORCEFIELD_UNIT.get() instanceof EmergencyForcefieldUnitArmor armor) {
+				armor.setForcefieldCooldown(BioMechConfig.COMMON.emergencyForcefieldUnitCooldown.get().floatValue());
+			}
 			
 			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
 				@Override

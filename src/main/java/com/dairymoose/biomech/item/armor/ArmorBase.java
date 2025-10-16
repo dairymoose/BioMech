@@ -118,6 +118,10 @@ public class ArmorBase extends ArmorItem {
 		this.configDisabled = disabled;
 	}
 	
+	public void setForcefieldCooldown(float forceFieldCooldown) {
+		this.forceFieldCooldown = forceFieldCooldown;
+	}
+	
 	public float getForcefieldCooldown() {
 		return this.forceFieldCooldown;
 	}
