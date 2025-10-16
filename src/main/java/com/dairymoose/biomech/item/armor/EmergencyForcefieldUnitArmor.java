@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.BroadcastType;
 
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -25,6 +25,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class EmergencyForcefieldUnitArmor extends ArmorBase {
 
@@ -37,28 +39,36 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 		this.backArmorTranslation = 0.12;
 		this.mechPart = MechPart.Chest;
 		
-		this.forceFieldDuration = 6.0f;
-		this.forceFieldCooldown = 100.0f;
+		this.forceFieldDuration = 5.0f;
+		this.forceFieldCooldown = 90.0f;
 	}
 	
 	public static class DurationInfo {
 		public int remainingTicks = 0;
+		public int cooldownRemaining = 0;
 	}
 	public static Map<UUID, DurationInfo> durationMap = new HashMap<>();
 	public static int forceFieldDurationTicks;
+	public static int forceFieldCooldownTicks;
 	@Override
 	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, boolean serverOriginator) {
 		forceFieldDurationTicks = (int)(this.forceFieldDuration * 20);
+		forceFieldCooldownTicks = (int)(this.forceFieldCooldown * 20);
 		if (keyIsDown) {
 			DurationInfo dura = durationMap.computeIfAbsent(player.getUUID(), (uuid) -> new DurationInfo());
-			if (dura.remainingTicks == 0) {
+			if (dura.remainingTicks == 0 && dura.cooldownRemaining == 0) {
 				dura.remainingTicks = forceFieldDurationTicks;
+				dura.cooldownRemaining = forceFieldCooldownTicks;
+			} else {
+				if (dura.remainingTicks <= 0 && dura.cooldownRemaining > 0) {
+					if (player.level().isClientSide) {
+						player.sendSystemMessage(Component.literal("Forcefield Unit is recharging!  Wait " + (int)Math.ceil(dura.cooldownRemaining/20.0f) + " sec"));
+					}
+				}
 			}
 			
 			if (player.level().isClientSide) {
-				if (dura.remainingTicks > 0) {
-					--dura.remainingTicks;
-					
+				if (dura.remainingTicks == forceFieldDurationTicks) {
 					ParticleOptions forceFieldParticle = (ParticleOptions) BioMechRegistry.PARTICLE_TYPE_FORCE_FIELD.get();
 					Vec3 loc = player.position().add(0.0, player.getBbHeight()/2.0, 0.0);
 					EmergencyForcefieldUnitArmor.currentPlayer = player;
@@ -85,8 +95,8 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 					}
 				}
 			} else {
-				if (dura.remainingTicks > 0) {
-					player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, forceFieldDurationTicks, 4, false, false, false));
+				if (dura.remainingTicks == forceFieldDurationTicks) {
+					player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, forceFieldDurationTicks, 3, false, false, false));
 					player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, forceFieldDurationTicks, 1, false, false, false));
 					player.setInvulnerable(true);
 				}
@@ -106,14 +116,32 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 				if (entity instanceof LivingEntity living) {
 					DurationInfo dura = durationMap.get(player.getUUID());
 					if (dura != null) {
-						--dura.remainingTicks;
-						if (dura.remainingTicks <= 0) {
-							durationMap.remove(player.getUUID());
+						if (FMLEnvironment.dist == Dist.CLIENT) {
+							if (level.isClientSide) {
+								--dura.remainingTicks;
+							}
 						} else {
-							if (player.tickCount % 3 == 0) {
+							--dura.remainingTicks;
+						}
+						
+						if (dura.remainingTicks <= 0) {
+							if (FMLEnvironment.dist == Dist.CLIENT) {
+								if (level.isClientSide) {
+									--dura.cooldownRemaining;
+								}
+							} else {
+								--dura.cooldownRemaining;
+							}
+							
+							if (dura.cooldownRemaining <= 0) {
+								player.sendSystemMessage(Component.literal("Forcefield Unit recharged!"));
+								durationMap.remove(player.getUUID());
+							}
+						} else {
+							if (player.tickCount % 1 == 0) {
 								float volume = 1.0f;
-								float pitch = 1.0f + 0.5f*(float)(Math.random());
-								player.level().playLocalSound(player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_CLUSTER_PLACE, SoundSource.PLAYERS, volume, pitch, false);
+								float pitch = 1.0f + 1.0f*(float)(Math.random());
+								player.level().playLocalSound(player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_CLUSTER_STEP, SoundSource.PLAYERS, volume, pitch, false);
 							}
 						}
 					}

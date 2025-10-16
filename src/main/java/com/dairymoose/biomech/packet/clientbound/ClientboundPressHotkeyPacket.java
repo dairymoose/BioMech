@@ -69,7 +69,10 @@ public class ClientboundPressHotkeyPacket implements Packet<net.minecraft.networ
 					if (world != null) {
 						Entity e = world.getEntity(playerId);
 						if (e instanceof Player player) {
-							if (player != Minecraft.getInstance().player) {
+							BioMech.LOGGER.error("321");
+							if (player.getId() != Minecraft.getInstance().player.getId()) {
+								BioMech.LOGGER.error("abc");
+								BioMech.LOGGER.error(player.getId() + " vs " + Minecraft.getInstance().player.getId() + " and " + player.getUUID() + " vs " + Minecraft.getInstance().player.getUUID());
 								BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 								if (playerData != null) {
 									

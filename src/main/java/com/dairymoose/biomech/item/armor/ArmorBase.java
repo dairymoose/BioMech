@@ -289,6 +289,7 @@ public class ArmorBase extends ArmorItem {
 			replaced = replaced.replaceAll("\\{bonus_block_reach\\}", nf.format(this.getBonusBlockReach()));
 			replaced = replaced.replaceAll("\\{bonus_entity_reach\\}", nf.format(this.getBonusEntityReach()));
 			replaced = replaced.replaceAll("\\{forcefield_duration\\}", nf.format(this.getForcefieldDuration()));
+			replaced = replaced.replaceAll("\\{forcefield_cooldown\\}", nf.format(this.getForcefieldCooldown()));
 		}
 		
 		return replaced;
@@ -333,6 +334,7 @@ public class ArmorBase extends ArmorItem {
 		MutableComponent t2 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip2", "");
 		MutableComponent t3 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip3", "");
 		MutableComponent t4 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip4", "");
+		MutableComponent t5 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip5", "");
 		String t1Text = this.replaceTooltips(t1.getString());
 		if (!"".equals(t1Text)) {
 			comp.add(Component.literal(t1Text));
@@ -348,6 +350,10 @@ public class ArmorBase extends ArmorItem {
 		String t4Text = this.replaceTooltips(t4.getString());
 		if (!"".equals(t4Text)) {
 			comp.add(Component.literal(t4Text));
+		}
+		String t5Text = this.replaceTooltips(t5.getString());
+		if (!"".equals(t5Text)) {
+			comp.add(Component.literal(t5Text));
 		}
 	}
 	
