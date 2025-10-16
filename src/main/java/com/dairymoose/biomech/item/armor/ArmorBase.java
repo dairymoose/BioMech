@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.dairymoose.biomech.BioMech.ClientModEvents;
+import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.item.armor.arm.MiningLaserArmArmor;
@@ -66,6 +67,14 @@ public class ArmorBase extends ArmorItem {
 	
 	public ArmorBase(ArmorMaterial material, Type type, Properties props) {
 		super(NOTHING_MATERIAL, type, props);
+	}
+	
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown) {
+		
+	}
+	
+	public void onHotkeyHeld(Player player, BioMechPlayerData playerData) {
+		
 	}
 	
 	//itemStack is the first person arm itemStack, need to call BioMech.getThirdPersonArmItemStack for 3rd person
@@ -245,7 +254,10 @@ public class ArmorBase extends ArmorItem {
 			replaced = replaced.replaceAll("\\{near_damage_boost\\}", nf.format(100.0f*this.getNearbyEnemyDamageBoost()));
 			replaced = replaced.replaceAll("\\{nearby_enemy_range\\}", nf.format(HerosHeadpieceArmor.nearbyEnemiesDiameter));
 			replaced = replaced.replaceAll("\\{explosion_dr\\}", nf.format(100.0f*this.getExplosionDamageReduction()));
-			replaced = replaced.replaceAll("\\{psu\\}", ClientModEvents.HOTKEY_OPEN_PSU.getKey().getDisplayName().getString());
+			replaced = replaced.replaceAll("\\{key_back\\}", ClientModEvents.HOTKEY_ACTIVATE_BACK_ITEM.getKey().getDisplayName().getString());
+			replaced = replaced.replaceAll("\\{key_head\\}", ClientModEvents.HOTKEY_ACTIVATE_HEAD_ITEM.getKey().getDisplayName().getString());
+			replaced = replaced.replaceAll("\\{key_chest\\}", ClientModEvents.HOTKEY_ACTIVATE_CHEST_ITEM.getKey().getDisplayName().getString());
+			replaced = replaced.replaceAll("\\{key_leggings\\}", ClientModEvents.HOTKEY_ACTIVATE_LEGGINGS_ITEM.getKey().getDisplayName().getString());
 			replaced = replaced.replaceAll("\\{mining_laser_max_time\\}", nf.format(MiningLaserArmArmor.SECONDS_UNTIL_MAX_LASER));
 			replaced = replaced.replaceAll("\\{mining_laser_max_power\\}", nf.format(MiningLaserArmArmor.MAX_POWER));
 			replaced = replaced.replaceAll("\\{teleport_hold_time\\}", nf.format(TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS/20.0f));

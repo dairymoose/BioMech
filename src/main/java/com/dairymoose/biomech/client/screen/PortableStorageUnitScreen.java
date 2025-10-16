@@ -42,7 +42,7 @@ public class PortableStorageUnitScreen extends AbstractContainerScreen<PortableS
 		if (super.keyPressed(key, p_97766_, p_97767_)) {
 			return true;
 		}
-		else if (key == BioMech.ClientModEvents.HOTKEY_OPEN_PSU.getKey().getValue()) {
+		else if (key == BioMech.ClientModEvents.HOTKEY_ACTIVATE_BACK_ITEM.getKey().getValue()) {
 			this.onClose();
 			return true;
 		}

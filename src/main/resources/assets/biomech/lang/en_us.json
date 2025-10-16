@@ -31,7 +31,7 @@
 	"item.biomech.hovertech_leggings": "§5Hovertech Leggings§0",
 	"item.biomech.hovertech_leggings.tooltip1": "Causes the user to hover above the ground, rendering ground effects harmless and increasing jump height by 1 block.",
 	"item.biomech.hovertech_leggings.tooltip2": "Also grants the wearer slowfall during falls.",
-	"item.biomech.hovertech_leggings.tooltip3": "Press {alt} to toggle on/off.  Crouch to temporarily disable.",
+	"item.biomech.hovertech_leggings.tooltip3": "Press '{key_leggings}' to toggle on/off.  Crouch to temporarily disable.",
 
 	"item.biomech.extendo_arm": "§5Extendo-Arm§0",
 	"item.biomech.extendo_arm.tooltip1": "§9+{bonus_block_reach} Block Reach§0",
@@ -39,6 +39,7 @@
 	
 	"item.biomech.illuminator": "§5Illuminator§0",
 	"item.biomech.illuminator.tooltip1": "Lights up the area in front of you.",
+	"item.biomech.illuminator.tooltip2": "Press '{key_head} to toggle on/off'.",
 	"item.biomech.illuminator.tooltip3": "§6War... war never changes.§0",
 	
 	"item.biomech.drill_arm": "§5Drill Arm§0",
@@ -50,7 +51,7 @@
 	"item.biomech.power_arm.tooltip1": "Increases attack damage by {flat_damage_boost} when wielding a weapon.",
 
 	"item.biomech.teleportation_crystal": "§5Teleportation Crystal§0",
-	"item.biomech.teleportation_crystal.tooltip1": "Hold '{psu}' for {teleport_hold_time} seconds to teleport home.",
+	"item.biomech.teleportation_crystal.tooltip1": "Hold '{key_back}' for {teleport_hold_time} seconds to teleport home.",
 	"item.biomech.teleportation_crystal.tooltip2": "After teleporting home, use again (within {teleport_back_time} minutes) to teleport back to where you teleported from.",
 	"item.biomech.teleportation_crystal.tooltip3": "Taking damage will interrupt the teleport.",
 	
@@ -81,7 +82,7 @@
 	
 	"item.biomech.portable_storage_unit": "§5Portable Storage Unit§0",
 	"item.biomech.portable_storage_unit.tooltip1": "Provides additional inventory space.",
-	"item.biomech.portable_storage_unit.tooltip2": "Press '{psu}' to open.",
+	"item.biomech.portable_storage_unit.tooltip2": "Press '{key_back}' to open.",
 	
 	"item.biomech.battery_pack": "§5Battery Pack§0",
 	"item.biomech.battery_pack.tooltip1": "Grants suit energy regeneration.",
@@ -104,7 +105,7 @@
 	
 	// *** LOAD LIFTER
 	"item.biomech.optics_unit": "§5Optics Unit§0",
-	"item.biomech.optics_unit.tooltip1": "Hold {alt} to zoom in.",
+	"item.biomech.optics_unit.tooltip1": "Hold {key_head} to zoom in.",
 	"item.biomech.optics_unit.tooltip2": "Also highlights nearby spawners and treasure chests.",
 	"item.biomech.optics_unit.tooltip3": "§6I don't want to survive, I want to live!",
 	
@@ -126,7 +127,7 @@
 	"item.biomech.elytra_mech_chestplate.tooltip1": "Grants elytra flight.",
 	
 	"item.biomech.spider_walkers": "§5Spider Walkers§0",
-	"item.biomech.spider_walkers.tooltip1": "Hold {alt} while walking into a wall to activate.",
+	"item.biomech.spider_walkers.tooltip1": "Hold '{alt}' while walking into a wall to activate.",
 	"item.biomech.spider_walkers.tooltip2": "Climbs walls while active.  Can be used while falling to grip a nearby wall.",
 	"item.biomech.spider_walkers.tooltip3": "Costs a small amount of suit energy while active.",
 	
@@ -176,6 +177,7 @@
 	
 	"item.biomech.night_vision_visor": "§5Night Vision Visor§0",
 	"item.biomech.night_vision_visor.tooltip1": "Grants permanent night vision.",
+	"item.biomech.night_vision_visor.tooltip2": "Press '{key_head}' to toggle on/off.",
 	
 	"item.biomech.spring_loaded_leggings": "§5Spring-Loaded Leggings§0",
 	"item.biomech.spring_loaded_leggings.tooltip1": "Increases jump height and allows the user to double-jump.",
@@ -241,10 +243,13 @@
 	"item.biomech.digger_arm.tooltip2": "Hold to mine any shovel-mineable block.",
 	"item.biomech.digger_arm.tooltip3": "Mines in a 3x3 area (shovel blocks only).",
 	
-	"key.hold_to_enable": "Hold to Enable BioMech Arms",
-	"key.right_arm": "Use Right Arm",
-	"key.left_arm": "Use Left Arm",
-	"key.psu": "Open Portable Storage Unit",
+	"biomech.key.hold_to_enable": "Hold to Enable BioMech Arms",
+	"biomech.key.right_arm": "Use Right Arm",
+	"biomech.key.left_arm": "Use Left Arm",
+	"biomech.key.back": "Activate BioMech Back Item",
+	"biomech.key.head": "Activate BioMech Head Item",
+	"biomech.key.chest": "Activate BioMech Chest Item",
+	"biomech.key.leggings": "Activate BioMech Leggings Item",
 	"key.categories.biomech": "BioMech",
 	
 	"advancements.biomech.give_yourself_a_hand.title": "Give Yourself a Hand",

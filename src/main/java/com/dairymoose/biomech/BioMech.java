@@ -653,7 +653,7 @@ public class BioMech
         			tickInventoryForPlayer(event.player, playerData);
         			tickHandsForPlayer(event.player, playerData);
         			removePermanentModifiers(event.player, playerData);
-        			removeIlluminantBlocks(event.player, playerData);
+        			removeIlluminantBlocksIfNoArmor(event.player, playerData);
         			
         			HandActiveStatus has = BioMech.handActiveMap.get(event.player.getUUID());
         			checkForMidairJump(event.player, has);
@@ -721,6 +721,8 @@ public class BioMech
 		} else if (!has.jumpActive && maj.lastJumpActiveStatus) {
 			maj.primedForMidAirJump = true;
 			//primedForMidairJump = true;
+		} else if (player.fallDistance >= 3.0f) {
+			maj.primedForMidAirJump = true;
 		}
     	
     	maj.lastJumpActiveStatus = has.jumpActive;
@@ -865,18 +867,22 @@ public class BioMech
 		}
 	}
 	
-	private void removeIlluminantBlocks(final Player player, BioMechPlayerData playerData) {
-		if (!(playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof IlluminatorArmor armor)) {
-			List<IlluminantInfo> infos = IlluminatorArmor.illuminantMap.get(player.getUUID());
-			if (infos != null && !infos.isEmpty()) {
-				for (IlluminantInfo info : infos) {
-					if (info.pos != null) {
-						IlluminatorArmor.unsetIlluminantBlock(info.id, infos, player.level(), new Vec3(info.pos.getX(), info.pos.getY(), info.pos.getZ()));
-					}
+	public static void removeIlluminantBlocks(final Player player, BioMechPlayerData playerData) {
+		List<IlluminantInfo> infos = IlluminatorArmor.illuminantMap.get(player.getUUID());
+		if (infos != null && !infos.isEmpty()) {
+			for (IlluminantInfo info : infos) {
+				if (info.pos != null) {
+					IlluminatorArmor.unsetIlluminantBlock(info.id, infos, player.level(), new Vec3(info.pos.getX(), info.pos.getY(), info.pos.getZ()));
 				}
-				
-				IlluminatorArmor.illuminantMap.remove(player.getUUID());
 			}
+			
+			IlluminatorArmor.illuminantMap.remove(player.getUUID());
+		}
+	}
+	
+	public static void removeIlluminantBlocksIfNoArmor(final Player player, BioMechPlayerData playerData) {
+		if (!(playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof IlluminatorArmor armor)) {
+			removeIlluminantBlocks(player, playerData);
 		}
 	}
     
@@ -1443,12 +1449,15 @@ public class BioMech
     		
 		}
 
-    	public static final KeyMapping HOTKEY_ENABLE_ARM_FUNCTION = new KeyMapping("key.hold_to_enable", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.categories.biomech");
-    	public static final KeyMapping HOTKEY_RIGHT_ARM = new KeyMapping("key.right_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_LEFT, "key.categories.biomech");
-    	public static final KeyMapping HOTKEY_LEFT_ARM = new KeyMapping("key.left_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_RIGHT, "key.categories.biomech");
-    	public static final KeyMapping HOTKEY_OPEN_PSU = new KeyMapping("key.psu", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_ENABLE_ARM_FUNCTION = new KeyMapping("biomech.key.hold_to_enable", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_RIGHT_ARM = new KeyMapping("biomech.key.right_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_LEFT, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_LEFT_ARM = new KeyMapping("biomech.key.left_arm", InputConstants.Type.MOUSE, GLFW.GLFW_MOUSE_BUTTON_RIGHT, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_ACTIVATE_BACK_ITEM = new KeyMapping("biomech.key.back", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_I, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_ACTIVATE_HEAD_ITEM = new KeyMapping("biomech.key.head", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_ACTIVATE_CHEST_ITEM = new KeyMapping("biomech.key.chest", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_G, "key.categories.biomech");
+    	public static final KeyMapping HOTKEY_ACTIVATE_LEGGINGS_ITEM = new KeyMapping("biomech.key.leggings", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, "key.categories.biomech");
     	
-        public static final List<KeyMapping> allKeyMappings = List.of(HOTKEY_RIGHT_ARM, HOTKEY_LEFT_ARM, HOTKEY_ENABLE_ARM_FUNCTION, HOTKEY_OPEN_PSU);
+        public static final List<KeyMapping> allKeyMappings = List.of(HOTKEY_RIGHT_ARM, HOTKEY_LEFT_ARM, HOTKEY_ENABLE_ARM_FUNCTION, HOTKEY_ACTIVATE_BACK_ITEM, HOTKEY_ACTIVATE_HEAD_ITEM, HOTKEY_ACTIVATE_CHEST_ITEM, HOTKEY_ACTIVATE_LEGGINGS_ITEM);
 
         @SubscribeEvent
         public static void onRegisterParticle(RegisterParticleProvidersEvent event) {
@@ -1591,7 +1600,7 @@ public class BioMech
     		if (playerData != null) {
     			ItemStack headStack = playerData.getForSlot(MechPart.Head).itemStack;
     			if (headStack.getItem() instanceof OpticsUnitArmor armor) {
-    				if (localPlayerHoldingAlt) {
+    				if (armor.zoomIn) {
     					event.setCanceled(true);
     					maxOpticZoom += event.getScrollDelta();
     					if (maxOpticZoom < 0.0f) {
@@ -1617,7 +1626,7 @@ public class BioMech
         			if (headStack.getItem() instanceof OpticsUnitArmor armor) {
         				float zoomMod = 0.0f;
         				float fovPerTick = 0.34f;
-        				if (localPlayerHoldingAlt) {
+        				if (armor.zoomIn) {
         					opticsZoomProgress += fovPerTick;
         				} else {
         					opticsZoomProgress -= fovPerTick;
@@ -1801,6 +1810,10 @@ public class BioMech
     		return null;
     	}
     	
+    	boolean backKeyPriorStatus = false;
+    	boolean headKeyPriorStatus = false;
+    	boolean chestKeyPriorStatus = false;
+    	boolean leggingsKeyPriorStatus = false;
     	@SubscribeEvent
         public void onClientTick(final ClientTickEvent event) {
         	if (event.phase == TickEvent.Phase.START) {
@@ -1823,35 +1836,10 @@ public class BioMech
                 			BioMech.localPlayerJumping = Minecraft.getInstance().player.input.jumping;
                 		}
             			
-            			if (HOTKEY_OPEN_PSU.isDown()) {
-            				int tickDiff = Minecraft.getInstance().player.tickCount - PortableStorageUnitScreen.exitTick;
-            				if (tickDiff >= 3 && playerData.getForSlot(MechPart.Back).itemStack.getItem() instanceof PortableStorageUnitArmor psu) {
-            					while (HOTKEY_OPEN_PSU.consumeClick());
-            					BioMechNetwork.INSTANCE.sendToServer(new ServerboundOpenPortableStorageUnitPacket());
-            				}
-            				if (playerData.getForSlot(MechPart.Back).itemStack.getItem() instanceof TeleportationCrystalArmor tele) {
-            					while (HOTKEY_OPEN_PSU.consumeClick());
-            					
-            					++holdingTeleportTicks;
-            					
-            					float pitch = 1.0f + 0.8f * (float)holdingTeleportTicks/TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS;
-            					Minecraft.getInstance().player.playSound(SoundEvents.ALLAY_DEATH, 0.2f, pitch);
-            					if (playerData.tickCount % 2 == 0) {
-            						int particleCount = 6;
-            						for (int i=0; i<particleCount; ++i) {
-                						Vec3 loc = Minecraft.getInstance().player.position().add(new Vec3(2.0 * (Math.random() - 0.5), 1.3 + 0.25 * Math.random(), 2.0 * (Math.random() - 0.5)));
-                            			Minecraft.getInstance().player.level().addParticle(ParticleTypes.ELECTRIC_SPARK, loc.x, loc.y, loc.z, 0.0f, 0.0f, 0.0f);
-                					}
-            					}
-            					
-            					if (holdingTeleportTicks >= TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS) {
-            						holdingTeleportTicks = 0;
-            						BioMechNetwork.INSTANCE.sendToServer(new ServerboundTeleportationCrystalPacket());
-            					}
-            				}
-            			} else {
-            				holdingTeleportTicks = 0;
-            			}
+            			backKeyPriorStatus = dispatchHotkey(HOTKEY_ACTIVATE_BACK_ITEM, MechPart.Back, backKeyPriorStatus, playerData, localPlayer);
+            			headKeyPriorStatus = dispatchHotkey(HOTKEY_ACTIVATE_HEAD_ITEM, MechPart.Head, headKeyPriorStatus, playerData, localPlayer);
+            			chestKeyPriorStatus = dispatchHotkey(HOTKEY_ACTIVATE_CHEST_ITEM, MechPart.Chest, chestKeyPriorStatus, playerData, localPlayer);
+            			leggingsKeyPriorStatus = dispatchHotkey(HOTKEY_ACTIVATE_LEGGINGS_ITEM, MechPart.Leggings, leggingsKeyPriorStatus, playerData, localPlayer);
             			
             			if (requireModifierKeyForArmUsage) {
                 			if (HOTKEY_ENABLE_ARM_FUNCTION.isDown()) {
@@ -1893,6 +1881,21 @@ public class BioMech
         		}
         	}
         }
+
+		private boolean dispatchHotkey(KeyMapping key, MechPart part, boolean priorStatus, BioMechPlayerData playerData, Player localPlayer) {
+			if (playerData.getForSlot(part).itemStack.getItem() instanceof ArmorBase base) {
+				if (key.isDown()) {
+					while (key.consumeClick());
+					if (!priorStatus)
+						base.onHotkeyPressed(localPlayer, playerData, true);
+					base.onHotkeyHeld(localPlayer, playerData);
+				} else {
+					if (priorStatus)
+						base.onHotkeyPressed(localPlayer, playerData, false);
+				}
+			}
+			return key.isDown();
+		}
     	
         @SubscribeEvent
 		public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
