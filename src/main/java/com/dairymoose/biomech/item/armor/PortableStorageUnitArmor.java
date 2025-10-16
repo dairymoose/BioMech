@@ -3,10 +3,14 @@ package com.dairymoose.biomech.item.armor;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.client.screen.PortableStorageUnitScreen;
+import com.dairymoose.biomech.packet.serverbound.ServerboundOpenPortableStorageUnitPacket;
 import com.dairymoose.biomech.BioMechRegistry;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.Entity;
@@ -28,6 +32,14 @@ public class PortableStorageUnitArmor extends ArmorBase {
 	}
 
 	public static String ITEM_LIST = "ItemList";
+	
+	@Override
+	public void onHotkeyHeld(Player player, BioMechPlayerData playerData) {
+		int tickDiff = Minecraft.getInstance().player.tickCount - PortableStorageUnitScreen.exitTick;
+		if (tickDiff < 0 || tickDiff >= 3) {
+			BioMechNetwork.INSTANCE.sendToServer(new ServerboundOpenPortableStorageUnitPacket());
+		}
+	}
 	
 	@Override
 	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {

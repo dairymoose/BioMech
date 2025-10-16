@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
@@ -43,7 +44,13 @@ public class HovertechLeggingsArmor extends ArmorBase {
 
 	public static boolean particleEnabled = true;
 	
-	boolean lastAltState = false;
+	@Override
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown) {
+		if (keyIsDown) {
+			toggledOn = !toggledOn;
+		}
+	}
+	
 	boolean toggledOn = true;
 	double pickupRadiusScale = 2.0f;
 	@Override
@@ -75,14 +82,6 @@ public class HovertechLeggingsArmor extends ArmorBase {
 					boolean overheadNotSturdy = !level.getBlockState(overheadBlock).isFaceSturdy(level, overheadBlock, Direction.DOWN);
 					boolean overhead2NotSturdy = !level.getBlockState(overheadBlock2).isFaceSturdy(level, overheadBlock2, Direction.DOWN);
 					boolean overhead3NotSturdy = !level.getBlockState(overheadBlock3).isFaceSturdy(level, overheadBlock3, Direction.DOWN);
-					
-					if (level.isClientSide) {
-						if (BioMech.localPlayerHoldingAlt && !lastAltState) {
-							toggledOn = !toggledOn;
-							BioMech.LOGGER.debug("Hovertech: swap toggledOn to " + toggledOn);
-						}
-						lastAltState = BioMech.localPlayerHoldingAlt;
-					}
 					
 					if (toggledOn && overheadNotSturdy && overhead2NotSturdy && overhead3NotSturdy) {
 						BioMech.allowFlyingForPlayer(player);

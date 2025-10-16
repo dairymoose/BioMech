@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 
 import net.minecraft.world.effect.MobEffectInstance;
@@ -26,6 +27,14 @@ public class NightVisionVisorArmor extends ArmorBase {
 		this.mechPart = MechPart.Head;
 	}
 
+	private boolean toggledOn = true;
+	@Override
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown) {
+		if (keyIsDown) {
+			toggledOn = !toggledOn;
+		}
+	}
+	
 	@Override
 	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {
@@ -34,8 +43,13 @@ public class NightVisionVisorArmor extends ArmorBase {
 			if (armorItems.contains(BioMechRegistry.ITEM_SPIDER_WALKERS.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
 					MobEffectInstance nightVision = player.getEffect(MobEffects.NIGHT_VISION);
-					if (nightVision == null || nightVision.endsWithin(210)) {
-						player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 250, 1, false, false, false));
+					if (toggledOn) {
+						if (nightVision == null || nightVision.endsWithin(210)) {
+							player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 250, 1, false, false, false));
+						}
+					} else {
+						if (nightVision != null)
+							player.removeEffect(MobEffects.NIGHT_VISION);
 					}
 				}
 			}

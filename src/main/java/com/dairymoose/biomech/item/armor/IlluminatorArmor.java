@@ -44,6 +44,14 @@ public class IlluminatorArmor extends ArmorBase {
 	
 	public static long updateTickPeriod = 1;
 	
+	private boolean toggledOn = true;
+	@Override
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown) {
+		if (keyIsDown) {
+			toggledOn = !toggledOn;
+		}
+	}
+	
 	public static Map<UUID, List<IlluminantInfo>> illuminantMap = new HashMap<>();
 	public static double illuminatorScale = 7.0;
 	public static int illuminatorForwardBlocks = 4;
@@ -62,6 +70,11 @@ public class IlluminatorArmor extends ArmorBase {
 						if (playerData != null) {
 						
 							if (playerData.tickCount % updateTickPeriod == 0) {
+								if (player.isLocalPlayer() && !toggledOn) {
+									BioMech.removeIlluminantBlocks(player, playerData);
+									return;
+								}
+								
 								List<IlluminantInfo> infos = illuminantMap.computeIfAbsent(player.getUUID(), (uuid) -> new ArrayList<IlluminantInfo>());
 								if (infos.isEmpty()) {
 									int blocksCount = illuminatorForwardBlocks*(illuminatorConeBlocks + 1);

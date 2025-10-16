@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMech.OutlinedSpawnerInfo;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
@@ -44,6 +45,13 @@ public class OpticsUnitArmor extends ArmorBase {
 	public static boolean canEverHighlightSpawners = true;
 	public static boolean canEverHighlightChests = true;
 
+	public boolean zoomIn = false;
+	
+	@Override
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown) {
+		zoomIn = keyIsDown;
+	}
+	
 	public static Set<BlockPos> capturedSpawners = new HashSet<>();
 	@Override
 	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
