@@ -1156,6 +1156,12 @@ public class BioMech
 	public void onPlayerDealDamage(LivingAttackEvent event) {
 		if (event.getSource().getDirectEntity() instanceof Player player) {
 			if (!player.level().isClientSide) {
+				DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(Minecraft.getInstance().player.getUUID());
+	        	if (info != null && info.remainingTicks > 0) {
+	        		event.setCanceled(true);
+	        		return;
+	        	}
+				
 				if (event.getEntity() != null && event.getSource().type() == player.level().damageSources().playerAttack(player).type()) {
 					BioMechPlayerData playerData = null;
 		        	playerData = globalPlayerData.get(player.getUUID());
