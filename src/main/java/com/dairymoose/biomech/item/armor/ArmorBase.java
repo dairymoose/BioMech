@@ -6,10 +6,13 @@ import java.util.List;
 import java.util.UUID;
 
 import com.dairymoose.biomech.BioMech.ClientModEvents;
+import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.BroadcastType;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.item.armor.arm.MiningLaserArmArmor;
+import com.dairymoose.biomech.packet.serverbound.ServerboundPressHotkeyPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundTeleportationCrystalPacket;
 
 import mod.azure.azurelib.AzureLib;
@@ -60,6 +63,7 @@ public class ArmorBase extends ArmorItem {
 	protected float flatDamageBoost = 0.0f;
 	protected float bonusBlockReach = 0.0f;
 	protected float bonusEntityReach = 0.0f;
+	protected float forceFieldDuration = 0.0f;
 	
 	protected boolean hasAttributeModifier = false;
 	
@@ -69,7 +73,15 @@ public class ArmorBase extends ArmorItem {
 		super(NOTHING_MATERIAL, type, props);
 	}
 	
-	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown) {
+	protected void sendHotkeyToServer(Player player, boolean keysIsDown, BroadcastType broadcastType, boolean serverOriginator) {
+		if (serverOriginator)
+			return;
+		
+		if (player.level().isClientSide)
+			BioMechNetwork.INSTANCE.sendToServer(new ServerboundPressHotkeyPacket(this, keysIsDown, broadcastType));
+	}
+	
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, boolean serverOriginator) {
 		
 	}
 	
@@ -103,6 +115,10 @@ public class ArmorBase extends ArmorItem {
 	
 	public void setDisabled(boolean disabled) {
 		this.configDisabled = disabled;
+	}
+	
+	public float getForcefieldDuration() {
+		return this.forceFieldDuration;
 	}
 	
 	public boolean getHasAttributeModifier() {
@@ -267,6 +283,7 @@ public class ArmorBase extends ArmorItem {
 			replaced = replaced.replaceAll("\\{flat_damage_boost\\}", nf.format(this.getFlatDamageBoost()));
 			replaced = replaced.replaceAll("\\{bonus_block_reach\\}", nf.format(this.getBonusBlockReach()));
 			replaced = replaced.replaceAll("\\{bonus_entity_reach\\}", nf.format(this.getBonusEntityReach()));
+			replaced = replaced.replaceAll("\\{forcefield_duration\\}", nf.format(this.getForcefieldDuration()));
 		}
 		
 		return replaced;

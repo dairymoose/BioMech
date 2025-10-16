@@ -10,6 +10,8 @@ import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
+import com.dairymoose.biomech.BroadcastType;
+import com.dairymoose.biomech.ToggledStatus;
 import com.dairymoose.biomech.block.IlluminantBlock;
 
 import net.minecraft.core.BlockPos;
@@ -26,7 +28,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class IlluminatorArmor extends ArmorBase {
 
@@ -44,12 +48,23 @@ public class IlluminatorArmor extends ArmorBase {
 	
 	public static long updateTickPeriod = 1;
 	
-	private boolean toggledOn = true;
+	private Map<UUID, ToggledStatus> toggledOnMap = new HashMap<>();
 	@Override
-	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown) {
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, boolean serverOriginator) {
 		if (keyIsDown) {
-			toggledOn = !toggledOn;
+			ToggledStatus status = toggledOnMap.get(player.getUUID());
+			if (status != null) {
+				if (FMLEnvironment.dist == Dist.CLIENT) {
+					if (player.level().isClientSide) {
+						status.toggledOn = !status.toggledOn;
+					}
+				} else {
+					status.toggledOn = !status.toggledOn;
+				}
+			}
 		}
+		this.sendHotkeyToServer(player, keyIsDown, BroadcastType.SEND_TO_ALL_CLIENTS, serverOriginator);
+		super.onHotkeyPressed(player, playerData, keyIsDown, serverOriginator);
 	}
 	
 	public static Map<UUID, List<IlluminantInfo>> illuminantMap = new HashMap<>();
@@ -70,7 +85,9 @@ public class IlluminatorArmor extends ArmorBase {
 						if (playerData != null) {
 						
 							if (playerData.tickCount % updateTickPeriod == 0) {
-								if (player.isLocalPlayer() && !toggledOn) {
+								ToggledStatus status = toggledOnMap.computeIfAbsent(player.getUUID(), (uuid) -> new ToggledStatus(true));
+								
+								if (player.isLocalPlayer() && !status.toggledOn) {
 									BioMech.removeIlluminantBlocks(player, playerData);
 									return;
 								}

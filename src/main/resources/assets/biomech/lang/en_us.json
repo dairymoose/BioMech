@@ -39,8 +39,14 @@
 	
 	"item.biomech.illuminator": "§5Illuminator§0",
 	"item.biomech.illuminator.tooltip1": "Lights up the area in front of you.",
-	"item.biomech.illuminator.tooltip2": "Press '{key_head} to toggle on/off'.",
+	"item.biomech.illuminator.tooltip2": "Press '{key_head}' to toggle on/off.",
 	"item.biomech.illuminator.tooltip3": "§6War... war never changes.§0",
+	
+	"item.biomech.emergency_forcefield_unit": "§5Emergency Forcefield Unit§0",
+	"item.biomech.emergency_forcefield_unit.tooltip1": "Press '{key_chest}' to activate.",
+	"item.biomech.emergency_forcefield_unit.tooltip2": "Erects a forcefield around you, shielding you from harm ({forcefield_duration} seconds).",
+	"item.biomech.emergency_forcefield_unit.tooltip3": "While the forcefield is active, you are granted health regeneration.",
+	"item.biomech.emergency_forcefield_unit.tooltip4": "You are slowed and cannot act while the forcefield is active.",
 	
 	"item.biomech.drill_arm": "§5Drill Arm§0",
 	"item.biomech.drill_arm.tooltip1": "Hold '{alt}+{lmb}' to activate.",

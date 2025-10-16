@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.block_entity.renderer.BioMechStationRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
-import com.dairymoose.biomech.client.screen.PortableStorageUnitScreen;
 import com.dairymoose.biomech.config.BioMechCommonConfig;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
@@ -51,6 +50,7 @@ import com.dairymoose.biomech.item.armor.arm.PowerArmArmor;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
 import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
+import com.dairymoose.biomech.packet.clientbound.ClientboundPressHotkeyPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundProjectileDodgePacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
@@ -58,7 +58,9 @@ import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmBlockTarget
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundOpenPortableStorageUnitPacket;
+import com.dairymoose.biomech.packet.serverbound.ServerboundPressHotkeyPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundTeleportationCrystalPacket;
+import com.dairymoose.biomech.particle.ForceFieldParticle;
 import com.dairymoose.biomech.particle.InstantSmokeParticle;
 import com.dairymoose.biomech.particle.LaserParticle;
 import com.dairymoose.biomech.particle.MaxLaserParticle;
@@ -102,7 +104,6 @@ import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -116,7 +117,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -307,6 +307,8 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMiningArmBlockTargetPacket.class, ServerboundMiningArmBlockTargetPacket::write, ServerboundMiningArmBlockTargetPacket::new, ServerboundMiningArmBlockTargetPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundOpenPortableStorageUnitPacket.class, ServerboundOpenPortableStorageUnitPacket::write, ServerboundOpenPortableStorageUnitPacket::new, ServerboundOpenPortableStorageUnitPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundTeleportationCrystalPacket.class, ServerboundTeleportationCrystalPacket::write, ServerboundTeleportationCrystalPacket::new, ServerboundTeleportationCrystalPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundPressHotkeyPacket.class, ServerboundPressHotkeyPacket::write, ServerboundPressHotkeyPacket::new, ServerboundPressHotkeyPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundPressHotkeyPacket.class, ClientboundPressHotkeyPacket::write, ClientboundPressHotkeyPacket::new, ClientboundPressHotkeyPacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -721,7 +723,7 @@ public class BioMech
 		} else if (!has.jumpActive && maj.lastJumpActiveStatus) {
 			maj.primedForMidAirJump = true;
 			//primedForMidairJump = true;
-		} else if (player.fallDistance >= 3.0f) {
+		} else if (player.fallDistance >= 2.5f) {
 			maj.primedForMidAirJump = true;
 		}
     	
@@ -1468,6 +1470,7 @@ public class BioMech
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_INSTANT_SMOKE.get(), InstantSmokeParticle.Provider::new);
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_MUZZLE_FLASH.get(), MuzzleFlashParticle.Provider::new);
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_REPULSOR.get(), RepulsorParticle.Provider::new);
+        	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_FORCE_FIELD.get(), ForceFieldParticle.Provider::new);
         }
         
     	@SubscribeEvent
@@ -1887,11 +1890,11 @@ public class BioMech
 				if (key.isDown()) {
 					while (key.consumeClick());
 					if (!priorStatus)
-						base.onHotkeyPressed(localPlayer, playerData, true);
+						base.onHotkeyPressed(localPlayer, playerData, true, false);
 					base.onHotkeyHeld(localPlayer, playerData);
 				} else {
 					if (priorStatus)
-						base.onHotkeyPressed(localPlayer, playerData, false);
+						base.onHotkeyPressed(localPlayer, playerData, false, false);
 				}
 			}
 			return key.isDown();

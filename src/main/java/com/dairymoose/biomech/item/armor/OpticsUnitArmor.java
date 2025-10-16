@@ -48,8 +48,9 @@ public class OpticsUnitArmor extends ArmorBase {
 	public boolean zoomIn = false;
 	
 	@Override
-	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown) {
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, boolean serverOriginator) {
 		zoomIn = keyIsDown;
+		super.onHotkeyPressed(player, playerData, keyIsDown, serverOriginator);
 	}
 	
 	public static Set<BlockPos> capturedSpawners = new HashSet<>();

@@ -54,6 +54,7 @@ public class LaserParticle extends TextureSheetParticle {
 	         RenderSystem.depthMask(true);
 	         RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
 	         RenderSystem.enableBlend();
+	         RenderSystem.defaultBlendFunc();
 	         p_107462_.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
 	      }
 

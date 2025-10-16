@@ -61,7 +61,7 @@ public class BioMechClientConfig {
 		this.enableJetpackSmokeParticle = builder.comment("enableJetpackSmokeParticle").translation("config.biomech.enableJetpackSmokeParticle").define("enableJetpackSmokeParticle", true);
 		this.enableJetpackSound = builder.comment("enableJetpackSound").translation("config.biomech.enableJetpackSound").define("enableJetpackSound", true);
 		this.enableHovertechParticle = builder.comment("enableHovertechParticle").translation("config.biomech.enableHovertechParticle").define("enableHovertechParticle", true);
-		this.illuminatorUpdateLightingTickPeriod = builder.comment("illuminatorUpdateLightingTickPeriod").translation("config.biomech.illuminatorUpdateLightingTickPeriod").defineInRange("illuminatorUpdateLightingTickPeriod", 1, 1, 40);
+		this.illuminatorUpdateLightingTickPeriod = builder.comment("illuminatorUpdateLightingTickPeriod").translation("config.biomech.illuminatorUpdateLightingTickPeriod").defineInRange("illuminatorUpdateLightingTickPeriod", 4, 1, 40);
 		builder.pop();
 		
 		builder.push("gui");

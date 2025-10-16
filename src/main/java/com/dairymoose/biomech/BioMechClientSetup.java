@@ -9,6 +9,7 @@ import com.dairymoose.biomech.armor.renderer.DiamondMechArmorRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechHeadRenderer;
 import com.dairymoose.biomech.armor.renderer.DiamondMechLegsRenderer;
 import com.dairymoose.biomech.armor.renderer.ElytraMechChestplateRenderer;
+import com.dairymoose.biomech.armor.renderer.EmergencyForcefieldUnitRenderer;
 import com.dairymoose.biomech.armor.renderer.GasMaskRenderer;
 import com.dairymoose.biomech.armor.renderer.HerosChestplateRenderer;
 import com.dairymoose.biomech.armor.renderer.HerosHeadpieceRenderer;
@@ -61,6 +62,7 @@ import com.dairymoose.biomech.armor.renderer.arm.PowerLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.PowerRightArmRenderer;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.client.screen.PortableStorageUnitScreen;
+import com.dairymoose.biomech.item.armor.EmergencyForcefieldUnitArmor;
 import com.dairymoose.biomech.item.renderer.BioMechStationItemRenderer;
 import com.dairymoose.biomech.item.renderer.BuzzsawItemRenderer;
 import com.dairymoose.biomech.item.renderer.DiamondMechArmItemRenderer;
@@ -119,6 +121,7 @@ public class BioMechClientSetup {
     	AzArmorRendererRegistry.register(ExtendoRightArmRenderer::new, BioMechRegistry.ITEM_EXTENDO_ARM.get());
     	AzArmorRendererRegistry.register(ExtendoLeftArmRenderer::new, BioMechRegistry.ITEM_EXTENDO_LEFT_ARM.get());
     	AzArmorRendererRegistry.register(IlluminatorRenderer::new, BioMechRegistry.ITEM_ILLUMINATOR.get());
+    	AzArmorRendererRegistry.register(EmergencyForcefieldUnitRenderer::new, BioMechRegistry.ITEM_EMERGENCY_FORCEFIELD_UNIT.get());
     	
     	//LOAD LIFTER
     	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());

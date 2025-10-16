@@ -45,10 +45,11 @@ public class HovertechLeggingsArmor extends ArmorBase {
 	public static boolean particleEnabled = true;
 	
 	@Override
-	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown) {
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, boolean serverOriginator) {
 		if (keyIsDown) {
 			toggledOn = !toggledOn;
 		}
+		super.onHotkeyPressed(player, playerData, keyIsDown, serverOriginator);
 	}
 	
 	boolean toggledOn = true;

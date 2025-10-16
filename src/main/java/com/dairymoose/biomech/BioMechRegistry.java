@@ -15,6 +15,7 @@ import com.dairymoose.biomech.item.armor.DiamondMechChestArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechHeadArmor;
 import com.dairymoose.biomech.item.armor.DiamondMechLegsArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
+import com.dairymoose.biomech.item.armor.EmergencyForcefieldUnitArmor;
 import com.dairymoose.biomech.item.armor.GasMaskArmor;
 import com.dairymoose.biomech.item.armor.HerosChestplateArmor;
 import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
@@ -119,6 +120,8 @@ public class BioMechRegistry {
 	
 	public static RegistryObject<ParticleType> PARTICLE_TYPE_REPULSOR = BioMech.PARTICLES.register("repulsor", () -> new SimpleParticleType(false));
 	
+	public static RegistryObject<ParticleType> PARTICLE_TYPE_FORCE_FIELD = BioMech.PARTICLES.register("force_field", () -> new SimpleParticleType(false));
+	
 	public static RegistryObject<SoundEvent> SOUND_EVENT_LASER_LOOP = BioMech.SOUNDS.register("laser_loop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "laser_loop")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_JETPACK_LOOP = BioMech.SOUNDS.register("jetpack_loop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "jetpack_loop")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_MINING_DRILL = BioMech.SOUNDS.register("mining_drill", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "mining_drill")));
@@ -151,6 +154,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_HOVERTECH_LEGGINGS = BioMech.ITEMS.register("hovertech_leggings", () -> new HovertechLeggingsArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_NIGHT_VISION_VISOR = BioMech.ITEMS.register("night_vision_visor", () -> new NightVisionVisorArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_EMERGENCY_FORCEFIELD_UNIT = BioMech.ITEMS.register("emergency_forcefield_unit", () -> new EmergencyForcefieldUnitArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	//IRON MECH
 	public static RegistryObject<Item> ITEM_IRON_MECH_HEAD = BioMech.ITEMS.register("iron_mech_head", () -> new IronMechHeadArmor(ArmorMaterials.IRON, Type.HELMET, (new Item.Properties())));
