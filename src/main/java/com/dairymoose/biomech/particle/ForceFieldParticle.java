@@ -47,7 +47,7 @@ public class ForceFieldParticle extends TextureSheetParticle {
 		//this.yd += inputDeltaY;
 		//this.zd += inputDeltaZ;
 
-		this.quadSize = 0.1F * (this.random.nextFloat() * 0.2F + 0.5F) * 2.7F;
+		this.quadSize = 0.1F * (this.random.nextFloat() * 0.2F + 0.5F) * 2.5F;
 		this.quadSize *= 0.55F * p_171914_;
 		this.savedQuadSize = this.quadSize;
 		
@@ -78,7 +78,7 @@ public class ForceFieldParticle extends TextureSheetParticle {
 		if (this.age == 2) {
 			this.quadSize = this.savedQuadSize;
 		}
-		this.quadSize *= 0.997;
+		this.quadSize *= 0.988;
 	}
 	
 	protected ForceFieldParticle(ClientLevel p_107685_, double p_107686_, double p_107687_, double p_107688_, double p_107689_, double p_107690_, double p_107691_, float p_107692_, SpriteSet p_107693_) {

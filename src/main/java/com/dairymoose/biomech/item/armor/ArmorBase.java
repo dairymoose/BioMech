@@ -64,6 +64,7 @@ public class ArmorBase extends ArmorItem {
 	protected float bonusBlockReach = 0.0f;
 	protected float bonusEntityReach = 0.0f;
 	protected float forceFieldDuration = 0.0f;
+	protected float forceFieldCooldown = 0.0f;
 	
 	protected boolean hasAttributeModifier = false;
 	
@@ -115,6 +116,10 @@ public class ArmorBase extends ArmorItem {
 	
 	public void setDisabled(boolean disabled) {
 		this.configDisabled = disabled;
+	}
+	
+	public float getForcefieldCooldown() {
+		return this.forceFieldCooldown;
 	}
 	
 	public float getForcefieldDuration() {

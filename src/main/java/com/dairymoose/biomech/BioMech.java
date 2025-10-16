@@ -28,6 +28,8 @@ import com.dairymoose.biomech.item.IlluminantBlockItem;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.CpuArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
+import com.dairymoose.biomech.item.armor.EmergencyForcefieldUnitArmor;
+import com.dairymoose.biomech.item.armor.EmergencyForcefieldUnitArmor.DurationInfo;
 import com.dairymoose.biomech.item.armor.GasMaskArmor;
 import com.dairymoose.biomech.item.armor.HerosHeadpieceArmor;
 import com.dairymoose.biomech.item.armor.HovertechLeggingsArmor;
@@ -622,6 +624,13 @@ public class BioMech
     	}
     }
     
+    public void removeInvulnerable(Player player, BioMechPlayerData playerData) {
+    	DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(player.getUUID());
+    	if (!(playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof EmergencyForcefieldUnitArmor) || info == null || (info != null && info.remainingTicks <= 0)) {
+    		player.setInvulnerable(false);
+    	}
+    }
+    
     //client-side energy drain tracking
     private static float suitEnergyLast = 0.0f;
 	private static float suitEnergyDiffSum = 0.0f;
@@ -656,6 +665,7 @@ public class BioMech
         			tickHandsForPlayer(event.player, playerData);
         			removePermanentModifiers(event.player, playerData);
         			removeIlluminantBlocksIfNoArmor(event.player, playerData);
+        			removeInvulnerable(event.player, playerData);
         			
         			HandActiveStatus has = BioMech.handActiveMap.get(event.player.getUUID());
         			checkForMidairJump(event.player, has);
@@ -1513,6 +1523,13 @@ public class BioMech
     	
     	@SubscribeEvent
     	public void onClickInput(InputEvent.InteractionKeyMappingTriggered event) {
+    		DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(Minecraft.getInstance().player.getUUID());
+        	if (info != null && info.remainingTicks > 0) {
+        		event.setSwingHand(false);
+        		event.setCanceled(true);
+        		return;
+        	}
+    		
     		HandActiveStatus has = this.getLocalHandActiveStatus();
     		
     		if (has != null) {
