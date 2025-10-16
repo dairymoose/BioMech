@@ -41,7 +41,7 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 		this.mechPart = MechPart.Chest;
 		
 		this.forceFieldDuration = 5.0f;
-		this.forceFieldCooldown = 10.0f;
+		this.forceFieldCooldown = 90.0f;
 	}
 	
 	public static class DurationInfo {
