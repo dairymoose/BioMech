@@ -57,7 +57,6 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 		forceFieldDurationTicks = (int)(this.forceFieldDuration * 20);
 		forceFieldCooldownTicks = (int)(this.forceFieldCooldown * 20);
 		if (keyIsDown) {
-			BioMech.LOGGER.info("key press");
 			DurationInfo dura = durationMap.computeIfAbsent(player.getUUID(), (uuid) -> new DurationInfo());
 			if (dura.remainingTicks == 0 && dura.cooldownRemaining == 0) {
 				dura.remainingTicks = forceFieldDurationTicks;
