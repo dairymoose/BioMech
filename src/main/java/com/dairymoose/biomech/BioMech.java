@@ -1540,25 +1540,38 @@ public class BioMech
         }
     	
     	@SubscribeEvent
+    	public void onMouseInput(InputEvent.MouseButton.Pre event) {
+    		if (Minecraft.getInstance().player != null) {
+    			DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(Minecraft.getInstance().player.getUUID());
+            	if (info != null && info.remainingTicks > 0) {
+            		event.setCanceled(true);
+            		return;
+            	}
+    		}
+    	}
+    	
+    	@SubscribeEvent
     	public void onClickInput(InputEvent.InteractionKeyMappingTriggered event) {
-    		DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(Minecraft.getInstance().player.getUUID());
-        	if (info != null && info.remainingTicks > 0) {
-        		event.setSwingHand(false);
-        		event.setCanceled(true);
-        		return;
-        	}
-    		
-    		HandActiveStatus has = this.getLocalHandActiveStatus();
-    		
-    		if (has != null) {
-    			if (has.rightHandActive && event.isAttack() && Minecraft.getInstance().options.keyAttack.getKey().equals(HOTKEY_RIGHT_ARM.getKey())) {
-        			event.setSwingHand(false);
-        			event.setCanceled(true);
-        		}
+    		if (Minecraft.getInstance().player != null) {
+    			DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(Minecraft.getInstance().player.getUUID());
+            	if (info != null && info.remainingTicks > 0) {
+            		event.setSwingHand(false);
+            		event.setCanceled(true);
+            		return;
+            	}
         		
-        		if (has.leftHandActive && event.isUseItem() && Minecraft.getInstance().options.keyUse.getKey().equals(HOTKEY_LEFT_ARM.getKey())) {
-        			event.setSwingHand(false);
-        			event.setCanceled(true);
+        		HandActiveStatus has = this.getLocalHandActiveStatus();
+        		
+        		if (has != null) {
+        			if (has.rightHandActive && event.isAttack() && Minecraft.getInstance().options.keyAttack.getKey().equals(HOTKEY_RIGHT_ARM.getKey())) {
+            			event.setSwingHand(false);
+            			event.setCanceled(true);
+            		}
+            		
+            		if (has.leftHandActive && event.isUseItem() && Minecraft.getInstance().options.keyUse.getKey().equals(HOTKEY_LEFT_ARM.getKey())) {
+            			event.setSwingHand(false);
+            			event.setCanceled(true);
+            		}
         		}
     		}
     	}
@@ -1916,6 +1929,12 @@ public class BioMech
                     			has.leftHandActive= false;
                     		}
                 		}
+            			
+            			DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(localPlayer.getUUID());
+                    	if (info != null && info.remainingTicks > 0) {
+                    		has.rightHandActive = false;
+                    		has.leftHandActive = false;
+                    	}
             		}
             		
             		if (initialRight != has.rightHandActive || initialLeft != has.leftHandActive || initialModifier != has.modifierKeyActive || initialJump != has.jumpActive) {
