@@ -1233,6 +1233,15 @@ public class BioMech
 	public void onPlayerDamageBeforeMitigation(final LivingAttackEvent event) {
 		if (!event.getEntity().level().isClientSide) {
 			if (event.getEntity() instanceof Player player) {
+				DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(player.getUUID());
+	        	if (info != null && info.remainingTicks > 0) {
+	        		float volume = 1.5f;
+	        		float pitch = 2.0f;
+	        		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ALLAY_ITEM_GIVEN, SoundSource.PLAYERS, volume, pitch);
+	        		event.setCanceled(true);
+	        		return;
+	        	}
+				
 				BioMechPlayerData playerData = null;
 	        	playerData = globalPlayerData.get(event.getEntity().getUUID());
 	        	if (playerData != null) {
@@ -1309,15 +1318,6 @@ public class BioMech
 			//BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
 		}
 		if (event.getEntity() instanceof Player player) {
-			DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(player.getUUID());
-        	if (info != null && info.remainingTicks > 0) {
-        		float volume = 1.5f;
-        		float pitch = 2.0f;
-        		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMBIENT_UNDERWATER_ENTER, SoundSource.PLAYERS, volume, pitch);
-        		event.setCanceled(true);
-        		return;
-        	}
-			
 			//BioMech.LOGGER.info("damage to player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
 			BioMechPlayerData playerData = null;
         	playerData = globalPlayerData.get(event.getEntity().getUUID());
@@ -1949,11 +1949,11 @@ public class BioMech
 				if (key.isDown()) {
 					while (key.consumeClick());
 					if (!priorStatus)
-						base.onHotkeyPressed(localPlayer, playerData, true, false);
+						base.onHotkeyPressed(localPlayer, playerData, true, -1, false);
 					base.onHotkeyHeld(localPlayer, playerData);
 				} else {
 					if (priorStatus)
-						base.onHotkeyPressed(localPlayer, playerData, false, false);
+						base.onHotkeyPressed(localPlayer, playerData, false, -1, false);
 				}
 			}
 			return key.isDown();
