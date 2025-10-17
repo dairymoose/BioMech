@@ -74,7 +74,8 @@ public class IlluminatorArmor extends ArmorBase {
 	
 	public static Map<UUID, List<IlluminantInfo>> illuminantMap = new HashMap<>();
 	public static double illuminatorScale = 7.0;
-	public static int illuminatorForwardBlocks = 4;
+	public static int illuminatorForwardBlocks = 5; //the first block will always be on top of the player
+	//the rest of the blocks will fan out in a cone
 	public static int illuminatorConeBlocks = 2; //multiple of 2, 1 on each side
 	public static float coneAngle = 15.0f;
 	@Override
@@ -109,17 +110,19 @@ public class IlluminatorArmor extends ArmorBase {
 								for (int i=0; i<illuminatorForwardBlocks; ++i) {
 									++currentId;
 									
-									double currentScale = illuminatorScale*(i + 1);
+									double currentScale = illuminatorScale*(i);
 									Vec3 loc = player.getEyePosition().add(player.getViewVector(1.0f).scale(currentScale));
 									recalcIlluminantBlock(level, infos, currentId, player, loc);
 									
-									for (int c=0; c<illuminatorConeBlocks/2; ++c) {
-										Vec3 rightLoc = player.getEyePosition().add(player.getViewVector(1.0f).yRot(Mth.DEG_TO_RAD*coneAngle/(c+1)).scale(currentScale));
-										Vec3 leftLoc = player.getEyePosition().add(player.getViewVector(1.0f).yRot(Mth.DEG_TO_RAD*-coneAngle/(c+1)).scale(currentScale));
-										++currentId;
-										recalcIlluminantBlock(level, infos, currentId, player, rightLoc);
-										++currentId;
-										recalcIlluminantBlock(level, infos, currentId, player, leftLoc);
+									if (i != 0) {
+										for (int c=0; c<illuminatorConeBlocks/2; ++c) {
+											Vec3 rightLoc = player.getEyePosition().add(player.getViewVector(1.0f).yRot(Mth.DEG_TO_RAD*coneAngle/(c+1)).scale(currentScale));
+											Vec3 leftLoc = player.getEyePosition().add(player.getViewVector(1.0f).yRot(Mth.DEG_TO_RAD*-coneAngle/(c+1)).scale(currentScale));
+											++currentId;
+											recalcIlluminantBlock(level, infos, currentId, player, rightLoc);
+											++currentId;
+											recalcIlluminantBlock(level, infos, currentId, player, leftLoc);
+										}
 									}
 								}
 							}
