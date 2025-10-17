@@ -112,6 +112,29 @@ public class IlluminatorArmor extends ArmorBase {
 									
 									double currentScale = illuminatorScale*(i);
 									Vec3 loc = player.getEyePosition().add(player.getViewVector(1.0f).scale(currentScale));
+									if (i == 0) {
+										//aim for the blockPos 3 blocks in front of the player
+										//we do this to try to avoid flickering that occurs with certain shaders
+										
+										BlockPos capturedPositions[] = new BlockPos[3];
+										int blocksForwardCount = 3;
+										for (int b=0; b<blocksForwardCount; ++b) {
+											BlockPos originalPos = BlockPos.containing(loc);
+											BlockPos targetedPos = BlockPos.containing(loc);
+											
+											while (targetedPos.equals(originalPos)) {
+												loc = loc.add(player.getViewVector(1.0f).scale(0.10));
+												targetedPos = BlockPos.containing(loc);
+											}
+											capturedPositions[b] = targetedPos;
+										}
+										if (!locationCanBeIlluminated(level, capturedPositions[2].getCenter())) {
+											loc = capturedPositions[1].getCenter();
+											if (!locationCanBeIlluminated(level, capturedPositions[1].getCenter())) {
+												loc = capturedPositions[0].getCenter();
+											}
+										}
+									}
 									recalcIlluminantBlock(level, infos, currentId, player, loc);
 									
 									if (i != 0) {
