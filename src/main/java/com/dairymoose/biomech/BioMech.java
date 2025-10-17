@@ -2092,7 +2092,123 @@ public class BioMech
         	Player renderEntity = event.getEntity();
         	if (renderEntity.isSpectator())
         		return;
+        	
+        	doPreRenderLogic(event, renderEntity);
+        }
+        
+        @SubscribeEvent
+        public void onPostRenderPlayer(RenderPlayerEvent.Post event) {
+        	if (disableAllRenderingLogic)
+        		return;
+        	
+        	if (itemToRender == null) {
+        		itemToRender = new ItemStack(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
+        	}
+        	Player renderEntity = event.getEntity();
+        	
+        	if (!renderEntity.isSpectator()) {
+        		doRenderLogic(event, renderEntity);
+        	}
+        	
         	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
+        	if (armorRenderer != null && renderEntity != null) {
+        		if (!priorItems.isEmpty()) {
+        			for (Map.Entry<EquipmentSlot, ItemStack> priorItem : priorItems.entrySet()) {
+        				event.getEntity().setItemSlot(priorItem.getKey(), priorItem.getValue());
+        			}
+        		}
+        	}
+        }
+
+        ItemStack priorFeetItem = null;
+        private void doPreRenderLogic(RenderPlayerEvent event, Player renderEntity) {
+			AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
+        	//priorItem = null;
+        	if (armorRenderer != null && renderEntity != null) {
+        		
+            	//AzArmorModelRenderer renderer = new AzArmorModelRenderer(armorRenderer.rendererPipeline());
+        		
+        		//playerModel.copyPropertiesTo(armorModel);
+        		
+        		try {
+        			PlayerRenderer playerRenderer = event.getRenderer();
+        			PlayerModel playerModel = event.getRenderer().getModel();
+        			//armorRenderer.prepForRender(renderEntity, itemToRender, itemToRender.getEquipmentSlot(), playerModel);
+        			AzArmorModel armorModel = armorRenderer.rendererPipeline().armorModel();
+        			HumanoidArmorLayer hal = new HumanoidArmorLayer(event.getRenderer(), playerModel, armorModel, Minecraft.getInstance().getModelManager());
+        			
+        		    BioMechPlayerData playerData = BioMech.globalPlayerData.get(renderEntity.getUUID());
+        		    if (playerData != null) {
+        		    	priorItems.clear();
+            		    if (isMechArmVisuallyActive(renderEntity, playerData, MechPart.RightArm) || renderEntity.getMainHandItem().getItem() instanceof BioMechDeactivator) {
+            		    	priorItems.put(EquipmentSlot.MAINHAND, renderEntity.getMainHandItem());
+            		    	renderEntity.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+            		    }
+            		    if (isMechArmVisuallyActive(renderEntity, playerData, MechPart.LeftArm)|| renderEntity.getOffhandItem().getItem() instanceof BioMechDeactivator) {
+            		    	priorItems.put(EquipmentSlot.OFFHAND, renderEntity.getOffhandItem());
+            		    	renderEntity.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+            		    }
+        		    	
+        		    	playerData.getAllSlots().forEach((slottedItem) -> {
+        		    		
+        		    		if (!slottedItem.itemStack.isEmpty() && slottedItem.visible) {
+        		    			ItemStack itemStackToRender = slottedItem.itemStack;
+        		    			EquipmentSlot equipmentSlot = LivingEntity.getEquipmentSlotForItem(itemStackToRender);
+        		    			if (equipmentSlot != null) {
+        		    				ItemStack priorItem = event.getEntity().getItemBySlot(equipmentSlot);
+        		    				
+        		    				if (slottedItem.mechPart == MechPart.LeftArm) {
+        		    					if (itemStackToRender.getItem() instanceof ArmorBase base) {
+        		    						Item leftArmItem = base.getLeftArmItem();
+        		    						if (leftArmItem != null) {
+        		    							if (slottedItem.leftArmItemStack == null || !slottedItem.leftArmItemStack.is(leftArmItem)) {
+        		    								slottedItem.leftArmItemStack = new ItemStack(leftArmItem);
+        		    							}
+        		    							itemStackToRender = slottedItem.leftArmItemStack;
+        		    						}
+                            		    }
+        		    				}
+        		    				
+        		    				if (slottedItem.mechPart == MechPart.Leggings) {
+        		    					priorFeetItem = event.getEntity().getItemBySlot(EquipmentSlot.FEET);
+        		    					event.getEntity().setItemSlot(EquipmentSlot.FEET, ItemStack.EMPTY);
+        		    				}
+        		    				
+        		    				event.getEntity().setItemSlot(equipmentSlot, ItemStack.EMPTY);
+                        		    if (slottedItem.mechPart == MechPart.LeftArm || slottedItem.mechPart == MechPart.RightArm || slottedItem.mechPart == MechPart.Back) {
+                        		    	event.getEntity().setItemSlot(equipmentSlot, priorItem);
+                        		    } else {
+                        		    	priorItems.putIfAbsent(equipmentSlot, priorItem);
+                        		    	
+                        		    	if (slottedItem.mechPart == MechPart.Leggings) {
+                        		    		if (priorFeetItem != null)
+                        		    			priorItems.putIfAbsent(EquipmentSlot.FEET, priorFeetItem);
+            		    				}
+                        		    }
+                        		    
+                        		    if (itemStackToRender.getItem() instanceof ArmorBase base) {
+                        		    	if (base.shouldHidePlayerModel()) {
+                        		    		List<ModelPart> parts = MechPartUtil.getCorrespondingModelParts(playerModel, base.getMechPart());
+                    						for (ModelPart part : parts) {
+                    							part.visible = false;
+                    						}
+                    					}
+                        		    	if (base.alwaysHidePlayerHat()) {
+                        		    		playerModel.hat.visible = false;
+                        		    	}
+                        		    }
+        		    			}
+        		    		}
+        		    	});
+        		    }
+        		} catch (Exception e) {
+        			LOGGER.error("render error", e);
+        		}
+        	}
+		}
+        
+		private void doRenderLogic(RenderPlayerEvent event, Player renderEntity) {
+			AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
         	//priorItem = null;
         	if (armorRenderer != null && renderEntity != null) {
         		
@@ -2142,16 +2258,6 @@ public class BioMech
         		    
         		    BioMechPlayerData playerData = BioMech.globalPlayerData.get(renderEntity.getUUID());
         		    if (playerData != null) {
-        		    	priorItems.clear();
-            		    if (isMechArmVisuallyActive(renderEntity, playerData, MechPart.RightArm) || renderEntity.getMainHandItem().getItem() instanceof BioMechDeactivator) {
-            		    	priorItems.put(EquipmentSlot.MAINHAND, renderEntity.getMainHandItem());
-            		    	renderEntity.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
-            		    }
-            		    if (isMechArmVisuallyActive(renderEntity, playerData, MechPart.LeftArm)|| renderEntity.getOffhandItem().getItem() instanceof BioMechDeactivator) {
-            		    	priorItems.put(EquipmentSlot.OFFHAND, renderEntity.getOffhandItem());
-            		    	renderEntity.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
-            		    }
-        		    	
         		    	playerData.getAllSlots().forEach((slottedItem) -> {
         		    		
         		    		if (!slottedItem.itemStack.isEmpty() && slottedItem.visible) {
@@ -2170,14 +2276,6 @@ public class BioMech
         		    							itemStackToRender = slottedItem.leftArmItemStack;
         		    						}
                             		    }
-        		    				}
-        		    				
-        		    				ItemStack priorFeetItem = null;
-        		    				//this is required so AzureLib actually does any render at all in renderArmorPiece
-        		    				event.getEntity().setItemSlot(equipmentSlot, itemStackToRender);
-        		    				if (slottedItem.mechPart == MechPart.Leggings) {
-        		    					priorFeetItem = event.getEntity().getItemBySlot(EquipmentSlot.FEET);
-        		    					event.getEntity().setItemSlot(EquipmentSlot.FEET, ItemStack.EMPTY);
         		    				}
             		    			
         		    				poseStack.pushPose();
@@ -2220,34 +2318,25 @@ public class BioMech
         		    					}
         		    				}
         		    				
+        		    				if (slottedItem.mechPart == MechPart.LeftArm || slottedItem.mechPart == MechPart.RightArm || slottedItem.mechPart == MechPart.Back) {
+                        		    	event.getEntity().setItemSlot(equipmentSlot, priorItem);
+                        		    } else {
+                        		    	//priorItems.putIfAbsent(equipmentSlot, priorItem);
+                        		    	
+                        		    	if (slottedItem.mechPart == MechPart.Leggings) {
+                        		    		//if (priorFeetItem != null)
+                        		    		//	priorItems.putIfAbsent(EquipmentSlot.FEET, priorFeetItem);
+            		    				}
+                        		    }
+        		    				
+        		    				//this is required so AzureLib actually does any render at all in renderArmorPiece
+        		    				event.getEntity().setItemSlot(equipmentSlot, itemStackToRender);
         		    				BioMech.currentRenderItemStackContext = itemStackToRender;
                         		    hal.renderArmorPiece(event.getPoseStack(), event.getMultiBufferSource(), renderEntity, equipmentSlot, event.getPackedLight(), armorModel);
                         		    BioMech.currentRenderItemStackContext = null;
                         		    //this is required so that AzureLib does not re-render the same armor when it comes time to render the player via default MC logic
-                        		    event.getEntity().setItemSlot(equipmentSlot, ItemStack.EMPTY);
+                        		    //event.getEntity().setItemSlot(equipmentSlot, ItemStack.EMPTY);
                         		    poseStack.popPose();
-                        		    if (slottedItem.mechPart == MechPart.LeftArm || slottedItem.mechPart == MechPart.RightArm || slottedItem.mechPart == MechPart.Back) {
-                        		    	event.getEntity().setItemSlot(equipmentSlot, priorItem);
-                        		    } else {
-                        		    	priorItems.putIfAbsent(equipmentSlot, priorItem);
-                        		    	
-                        		    	if (slottedItem.mechPart == MechPart.Leggings) {
-                        		    		if (priorFeetItem != null)
-                        		    			priorItems.putIfAbsent(EquipmentSlot.FEET, priorFeetItem);
-            		    				}
-                        		    }
-                        		    
-                        		    if (itemStackToRender.getItem() instanceof ArmorBase base) {
-                        		    	if (base.shouldHidePlayerModel()) {
-                        		    		List<ModelPart> parts = MechPartUtil.getCorrespondingModelParts(playerModel, base.getMechPart());
-                    						for (ModelPart part : parts) {
-                    							part.visible = false;
-                    						}
-                    					}
-                        		    	if (base.alwaysHidePlayerHat()) {
-                        		    		playerModel.hat.visible = false;
-                        		    	}
-                        		    }
         		    			}
         		    		}
         		    	});
@@ -2258,31 +2347,12 @@ public class BioMech
         			LOGGER.error("render error", e);
         		}
         	}
-        }
+		}
         
         protected void scale(AbstractClientPlayer player, PoseStack poseStack, float partialTick) {
             float f = 0.9375F;
             poseStack.scale(0.9375F, 0.9375F, 0.9375F);
          }
-        
-        @SubscribeEvent
-        public void onPostRenderPlayer(RenderPlayerEvent.Post event) {
-        	if (disableAllRenderingLogic)
-        		return;
-        	
-        	if (itemToRender == null) {
-        		itemToRender = new ItemStack(BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
-        	}
-        	Player renderEntity = event.getEntity();
-        	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
-        	if (armorRenderer != null && renderEntity != null) {
-        		if (!priorItems.isEmpty()) {
-        			for (Map.Entry<EquipmentSlot, ItemStack> priorItem : priorItems.entrySet()) {
-        				event.getEntity().setItemSlot(priorItem.getKey(), priorItem.getValue());
-        			}
-        		}
-        	}
-        }
         
         private static void markItemTooltipsAsDisabled() {
         	List<String> disabled = BioMech.getDisabledConfigItems();
