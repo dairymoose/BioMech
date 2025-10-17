@@ -277,7 +277,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						if (hitResult instanceof BlockHitResult bhr) {
 							BlockPos pos = bhr.getBlockPos();
 							BlockState blockState = player.level().getBlockState(pos);
-							if (!blockState.isAir() && !blockState.getFluidState().isSource()) {
+							if (!blockState.isAir() && !blockState.getFluidState().isSource() && !blockState.getCollisionShape(player.level(), pos).isEmpty()) {
 								didHit = true;
 								float blockDestroySpeed = blockState.getDestroySpeed(player.level(), pos);
 
@@ -365,7 +365,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						} else if (blockTarget != null) {
 							BlockState blockState = player.level().getBlockState(blockTarget);
 							
-							if (!blockState.isAir() && !blockState.getFluidState().isSource()) {
+							if (!blockState.isAir() && !blockState.getFluidState().isSource() && !blockState.getCollisionShape(player.level(), blockTarget).isEmpty()) {
 								didHit = true;
 								mineAllBlocks(dbpMap, player, miningPower, blockTarget);
 							}
