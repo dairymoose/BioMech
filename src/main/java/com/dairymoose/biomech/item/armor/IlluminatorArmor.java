@@ -74,7 +74,7 @@ public class IlluminatorArmor extends ArmorBase {
 	
 	public static Map<UUID, List<IlluminantInfo>> illuminantMap = new HashMap<>();
 	public static double illuminatorScale = 7.0;
-	public static int illuminatorForwardBlocks = 5; //the first block will always be on top of the player
+	public static int illuminatorForwardBlocks = 5; //the first block will always be on top of the player (or 1-3 blocks forward)
 	//the rest of the blocks will fan out in a cone
 	public static int illuminatorConeBlocks = 2; //multiple of 2, 1 on each side
 	public static float coneAngle = 15.0f;
