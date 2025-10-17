@@ -1,7 +1,6 @@
 package com.dairymoose.biomech.packet.serverbound;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -12,13 +11,9 @@ import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BroadcastType;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
-import com.dairymoose.biomech.item.armor.TeleportationCrystalArmor;
 import com.dairymoose.biomech.packet.clientbound.ClientboundPressHotkeyPacket;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.server.level.ServerLevel;
@@ -29,21 +24,21 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.PacketDistributor.PacketTarget;
-import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class ServerboundPressHotkeyPacket implements Packet<ServerGamePacketListener> {
 	public MechPart mechPart;
 	public boolean isHotkeyDown;
 	public BroadcastType broadcastType;
+	public int bonusData;
 	
 	public ServerboundPressHotkeyPacket() {
 	}
 	
-	public ServerboundPressHotkeyPacket(ArmorBase base, boolean isHotkeyDown, BroadcastType broadcastType) {
+	public ServerboundPressHotkeyPacket(ArmorBase base, boolean isHotkeyDown, int bonusData, BroadcastType broadcastType) {
 		this.mechPart = base.getMechPart();
 		this.isHotkeyDown = isHotkeyDown;
 		this.broadcastType = broadcastType;
+		this.bonusData = bonusData;
 	}
 	
 	public ServerboundPressHotkeyPacket(FriendlyByteBuf buffer) {
@@ -54,12 +49,14 @@ public class ServerboundPressHotkeyPacket implements Packet<ServerGamePacketList
 		this.mechPart = MechPart.values()[byteBuf.readInt()];
 		this.isHotkeyDown = byteBuf.readBoolean();
 		this.broadcastType = BroadcastType.values()[byteBuf.readInt()];
+		this.bonusData = byteBuf.readInt();
 	}
 
 	public void write(FriendlyByteBuf byteBuf) {
 		byteBuf.writeInt(mechPart.ordinal());
 		byteBuf.writeBoolean(isHotkeyDown);
 		byteBuf.writeInt(broadcastType.ordinal());
+		byteBuf.writeInt(bonusData);
 	}
 
 	public void handle(Supplier<NetworkEvent.Context> ctx) {
@@ -89,10 +86,10 @@ public class ServerboundPressHotkeyPacket implements Packet<ServerGamePacketList
 				if (playerData != null) {
 					
 					if (playerData.getForSlot(this.mechPart).itemStack.getItem() instanceof ArmorBase base) {
-						base.onHotkeyPressed(player, playerData, this.isHotkeyDown, true);
+						base.onHotkeyPressed(player, playerData, this.isHotkeyDown, bonusData, true);
 					}
 					if (this.broadcastType == BroadcastType.SEND_TO_ALL_CLIENTS) {
-						BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), new ClientboundPressHotkeyPacket(player, mechPart, isHotkeyDown));
+						BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), new ClientboundPressHotkeyPacket(player, mechPart, isHotkeyDown, bonusData));
 					}
 					
 				}

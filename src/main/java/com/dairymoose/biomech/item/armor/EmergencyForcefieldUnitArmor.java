@@ -53,7 +53,7 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 	public static int forceFieldDurationTicks;
 	public static int forceFieldCooldownTicks;
 	@Override
-	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, boolean serverOriginator) {
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, int bonusData, boolean serverOriginator) {
 		forceFieldDurationTicks = (int)(this.forceFieldDuration * 20);
 		forceFieldCooldownTicks = (int)(this.forceFieldCooldown * 20);
 		if (keyIsDown) {
@@ -99,10 +99,10 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 				}
 			}
 			
-			this.sendHotkeyToServer(player, keyIsDown, BroadcastType.SEND_TO_ALL_CLIENTS, serverOriginator);
+			this.sendHotkeyToServer(player, keyIsDown, bonusData, BroadcastType.SEND_TO_ALL_CLIENTS, serverOriginator);
 		}
 		
-		super.onHotkeyPressed(player, playerData, keyIsDown, serverOriginator);
+		super.onHotkeyPressed(player, playerData, keyIsDown, bonusData, serverOriginator);
 	}
 	
 	public static Player currentPlayer = null;
@@ -121,7 +121,6 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 								
 								player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, forceFieldDurationTicks, 3, false, false, false));
 								player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, forceFieldDurationTicks, 1, false, false, false));
-								//player.setInvulnerable(true);
 							}
 						}
 						

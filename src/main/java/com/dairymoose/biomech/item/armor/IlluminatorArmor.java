@@ -50,22 +50,26 @@ public class IlluminatorArmor extends ArmorBase {
 	
 	private Map<UUID, ToggledStatus> toggledOnMap = new HashMap<>();
 	@Override
-	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, boolean serverOriginator) {
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, int bonusData, boolean serverOriginator) {
 		if (keyIsDown) {
 			ToggledStatus status = toggledOnMap.get(player.getUUID());
 			if (status != null) {
-				if (FMLEnvironment.dist == Dist.CLIENT) {
-					if (player.level().isClientSide) {
+				if (bonusData == -1) {
+					if (FMLEnvironment.dist == Dist.CLIENT) {
+						if (player.level().isClientSide) {
+							status.toggledOn = !status.toggledOn;
+						}
+					} else {
 						status.toggledOn = !status.toggledOn;
 					}
 				} else {
-					status.toggledOn = !status.toggledOn;
+					status.toggledOn = bonusData == 1 ? true : false;
 				}
 			}
-			this.sendHotkeyToServer(player, keyIsDown, BroadcastType.SEND_TO_ALL_CLIENTS, serverOriginator);
+			this.sendHotkeyToServer(player, keyIsDown, status.toggledOn ? 1 : 0, BroadcastType.SEND_TO_ALL_CLIENTS, serverOriginator);
 		}
 		
-		super.onHotkeyPressed(player, playerData, keyIsDown, serverOriginator);
+		super.onHotkeyPressed(player, playerData, keyIsDown, bonusData, serverOriginator);
 	}
 	
 	public static Map<UUID, List<IlluminantInfo>> illuminantMap = new HashMap<>();
@@ -88,7 +92,7 @@ public class IlluminatorArmor extends ArmorBase {
 							if (playerData.tickCount % updateTickPeriod == 0) {
 								ToggledStatus status = toggledOnMap.computeIfAbsent(player.getUUID(), (uuid) -> new ToggledStatus(true));
 								
-								if (player.isLocalPlayer() && !status.toggledOn) {
+								if (!status.toggledOn) {
 									BioMech.removeIlluminantBlocks(player, playerData);
 									return;
 								}

@@ -29,11 +29,11 @@ public class NightVisionVisorArmor extends ArmorBase {
 
 	private boolean toggledOn = true;
 	@Override
-	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, boolean serverOriginator) {
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, int bonusData, boolean serverOriginator) {
 		if (keyIsDown) {
 			toggledOn = !toggledOn;
 		}
-		super.onHotkeyPressed(player, playerData, keyIsDown, serverOriginator);
+		super.onHotkeyPressed(player, playerData, keyIsDown, bonusData, serverOriginator);
 	}
 	
 	@Override

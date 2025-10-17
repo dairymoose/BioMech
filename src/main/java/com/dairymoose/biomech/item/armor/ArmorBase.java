@@ -74,15 +74,15 @@ public class ArmorBase extends ArmorItem {
 		super(NOTHING_MATERIAL, type, props);
 	}
 	
-	protected void sendHotkeyToServer(Player player, boolean keysIsDown, BroadcastType broadcastType, boolean serverOriginator) {
+	protected void sendHotkeyToServer(Player player, boolean keysIsDown, int bonusData, BroadcastType broadcastType, boolean serverOriginator) {
 		if (serverOriginator)
 			return;
 		
 		if (player.level().isClientSide)
-			BioMechNetwork.INSTANCE.sendToServer(new ServerboundPressHotkeyPacket(this, keysIsDown, broadcastType));
+			BioMechNetwork.INSTANCE.sendToServer(new ServerboundPressHotkeyPacket(this, keysIsDown, bonusData, broadcastType));
 	}
 	
-	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, boolean serverOriginator) {
+	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, int bonusData, boolean serverOriginator) {
 		
 	}
 	
