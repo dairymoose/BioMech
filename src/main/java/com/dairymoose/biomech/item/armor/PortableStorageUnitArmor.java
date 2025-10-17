@@ -26,6 +26,7 @@ public class PortableStorageUnitArmor extends ArmorBase {
 	public PortableStorageUnitArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 20;
+		this.suitEnergyPerSec = 0.5f;
 		this.alwaysHidePlayerHat = false;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Back;
