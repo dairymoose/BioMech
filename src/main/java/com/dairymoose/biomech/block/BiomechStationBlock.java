@@ -162,6 +162,17 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 		p_54097_.add(FACING, MULTIBLOCK, WATERLOGGED);
 	}
 	
+	public static float sanitizeRotation(float in) {
+		float out = in % 360.0f;
+		if (out > 180.0f) {
+			out -= 360.0f;
+		}
+		if (out < -180.0f) {
+			out += 360.0f;
+		}
+		return out;
+	}
+	
 	private InteractionResult useBlock(BlockState blockState, Level level, BlockPos blockPos, Player player,
 			InteractionHand hand, BlockHitResult hitResult) {
 		BlockEntity blockEntity = level.getBlockEntity(blockPos);
@@ -182,7 +193,7 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 					if (be.canOpen(player)) {
 						if (be.walkToStationTicks == -1 && be.walkToStationPlayer == null) {
 							be.playerStartLoc = player.getPosition(1.0f);
-							be.playerStartYRot = player.getYRot();
+							be.playerStartYRot = BioMechStationBlock.sanitizeRotation(player.getYRot());
 							be.walkToStationPlayer = player;
 							Vec3 blockEntityPos = blockEntity.getBlockPos().getCenter().with(Axis.Y, blockEntity.getBlockPos().getY());
 							double dist = blockEntityPos.distanceTo(be.playerStartLoc);

@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.block_entity;
 
+import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.block_entity.anim.BioMechStationDispatcher;
@@ -85,7 +86,15 @@ public class BioMechStationBlockEntity extends RandomizableContainerBlockEntity 
 			Player player = blockEntity.walkToStationPlayer;
 			
 			if (blockEntity.turnAroundTicks >= 0 && blockEntity.walkToStationPlayer != null) {
-				float finalYRot = blockState.getValue(BioMechStationBlock.FACING).toYRot();
+				float finalYRot = BioMechStationBlock.sanitizeRotation(blockState.getValue(BioMechStationBlock.FACING).toYRot());
+				float angularDiff = Math.abs(finalYRot - blockEntity.playerStartYRot);
+				if (angularDiff > 180.0f) {
+					//we would cross the 180.0 degree barrier - so instead reverse the rotation
+					if (blockEntity.playerStartYRot > 0.0f)
+						blockEntity.playerStartYRot -= 360.0f;
+					else
+						blockEntity.playerStartYRot += 360.0f;
+				}
 				double tickPct = (double)(blockEntity.turnAroundTicksMax - blockEntity.turnAroundTicks)/blockEntity.turnAroundTicksMax;
 				float yRot = (float) Mth.lerp(tickPct, blockEntity.playerStartYRot, finalYRot);
 				player.setYRot(yRot);
