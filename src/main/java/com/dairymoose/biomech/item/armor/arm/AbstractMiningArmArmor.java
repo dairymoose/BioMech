@@ -228,11 +228,11 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						double xComp = perpendicularDist * -Math.sin(Math.toRadians(yaw));
 						double zComp = perpendicularDist * Math.cos(Math.toRadians(yaw));
 						
-						Vec3 viewVecOffset = player.getViewVector(1.0f).scale(particleDistance);
-						Vec3 startLoc = player.position().add(viewVecOffset).add(
+						Vec3 viewVecOffset = player.getViewVector(partialTick).scale(particleDistance);
+						Vec3 startLoc = player.getPosition(partialTick).add(viewVecOffset).add(
 								new Vec3(xComp, particleStartY, zComp));
 						//our rendering is off by 1 tick, add delta movement to account for this
-						startLoc.add(player.getDeltaMovement());
+						startLoc = startLoc.add(player.getDeltaMovement().with(Axis.Y, 0.0).scale(partialTick));
 						
 						if (player.isLocalPlayer() && cc.isFirstPerson) {
 							//the particles line up in 3rd person but look very wrong in first person
@@ -255,16 +255,16 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 							zComp = firstPersonStandNextToDist * Math.cos(Math.toRadians(yaw));
 							
 							//positioned next to the player, we'll look in the exact same direction as the player, but slightly lower
-							startLoc = player.getEyePosition().add(xComp, 0.0, zComp).add(new Vec3(xComp3, yComp3, zComp3));
+							startLoc = player.getEyePosition(partialTick).add(xComp, 0.0, zComp).add(new Vec3(xComp3, yComp3, zComp3));
 							//our rendering is off by 1 tick, add delta movement to account for this
-							startLoc.add(player.getDeltaMovement());
+							startLoc = startLoc.add(player.getDeltaMovement().with(Axis.Y, 0.0).scale(partialTick));
 							
 							viewVec = new Vec3(0.0, 0.0, 0.0);
 						}
 						
 						Vec3 endLoc = hitResult.getLocation();
 						if (hitResult instanceof EntityHitResult ehr) {
-							Vec3 vecToEntity = ehr.getLocation().subtract(player.position());
+							Vec3 vecToEntity = ehr.getLocation().subtract(player.getPosition(partialTick));
 							viewVec = originalPlayerViewVec;
 							endLoc = player.getEyePosition(partialTick).add(viewVec.scale(vecToEntity.length()));
 						}
