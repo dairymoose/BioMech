@@ -30,6 +30,7 @@ public class MuzzleFlashParticle extends TextureSheetParticle {
 	      this.quadSize *= 0.55F * p_171914_;
 	      this.lifetime = 0;
 	      this.hasPhysics = p_171919_;
+	      this.setAlpha(0.90f);
 	}
 
 	@Override

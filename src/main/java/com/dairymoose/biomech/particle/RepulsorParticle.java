@@ -51,6 +51,7 @@ public class RepulsorParticle extends TextureSheetParticle {
 		this.lifetime = 20;
 		// this.hasPhysics = p_171919_;
 		this.hasPhysics = false;
+		//this.setAlpha(0.95f);
 	}
 
 	@Override

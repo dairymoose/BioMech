@@ -28,6 +28,7 @@ public class LaserParticle extends TextureSheetParticle {
       this.yd = p_105778_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;
       this.zd = p_105779_ * (double)0.2F + (Math.random() * 2.0D - 1.0D) * (double)0.02F;
       this.lifetime = 0;
+      this.setAlpha(0.90f);
    }
 
    public void tick() {

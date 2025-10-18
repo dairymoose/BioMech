@@ -57,6 +57,7 @@ public class ForceFieldParticle extends TextureSheetParticle {
 		this.lifetime = EmergencyForcefieldUnitArmor.forceFieldDurationTicks;
 		// this.hasPhysics = p_171919_;
 		this.hasPhysics = false;
+		this.setAlpha(0.60f);
 	}
 
 	@Override
