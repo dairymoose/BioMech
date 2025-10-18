@@ -612,6 +612,11 @@ public class BioMech
     	if (player instanceof ServerPlayer sp) {
     		boolean done = false;
         	while (!done) {
+        		if (failureCount >= 10) {
+        			BioMech.LOGGER.error("Could not send item slots to player: " + player);
+        			break;
+        		}
+        		
         		try {
         			Map<UUID, BioMechPlayerData> globalPlayerDataCopy = new HashMap<>(globalPlayerData);
         			for (Map.Entry<UUID, BioMechPlayerData> playerDataEntrySet : globalPlayerDataCopy.entrySet()) {
