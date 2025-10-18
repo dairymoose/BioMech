@@ -64,8 +64,10 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 			} else {
 				if (dura.remainingTicks <= 0 && dura.cooldownRemaining > 0) {
 					if (player.level().isClientSide) {
-						player.sendSystemMessage(Component.literal("Forcefield Unit is recharging!  Wait " + (int)Math.ceil(dura.cooldownRemaining/20.0f) + " sec"));
-						return;
+						if (player.isLocalPlayer()) {
+							player.sendSystemMessage(Component.literal("Forcefield Unit is recharging!  Wait " + (int)Math.ceil(dura.cooldownRemaining/20.0f) + " sec"));
+							return;
+						}
 					}
 				}
 			}
@@ -143,7 +145,9 @@ public class EmergencyForcefieldUnitArmor extends ArmorBase {
 							
 							if (dura.cooldownRemaining <= 0) {
 								if (level.isClientSide) {
-									player.sendSystemMessage(Component.literal("Forcefield Unit recharged!"));
+									if (player.isLocalPlayer()) {
+										player.sendSystemMessage(Component.literal("Forcefield Unit recharged!"));
+									}
 								}
 								durationMap.remove(player.getUUID());
 							}
