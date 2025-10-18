@@ -65,8 +65,9 @@ public class IlluminatorArmor extends ArmorBase {
 				} else {
 					status.toggledOn = (bonusData == 1 ? true : false);
 				}
+				
+				this.sendHotkeyToServer(player, keyIsDown, status.toggledOn ? 1 : 0, BroadcastType.SEND_TO_ALL_CLIENTS, serverOriginator);
 			}
-			this.sendHotkeyToServer(player, keyIsDown, status.toggledOn ? 1 : 0, BroadcastType.SEND_TO_ALL_CLIENTS, serverOriginator);
 		}
 		
 		super.onHotkeyPressed(player, playerData, keyIsDown, bonusData, serverOriginator);
