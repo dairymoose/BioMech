@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.ConfigPrefetch;
 import com.dairymoose.biomech.item.armor.IlluminatorArmor;
 import com.dairymoose.biomech.item.armor.IlluminatorArmor.IlluminantInfo;
 
@@ -34,8 +35,24 @@ public class IlluminantBlock extends Block implements SimpleWaterloggedBlock {
 	public static final IntegerProperty WATER_LEVEL = IntegerProperty.create("water_level", 0, 8);
 	
 	public IlluminantBlock(Properties props) {
-		super(props.noCollission().noOcclusion().replaceable().lightLevel((state) -> 15));
+		super(props.noCollission().noOcclusion().replaceable().lightLevel(IlluminantBlock::getIlluminantLightLevel));
+		try {
+			BioMech.LOGGER.debug("Init IlluminantBlock with lightLevel=" + this.getLightEmission(this.defaultBlockState(), null, null));
+		} catch (Exception e) {
+			;
+		}
 		this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, Boolean.FALSE).setValue(WATER_LEVEL, 0));
+	}
+	
+	static boolean didConfigLoad = false;
+	public static int lightLevel = 15;
+	public static Integer getIlluminantLightLevel(BlockState blockState) {
+		if (!didConfigLoad) {
+			didConfigLoad = true;
+			lightLevel = Integer.valueOf(new ConfigPrefetch().parseConfigForKey(BioMech.MODID, "client", "illuminatorLightValue", "15"));
+		} 
+		
+		return lightLevel;
 	}
 	
 	@Override

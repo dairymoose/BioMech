@@ -39,6 +39,7 @@ public class BioMechClientConfig {
 	public final ForgeConfigSpec.BooleanValue enableHovertechParticle;
 	
 	public final ForgeConfigSpec.IntValue illuminatorUpdateLightingTickPeriod;
+	public final ForgeConfigSpec.IntValue illuminatorLightValue;
 	
 	public BioMechClientConfig(ForgeConfigSpec.Builder builder) {
 		builder.push("first_person");
@@ -62,6 +63,7 @@ public class BioMechClientConfig {
 		this.enableJetpackSound = builder.comment("enableJetpackSound").translation("config.biomech.enableJetpackSound").define("enableJetpackSound", true);
 		this.enableHovertechParticle = builder.comment("enableHovertechParticle").translation("config.biomech.enableHovertechParticle").define("enableHovertechParticle", true);
 		this.illuminatorUpdateLightingTickPeriod = builder.comment("illuminatorUpdateLightingTickPeriod").translation("config.biomech.illuminatorUpdateLightingTickPeriod").defineInRange("illuminatorUpdateLightingTickPeriod", 3, 1, 40);
+		this.illuminatorLightValue = builder.comment("illuminatorLightValue").translation("config.biomech.illuminatorLightValue").defineInRange("illuminatorLightValue", 15, 1, 15);
 		builder.pop();
 		
 		builder.push("gui");
