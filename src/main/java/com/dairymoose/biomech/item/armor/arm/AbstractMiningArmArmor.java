@@ -231,9 +231,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						Vec3 viewVecOffset = player.getViewVector(partialTick).scale(particleDistance);
 						Vec3 startLoc = player.getPosition(partialTick).add(viewVecOffset).add(
 								new Vec3(xComp, particleStartY, zComp));
-						//our rendering is off by 1 tick, add delta movement to account for this
-						startLoc = startLoc.add(player.getDeltaMovement().with(Axis.Y, 0.0).scale(partialTick));
-						
+
 						if (player.isLocalPlayer() && cc.isFirstPerson) {
 							//the particles line up in 3rd person but look very wrong in first person
 							//do an entirely new calculation in first person
@@ -256,9 +254,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 							
 							//positioned next to the player, we'll look in the exact same direction as the player, but slightly lower
 							startLoc = player.getEyePosition(partialTick).add(xComp, 0.0, zComp).add(new Vec3(xComp3, yComp3, zComp3));
-							//our rendering is off by 1 tick, add delta movement to account for this
-							startLoc = startLoc.add(player.getDeltaMovement().with(Axis.Y, 0.0).scale(partialTick));
-							
+
 							viewVec = new Vec3(0.0, 0.0, 0.0);
 						}
 						
