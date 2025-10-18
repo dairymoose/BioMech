@@ -5,10 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.block_entity.BioMechStationBlockEntity;
 
-import mod.azure.azurelib.rewrite.animation.AzAnimatorConfig;
-import mod.azure.azurelib.rewrite.animation.controller.AzAnimationController;
-import mod.azure.azurelib.rewrite.animation.controller.AzAnimationControllerContainer;
-import mod.azure.azurelib.rewrite.animation.impl.AzBlockAnimator;
+import mod.azure.azurelib.animation.AzAnimatorConfig;
+import mod.azure.azurelib.animation.controller.AzAnimationController;
+import mod.azure.azurelib.animation.controller.AzAnimationControllerContainer;
+import mod.azure.azurelib.animation.impl.AzBlockAnimator;
 import net.minecraft.resources.ResourceLocation;
 
 public class BioMechStationAnimator extends AzBlockAnimator<BioMechStationBlockEntity> {

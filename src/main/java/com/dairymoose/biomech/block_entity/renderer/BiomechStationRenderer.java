@@ -9,8 +9,8 @@ import com.dairymoose.biomech.block_entity.BioMechStationBlockEntity;
 import com.dairymoose.biomech.block_entity.anim.BioMechStationAnimator;
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import mod.azure.azurelib.rewrite.render.block.AzBlockEntityRenderer;
-import mod.azure.azurelib.rewrite.render.block.AzBlockEntityRendererConfig;
+import mod.azure.azurelib.render.block.AzBlockEntityRenderer;
+import mod.azure.azurelib.render.block.AzBlockEntityRendererConfig;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
 

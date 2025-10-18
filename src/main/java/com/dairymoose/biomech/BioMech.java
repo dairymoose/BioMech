@@ -80,13 +80,13 @@ import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 
 import mod.azure.azurelib.AzureLib;
-import mod.azure.azurelib.rewrite.animation.AzAnimator;
-import mod.azure.azurelib.rewrite.animation.AzAnimatorAccessor;
-import mod.azure.azurelib.rewrite.animation.dispatch.AzDispatchSide;
-import mod.azure.azurelib.rewrite.animation.dispatch.command.AzCommand;
-import mod.azure.azurelib.rewrite.render.armor.AzArmorModel;
-import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
-import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererRegistry;
+import mod.azure.azurelib.animation.AzAnimator;
+import mod.azure.azurelib.animation.AzAnimatorAccessor;
+import mod.azure.azurelib.animation.dispatch.AzDispatchSide;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.render.armor.AzArmorModel;
+import mod.azure.azurelib.render.armor.AzArmorRenderer;
+import mod.azure.azurelib.render.armor.AzArmorRendererRegistry;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -1064,7 +1064,7 @@ public class BioMech
     	
     	try {
 	    	if (itemStack.getTag() != null && itemStack.getOrCreateTag().contains(AzureLib.ITEM_UUID_TAG)) {
-	    		AzAnimator<ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
+	    		AzAnimator<UUID, ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
 	    		//AzAnimator<ItemStack> anim = AzIdentifiableItemStackAnimatorCache.getInstance().getOrNull(itemStack.getTag().getUUID(AzureLib.ITEM_UUID_TAG));
 	        	if (anim != null) {
 	        		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));

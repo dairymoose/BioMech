@@ -4,8 +4,8 @@ import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.armor.renderer.arm.BuzzsawRightArmRenderer;
 import com.dairymoose.biomech.item.anim.BuzzsawAnimator;
 
-import mod.azure.azurelib.rewrite.render.item.AzItemRenderer;
-import mod.azure.azurelib.rewrite.render.item.AzItemRendererConfig;
+import mod.azure.azurelib.render.item.AzItemRenderer;
+import mod.azure.azurelib.render.item.AzItemRendererConfig;
 import net.minecraft.resources.ResourceLocation;
 
 public class BuzzsawItemRenderer extends AzItemRenderer {

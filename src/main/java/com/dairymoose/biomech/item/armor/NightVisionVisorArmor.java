@@ -3,8 +3,8 @@ package com.dairymoose.biomech.item.armor;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechPlayerData;
+import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 
 import net.minecraft.world.effect.MobEffectInstance;

@@ -3,7 +3,6 @@ package com.dairymoose.biomech.mixins;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.dairymoose.biomech.BioMech;
@@ -13,8 +12,6 @@ import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
-import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
-import com.dairymoose.biomech.item.armor.RepulsorLiftArmor;
 import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
 
 import net.minecraft.client.Minecraft;

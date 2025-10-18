@@ -1,12 +1,14 @@
 package com.dairymoose.biomech.armor.renderer;
 
+import java.util.UUID;
+
 import com.dairymoose.biomech.BioMech;
 
 import mod.azure.azurelib.cache.texture.AnimatableTexture;
-import mod.azure.azurelib.rewrite.render.AzRendererConfig;
-import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
-import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererConfig;
-import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererPipeline;
+import mod.azure.azurelib.render.AzRendererConfig;
+import mod.azure.azurelib.render.armor.AzArmorRenderer;
+import mod.azure.azurelib.render.armor.AzArmorRendererConfig;
+import mod.azure.azurelib.render.armor.AzArmorRendererPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -30,7 +32,7 @@ public class MobilityTreadsRenderer extends AzArmorRenderer {
     	
     	protected long lastMillis = 0;
     	
-		public AnimatedRendererPipeline(AzRendererConfig<ItemStack> config, AzArmorRenderer armorRenderer) {
+		public AnimatedRendererPipeline(AzRendererConfig<UUID, ItemStack> config, AzArmorRenderer armorRenderer) {
 			super(config, armorRenderer);
 		}
 		

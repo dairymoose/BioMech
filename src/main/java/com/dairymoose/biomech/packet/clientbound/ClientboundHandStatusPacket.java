@@ -3,14 +3,9 @@ package com.dairymoose.biomech.packet.clientbound;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.HandActiveStatus;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraftforge.api.distmarker.Dist;

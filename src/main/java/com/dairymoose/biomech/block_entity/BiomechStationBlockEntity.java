@@ -1,6 +1,5 @@
 package com.dairymoose.biomech.block_entity;
 
-import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.block_entity.anim.BioMechStationDispatcher;

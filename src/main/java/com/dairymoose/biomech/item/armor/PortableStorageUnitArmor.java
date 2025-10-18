@@ -6,9 +6,9 @@ import java.util.List;
 import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.client.screen.PortableStorageUnitScreen;
 import com.dairymoose.biomech.packet.serverbound.ServerboundOpenPortableStorageUnitPacket;
-import com.dairymoose.biomech.BioMechRegistry;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;

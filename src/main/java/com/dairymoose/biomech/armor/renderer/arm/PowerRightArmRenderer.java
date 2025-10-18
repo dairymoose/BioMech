@@ -2,11 +2,9 @@ package com.dairymoose.biomech.armor.renderer.arm;
 
 import com.dairymoose.biomech.BioMech;
 
-import mod.azure.azurelib.rewrite.render.AzRendererConfig;
-import mod.azure.azurelib.rewrite.render.armor.AzArmorRenderer;
-import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererConfig;
+import mod.azure.azurelib.render.armor.AzArmorRenderer;
+import mod.azure.azurelib.render.armor.AzArmorRendererConfig;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 
 public class PowerRightArmRenderer extends AzArmorRenderer {
     public static final ResourceLocation GEO = ResourceLocation.fromNamespaceAndPath(
@@ -23,7 +21,7 @@ public class PowerRightArmRenderer extends AzArmorRenderer {
         super(AzArmorRendererConfig.builder(GEO, TEX).build());
     }
     
-    public PowerRightArmRenderer(AzRendererConfig <ItemStack> config) {
+    public PowerRightArmRenderer(AzArmorRendererConfig config) {
         super(config);
     }
 }

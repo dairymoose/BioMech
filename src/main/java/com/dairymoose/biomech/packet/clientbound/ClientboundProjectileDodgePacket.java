@@ -3,10 +3,8 @@ package com.dairymoose.biomech.packet.clientbound;
 import java.util.function.Supplier;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.world.entity.Entity;

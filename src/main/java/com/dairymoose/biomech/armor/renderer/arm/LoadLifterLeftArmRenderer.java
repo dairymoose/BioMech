@@ -1,9 +1,8 @@
 package com.dairymoose.biomech.armor.renderer.arm;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.item.anim.DrillAnimator;
 
-import mod.azure.azurelib.rewrite.render.armor.AzArmorRendererConfig;
+import mod.azure.azurelib.render.armor.AzArmorRendererConfig;
 import net.minecraft.resources.ResourceLocation;
 
 public class LoadLifterLeftArmRenderer extends LoadLifterRightArmRenderer {

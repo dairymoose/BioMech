@@ -1,7 +1,7 @@
 package com.dairymoose.biomech.item.anim;
 
-import mod.azure.azurelib.rewrite.animation.dispatch.command.AzCommand;
-import mod.azure.azurelib.rewrite.animation.play_behavior.AzPlayBehavior;
+import mod.azure.azurelib.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.animation.play_behavior.AzPlayBehavior;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 

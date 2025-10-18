@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMech.OutlinedSpawnerInfo;
+import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
 
