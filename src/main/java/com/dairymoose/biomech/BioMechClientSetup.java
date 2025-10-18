@@ -48,6 +48,8 @@ import com.dairymoose.biomech.armor.renderer.arm.ExtendoLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.ExtendoRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.GatlingLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.GatlingRightArmRenderer;
+import com.dairymoose.biomech.armor.renderer.arm.HarvesterLeftArmRenderer;
+import com.dairymoose.biomech.armor.renderer.arm.HarvesterRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.HerosLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.HerosRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.IronMechLeftArmRenderer;
@@ -70,6 +72,7 @@ import com.dairymoose.biomech.item.renderer.DiggerArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.DrillItemRenderer;
 import com.dairymoose.biomech.item.renderer.ExtendoArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.GatlingItemRenderer;
+import com.dairymoose.biomech.item.renderer.HarvesterArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.HerosArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.LoadLifterArmItemRenderer;
@@ -85,6 +88,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class BioMechClientSetup {
 
+	@SuppressWarnings("unchecked")
 	public static void doClientSetup(FMLClientSetupEvent event) {
 		//"bone" is null error?  The .geo file is missing from geo.item package
     	AzArmorRendererRegistry.register(HovertechLeggingsRenderer::new, BioMechRegistry.ITEM_HOVERTECH_LEGGINGS.get());
@@ -122,6 +126,8 @@ public class BioMechClientSetup {
     	AzArmorRendererRegistry.register(ExtendoLeftArmRenderer::new, BioMechRegistry.ITEM_EXTENDO_LEFT_ARM.get());
     	AzArmorRendererRegistry.register(IlluminatorRenderer::new, BioMechRegistry.ITEM_ILLUMINATOR.get());
     	AzArmorRendererRegistry.register(EmergencyForcefieldUnitRenderer::new, BioMechRegistry.ITEM_EMERGENCY_FORCEFIELD_UNIT.get());
+    	AzArmorRendererRegistry.register(HarvesterRightArmRenderer::new, BioMechRegistry.ITEM_HARVESTER_ARM.get());
+    	AzArmorRendererRegistry.register(HarvesterLeftArmRenderer::new, BioMechRegistry.ITEM_HARVESTER_LEFT_ARM.get());
     	
     	//LOAD LIFTER
     	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());
@@ -176,6 +182,7 @@ public class BioMechClientSetup {
     	AzItemRendererRegistry.register(HerosArmItemRenderer::new, BioMechRegistry.ITEM_HEROS_ARM.get());
     	AzItemRendererRegistry.register(LoadLifterArmItemRenderer::new, BioMechRegistry.ITEM_LOAD_LIFTER_ARM.get());
     	AzItemRendererRegistry.register(ExtendoArmItemRenderer::new, BioMechRegistry.ITEM_EXTENDO_ARM.get());
+    	AzItemRendererRegistry.register(HarvesterArmItemRenderer::new, BioMechRegistry.ITEM_HARVESTER_ARM.get());
     	//------ Arm items - render item display / right arm only ------
     	
     	//------ All Animated ------
@@ -189,6 +196,7 @@ public class BioMechClientSetup {
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_TELEPORTATION_CRYSTAL.get());
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_REPULSOR_LIFT.get());
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_EXTENDO_ARM.get(), BioMechRegistry.ITEM_EXTENDO_LEFT_ARM.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_HARVESTER_ARM.get(), BioMechRegistry.ITEM_HARVESTER_LEFT_ARM.get());
     	//------ All Animated ------
     	
     	

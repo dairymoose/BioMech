@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " a ",
+    "#b#",
+    "   "
+  ],
+  "key": {
+    "#": {
+      "item": "biomech:biomech_scrap_block"
+    },
+	"b": {
+      "item": "minecraft:diamond_hoe"
+    },
+	"a": {
+	  "item": "minecraft:chain"
+	}
+  },
+  "result": {
+    "item": "biomech:harvester_arm",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableHarvesterArmCrafting"
+    }
+  ]
+} 

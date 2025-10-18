@@ -32,6 +32,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableExtendoArmCrafting;
 	public final ForgeConfigSpec.BooleanValue enableGasMaskCrafting;
 	public final ForgeConfigSpec.BooleanValue enableGatlingArmCrafting;
+	public final ForgeConfigSpec.BooleanValue enableHarvesterArmCrafting;
 	public final ForgeConfigSpec.BooleanValue enableHerosArmCrafting;
 	public final ForgeConfigSpec.BooleanValue enableHerosChestplateCrafting;
 	public final ForgeConfigSpec.BooleanValue enableHerosHeadpieceCrafting;
@@ -73,6 +74,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableExtendoArmLooting;
 	public final ForgeConfigSpec.BooleanValue enableGasMaskLooting;
 	public final ForgeConfigSpec.BooleanValue enableGatlingArmLooting;
+	public final ForgeConfigSpec.BooleanValue enableHarvesterArmLooting;
 	public final ForgeConfigSpec.BooleanValue enableHerosArmLooting;
 	public final ForgeConfigSpec.BooleanValue enableHerosChestplateLooting;
 	public final ForgeConfigSpec.BooleanValue enableHerosHeadpieceLooting;
@@ -138,6 +140,7 @@ public class BioMechCommonConfig {
 		this.enableExtendoArmCrafting = builder.comment("enableExtendoArmCrafting").translation("config.biomech.enableExtendoArmCrafting").define("enableExtendoArmCrafting", true);
 		this.enableGasMaskCrafting = builder.comment("enableGasMaskCrafting").translation("config.biomech.enableGasMaskCrafting").define("enableGasMaskCrafting", true);
 		this.enableGatlingArmCrafting = builder.comment("enableGatlingArmCrafting").translation("config.biomech.enableGatlingArmCrafting").define("enableGatlingArmCrafting", true);
+		this.enableHarvesterArmCrafting = builder.comment("enableHarvesterArmCrafting").translation("config.biomech.enableHarvesterArmCrafting").define("enableHarvesterArmCrafting", true);
 		this.enableHerosArmCrafting = builder.comment("enableHerosArmCrafting").translation("config.biomech.enableHerosArmCrafting").define("enableHerosArmCrafting", true);
 		this.enableHerosChestplateCrafting = builder.comment("enableHerosChestplateCrafting").translation("config.biomech.enableHerosChestplateCrafting").define("enableHerosChestplateCrafting", true);
 		this.enableHerosHeadpieceCrafting = builder.comment("enableHerosHeadpieceCrafting").translation("config.biomech.enableHerosHeadpieceCrafting").define("enableHerosHeadpieceCrafting", true);
@@ -181,6 +184,7 @@ public class BioMechCommonConfig {
 		this.enableExtendoArmLooting = builder.comment("enableExtendoArmLooting").translation("config.biomech.enableExtendoArmLooting").define("enableExtendoArmLooting", true);
 		this.enableGasMaskLooting = builder.comment("enableGasMaskLooting").translation("config.biomech.enableGasMaskLooting").define("enableGasMaskLooting", true);
 		this.enableGatlingArmLooting = builder.comment("enableGatlingArmLooting").translation("config.biomech.enableGatlingArmLooting").define("enableGatlingArmLooting", true);
+		this.enableHarvesterArmLooting = builder.comment("enableHarvesterArmLooting").translation("config.biomech.enableHarvesterArmLooting").define("enableHarvesterArmLooting", true);
 		this.enableHerosArmLooting = builder.comment("enableHerosArmLooting").translation("config.biomech.enableHerosArmLooting").define("enableHerosArmLooting", true);
 		this.enableHerosChestplateLooting = builder.comment("enableHerosChestplateLooting").translation("config.biomech.enableHerosChestplateLooting").define("enableHerosChestplateLooting", true);
 		this.enableHerosHeadpieceLooting = builder.comment("enableHerosHeadpieceLooting").translation("config.biomech.enableHerosHeadpieceLooting").define("enableHerosHeadpieceLooting", true);

@@ -37,6 +37,11 @@
 	"item.biomech.extendo_arm.tooltip1": "§9+{bonus_block_reach} Block Reach§0",
 	"item.biomech.extendo_arm.tooltip2": "§9+{bonus_entity_reach} Entity Reach§0",
 	
+	"item.biomech.harvester_arm": "§5Harvester Arm§0",
+	"item.biomech.harvester_arm.tooltip1": "Hold '{alt}+{lmb}' to activate.",
+	"item.biomech.harvester_arm.tooltip2": "Hold to harvest crops (or till) in a 3x3 area.",
+	"item.biomech.harvester_arm.tooltip3": "Crops are automatically replanted when harvested.",
+	
 	"item.biomech.illuminator": "§5Illuminator§0",
 	"item.biomech.illuminator.tooltip1": "Lights up the area in front of you.",
 	"item.biomech.illuminator.tooltip2": "Press '{key_head}' to toggle on/off.",

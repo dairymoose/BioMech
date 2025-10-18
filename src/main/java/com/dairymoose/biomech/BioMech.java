@@ -166,7 +166,6 @@ import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.data.SoundDefinition.SoundType;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -334,7 +333,13 @@ public class BioMech
 		}
     }
     
+    public static boolean didAddItemsToCreative = false;
     public void addItemsToCreativeTab(BuildCreativeModeTabContentsEvent event) {
+    	if (didAddItemsToCreative) {
+    		return;
+    	}
+    	didAddItemsToCreative = false;
+    	
 		if (event.getTab() == BioMechRegistry.TAB_BIOMECH_CREATIVE.get()) {
 			Field[] allFields = BioMechRegistry.class.getDeclaredFields();
 			for (Field f : allFields) {
@@ -620,10 +625,12 @@ public class BioMech
         		try {
         			Map<UUID, BioMechPlayerData> globalPlayerDataCopy = new HashMap<>(globalPlayerData);
         			for (Map.Entry<UUID, BioMechPlayerData> playerDataEntrySet : globalPlayerDataCopy.entrySet()) {
-        				CompoundTag playerDataTag = BioMechPlayerData.serialize(playerDataEntrySet.getValue());
-        				++playerDataCount;
-        				ClientboundUpdateSlottedItemPacket slottedItemPacket = new ClientboundUpdateSlottedItemPacket(playerDataEntrySet.getKey(), playerDataTag);
-        				BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), slottedItemPacket);
+        				if (!player.getUUID().equals(playerDataEntrySet.getKey())) {
+        					CompoundTag playerDataTag = BioMechPlayerData.serialize(playerDataEntrySet.getValue());
+            				++playerDataCount;
+            				ClientboundUpdateSlottedItemPacket slottedItemPacket = new ClientboundUpdateSlottedItemPacket(playerDataEntrySet.getKey(), playerDataTag);
+            				BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), slottedItemPacket);
+        				}
         			}
         		} catch (Exception ex) {
         			++failureCount;

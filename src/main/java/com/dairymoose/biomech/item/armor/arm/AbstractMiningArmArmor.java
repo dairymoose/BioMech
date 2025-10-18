@@ -66,6 +66,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 		public static float progressMax = 100.0f;
 	}
 
+	protected boolean spawnsBlockMiningParticles = true;
 	protected float minSpeedMult = 2.5f;
 	protected float maxSpeedMult = minSpeedMult * 6.0f;
 	protected double blockReachMult = 1.6;
@@ -124,6 +125,10 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 	
 	public static Map<Player, BlockPos> blockTargetMap = new ConcurrentHashMap<>();
 	public static Map<Player, Entity> entityTargetMap = new ConcurrentHashMap<>();
+	
+	protected boolean doSpecialBlockMiningLogic(Player player, Level level, BlockState blockState, BlockPos blockPos) {
+		return false;
+	}
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -273,22 +278,24 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						if (hitResult instanceof BlockHitResult bhr) {
 							BlockPos pos = bhr.getBlockPos();
 							BlockState blockState = player.level().getBlockState(pos);
-							if (!blockState.isAir() && !blockState.getFluidState().isSource() && !blockState.getCollisionShape(player.level(), pos).isEmpty()) {
-								didHit = true;
-								float blockDestroySpeed = blockState.getDestroySpeed(player.level(), pos);
+							if (this.spawnsBlockMiningParticles || !this.matchesCorrectTool(player, player.level(), pos, blockState)) {
+								if (!blockState.isAir() && !blockState.getFluidState().isSource() && !blockState.getCollisionShape(player.level(), pos).isEmpty()) {
+									didHit = true;
+									float blockDestroySpeed = blockState.getDestroySpeed(player.level(), pos);
 
-								//mineAllBlocks(dbpMapClient, player, miningPower, bhr);
-								
-								ParticleType particles = ForgeRegistries.PARTICLE_TYPES
-										.getValue(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.BLOCK));
-								if (particles != null && blockDestroySpeed > 0.0f) {
-									BlockParticleOption blockParticle = new BlockParticleOption(ParticleTypes.BLOCK,
-											blockState);
-									for (int i = 0; i < 3; ++i) {
-										player.level().addParticle(blockParticle,
-												endLoc.x + (Math.random() * 1.0 - 0.5),
-												endLoc.y + (Math.random() * 1.0 - 0.5),
-												endLoc.z + (Math.random() * 1.0 - 0.5), 0.0D, 0.0D, 0.0D);
+									//mineAllBlocks(dbpMapClient, player, miningPower, bhr);
+									
+									ParticleType particles = ForgeRegistries.PARTICLE_TYPES
+											.getValue(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.BLOCK));
+									if (particles != null && blockDestroySpeed > 0.0f) {
+										BlockParticleOption blockParticle = new BlockParticleOption(ParticleTypes.BLOCK,
+												blockState);
+										for (int i = 0; i < 3; ++i) {
+											player.level().addParticle(blockParticle,
+													endLoc.x + (Math.random() * 1.0 - 0.5),
+													endLoc.y + (Math.random() * 1.0 - 0.5),
+													endLoc.z + (Math.random() * 1.0 - 0.5), 0.0D, 0.0D, 0.0D);
+										}
 									}
 								}
 							}
@@ -361,9 +368,11 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						} else if (blockTarget != null) {
 							BlockState blockState = player.level().getBlockState(blockTarget);
 							
-							if (!blockState.isAir() && !blockState.getFluidState().isSource() && !blockState.getCollisionShape(player.level(), blockTarget).isEmpty()) {
-								didHit = true;
-								mineAllBlocks(dbpMap, player, miningPower, blockTarget);
+							if (!this.doSpecialBlockMiningLogic(player, player.level(), blockState, blockTarget)) {
+								if (!blockState.isAir() && !blockState.getFluidState().isSource() && !blockState.getCollisionShape(player.level(), blockTarget).isEmpty()) {
+									didHit = true;
+									mineAllBlocks(dbpMap, player, miningPower, blockTarget);
+								}
 							}
 						}
 						
@@ -417,16 +426,14 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 		int expectedSize = xSize*ySize*zSize;
 		if (originMustMatchToolToMineArea) {
 			BlockState originState = player.level().getBlockState(origin);
-			if (!this.miningTool.isCorrectToolForDrops(originState)) {
+			if (!this.matchesCorrectTool(player, player.level(), origin, originState)) {
 				xDiff = 0;
 				yDiff = 0;
 				zDiff = 0;
 				expectedSize = 1;
 			}
 		}
-		BlockPos minPos = origin.relative(Axis.X, -xDiff).relative(Axis.Y, -yDiff).relative(Axis.Z, -zDiff);
-		BlockPos maxPos = origin.relative(Axis.X, xDiff).relative(Axis.Y, yDiff).relative(Axis.Z, zDiff);
-		Iterable<BlockPos> blocks = BlockPos.betweenClosed(minPos, maxPos);
+		Iterable<BlockPos> blocks = getAllMineableBlocks(origin, xDiff, yDiff, zDiff);
 		int dbpIndex = 0;
 		
 		for (BlockPos pos : blocks) {
@@ -438,6 +445,17 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 			
 			++dbpIndex;
 		}
+	}
+
+	protected Iterable<BlockPos> getAllMineableBlocks(BlockPos origin, int xDiff, int yDiff, int zDiff) {
+		BlockPos minPos = origin.relative(Axis.X, -xDiff).relative(Axis.Y, -yDiff).relative(Axis.Z, -zDiff);
+		BlockPos maxPos = origin.relative(Axis.X, xDiff).relative(Axis.Y, yDiff).relative(Axis.Z, zDiff);
+		Iterable<BlockPos> blocks = BlockPos.betweenClosed(minPos, maxPos);
+		return blocks;
+	}
+
+	protected boolean matchesCorrectTool(Player player, Level level, BlockPos origin, BlockState originState) {
+		return this.miningTool.isCorrectToolForDrops(originState);
 	}
 
 	private int mineBlocksDestructionId = -1;
@@ -453,7 +471,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 		BlockState blockState = player.level().getBlockState(pos);
 		float blockDestroySpeed = blockState.getDestroySpeed(player.level(), dbp.pos);
 		float toolSpeed = miningTool.getDestroySpeed(blockState);
-		boolean isCorrect = miningTool.isCorrectToolForDrops(blockState);
+		boolean isCorrect = this.matchesCorrectTool(player, player.level(), pos, blockState);
 		float penaltyMod = isCorrect ? 1.0f : wrongToolPenalty;
 		float miningSpeed = penaltyMod * (toolSpeed / blockDestroySpeed);
 		float speedMult = Mth.lerp(miningPower, minSpeedMult, maxSpeedMult);
