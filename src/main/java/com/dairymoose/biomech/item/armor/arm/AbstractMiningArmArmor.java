@@ -358,7 +358,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 							Entity e = entityTarget;
 							if (e instanceof LivingEntity living) {
 								if (!living.isInvulnerable() && !living.isDeadOrDying()) {
-									dealEntityDamage(player, bothHandsActive, miningPower, living);
+									dealEntityDamage(itemStack, player, bothHandsActive, miningPower, living);
 								}
 								
 								if (living.isDeadOrDying() || living.isRemoved()) {
@@ -509,7 +509,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 
 	protected abstract void playSound(Player player, int useTicks, boolean didHit);
 	
-	protected abstract void dealEntityDamage(Player player, boolean bothHandsActive, float miningPower, LivingEntity living);
+	protected abstract void dealEntityDamage(ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living);
 
 	protected abstract void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec);
 

@@ -7,6 +7,7 @@ import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.item.anim.HarvesterDispatcher;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -211,9 +212,18 @@ public abstract class HarvesterArmArmor extends AbstractMiningArmArmor {
 	}
 	
 	@Override
-	protected void dealEntityDamage(Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
-		float damageMult = 1.0f;
-		living.hurt(player.level().damageSources().playerAttack(player), damageMult*hoeDamage*miningPower);
+	protected void dealEntityDamage(ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
+		CompoundTag compound = itemStack.getOrCreateTag();
+		long swingDiff = -1;
+		if (compound.contains("LastSwingTime")) {
+			long lastSwingTime = compound.getLong("LastSwingTime");
+			swingDiff = player.tickCount - lastSwingTime;
+		}
+		if (swingDiff < 0 || swingDiff >= 20) {
+			float damageMult = 1.0f;
+			living.hurt(player.level().damageSources().playerAttack(player), damageMult*hoeDamage*miningPower);
+			compound.putLong("LastSwingTime", player.tickCount);
+		}
 	}
 	
 	@Override

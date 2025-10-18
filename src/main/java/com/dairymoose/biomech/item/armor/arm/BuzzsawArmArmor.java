@@ -52,7 +52,7 @@ public abstract class BuzzsawArmArmor extends AbstractMiningArmArmor {
 	}
 	
 	@Override
-	protected void dealEntityDamage(Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
+	protected void dealEntityDamage(ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
 		float damageMult = 1.0f;
 		if (bothHandsActive) {
 			//damageMult = 2.0f;
