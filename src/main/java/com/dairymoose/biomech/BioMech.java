@@ -606,6 +606,31 @@ public class BioMech
 		BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), slottedItemPacket);
     }
     
+    public static void sendAllItemSlotsToOnePlayer(Player player) {
+    	int playerDataCount = 0;
+    	int failureCount = 0;
+    	if (player instanceof ServerPlayer sp) {
+    		boolean done = false;
+        	while (!done) {
+        		try {
+        			Map<UUID, BioMechPlayerData> globalPlayerDataCopy = new HashMap<>(globalPlayerData);
+        			for (Map.Entry<UUID, BioMechPlayerData> playerDataEntrySet : globalPlayerDataCopy.entrySet()) {
+        				CompoundTag playerDataTag = BioMechPlayerData.serialize(playerDataEntrySet.getValue());
+        				++playerDataCount;
+        				ClientboundUpdateSlottedItemPacket slottedItemPacket = new ClientboundUpdateSlottedItemPacket(playerDataEntrySet.getKey(), playerDataTag);
+        				BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), slottedItemPacket);
+        			}
+        		} catch (Exception ex) {
+        			++failureCount;
+        			BioMech.LOGGER.warn("Error while sending item slots to player: " + player);
+        		}
+            	
+            	done = true;
+        	}
+    	}
+    	BioMech.LOGGER.debug("Sent " + playerDataCount + " SlottedItemPackets to " + player + " with failureCount=" + failureCount);
+    }
+    
     @SubscribeEvent
     public void onJump(LivingEvent.LivingJumpEvent event) {
     	if (event.getEntity() instanceof Player player) {
@@ -906,6 +931,7 @@ public class BioMech
     	LOGGER.debug("Player " + event.getEntity().getDisplayName().getString() + " joined the server!");
     	if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer sp) {
     		BioMech.sendItemSlotUpdateForPlayer(sp);
+    		BioMech.sendAllItemSlotsToOnePlayer(sp);
     	}
     }
     
