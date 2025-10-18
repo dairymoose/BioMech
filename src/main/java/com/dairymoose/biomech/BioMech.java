@@ -1190,7 +1190,7 @@ public class BioMech
 	}
 	
 	public static boolean damageCanHurtEntity(float damage, LivingEntity living) {
-		return living.invulnerableTime <= 10 || damage >= living.lastHurt;
+		return living.invulnerableTime <= 10 || damage > living.lastHurt;
 	}
 	
 	@SubscribeEvent
