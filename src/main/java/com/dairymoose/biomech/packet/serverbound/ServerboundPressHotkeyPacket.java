@@ -81,17 +81,21 @@ public class ServerboundPressHotkeyPacket implements Packet<ServerGamePacketList
 			ServerGamePacketListenerImpl serverHandler = (ServerGamePacketListenerImpl)packetListener;
 			Level world = serverHandler.player.level();
 			if (world != null) {
-				Player player = serverHandler.player;
-				BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
-				if (playerData != null) {
-					
-					if (playerData.getForSlot(this.mechPart).itemStack.getItem() instanceof ArmorBase base) {
-						base.onHotkeyPressed(player, playerData, this.isHotkeyDown, bonusData, true);
+				try {
+					Player player = serverHandler.player;
+					BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
+					if (playerData != null) {
+						
+						if (playerData.getForSlot(this.mechPart).itemStack.getItem() instanceof ArmorBase base) {
+							base.onHotkeyPressed(player, playerData, this.isHotkeyDown, bonusData, true);
+						}
+						if (this.broadcastType == BroadcastType.SEND_TO_ALL_CLIENTS) {
+							BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), new ClientboundPressHotkeyPacket(player, mechPart, isHotkeyDown, bonusData));
+						}
+						
 					}
-					if (this.broadcastType == BroadcastType.SEND_TO_ALL_CLIENTS) {
-						BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), new ClientboundPressHotkeyPacket(player, mechPart, isHotkeyDown, bonusData));
-					}
-					
+				} catch (Exception e) {
+					BioMech.LOGGER.error("Error handling serverbound hotkey packet", e);
 				}
 			}
 		}

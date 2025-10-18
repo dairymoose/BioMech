@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.packet.clientbound;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import com.dairymoose.biomech.BioMech;
@@ -18,7 +19,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 public class ClientboundPressHotkeyPacket implements Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> {
-	public int playerId;
+	public UUID playerUuid;
 	public MechPart mechPart;
 	public boolean isHotkeyDown;
 	public int bonusData;
@@ -31,21 +32,21 @@ public class ClientboundPressHotkeyPacket implements Packet<net.minecraft.networ
 	}
 	
 	public ClientboundPressHotkeyPacket(Player player, MechPart mechPart, boolean isHotkeyDown, int bonusData) {
-		this.playerId = player.getId();
+		this.playerUuid = player.getUUID();
 		this.mechPart = mechPart;
 		this.isHotkeyDown = isHotkeyDown;
 		this.bonusData = bonusData;
 	}
 
 	public void read(FriendlyByteBuf byteBuf) {
-		this.playerId = byteBuf.readInt();
+		this.playerUuid = byteBuf.readUUID();
 		this.mechPart = MechPart.values()[byteBuf.readInt()];
 		this.isHotkeyDown = byteBuf.readBoolean();
 		this.bonusData = byteBuf.readInt();
 	}
 
 	public void write(FriendlyByteBuf byteBuf) {
-		byteBuf.writeInt(playerId);
+		byteBuf.writeUUID(playerUuid);
 		byteBuf.writeInt(mechPart.ordinal());
 		byteBuf.writeBoolean(isHotkeyDown);
 		byteBuf.writeInt(bonusData);
@@ -68,18 +69,22 @@ public class ClientboundPressHotkeyPacket implements Packet<net.minecraft.networ
 					net.minecraft.client.multiplayer.ClientPacketListener clientHandler = (net.minecraft.client.multiplayer.ClientPacketListener)handler;
 					Level world = clientHandler.getLevel();
 					if (world != null) {
-						Entity e = world.getEntity(playerId);
-						if (e instanceof Player player) {
-							if (player.getId() != Minecraft.getInstance().player.getId()) {
-								BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
-								if (playerData != null) {
-									
-									if (playerData.getForSlot(mechPart).itemStack.getItem() instanceof ArmorBase base) {
-										base.onHotkeyPressed(player, playerData, isHotkeyDown, bonusData, true);
+						try {
+							Player player = world.getPlayerByUUID(playerUuid);
+							if (player != null) {
+								if (!player.isLocalPlayer()) {
+									BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
+									if (playerData != null) {
+										
+										if (playerData.getForSlot(mechPart).itemStack.getItem() instanceof ArmorBase base) {
+											base.onHotkeyPressed(player, playerData, isHotkeyDown, bonusData, true);
+										}
+										
 									}
-									
 								}
 							}
+						} catch (Exception e) {
+							BioMech.LOGGER.error("Error handling clientbound hotkey packet", e);
 						}
 					}
 				}
