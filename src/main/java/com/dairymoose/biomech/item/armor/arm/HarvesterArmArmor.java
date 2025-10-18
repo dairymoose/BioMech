@@ -9,6 +9,7 @@ import com.dairymoose.biomech.item.anim.HarvesterDispatcher;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.datafix.fixes.ChunkPalettedStorageFix.Direction;
 import net.minecraft.world.InteractionHand;
@@ -138,6 +139,8 @@ public abstract class HarvesterArmArmor extends AbstractMiningArmArmor {
 		Iterable<BlockPos> blocks = this.getAllMineableBlocks(blockPos, xDiff, yDiff, zDiff);
 		
 		boolean handled = false;
+		boolean didTill = false;
+		boolean didReplant = false;
 		for (BlockPos pos : blocks) {
 			BlockState state = level.getBlockState(pos);
 			
@@ -145,6 +148,7 @@ public abstract class HarvesterArmArmor extends AbstractMiningArmArmor {
 			if (toolModifiedState != null) {
 				if (!level.isClientSide) {
 					level.setBlock(pos, toolModifiedState, 3);
+					didTill = true;
 				}
 				
 				handled = true;
@@ -157,10 +161,12 @@ public abstract class HarvesterArmArmor extends AbstractMiningArmArmor {
 						if (age >= crop.getMaxAge()) {
 							this.replantCrop(pos, state, serverLevel);
 						}
+						didReplant = true;
 					} else if (state.getBlock() instanceof NetherWartBlock wart) {
 						if (age >= NetherWartBlock.MAX_AGE) {
 							this.replantCrop(pos, state, serverLevel);
 						}
+						didReplant = true;
 					}
 				}
 				
@@ -168,6 +174,13 @@ public abstract class HarvesterArmArmor extends AbstractMiningArmArmor {
 			}
 		}
 		if (handled) {
+			if (didTill) {
+				if (!level.isClientSide)
+					level.playSound(null, blockPos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+			} else if (didReplant) {
+				if (!level.isClientSide && player.tickCount % 10 == 0)
+					level.playSound(null, blockPos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+			}
 			return true;
 		}
 		
