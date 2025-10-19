@@ -39,7 +39,7 @@ public abstract class DrillArmArmor extends AbstractMiningArmArmor {
 		this.onlyMinesMatchingBlocks = true;
 	}
 
-	public static float drillDamage = 5.5f;
+	public static float drillDamage = 6.1f;
 	
 	@Override
 	protected void playSound(Player player, int useTicks, boolean didHit) {
