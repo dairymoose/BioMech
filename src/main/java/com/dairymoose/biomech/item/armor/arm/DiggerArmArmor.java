@@ -42,7 +42,7 @@ public abstract class DiggerArmArmor extends AbstractMiningArmArmor {
 		this.soundTickPeriod = 10;
 	}
 
-	public static float bucketDamage = 2.0f;
+	public static float bucketDamage = 2.5f;
 	
 	@Override
 	protected void playSound(Player player, int useTicks, boolean didHit) {
@@ -62,7 +62,7 @@ public abstract class DiggerArmArmor extends AbstractMiningArmArmor {
 			long lastSwingTime = compound.getLong("LastSwingTime");
 			swingDiff = player.tickCount - lastSwingTime;
 		}
-		if (swingDiff < 0 || swingDiff >= 18) {
+		if (swingDiff < 0 || swingDiff >= 22) {
 			float damageMult = 1.0f;
 			living.hurt(player.level().damageSources().playerAttack(player), damageMult*bucketDamage*miningPower);
 			compound.putLong("LastSwingTime", player.tickCount);
