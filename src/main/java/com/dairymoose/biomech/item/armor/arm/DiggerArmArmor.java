@@ -6,6 +6,7 @@ import com.dairymoose.biomech.item.anim.DiggerDispatcher;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
@@ -55,7 +56,7 @@ public abstract class DiggerArmArmor extends AbstractMiningArmArmor {
 	}
 	
 	@Override
-	protected void dealEntityDamage(ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
+	protected void dealEntityDamage(Vec3 hitLocation, ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
 		CompoundTag compound = itemStack.getOrCreateTag();
 		long swingDiff = -1;
 		if (compound.contains("LastSwingTime")) {
@@ -107,7 +108,7 @@ public abstract class DiggerArmArmor extends AbstractMiningArmArmor {
 	}
 	
 	@Override
-	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec) {
+	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec, Entity entity, boolean didHit) {
 		
 	}
 	

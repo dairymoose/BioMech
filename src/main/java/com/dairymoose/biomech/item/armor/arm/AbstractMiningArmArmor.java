@@ -125,8 +125,26 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 
 	private Object previousClientTarget = null;
 	
-	public static Map<Player, BlockPos> blockTargetMap = new ConcurrentHashMap<>();
-	public static Map<Player, Entity> entityTargetMap = new ConcurrentHashMap<>();
+	public static class BlockTargetInfo {
+		public BlockTargetInfo(BlockPos pos, Vec3 hitLocation) {
+			this.pos = pos;
+			this.hitLocation = hitLocation;
+		}
+		
+		public BlockPos pos;
+		public Vec3 hitLocation;
+	}
+	public static class EntityTargetInfo {
+		public EntityTargetInfo(Entity entity, Vec3 hitLocation) {
+			this.entity = entity;
+			this.hitLocation = hitLocation;
+		}
+		
+		public Entity entity;
+		public Vec3 hitLocation;
+	}
+	public static Map<Player, BlockTargetInfo> blockTargetMap = new ConcurrentHashMap<>();
+	public static Map<Player, EntityTargetInfo> entityTargetMap = new ConcurrentHashMap<>();
 	
 	protected boolean doSpecialBlockMiningLogic(Player player, Level level, BlockState blockState, BlockPos blockPos) {
 		return false;
@@ -273,10 +291,10 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 							viewVec = originalPlayerViewVec;
 							endLoc = player.getEyePosition(partialTick).add(viewVec.scale(vecToEntity.length()));
 						}
-						this.onSpawnParticles(player, startLoc, endLoc, useTicks, viewVec);
 
 						BlockPos newBlockTarget = null;
 						Entity newEntityTarget = null;
+						Vec3 hitLocation = null;
 						
 						float miningPower = this.getMiningPower(useTicks);
 						if (hitResult instanceof BlockHitResult bhr) {
@@ -305,24 +323,27 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 							}
 							
 							newBlockTarget = pos;
+							hitLocation = endLoc;
 						} else if (hitResult instanceof EntityHitResult ehr) {
 							didHit = true;
 							
 							newEntityTarget = ehr.getEntity();
+							hitLocation = endLoc;
 						}
+						this.onSpawnParticles(player, startLoc, endLoc, useTicks, viewVec, newEntityTarget, didHit);
 						
 						if (newBlockTarget != null) {
 							//our hitscan yielded a block
 							
 							if (previousClientTarget != newBlockTarget) {
-								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMiningArmBlockTargetPacket(newBlockTarget));
+								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMiningArmBlockTargetPacket(newBlockTarget, hitLocation));
 								previousClientTarget = newBlockTarget;
 							}
 						} else if (newEntityTarget != null) {
 							//our hitscan yielded an entity
 							
 							if (previousClientTarget != newEntityTarget) {
-								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMiningArmEntityTargetPacket(newEntityTarget));
+								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMiningArmEntityTargetPacket(newEntityTarget, hitLocation));
 								previousClientTarget = newEntityTarget;
 							}
 						}
@@ -339,8 +360,8 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						
 						float miningPower = this.getMiningPower(useTicks);
 						
-						BlockPos blockTarget = blockTargetMap.get(player);
-						Entity entityTarget = entityTargetMap.get(player);
+						BlockTargetInfo blockTarget = blockTargetMap.get(player);
+						EntityTargetInfo entityTarget = entityTargetMap.get(player);
 						if (entityTarget == null) {
 							HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
 									(e) -> (e instanceof LivingEntity && !((LivingEntity)e).isDeadOrDying()) && !e.isRemoved() && !e.isSpectator(),
@@ -348,34 +369,34 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 							
 							if (hitResult instanceof BlockHitResult bhr) {
 								if (serverEverChecksBlockHits) {
-									blockTarget = bhr.getBlockPos();
+									blockTarget = new BlockTargetInfo(bhr.getBlockPos(), bhr.getLocation());
 								}
 							} else if (hitResult instanceof EntityHitResult ehr) {
 								if (serverEverChecksEntityHits) {
-									entityTarget = ehr.getEntity();
+									entityTarget = new EntityTargetInfo(ehr.getEntity(), ehr.getLocation());
 								}
 							}
 						}
 						
-						if (entityTarget != null) {
+						if (entityTarget != null && entityTarget.entity != null) {
 							didHit = true;
-							Entity e = entityTarget;
+							Entity e = entityTarget.entity;
 							if (e instanceof LivingEntity living) {
 								if (!living.isInvulnerable() && !living.isDeadOrDying()) {
-									dealEntityDamage(itemStack, player, bothHandsActive, miningPower, living);
+									dealEntityDamage(entityTarget.hitLocation, itemStack, player, bothHandsActive, miningPower, living);
 								}
 								
 								if (living.isDeadOrDying() || living.isRemoved()) {
 									entityTargetMap.remove(player);
 								}
 							}
-						} else if (blockTarget != null) {
-							BlockState blockState = player.level().getBlockState(blockTarget);
+						} else if (blockTarget != null && blockTarget.pos != null) {
+							BlockState blockState = player.level().getBlockState(blockTarget.pos);
 							
-							if (!this.doSpecialBlockMiningLogic(player, player.level(), blockState, blockTarget)) {
-								if (!blockState.isAir() && !blockState.getFluidState().isSource() && !blockState.getCollisionShape(player.level(), blockTarget).isEmpty()) {
+							if (!this.doSpecialBlockMiningLogic(player, player.level(), blockState, blockTarget.pos)) {
+								if (!blockState.isAir() && !blockState.getFluidState().isSource() && !blockState.getCollisionShape(player.level(), blockTarget.pos).isEmpty()) {
 									didHit = true;
-									mineAllBlocks(dbpMap, player, miningPower, blockTarget);
+									mineAllBlocks(dbpMap, player, miningPower, blockTarget.pos);
 								}
 							}
 						}
@@ -517,9 +538,9 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 
 	protected abstract void playSound(ItemStack itemStack, Player player, int useTicks, boolean didHit);
 	
-	protected abstract void dealEntityDamage(ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living);
+	protected abstract void dealEntityDamage(Vec3 hitLocation, ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living);
 
-	protected abstract void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec);
+	protected abstract void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec, Entity entity, boolean didHit);
 
 	@Override
 	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isLeftArm) {

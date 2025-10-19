@@ -6,8 +6,10 @@ import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.item.anim.GatlingDispatcher;
 
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
@@ -100,13 +102,13 @@ public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 	protected void playSound(ItemStack itemStack, Player player, int useTicks, boolean didHit) {
 		this.notYetActiveSound(itemStack, player);
 		
-		float volume = activeVolumeMod * 1.0f;
+		float volume = activeVolumeMod * 0.9f;
 		float laserPitch = 1.0f;
 		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_GATLING_FIRING.get(), SoundSource.PLAYERS, volume, laserPitch, false);
 	}
 	
 	@Override
-	protected void dealEntityDamage(ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
+	protected void dealEntityDamage(Vec3 hitLocation, ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
 		float damageMult = 1.0f;
 		if (bothHandsActive) {
 			//damageMult = 2.0f;
@@ -118,8 +120,24 @@ public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 		//as distTo multiplier is decreased, falloff also decreases
 		damageFalloffFactor = (float) Math.min(1.0, Math.max(gatlingMinFalloff, 1.0/Math.log10(distTo*0.50)));
 		
-		//living.hurt(player.level().damageSources().playerAttack(player), damageMult*drillDamage*miningPower);
-		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), damageFalloffFactor*damageMult*gatlingDamage*miningPower/20.0f);
+		float calcDamage = damageFalloffFactor*damageMult*gatlingDamage*miningPower/20.0f;
+		
+		boolean headShot = isHeadshot(hitLocation, living);
+		if (headShot) {
+			calcDamage *= 1.20f;
+		}
+		
+		living.hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), calcDamage);
+	}
+
+	private boolean isHeadshot(Vec3 hitLocation, Entity entity) {
+		if (entity == null) {
+			return false;
+		}
+		
+		float foreheadHeight = entity.getBbHeight() - entity.getEyeHeight();
+		boolean headShot = hitLocation.y >= (entity.getEyeY() - foreheadHeight);
+		return headShot;
 	}
 	
 	@Override
@@ -160,7 +178,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 	}
 	
 	@Override
-	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec) {
+	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec, Entity entity, boolean didHit) {
 		//double vecScale = 0.60;
 		double vecScale = 0.0;
 		Vec3 loc = startLoc.add(viewVec.scale(vecScale));
@@ -168,9 +186,19 @@ public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 		player.level().addParticle((ParticleOptions) BioMechRegistry.PARTICLE_TYPE_MUZZLE_FLASH.get(), loc.x, loc.y, loc.z,
 				0.0, 0.0, 0.0);
 		
-		//flamethrower?
-		//player.level().addParticle(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z,
-				//viewVec.scale(vecScale).x, viewVec.scale(vecScale).y, viewVec.scale(vecScale).z);
+		if (entity != null) {
+			boolean headShot = isHeadshot(endLoc, entity);
+			if (headShot) {
+				for (int i=0; i<3; ++i) {
+					double speedMult = 1.2;
+					double randX = speedMult*(Math.random()-0.5);
+					double randY = speedMult*(Math.random()-0.5);
+					double randZ = speedMult*(Math.random()-0.5);
+					player.level().addParticle(ParticleTypes.CRIMSON_SPORE, endLoc.x, endLoc.y, endLoc.z,
+							randX, randY, randZ);
+				}
+			}
+		}
 	}
 	
 	@Override

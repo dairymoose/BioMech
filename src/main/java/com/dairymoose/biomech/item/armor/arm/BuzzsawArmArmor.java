@@ -5,6 +5,7 @@ import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.item.anim.BuzzsawDispatcher;
 
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
@@ -52,7 +53,7 @@ public abstract class BuzzsawArmArmor extends AbstractMiningArmArmor {
 	}
 	
 	@Override
-	protected void dealEntityDamage(ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
+	protected void dealEntityDamage(Vec3 hitLocation, ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
 		float damageMult = 1.0f;
 		if (bothHandsActive) {
 			//damageMult = 2.0f;
@@ -99,7 +100,7 @@ public abstract class BuzzsawArmArmor extends AbstractMiningArmArmor {
 	}
 	
 	@Override
-	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec) {
+	protected void onSpawnParticles(Player player, Vec3 startLoc, Vec3 endLoc, int useTicks, Vec3 viewVec, Entity entity, boolean didHit) {
 		
 	}
 	
