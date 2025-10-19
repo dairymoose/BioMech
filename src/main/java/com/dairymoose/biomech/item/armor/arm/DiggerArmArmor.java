@@ -62,7 +62,7 @@ public abstract class DiggerArmArmor extends AbstractMiningArmArmor {
 			long lastSwingTime = compound.getLong("LastSwingTime");
 			swingDiff = player.tickCount - lastSwingTime;
 		}
-		if (swingDiff < 0 || swingDiff >= 20) {
+		if (swingDiff < 0 || swingDiff >= 18) {
 			float damageMult = 1.0f;
 			living.hurt(player.level().damageSources().playerAttack(player), damageMult*bucketDamage*miningPower);
 			compound.putLong("LastSwingTime", player.tickCount);
