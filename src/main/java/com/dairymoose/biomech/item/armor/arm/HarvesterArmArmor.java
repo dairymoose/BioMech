@@ -137,13 +137,23 @@ public abstract class HarvesterArmArmor extends AbstractMiningArmArmor {
 		int zDiff = zSize/2;
 		Iterable<BlockPos> blocks = this.getAllMineableBlocks(blockPos, xDiff, yDiff, zDiff);
 		
+		boolean targetingCrop = false;
+		BlockPos abovePos = blockPos.above();
+		BlockState aboveState = level.getBlockState(abovePos);
+		if (isCrop(blockState) || isCrop(aboveState)) {
+			//do not attempt to till any blocks if our primary block is a crop
+			targetingCrop = true;
+		}
 		boolean handled = false;
 		boolean didTill = false;
 		boolean didReplant = false;
 		for (BlockPos pos : blocks) {
 			BlockState state = level.getBlockState(pos);
 			
-			BlockState toolModifiedState = getHoeToolModifiedState(player, level, pos);
+			BlockState toolModifiedState = null;
+			if (!targetingCrop) {
+				toolModifiedState = getHoeToolModifiedState(player, level, pos);
+			}
 			if (toolModifiedState != null) {
 				if (!level.isClientSide) {
 					level.setBlock(pos, toolModifiedState, 3);
