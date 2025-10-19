@@ -1580,11 +1580,13 @@ public class BioMech
     	@SubscribeEvent
     	public void onMouseInput(InputEvent.MouseButton.Pre event) {
     		if (Minecraft.getInstance().player != null) {
-    			DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(Minecraft.getInstance().player.getUUID());
-            	if (info != null && info.remainingTicks > 0) {
-            		event.setCanceled(true);
-            		return;
-            	}
+    			if (!Minecraft.getInstance().isPaused()) {
+    				DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(Minecraft.getInstance().player.getUUID());
+                	if (info != null && info.remainingTicks > 0) {
+                		event.setCanceled(true);
+                		return;
+                	}
+    			}
     		}
     	}
     	
