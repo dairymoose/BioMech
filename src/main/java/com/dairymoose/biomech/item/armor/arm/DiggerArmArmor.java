@@ -45,7 +45,7 @@ public abstract class DiggerArmArmor extends AbstractMiningArmArmor {
 	public static float bucketDamage = 2.5f;
 	
 	@Override
-	protected void playSound(Player player, int useTicks, boolean didHit) {
+	protected void playSound(ItemStack itemStack, Player player, int useTicks, boolean didHit) {
 		float volume = 0.7f;
 		float pitch = 1.0f;
 		if (didHit) {

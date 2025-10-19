@@ -129,6 +129,7 @@ public class BioMechRegistry {
 	public static RegistryObject<SoundEvent> SOUND_EVENT_MINING_DRILL = BioMech.SOUNDS.register("mining_drill", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "mining_drill")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_BUZZSAW_LOOP = BioMech.SOUNDS.register("buzzsaw_loop", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "buzzsaw_loop")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_GATLING_SPIN_UP = BioMech.SOUNDS.register("gatling_spin_up", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "gatling_spin_up")));
+	public static RegistryObject<SoundEvent> SOUND_EVENT_GATLING_SPINNING = BioMech.SOUNDS.register("gatling_spinning", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "gatling_spinning")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_GATLING_FIRING = BioMech.SOUNDS.register("gatling_firing", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "gatling_firing")));
 	public static RegistryObject<SoundEvent> SOUND_EVENT_SHOVEL_DIG = BioMech.SOUNDS.register("shovel_dig", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BioMech.MODID, "shovel_dig")));
 	

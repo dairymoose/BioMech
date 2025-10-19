@@ -33,7 +33,7 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArmArmor {
 	public static float laserDamageAtMaxPower = 6.0f;
 	
 	@Override
-	protected void playSound(Player player, int useTicks, boolean didHit) {
+	protected void playSound(ItemStack itemStack, Player player, int useTicks, boolean didHit) {
 		float volume = 0.45f;
 		float laserPitch = 0.85f + this.getMiningPower(useTicks)*0.3f;
 		if (didHit) {

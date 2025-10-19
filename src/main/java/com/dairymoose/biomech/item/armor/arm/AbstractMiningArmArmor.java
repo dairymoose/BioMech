@@ -47,6 +47,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public abstract class AbstractMiningArmArmor extends ArmorBase {
 
+	protected static final String USE_TICKS = "useTicks";
+
 	public AbstractMiningArmArmor(ArmorMaterial material, Type type, Properties props) {
 		super(material, type, props);
 	}
@@ -110,7 +112,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 		
 	}
 	
-	protected void beginHandTick(Player player) {
+	protected void beginHandTick(BioMechPlayerData playerData, ItemStack itemStack, Player player) {
 		
 	}
 	
@@ -138,18 +140,18 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 		BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 
 		if (playerData != null) {
-			this.beginHandTick(player);
+			ItemStack thirdPersonItemStack = BioMech.getThirdPersonArmItemStack(playerData, handPart);
+			
+			this.beginHandTick(playerData, thirdPersonItemStack, player);
 			this.energyPerTick = energyPerSec / 20.0f;
 			this.energyPerTickMiss = energyPerSecMiss / 20.0f;
-			
-			ItemStack thirdPersonItemStack = BioMech.getThirdPersonArmItemStack(playerData, handPart);
 			
 			if (playerData.getSuitEnergy() < energyPerTick) {
 				active = false;
 			}
 			
 			if (active) {
-				int useTicks = thirdPersonItemStack.getTag().getInt("useTicks");
+				int useTicks = thirdPersonItemStack.getTag().getInt(USE_TICKS);
 				if (FMLEnvironment.dist == Dist.CLIENT) {
 					if (player.level().isClientSide)
 						++useTicks;
@@ -157,7 +159,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 					++useTicks;
 				}
 				
-				thirdPersonItemStack.getTag().putInt("useTicks", useTicks);
+				thirdPersonItemStack.getTag().putInt(USE_TICKS, useTicks);
 
 				boolean didHit = false;
 				if (player.level().isClientSide) {
@@ -171,6 +173,8 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 
 						this.thirdPersonStartUsingAnimation(thirdPersonItemStack);
 						player.setYBodyRot(player.getYHeadRot());
+						
+						this.notYetActiveSound(thirdPersonItemStack, player);
 					} else {
 						this.miningAnimation(itemStack);
 						
@@ -325,7 +329,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						
 						
 						if (player.tickCount % soundTickPeriod == 0) {
-							playSound(player, useTicks, didHit);
+							playSound(thirdPersonItemStack, player, useTicks, didHit);
 						}
 					}
 				}
@@ -406,14 +410,18 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 				
 				
 			} else {
-				if (thirdPersonItemStack.getTag() != null && thirdPersonItemStack.getTag().contains("useTicks")) {
-					thirdPersonItemStack.getTag().putInt("useTicks", 0);
+				if (thirdPersonItemStack.getTag() != null && thirdPersonItemStack.getTag().contains(USE_TICKS)) {
+					thirdPersonItemStack.getTag().putInt(USE_TICKS, 0);
 				}
 				if (player.level().isClientSide) {
 					this.passiveAnimation(itemStack);
 				}
 			}
 		}
+	}
+
+	protected void notYetActiveSound(ItemStack itemStack, Player player) {
+		
 	}
 
 	private void mineAllBlocks(Map<Player, DestroyBlockProgressList> destroyBlockProgressMap, Player player, float miningPower, BlockPos blockTarget) {
@@ -507,7 +515,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 		}
 	}
 
-	protected abstract void playSound(Player player, int useTicks, boolean didHit);
+	protected abstract void playSound(ItemStack itemStack, Player player, int useTicks, boolean didHit);
 	
 	protected abstract void dealEntityDamage(ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living);
 

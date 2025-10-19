@@ -1,10 +1,12 @@
 package com.dairymoose.biomech.item.armor.arm;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.item.anim.GatlingDispatcher;
 
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -46,14 +48,31 @@ public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 		this.particleYThirdPerson = 1.44;
 		this.particleDistanceFromPlayerThirdPerson = 0.85;
 		this.particlePerpendicularDistanceThirdPerson = 0.35;
+		
+		this.startUsingTickCount = 12;
 	}
 
 	public static float gatlingDamage = 30.0f;
 	
 	@Override
-	protected void beginHandTick(Player player) {
+	protected void beginHandTick(BioMechPlayerData playerData, ItemStack itemStack, Player player) {
 		this.energyPerSec = gatlingEnergyPerSec;
 		this.energyPerSecMiss = gatlingEnergyPerSec;
+		
+		CompoundTag tag = itemStack.getTag();
+		if (tag != null && tag.contains(USE_TICKS)) {
+			int useTicks = tag.getInt(USE_TICKS);
+			if (useTicks > this.startUsingTickCount) {
+				if (playerData.getSuitEnergy() >= energyPerTick) {
+					float randNegativeOnePositiveOneY = (float)(2*(Math.random() - 0.5));
+					float randPositiveOneX = (float)Math.random();
+					float xRotInc = -0.40f + -0.20f * randPositiveOneX;
+					float yRotInc =  0.35f * randNegativeOnePositiveOneY;
+					player.setXRot(player.getXRot() + xRotInc);
+					player.setYRot(player.getYRot() + yRotInc);
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -63,9 +82,25 @@ public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_GATLING_SPIN_UP.get(), SoundSource.PLAYERS, volume, pitch, false);
 	}
 	
+	public static float activeVolumeMod = 0.50f;
 	@Override
-	protected void playSound(Player player, int useTicks, boolean didHit) {
-		float volume = 1.4f;
+	protected void notYetActiveSound(ItemStack itemStack, Player player) {
+		CompoundTag tag = itemStack.getTag();
+		if (tag != null && tag.contains(USE_TICKS)) {
+			int useTicks = tag.getInt(USE_TICKS);
+			if (useTicks >= this.startUsingTickCount/3) {
+				float volume = activeVolumeMod * 0.70f;
+				float pitch = 1.0f;
+				player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_GATLING_SPINNING.get(), SoundSource.PLAYERS, volume, pitch, false);
+			}
+		}
+	}
+	
+	@Override
+	protected void playSound(ItemStack itemStack, Player player, int useTicks, boolean didHit) {
+		this.notYetActiveSound(itemStack, player);
+		
+		float volume = activeVolumeMod * 1.0f;
 		float laserPitch = 1.0f;
 		player.level().playLocalSound(player.position().x, player.position().y, player.position().z, BioMechRegistry.SOUND_EVENT_GATLING_FIRING.get(), SoundSource.PLAYERS, volume, laserPitch, false);
 	}

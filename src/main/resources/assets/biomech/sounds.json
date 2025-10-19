@@ -19,6 +19,11 @@
         "subtitle": "entity.subtitle.gatling_spin_up",
         "sounds": ["biomech:item/gatling_spin_up"]
     },
+	"gatling_spinning": {
+	    "category": "block",
+	    "subtitle": "entity.subtitle.gatling_spinning",
+	    "sounds": ["biomech:item/gatling_spinning"]
+	},
     "gatling_firing": {
         "category": "block",
         "subtitle": "entity.subtitle.gatling_firing",

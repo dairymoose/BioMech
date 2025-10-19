@@ -42,7 +42,7 @@ public abstract class DrillArmArmor extends AbstractMiningArmArmor {
 	public static float drillDamage = 6.1f;
 	
 	@Override
-	protected void playSound(Player player, int useTicks, boolean didHit) {
+	protected void playSound(ItemStack itemStack, Player player, int useTicks, boolean didHit) {
 		float volume = 1.2f;
 		float laserPitch = 1.20f;
 		if (didHit) {
