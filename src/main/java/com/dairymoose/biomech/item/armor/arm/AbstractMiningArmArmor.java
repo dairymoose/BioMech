@@ -204,9 +204,9 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 								(e) -> (e instanceof LivingEntity && !((LivingEntity)e).isDeadOrDying()) && !e.isRemoved() && !e.isSpectator(),
 								player.getBlockReach() * blockReachMult);
 
-						double handMult = 1.0;
+						double handMult = -1.0;
 						if (handPart == MechPart.RightArm)
-							handMult = -1.0;
+							handMult = 1.0;
 						
 						Vec3 originalPlayerViewVec = player.getViewVector(partialTick);
 						Vec3 viewVec = originalPlayerViewVec;
@@ -239,12 +239,14 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						
 						class FirstPersonCameraChecker {
 							boolean isFirstPerson = false;
+							int currentFov = 60;
 						}
 						FirstPersonCameraChecker cc = new FirstPersonCameraChecker();
 						DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
 							@Override
 							public void run() {
 								cc.isFirstPerson = Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON;
+								cc.currentFov = Minecraft.getInstance().options.fov().get();
 							}});
 						
 						if (player.isLocalPlayer() && cc.isFirstPerson) {
@@ -262,20 +264,31 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						if (player.isLocalPlayer() && cc.isFirstPerson) {
 							//the particles line up in 3rd person but look very wrong in first person
 							//do an entirely new calculation in first person
-							double lowerPitchBy = 25.0;
+							double lowerPitchBy = 20.0;
+							
+							float defaultFov = 70.0f;
+							float currentFov = cc.currentFov;
+							float fovFactor = currentFov/defaultFov;
+							double fovScalingCalc = Math.cos(Math.toRadians(currentFov/1.8f));
+							
+							lowerPitchBy /= fovScalingCalc;
 							
 							double xRot = player.getXRot();
 							xRot += lowerPitchBy;
 							double yRot = player.getYRot();
 
 							double look3dDist = 0.5;
+							//look3dDist /= fovScalingSin;
+							
 							//3d projection with player view vector - with distance 'look3dDist'
 							float yComp3 = (float)(look3dDist * Math.sin(Math.toRadians(-xRot)));
 							float horizontalComponent = (float)(look3dDist * Math.cos(Math.toRadians(-xRot)));
 							float xComp3 = (float)(horizontalComponent * -Math.sin(Math.toRadians(yRot)));
 							float zComp3 = (float)(horizontalComponent * Math.cos(Math.toRadians(yRot)));
 
-							double firstPersonStandNextToDist = 0.25;
+							//double firstPersonStandNextToDist = 0.25;
+							double firstPersonStandNextToDist = 0.20;
+							firstPersonStandNextToDist /= fovScalingCalc;
 							xComp = firstPersonStandNextToDist * -Math.sin(Math.toRadians(yaw));
 							zComp = firstPersonStandNextToDist * Math.cos(Math.toRadians(yaw));
 							
