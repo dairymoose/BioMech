@@ -277,6 +277,14 @@ public class BioMechPlayerData {
 		
 		return data;
 	}
+
+	public void overwrite(BioMechPlayerData incomingPlayerData) {
+		for (SlottedItem slottedItem : this.getAllSlots()) {
+			SlottedItem incomingSlottedItem = incomingPlayerData.getForSlot(slottedItem.mechPart);
+			slottedItem.itemStack = incomingSlottedItem.itemStack;
+			slottedItem.visible = incomingSlottedItem.visible;
+		}
+	}
 	
 //	@Override
 //	public String toString() {

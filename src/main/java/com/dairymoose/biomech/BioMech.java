@@ -62,6 +62,7 @@ import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket
 import com.dairymoose.biomech.packet.serverbound.ServerboundOpenPortableStorageUnitPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundPressHotkeyPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundTeleportationCrystalPacket;
+import com.dairymoose.biomech.packet.serverbound.ServerboundUpdateVisibilityPacket;
 import com.dairymoose.biomech.particle.ForceFieldParticle;
 import com.dairymoose.biomech.particle.InstantSmokeParticle;
 import com.dairymoose.biomech.particle.LaserParticle;
@@ -313,6 +314,7 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundTeleportationCrystalPacket.class, ServerboundTeleportationCrystalPacket::write, ServerboundTeleportationCrystalPacket::new, ServerboundTeleportationCrystalPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundPressHotkeyPacket.class, ServerboundPressHotkeyPacket::write, ServerboundPressHotkeyPacket::new, ServerboundPressHotkeyPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundPressHotkeyPacket.class, ClientboundPressHotkeyPacket::write, ClientboundPressHotkeyPacket::new, ClientboundPressHotkeyPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundUpdateVisibilityPacket.class, ServerboundUpdateVisibilityPacket::write, ServerboundUpdateVisibilityPacket::new, ServerboundUpdateVisibilityPacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -1049,12 +1051,12 @@ public class BioMech
 	//Cannot invoke "Object.getClass()" because "animatable" is null: The animation file has a problem with it
     public static void clientSideItemAnimation(ItemStack itemStack, AzCommand command) {
     	if (FMLEnvironment.dist == Dist.DEDICATED_SERVER) {
-    		BioMech.LOGGER.debug("skip animation on server side: " + itemStack);
+    		BioMech.LOGGER.trace("skip animation on server side: " + itemStack);
     		return;
     	}
     	
     	if (itemStack == null) {
-    		BioMech.LOGGER.debug("itemStack was null for command: " + command);
+    		BioMech.LOGGER.trace("itemStack was null for command: " + command);
     		return;
     	}
     	
@@ -2214,17 +2216,21 @@ public class BioMech
         		    					event.getEntity().setItemSlot(EquipmentSlot.FEET, ItemStack.EMPTY);
         		    				}
         		    				
-        		    				event.getEntity().setItemSlot(equipmentSlot, ItemStack.EMPTY);
-                        		    if (slottedItem.mechPart == MechPart.LeftArm || slottedItem.mechPart == MechPart.RightArm || slottedItem.mechPart == MechPart.Back) {
-                        		    	event.getEntity().setItemSlot(equipmentSlot, priorItem);
-                        		    } else {
+        		    				//set item slots to empty so that they aren't rendered by MC normal rendering logic
+        		    				if (slottedItem.mechPart != MechPart.LeftArm && slottedItem.mechPart != MechPart.RightArm && slottedItem.mechPart != MechPart.Back) {
+        		    					//ignore arm slots & back slot because these don't correspond to existing MC item slots
+        		    					event.getEntity().setItemSlot(equipmentSlot, ItemStack.EMPTY);
+        		    				}
+                        		    //if (slottedItem.mechPart == MechPart.LeftArm || slottedItem.mechPart == MechPart.RightArm || slottedItem.mechPart == MechPart.Back) {
+                        		    	//event.getEntity().setItemSlot(equipmentSlot, priorItem);
+                        		    //} else {
                         		    	priorItems.putIfAbsent(equipmentSlot, priorItem);
                         		    	
                         		    	if (slottedItem.mechPart == MechPart.Leggings) {
                         		    		if (priorFeetItem != null)
                         		    			priorItems.putIfAbsent(EquipmentSlot.FEET, priorFeetItem);
             		    				}
-                        		    }
+                        		    //}
                         		    
                         		    if (itemStackToRender.getItem() instanceof ArmorBase base) {
                         		    	if (base.shouldHidePlayerModel()) {

@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
@@ -56,11 +57,17 @@ public class ClientboundUpdateSlottedItemPacket implements Packet<net.minecraft.
 				public void run() {
 					net.minecraft.client.multiplayer.ClientPacketListener clientHandler = (net.minecraft.client.multiplayer.ClientPacketListener)handler;
 					try {
-						BioMechPlayerData playerData = BioMechPlayerData.deserialize(playerDataTag);
+						BioMechPlayerData incomingPlayerData = BioMechPlayerData.deserialize(playerDataTag);
 						
+						BioMechPlayerData existingPlayerData = BioMech.globalPlayerData.get(uuid);
 						//in singleplayer the globalPlayerData is shared between client + server - if we overwrite this we lose the items in the backpack (they are not serialized)
 						if (ServerLifecycleHooks.getCurrentServer() == null || !ServerLifecycleHooks.getCurrentServer().isSingleplayer()) {
-							BioMech.globalPlayerData.put(uuid, playerData);
+							if (existingPlayerData == null) {
+								BioMech.globalPlayerData.put(uuid, incomingPlayerData);
+							}
+							else {
+								existingPlayerData.overwrite(incomingPlayerData);
+							}
 						}
 					} catch (Exception e) {
 						BioMech.LOGGER.error("Failed to deserialize data", e);

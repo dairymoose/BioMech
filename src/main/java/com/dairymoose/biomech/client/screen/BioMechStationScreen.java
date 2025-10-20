@@ -1,11 +1,13 @@
 package com.dairymoose.biomech.client.screen;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
+import com.dairymoose.biomech.packet.serverbound.ServerboundUpdateVisibilityPacket;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -100,8 +102,9 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 										}
 									}
 								}
+								
+								BioMechNetwork.INSTANCE.sendToServer(new ServerboundUpdateVisibilityPacket(BioMechPlayerData.serialize(playerData)));
 							}
-							// send updated playerData to server
 						}
 
 					});
