@@ -33,7 +33,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 		
 		this.blockReachMult = 100.0;
 		
-		this.minSpeedMult = 0.75f;
+		this.minSpeedMult = 0.80f;
 		this.maxSpeedMult = minSpeedMult;
 		
 		this.wrongToolPenalty = 10.0f;
