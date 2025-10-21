@@ -75,7 +75,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 	protected ItemStack miningTool = new ItemStack(Items.IRON_PICKAXE);
 	protected int startUsingTickCount = 5;
 	
-	protected float energyPerSec = 4.0f;
+	protected float energyPerSec = 5.0f;
 	protected float energyPerTick;
 	
 	protected float energyPerSecMiss = 1.0f;

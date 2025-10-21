@@ -40,7 +40,7 @@ public abstract class BuzzsawArmArmor extends AbstractMiningArmArmor {
 		this.instantDestroyLeaves = true;
 	}
 
-	public static float drillDamage = 6.1f;
+	public static float drillDamage = 8.0f;
 	
 	@Override
 	protected void playSound(ItemStack itemStack, Player player, int useTicks, boolean didHit) {
