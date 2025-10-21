@@ -7,6 +7,9 @@
 				"glowing": {
 					"position": {
 						"vector": [0, 0, 0]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
 					}
 				}
 			}
@@ -17,6 +20,9 @@
 				"glowing": {
 					"position": {
 						"vector": [0, 0, 1.5]
+					},
+					"scale": {
+						"vector": [0.1, 0.1, 0.1]
 					}
 				}
 			}
