@@ -20,6 +20,7 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(PlayerModel.class)
@@ -122,10 +123,12 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 	            			Minecraft.getInstance().player.bob = 0.0f;
 						}
 						
-						//greatly reduce arm bob
-						if (this.attackTime == 0.0f && this.swimAmount == 0.0f) {
-							this.rightArm.xRot = this.rightArm.xRot * base.getViewBobArmSwayModifier();
-							this.leftArm.xRot = this.leftArm.xRot * base.getViewBobArmSwayModifier();
+						if (living instanceof Player player) {
+							//greatly reduce arm bob
+							if (this.attackTime == 0.0f && this.swimAmount == 0.0f && player.getAttackStrengthScale(0.0f) == 1.0f) {
+								this.rightArm.xRot = this.rightArm.xRot * base.getViewBobArmSwayModifier();
+								this.leftArm.xRot = this.leftArm.xRot * base.getViewBobArmSwayModifier();
+							}
 						}
 						
 						//normal leg walking forward-and-back

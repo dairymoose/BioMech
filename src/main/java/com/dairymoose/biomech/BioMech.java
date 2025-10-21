@@ -88,6 +88,7 @@ import mod.azure.azurelib.animation.dispatch.command.AzCommand;
 import mod.azure.azurelib.render.armor.AzArmorModel;
 import mod.azure.azurelib.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.render.armor.AzArmorRendererRegistry;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -1601,7 +1602,7 @@ public class BioMech
             		event.setCanceled(true);
             		return;
             	}
-        		
+            	
         		HandActiveStatus has = this.getLocalHandActiveStatus();
         		
         		if (has != null) {
@@ -1972,6 +1973,11 @@ public class BioMech
                     		}
                 		}
             			
+            			if (has.rightHandActive || has.leftHandActive) {
+            				//add this so Better Combat doesn't swing when we use our hotkey
+            				Minecraft.getInstance().missTime = 10;
+            			}
+            			
             			DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(localPlayer.getUUID());
                     	if (info != null && info.remainingTicks > 0) {
                     		has.rightHandActive = false;
@@ -2148,7 +2154,7 @@ public class BioMech
         	}
         	Player renderEntity = event.getEntity();
         	
-        	if (!renderEntity.isSpectator()) {
+        	if (!renderEntity.isSpectator() && (Minecraft.getInstance().screen != null || Minecraft.getInstance().options.getCameraType() != CameraType.FIRST_PERSON)) {
         		doRenderLogic(event, renderEntity);
         	}
         	
