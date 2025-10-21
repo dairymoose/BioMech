@@ -196,6 +196,7 @@ public class BioMechClientSetup {
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_REPULSOR_LIFT.get());
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_EXTENDO_ARM.get(), BioMechRegistry.ITEM_EXTENDO_LEFT_ARM.get());
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_HARVESTER_ARM.get(), BioMechRegistry.ITEM_HARVESTER_LEFT_ARM.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_ILLUMINATOR.get());
     	//------ All Animated ------
     	
     	

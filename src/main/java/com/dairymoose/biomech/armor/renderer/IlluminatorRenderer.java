@@ -3,6 +3,7 @@ package com.dairymoose.biomech.armor.renderer;
 import java.util.UUID;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.item.anim.IlluminatorAnimator;
 
 import mod.azure.azurelib.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.render.armor.AzArmorRendererConfig;
@@ -24,6 +25,7 @@ public class IlluminatorRenderer extends AzArmorRenderer {
     public IlluminatorRenderer() {
         super(AzArmorRendererConfig.builder(GEO, TEX)
         		.addRenderLayer(new AzAutoGlowingLayer<UUID, ItemStack>())
+        		.setAnimatorProvider(IlluminatorAnimator::new)
         		.build());
     }
 }

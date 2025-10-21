@@ -13,6 +13,7 @@ import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.BroadcastType;
 import com.dairymoose.biomech.ToggledStatus;
 import com.dairymoose.biomech.block.IlluminantBlock;
+import com.dairymoose.biomech.item.anim.IlluminatorDispatcher;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
@@ -34,10 +35,13 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class IlluminatorArmor extends ArmorBase {
 
+	private final IlluminatorDispatcher dispatcher;
+	
 	public IlluminatorArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 20;
 		this.mechPart = MechPart.Head;
+		this.dispatcher = new IlluminatorDispatcher();
 	}
 
 	public static class IlluminantInfo {
@@ -95,9 +99,11 @@ public class IlluminatorArmor extends ArmorBase {
 								ToggledStatus status = toggledOnMap.computeIfAbsent(player.getUUID(), (uuid) -> new ToggledStatus(true));
 								
 								if (!status.toggledOn) {
+									BioMech.clientSideItemAnimation(itemStack, dispatcher.OFF_COMMAND.cmd);
 									BioMech.removeIlluminantBlocks(player, playerData);
 									return;
 								}
+								BioMech.clientSideItemAnimation(itemStack, dispatcher.ON_COMMAND.cmd);
 								
 								List<IlluminantInfo> infos = illuminantMap.computeIfAbsent(player.getUUID(), (uuid) -> new ArrayList<IlluminantInfo>());
 								if (infos.isEmpty()) {
