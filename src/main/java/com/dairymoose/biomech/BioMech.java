@@ -1652,7 +1652,7 @@ public class BioMech
     		if (Minecraft.getInstance().player == null)
     			return;
     		
-    		if (event.getStage() == Stage.AFTER_ENTITIES) {
+    		if (event.getStage() == Stage.AFTER_BLOCK_ENTITIES) {
     			if (!outlinedSpawners.isEmpty()) {
         			synchronized (outlinedSpawners) {
     					List<OutlinedSpawnerInfo> toRemove = new ArrayList<>();
