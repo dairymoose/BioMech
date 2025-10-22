@@ -101,7 +101,7 @@ public class SpiderWalkersArmor extends ArmorBase {
 								if (!didClimb) {
 									boolean hasNearbyMatch = false;
 									
-									float gripRadius = 1.35f;
+									float gripRadius = 1.40f;
 									hasNearbyMatch = hasBlocksNearby(level, player, gripRadius);
 									
 									if (hasNearbyMatch) {
