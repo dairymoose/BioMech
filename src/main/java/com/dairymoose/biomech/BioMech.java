@@ -1644,18 +1644,18 @@ public class BioMech
 				}
 			}
     	}
-    	
+
     	//same as LINE but with NO_DEPTH_TEST
-    	public static RenderType BIOMECH_LINE = RenderType.create("biomech_line", DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 256, false, false, RenderType.CompositeState.builder().setDepthTestState(RenderStateShard.NO_DEPTH_TEST).setShaderState(RenderType.RENDERTYPE_LINES_SHADER).setLineState(new RenderStateShard.LineStateShard(OptionalDouble.empty())).setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING).setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY).setOutputState(RenderType.ITEM_ENTITY_TARGET).setWriteMaskState(RenderType.COLOR_DEPTH_WRITE).setCullState(RenderType.NO_CULL).createCompositeState(false));
+    	public static RenderType BIOMECH_LINE = RenderType.create("biomech_line", DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 256, false, false, RenderType.CompositeState.builder().setDepthTestState(RenderStateShard.NO_DEPTH_TEST).setShaderState(RenderType.RENDERTYPE_LINES_SHADER).setLineState(new RenderStateShard.LineStateShard(OptionalDouble.empty())).setLayeringState(RenderType.VIEW_OFFSET_Z_LAYERING).setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY).setOutputState(RenderType.OUTLINE_TARGET).setWriteMaskState(RenderType.COLOR_DEPTH_WRITE).setCullState(RenderType.NO_CULL).createCompositeState(false));
     	@SubscribeEvent
     	public void onRenderWorld(RenderLevelStageEvent event) {
     		if (Minecraft.getInstance().player == null)
     			return;
     		
-    		if (event.getStage() == Stage.AFTER_TRIPWIRE_BLOCKS) {
+    		if (event.getStage() == Stage.AFTER_ENTITIES) {
     			if (!outlinedSpawners.isEmpty()) {
         			synchronized (outlinedSpawners) {
-        				List<OutlinedSpawnerInfo> toRemove = new ArrayList<>();
+    					List<OutlinedSpawnerInfo> toRemove = new ArrayList<>();
         				for (OutlinedSpawnerInfo info : outlinedSpawners) {
             				if (Minecraft.getInstance().player.distanceToSqr(info.pos.getCenter()) > (OpticsUnitArmor.XZ_SIZE*OpticsUnitArmor.XZ_SIZE)) {
             					toRemove.add(info);
@@ -1673,10 +1673,16 @@ public class BioMech
                     			g = 0.84f;
                     			b = 0.0f;
                     		}
-                    		float a = 0.5f;
+                    		float a = 0.6f;
                     		Vec3 loc = info.pos.getCenter().add(-0.5, -0.5, -0.5);
                     		float boxSize = 1.0f;
+                    		RenderSystem.disableDepthTest();
+                    	    RenderSystem.depthMask(false);
+                    	    RenderSystem.enableBlend();
                     		LevelRenderer.renderLineBox(event.getPoseStack(), outlineBuffer.getBuffer(BIOMECH_LINE), loc.x, loc.y, loc.z, loc.x+boxSize, loc.y+boxSize, loc.z+boxSize, r, g, b, a);
+                    	    RenderSystem.disableBlend();
+                    	    RenderSystem.depthMask(true);
+                    	    RenderSystem.enableDepthTest();
                     		event.getPoseStack().popPose();
             			}
             			for (OutlinedSpawnerInfo info : toRemove) {
