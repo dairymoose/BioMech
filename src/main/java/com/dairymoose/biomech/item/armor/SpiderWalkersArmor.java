@@ -129,7 +129,6 @@ public class SpiderWalkersArmor extends ArmorBase {
 		BlockState state = player.level().getBlockState(pos);
 		VoxelShape collisionShape = state.getCollisionShape(player.level(), pos);
 
-		BioMech.LOGGER.info("deltaMov=" + delta + " and bbWidth=" + halfWidth + " with deltaBB=" + (delta.normalize().scale(halfWidth)) + " has blockPos=" + pos + " with state=" + state + " with result=" + result);
 		if (!collisionShape.isEmpty()) {
 			return true;
 		}
