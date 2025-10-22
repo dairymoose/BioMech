@@ -1580,18 +1580,18 @@ public class BioMech
         	}
         }
     	
-    	@SubscribeEvent
-    	public void onMouseInput(InputEvent.MouseButton.Pre event) {
-    		if (Minecraft.getInstance().player != null) {
-    			if (!Minecraft.getInstance().isPaused() && Minecraft.getInstance().screen == null) {
-    				DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(Minecraft.getInstance().player.getUUID());
-                	if (info != null && info.remainingTicks > 0) {
-                		event.setCanceled(true);
-                		return;
-                	}
-    			}
-    		}
-    	}
+//    	@SubscribeEvent
+//    	public void onMouseInput(InputEvent.MouseButton.Pre event) {
+//    		if (Minecraft.getInstance().player != null) {
+//    			if (!Minecraft.getInstance().isPaused() && Minecraft.getInstance().screen == null) {
+//    				DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(Minecraft.getInstance().player.getUUID());
+//                	if (info != null && info.remainingTicks > 0) {
+//                		event.setCanceled(true);
+//                		return;
+//                	}
+//    			}
+//    		}
+//    	}
     	
     	@SubscribeEvent
     	public void onClickInput(InputEvent.InteractionKeyMappingTriggered event) {
@@ -1988,6 +1988,7 @@ public class BioMech
                     	if (info != null && info.remainingTicks > 0) {
                     		has.rightHandActive = false;
                     		has.leftHandActive = false;
+                    		Minecraft.getInstance().missTime = 10;
                     	}
             		}
             		
