@@ -124,6 +124,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
@@ -635,12 +636,12 @@ public class BioMech
             				BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), slottedItemPacket);
         				}
         			}
+        			
+        			done = true;
         		} catch (Exception ex) {
         			++failureCount;
         			BioMech.LOGGER.warn("Error while sending item slots to player: " + player);
         		}
-            	
-            	done = true;
         	}
     	}
     	BioMech.LOGGER.debug("Sent " + playerDataCount + " SlottedItemPackets to " + player + " with failureCount=" + failureCount);
@@ -1652,7 +1653,7 @@ public class BioMech
     		if (Minecraft.getInstance().player == null)
     			return;
     		
-    		if (event.getStage() == Stage.AFTER_BLOCK_ENTITIES) {
+    		if (event.getStage() == Stage.AFTER_ENTITIES) {
     			if (!outlinedSpawners.isEmpty()) {
         			synchronized (outlinedSpawners) {
     					List<OutlinedSpawnerInfo> toRemove = new ArrayList<>();
@@ -1676,13 +1677,13 @@ public class BioMech
                     		float a = 0.6f;
                     		Vec3 loc = info.pos.getCenter().add(-0.5, -0.5, -0.5);
                     		float boxSize = 1.0f;
-                    		RenderSystem.disableDepthTest();
-                    	    RenderSystem.depthMask(false);
-                    	    RenderSystem.enableBlend();
+                    		//RenderSystem.disableDepthTest();
+                    	    //RenderSystem.depthMask(false);
+                    	    //RenderSystem.enableBlend();
                     		LevelRenderer.renderLineBox(event.getPoseStack(), outlineBuffer.getBuffer(BIOMECH_LINE), loc.x, loc.y, loc.z, loc.x+boxSize, loc.y+boxSize, loc.z+boxSize, r, g, b, a);
-                    	    RenderSystem.disableBlend();
-                    	    RenderSystem.depthMask(true);
-                    	    RenderSystem.enableDepthTest();
+                    	    //RenderSystem.disableBlend();
+                    	    //RenderSystem.depthMask(true);
+                    	    //RenderSystem.enableDepthTest();
                     		event.getPoseStack().popPose();
             			}
             			for (OutlinedSpawnerInfo info : toRemove) {
