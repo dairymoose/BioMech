@@ -1,0 +1,32 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.grapple_arm.inert": {
+			"loop": "hold_on_last_frame"
+		},
+		"animation.grapple_arm.launch": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.1667,
+			"bones": {
+				"grapple_midpoint": {
+					"position": {
+						"0.0": [0, 0, 0],
+						"0.1667": [0, -3, 0]
+					},
+					"scale": {
+						"0.0": [1, 1, 1],
+						"0.125": [0.4, 0.4, 0.4],
+						"0.1667": [0, 0, 0]
+					}
+				},
+				"mech_body": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.1667": [57.5, 0, 0]
+					}
+				}
+			}
+		}
+	},
+	"azurelib_format_version": 2
+}

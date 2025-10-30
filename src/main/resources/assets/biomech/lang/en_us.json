@@ -38,6 +38,10 @@
 	"item.biomech.extendo_arm.tooltip1": "§9+{bonus_block_reach} Block Reach§0",
 	"item.biomech.extendo_arm.tooltip2": "§9+{bonus_entity_reach} Entity Reach§0",
 	
+	"item.biomech.grapple_arm": "§5Grapple Arm§0",
+	"item.biomech.grapple_arm.tooltip1": "Press '{alt}+{lmb}' to launch the grappling hook.",
+	"item.biomech.grapple_arm.tooltip2": "If the hook implants into a block, press '{alt}+{lmb}' again to launch yourself towards it.",
+	
 	"item.biomech.harvester_arm": "§5Harvester Arm§0",
 	"item.biomech.harvester_arm.tooltip1": "Hold '{alt}+{lmb}' to activate.",
 	"item.biomech.harvester_arm.tooltip2": "Hold to harvest crops (or till) in a 3x3 area.",
