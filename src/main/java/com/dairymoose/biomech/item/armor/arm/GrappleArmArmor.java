@@ -15,9 +15,8 @@ import com.dairymoose.biomech.item.anim.GrappleArmDispatcher;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -88,6 +87,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 		return straightLineDistance;
 	}
 	
+	public static MechPart clientLastUsedArm = MechPart.RightArm;
 	private float localPlayerLastFallDist = -1.0f;
 	private boolean justDidRecalculate = false;
 	@Override
@@ -134,6 +134,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 						//this.thirdPersonMiningAnimation(thirdPersonItemStack);
 						//player.setYBodyRot(player.getYHeadRot());
 						
+						clientLastUsedArm = handPart;
 						if (player.isLocalPlayer()) {
 							if (active && useTicks > startUsingTickCount && grappleInfo != null && grappleInfo.hookPos != null) {
 								if (!player.onGround() && player.fallDistance >= 0.0f) {
@@ -227,10 +228,12 @@ public abstract class GrappleArmArmor extends ArmorBase {
 							}
 							grappleInfo.grappleTetherDistance = 0.0f;
 							if (!level.isClientSide && grappleInfo.grappleEntity == null) {
+								BioMech.LOGGER.debug("launch grapple for player: " + player);
 								itemStack.getOrCreateTag().putBoolean("Launched", true);
 								GrapplingHook launched = new GrapplingHook(level, player);
 								launched.setItem(new ItemStack(Items.ARROW));
 								launched.entityOwner = player;
+								launched.mechPart = handPart;
 								grappleInfo.grappleEntity = launched;
 								launched.setYRot(player.getYRot());
 								launched.setXRot(player.getXRot());
@@ -243,7 +246,6 @@ public abstract class GrappleArmArmor extends ArmorBase {
 						}
 					} else if (active && useTicks > startUsingTickCount && grappleInfo != null && grappleInfo.hookPos != null) {
 						BioMech.allowFlyingForPlayer(player);
-						player.resetFallDistance();
 					}
 				}
 				
@@ -263,108 +265,118 @@ public abstract class GrappleArmArmor extends ArmorBase {
 				
 				
 			} else {
-				justDidRecalculate = false;
-				player.setDiscardFriction(false);
-				GrappleInfo grappleInfo = GrappleArmArmor.grappleInfoMap.get(player.getUUID());
-				if (grappleInfo != null) {
-					if (player.level().isClientSide) {
-						if (grappleInfo.hookPos != null) {
-							//launch player towards hook if they are looking at it
-							Vec3 vecToHook = grappleInfo.hookPos.subtract(player.position());
-							Vec3 vecToHookNormalized = vecToHook.normalize();
-							Vec3 viewVec = player.getViewVector(1.0f);
-							float launchLookAtThreshold = 0.8f;
-							double dotProduct = viewVec.dot(vecToHookNormalized);
-							BioMech.LOGGER.info("dotProduct=" + dotProduct);
-							if (dotProduct >= launchLookAtThreshold) {
-								Vec3 averageVec = vecToHookNormalized.add(viewVec).normalize();
-								
-								Vec3 targetLocationVec = averageVec.scale(vecToHook.length());
-								Vec3 overshootVec = targetLocationVec.with(Axis.Y, 0.0).normalize().scale(1.5).with(Axis.Y, 2.0);
-								targetLocationVec = targetLocationVec.add(overshootVec);
-								double launchDistance = targetLocationVec.length();
-								float airFriction = 0.91f;
-								//geometric series
-								//v + v*0.91 + v*0.91^2 + v*0.91^3 + v*0.91^4 + v*0.91^5 = dist
-								//Formula: \(S_{n}=\frac{a(1-r^{n})}{1-r}\)
-								//\(S_{n}\) is the sum of the first \(n\) terms
-								//\(a\) is the first term
-								//\(r\) is the common ratio (the value you multiply by to get the next term) 
-								//\(n\) is the number of terms
-								//a = sum*(1-r)/(1-r^n)
-								//v = dist*(1-airFriction)
-								int n = 15;
-								//double launchVelocity = launchDistance/((1-Math.pow(airFriction, n+1))/(1-airFriction));
-								double launchVelocity = launchDistance/((1-Math.pow(airFriction, n+1))/(1-airFriction));
-								double predictedDistanceIn5Sec = launchVelocity * ((1-Math.pow(airFriction, n+1))/(1-airFriction));
-								double calcDist5Sec = 0.0;
-								
-								double launchVelocityWithFriction = launchVelocity;
-								for (int i=0; i<n; ++i) {
-									calcDist5Sec += launchVelocityWithFriction;
-									launchVelocityWithFriction *= airFriction;
-								}
-								
-								//double finalLaunchScale = Math.pow(launchVelocity, 1.4);
-								double finalLaunchScale = launchVelocity;
-								Vec3 launchVec = averageVec.scale(finalLaunchScale);
-								
-								double g = player.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
-								double desiredY = targetLocationVec.y;
-								double ySimulation = desiredY * 0.05;
-								
-								int attempts = 15;
-								double yDistTravelled = 0.0;
-								double ySimulationInitial = ySimulation;
-								while (attempts > 0 && yDistTravelled < desiredY) {
-									--attempts;
+				if (bothHandsInactive) {
+					justDidRecalculate = false;
+					player.setDiscardFriction(false);
+					GrappleInfo grappleInfo = GrappleArmArmor.grappleInfoMap.get(player.getUUID());
+					if (grappleInfo != null) {
+						if (player.level().isClientSide) {
+							if (grappleInfo.hookPos != null) {
+								CompoundTag tag = thirdPersonItemStack.getTag();
+								if (tag != null) {
+									int useTicks = tag.getInt(USE_TICKS);
 									
-									yDistTravelled = 0.0;
-									ySimulation = ySimulationInitial + desiredY * 0.02;
-									ySimulationInitial = ySimulation;
-									
-									BioMech.LOGGER.info("new attempt with launch velocity = " + ySimulationInitial + " for goal=" + desiredY + " with overshootVec=" + overshootVec);
-									for (int i=0; i<15; ++i) {
-										yDistTravelled += ySimulation;
-										ySimulation -= g;
-										ySimulation *= 0.98;
-										BioMech.LOGGER.info("travelled dist = " + yDistTravelled);
+									if (useTicks > startUsingTickCount) {
+										tag.putInt(USE_TICKS, 0);
+										//launch player towards hook if they are looking at it
+										Vec3 vecToHook = grappleInfo.hookPos.subtract(player.position());
+										Vec3 vecToHookNormalized = vecToHook.normalize();
+										Vec3 viewVec = player.getViewVector(1.0f);
+										float launchLookAtThreshold = 0.8f;
+										double dotProduct = viewVec.dot(vecToHookNormalized);
+										BioMech.LOGGER.info("dotProduct=" + dotProduct + " and vecToHook len=" + vecToHook.length());
+										if (dotProduct >= launchLookAtThreshold || vecToHook.length() <= 3.0) {
+											Vec3 averageVec = vecToHookNormalized.add(viewVec).normalize();
+											
+											Vec3 targetLocationVec = averageVec.scale(vecToHook.length());
+											Vec3 overshootVec = targetLocationVec.with(Axis.Y, 0.0).normalize().scale(1.5).with(Axis.Y, 2.0);
+											targetLocationVec = targetLocationVec.add(overshootVec);
+											double launchDistance = targetLocationVec.length();
+											float airFriction = 0.91f;
+											//geometric series
+											//v + v*0.91 + v*0.91^2 + v*0.91^3 + v*0.91^4 + v*0.91^5 = dist
+											//Formula: \(S_{n}=\frac{a(1-r^{n})}{1-r}\)
+											//\(S_{n}\) is the sum of the first \(n\) terms
+											//\(a\) is the first term
+											//\(r\) is the common ratio (the value you multiply by to get the next term) 
+											//\(n\) is the number of terms
+											//a = sum*(1-r)/(1-r^n)
+											//v = dist*(1-airFriction)
+											int n = 15;
+											//double launchVelocity = launchDistance/((1-Math.pow(airFriction, n+1))/(1-airFriction));
+											double launchVelocity = launchDistance/((1-Math.pow(airFriction, n+1))/(1-airFriction));
+											double predictedDistanceIn5Sec = launchVelocity * ((1-Math.pow(airFriction, n+1))/(1-airFriction));
+											double calcDist5Sec = 0.0;
+											
+											double launchVelocityWithFriction = launchVelocity;
+											for (int i=0; i<n; ++i) {
+												calcDist5Sec += launchVelocityWithFriction;
+												launchVelocityWithFriction *= airFriction;
+											}
+											
+											//double finalLaunchScale = Math.pow(launchVelocity, 1.4);
+											double finalLaunchScale = launchVelocity;
+											Vec3 launchVec = averageVec.scale(finalLaunchScale);
+											
+											double g = player.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
+											double desiredY = targetLocationVec.y;
+											double ySimulation = desiredY * 0.05;
+											
+											int attempts = 20;
+											double yDistTravelled = 0.0;
+											double ySimulationInitial = ySimulation;
+											while (attempts > 0 && yDistTravelled < desiredY) {
+												--attempts;
+												
+												yDistTravelled = 0.0;
+												ySimulation = ySimulationInitial + desiredY * 0.02;
+												ySimulationInitial = ySimulation;
+												
+												BioMech.LOGGER.info("new attempt with launch velocity = " + ySimulationInitial + " for goal=" + desiredY + " with overshootVec=" + overshootVec);
+												for (int i=0; i<15; ++i) {
+													yDistTravelled += ySimulation;
+													ySimulation -= g;
+													ySimulation *= 0.98;
+													BioMech.LOGGER.info("travelled dist = " + yDistTravelled);
+												}
+											}
+											if (yDistTravelled >= desiredY) {
+												BioMech.LOGGER.info("met y goal with yDistTravelled=" + yDistTravelled + " vs desiredY=" + desiredY);
+											}
+											launchVec = launchVec.with(Axis.Y, ySimulationInitial);
+											
+											BioMech.LOGGER.info("dist = " + launchDistance + " and launchVec=" + launchVec + " having finalLaunchScale=" + finalLaunchScale + " and launchVelocity=" + launchVelocity + " with predictedDist=" + predictedDistanceIn5Sec + " and calcDist5=" + calcDist5Sec);
+											BioMech.LOGGER.info("launchVec speed=" + launchVec.length());
+											Vec3 deltaMov = player.getDeltaMovement();
+											player.setOnGround(false);
+											player.setDeltaMovement(new Vec3(deltaMov.x + launchVec.x, deltaMov.y + launchVec.y, deltaMov.z + launchVec.z));
+											BioMech.LOGGER.info("player starting loc = " + player.position());
+											BioMech.LOGGER.info("player starting deltaMov = " + player.getDeltaMovement());
+											//player.setDeltaMovement(1.0, 0.0, 0.0);
+											BioMech.LOGGER.info("player deltaMov now = " + player.getDeltaMovement());
+										}
 									}
 								}
-								if (yDistTravelled >= desiredY) {
-									BioMech.LOGGER.info("met y goal with yDistTravelled=" + yDistTravelled + " vs desiredY=" + desiredY);
-								}
-								launchVec = launchVec.with(Axis.Y, ySimulationInitial);
-								
-								BioMech.LOGGER.info("dist = " + launchDistance + " and launchVec=" + launchVec + " having finalLaunchScale=" + finalLaunchScale + " and launchVelocity=" + launchVelocity + " with predictedDist=" + predictedDistanceIn5Sec + " and calcDist5=" + calcDist5Sec);
-								BioMech.LOGGER.info("launchVec speed=" + launchVec.length());
-								Vec3 deltaMov = player.getDeltaMovement();
-								player.setOnGround(false);
-								player.setDeltaMovement(new Vec3(deltaMov.x + launchVec.x, deltaMov.y + launchVec.y, deltaMov.z + launchVec.z));
-								BioMech.LOGGER.info("player starting loc = " + player.position());
-								BioMech.LOGGER.info("player starting deltaMov = " + player.getDeltaMovement());
-								//player.setDeltaMovement(1.0, 0.0, 0.0);
-								BioMech.LOGGER.info("player deltaMov now = " + player.getDeltaMovement());
 							}
 						}
-					}
-					//BioMech.LOGGER.info("grappleEntity=" + grappleInfo.grappleEntity);
-					if (grappleInfo.grappleEntity != null) {
-						if (!player.level().isClientSide) {
-							grappleInfo.grappleEntity.discard();
-							grappleInfo.grappleEntity = null;
+						//BioMech.LOGGER.info("grappleEntity=" + grappleInfo.grappleEntity);
+						if (grappleInfo.grappleEntity != null) {
+							if (!player.level().isClientSide) {
+								grappleInfo.grappleEntity.discard();
+								grappleInfo.grappleEntity = null;
+							}
+						}
+						
+						if (grappleInfo.grappleEntity == null || grappleInfo.grappleEntity.isRemoved()) {
+							GrappleArmArmor.grappleInfoMap.remove(player.getUUID());
 						}
 					}
-					
-					if (grappleInfo.grappleEntity == null || grappleInfo.grappleEntity.isRemoved()) {
-						GrappleArmArmor.grappleInfoMap.remove(player.getUUID());
+					if (thirdPersonItemStack.getTag() != null && thirdPersonItemStack.getTag().contains(USE_TICKS)) {
+						thirdPersonItemStack.getTag().putInt(USE_TICKS, 0);
 					}
-				}
-				if (thirdPersonItemStack.getTag() != null && thirdPersonItemStack.getTag().contains(USE_TICKS)) {
-					thirdPersonItemStack.getTag().putInt(USE_TICKS, 0);
-				}
-				if (player.level().isClientSide) {
-					BioMech.clientSideItemAnimation(itemStack, this.dispatcher.INERT_COMMAND.cmd);
+					if (player.level().isClientSide) {
+						BioMech.clientSideItemAnimation(itemStack, this.dispatcher.INERT_COMMAND.cmd);
+					}
 				}
 			}
 		}

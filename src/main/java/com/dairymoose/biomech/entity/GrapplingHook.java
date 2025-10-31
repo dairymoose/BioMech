@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
+import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.arm.GrappleArmArmor;
 import com.dairymoose.biomech.item.armor.arm.GrappleArmArmor.GrappleInfo;
 import com.mojang.logging.LogUtils;
@@ -29,6 +30,7 @@ public class GrapplingHook extends ThrowableItemProjectile {
 
 	private static final Logger LOGGER = LogUtils.getLogger();
 	
+	public MechPart mechPart = null;
 	public Entity entityOwner = null;
 	public boolean didHit = false;
 	public int lifeSpan = -1;
@@ -44,6 +46,9 @@ public class GrapplingHook extends ThrowableItemProjectile {
 	
 	public GrapplingHook(EntityType<? extends GrapplingHook> entityType, Level level) {
 		super(entityType, level);
+		if (this.level().isClientSide) {
+			mechPart = GrappleArmArmor.clientLastUsedArm;
+		}
 	}
 	
 	public GrapplingHook(Level level, LivingEntity living) {
@@ -63,6 +68,7 @@ public class GrapplingHook extends ThrowableItemProjectile {
 
 	public static final EntityDataAccessor<Integer> DATA_ENTITY_OWNER_ID = SynchedEntityData.defineId(GrapplingHook.class, EntityDataSerializers.INT);
 	public static final EntityDataAccessor<Vector3f> DATA_IMPACT_POINT = SynchedEntityData.defineId(GrapplingHook.class, EntityDataSerializers.VECTOR3);
+	public static final EntityDataAccessor<Integer> DATA_MECH_PART_ORDINAL = SynchedEntityData.defineId(GrapplingHook.class, EntityDataSerializers.INT);
 	
 	@Override
 	protected Vec3 getLeashOffset() {
@@ -86,6 +92,9 @@ public class GrapplingHook extends ThrowableItemProjectile {
 				if (grappleInfo != null) {
 					Vec3 loc = location;
 					this.updateGrappleInfo(grappleInfo, loc);
+				}
+				if (!this.level().isClientSide) {
+					entityOwner.resetFallDistance();
 				}
 			} else {
 				if (this.level().isClientSide) {
@@ -112,6 +121,11 @@ public class GrapplingHook extends ThrowableItemProjectile {
     		}
     	} else if (accessor == DATA_IMPACT_POINT) {
     		this.onHitLogic();
+    	} else if (accessor == DATA_MECH_PART_ORDINAL) {
+    		int ordinal = this.getEntityData().get(DATA_MECH_PART_ORDINAL).intValue();
+    		if (ordinal != -1) {
+    			this.mechPart = MechPart.values()[ordinal];
+    		}
     	}
     }
     
@@ -119,6 +133,7 @@ public class GrapplingHook extends ThrowableItemProjectile {
         super.defineSynchedData();
         this.getEntityData().define(DATA_ENTITY_OWNER_ID, -1);
         this.getEntityData().define(DATA_IMPACT_POINT, new Vector3f(0.0f, 0.0f, 0.0f));
+        this.getEntityData().define(DATA_MECH_PART_ORDINAL, -1);
      }
 
 	@Override
@@ -148,6 +163,10 @@ public class GrapplingHook extends ThrowableItemProjectile {
 		}
 		
 		if (!this.level().isClientSide) {
+			if (this.getEntityData().get(DATA_MECH_PART_ORDINAL).intValue() == -1) {
+				this.getEntityData().set(DATA_MECH_PART_ORDINAL, this.mechPart.ordinal());
+			}
+			
 			if (lifeSpan > 0) {
 				--lifeSpan;
 			}
@@ -177,6 +196,7 @@ public class GrapplingHook extends ThrowableItemProjectile {
 		if (entityOwner.isControlledByLocalInstance()) {
 			//BioMech.fallingDeltaY = entityOwner.getDeltaMovement().y;
 		}
+		
 		LOGGER.debug("Got hit at location " + loc + " with distance " + tetherDistance);
 	}
 	

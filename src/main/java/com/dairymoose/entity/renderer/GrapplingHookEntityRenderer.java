@@ -5,6 +5,7 @@ import org.joml.Matrix4f;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.entity.GrapplingHook;
+import com.dairymoose.biomech.item.armor.MechPart;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -58,6 +59,10 @@ public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook>
 	int x=44;
 	@Override
 	public void render(@NotNull GrapplingHook entity, float entityYaw, float partialTick, @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight) {
+		if (entity.tickCount <= 1) {
+			return;
+		}
+		
 		if (entity.didHit) {
 			//override lightning because sometimes, after we hit, it goes inside a block and becomes fully dark
 			packedLight = LightTexture.FULL_BRIGHT;
@@ -84,12 +89,17 @@ public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook>
 			this.renderLeash(entity, partialTick, poseStack, bufferSource, Minecraft.getInstance().player);
 	}
 
-	public Vec3 getRopeHoldPositionForPlayer(Entity holder, float partialTick) {
+	public Vec3 getRopeHoldPositionForPlayer(Entity grappleHook, Entity holder, float partialTick) {
       if (holder.isControlledByLocalInstance() && Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
          float f = Mth.lerp(partialTick * 0.5F, holder.getYRot(), holder.yRotO) * ((float)Math.PI / 180F);
          float f1 = Mth.lerp(partialTick * 0.5F, holder.getXRot(), holder.xRotO) * ((float)Math.PI / 180F);
-         //double d0 = player.getMainArm() == HumanoidArm.RIGHT ? -1.0D : 1.0D;
-         double d0 = 1.0;
+         boolean rightArm = true;
+         if (grappleHook instanceof GrapplingHook hook) {
+        	 if (hook.mechPart == MechPart.LeftArm) {
+        		 rightArm = false;
+        	 }
+         }
+         double d0 = rightArm ? -1.0D : 1.0D;
          Vec3 vec3 = new Vec3(0.39D * d0, -0.6D, 0.3D);
          return vec3.xRot(-f1).yRot(-f).add(holder.getEyePosition(partialTick));
       	} else {
@@ -100,7 +110,7 @@ public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook>
 	private <E extends Entity> void renderLeash(Entity entity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, E holder) {
 		poseStack.pushPose();
 		//Vec3 vec3 = holder.getRopeHoldPosition(partialTick);
-		Vec3 vec3 = this.getRopeHoldPositionForPlayer(holder, partialTick);
+		Vec3 vec3 = this.getRopeHoldPositionForPlayer(entity, holder, partialTick);
 		double d0 = (double) (entity.getYRot() * ((float) Math.PI / 180F)) + (Math.PI / 2D);
 		Vec3 vec31 = entity.getLeashOffset(partialTick);
 		double d1 = Math.cos(d0) * vec31.z + Math.sin(d0) * vec31.x;
