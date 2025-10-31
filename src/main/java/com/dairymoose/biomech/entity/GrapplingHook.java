@@ -42,7 +42,7 @@ public class GrapplingHook extends ThrowableItemProjectile {
 
 	public static final EntityType<GrapplingHook> GRAPPLING_HOOK_ENTITY = EntityType.Builder
 			.<GrapplingHook>of(GrapplingHook::new, MobCategory.MISC).sized(0.40F, 0.40F)
-			.clientTrackingRange(4).updateInterval(20).build(new ResourceLocation(BioMech.MODID, "grappling_hook").toString());
+			.clientTrackingRange(30).updateInterval(20).build(new ResourceLocation(BioMech.MODID, "grappling_hook").toString());
 	
 	public GrapplingHook(EntityType<? extends GrapplingHook> entityType, Level level) {
 		super(entityType, level);

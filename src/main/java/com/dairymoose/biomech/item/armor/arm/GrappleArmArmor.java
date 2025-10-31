@@ -140,8 +140,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 								if (!player.onGround() && player.fallDistance >= 0.0f) {
 									if (localPlayerLastFallDist == 0.0f && player.fallDistance > 0.0f) {
 										//we just started falling, recalculate tether length now
-										float oldTetherDist = grappleInfo.grappleTetherDistance;
-										grappleInfo.grappleTetherDistance = (float) this.getDistanceToHook(player, grappleInfo.hookPos);
+										float oldTetherDist = shortenTetherToCurrent(player, grappleInfo);
 										Vec3 deltaMov = player.getDeltaMovement();
 										player.setDeltaMovement(new Vec3(deltaMov.x, 0.0, deltaMov.z));
 										BioMech.LOGGER.debug("recalculate tether distance from " + oldTetherDist + " to " + grappleInfo.grappleTetherDistance);
@@ -149,8 +148,11 @@ public abstract class GrappleArmArmor extends ArmorBase {
 									}
 									localPlayerLastFallDist = player.fallDistance;
 								}
-								if (!player.onGround() && (justDidRecalculate || player.fallDistance > 1.0f)) {
-									player.setDiscardFriction(true);
+								if (!player.onGround() && (justDidRecalculate || player.fallDistance >= 0.2f)) {
+									if (!player.shouldDiscardFriction()) {
+										float oldTetherDist = shortenTetherToCurrent(player, grappleInfo);
+										player.setDiscardFriction(true);
+									}
 									double m = 1.0;
 									double g = -player.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
 									
@@ -238,7 +240,8 @@ public abstract class GrappleArmArmor extends ArmorBase {
 								launched.setYRot(player.getYRot());
 								launched.setXRot(player.getXRot());
 								launched.setOldPosAndRot();
-								launched.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0f, 1.0F);
+								//last 3 args: extra pitch, launch speed mult, random factor
+								launched.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0f, 0.0F);
 								level.addFreshEntity(launched);
 								itemStack.getOrCreateTag().putInt("LaunchedEntityId", launched.getId());
 								itemStack.getOrCreateTag().putLong("LaunchedTimestamp", System.currentTimeMillis());
@@ -246,6 +249,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 						}
 					} else if (active && useTicks > startUsingTickCount && grappleInfo != null && grappleInfo.hookPos != null) {
 						BioMech.allowFlyingForPlayer(player);
+						player.resetFallDistance();
 					}
 				}
 				
@@ -269,14 +273,23 @@ public abstract class GrappleArmArmor extends ArmorBase {
 										Vec3 viewVec = player.getViewVector(1.0f);
 										float launchLookAtThreshold = 0.8f;
 										double dotProduct = viewVec.dot(vecToHookNormalized);
-										BioMech.LOGGER.info("dotProduct=" + dotProduct + " and vecToHook len=" + vecToHook.length());
+										BioMech.LOGGER.debug("dotProduct=" + dotProduct + " and vecToHook len=" + vecToHook.length());
 										if (dotProduct >= launchLookAtThreshold || vecToHook.length() <= 3.0) {
 											Vec3 averageVec = vecToHookNormalized.add(viewVec).normalize();
 											
 											Vec3 targetLocationVec = averageVec.scale(vecToHook.length());
-											Vec3 overshootVec = targetLocationVec.with(Axis.Y, 0.0).normalize().scale(1.5).with(Axis.Y, 2.0);
+											double xzOvershoot = 1.0;
+											double yOvershoot = 3.5;
+											if (targetLocationVec.y < 0.0) {
+												xzOvershoot = 5.0;
+												yOvershoot = 5.0;
+												BioMech.LOGGER.debug("Use xzOvershoot of " + xzOvershoot + " for downward target");
+											}
+											Vec3 overshootVec = targetLocationVec.with(Axis.Y, 0.0).normalize().scale(xzOvershoot).with(Axis.Y, yOvershoot);
 											targetLocationVec = targetLocationVec.add(overshootVec);
 											double launchDistance = targetLocationVec.length();
+											double desiredY = targetLocationVec.y;
+											
 											float airFriction = 0.91f;
 											//geometric series
 											//v + v*0.91 + v*0.91^2 + v*0.91^3 + v*0.91^4 + v*0.91^5 = dist
@@ -304,29 +317,36 @@ public abstract class GrappleArmArmor extends ArmorBase {
 											Vec3 launchVec = averageVec.scale(finalLaunchScale);
 											
 											double g = player.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
-											double desiredY = targetLocationVec.y;
 											double ySimulation = desiredY * 0.05;
+											double ySimIncrement = Math.abs(desiredY * 0.01);
 											
-											int attempts = 20;
+											int attempts = 50;
+											int ticksToTry = 50;
 											double yDistTravelled = 0.0;
 											double ySimulationInitial = ySimulation;
-											while (attempts > 0 && yDistTravelled < desiredY) {
+											
+											//check against yDistTravelled = 0 so that negative desiredY values don't immediately skip the loop
+											while (attempts > 0 && (yDistTravelled == 0.0 || yDistTravelled < desiredY)) {
 												--attempts;
 												
 												yDistTravelled = 0.0;
-												ySimulation = ySimulationInitial + desiredY * 0.02;
+												ySimulation = ySimulationInitial + ySimIncrement;
 												ySimulationInitial = ySimulation;
 												
 												BioMech.LOGGER.debug("new attempt with launch velocity = " + ySimulationInitial + " for goal=" + desiredY + " with overshootVec=" + overshootVec);
-												for (int i=0; i<15; ++i) {
+												for (int i=0; i<ticksToTry; ++i) {
 													yDistTravelled += ySimulation;
 													ySimulation -= g;
 													ySimulation *= 0.98;
 													BioMech.LOGGER.debug("travelled dist = " + yDistTravelled);
+													if (yDistTravelled >= desiredY) {
+														BioMech.LOGGER.debug("breaking early due to meeting goal = " + desiredY);
+														break;
+													}
 												}
 											}
 											if (yDistTravelled >= desiredY) {
-												BioMech.LOGGER.debug("met y goal with yDistTravelled=" + yDistTravelled + " vs desiredY=" + desiredY);
+												BioMech.LOGGER.debug("met y goal with yDistTravelled=" + yDistTravelled + " vs desiredY=" + desiredY + " giving launchY=" + ySimulationInitial);
 											}
 											launchVec = launchVec.with(Axis.Y, ySimulationInitial);
 											
@@ -334,6 +354,11 @@ public abstract class GrappleArmArmor extends ArmorBase {
 											BioMech.LOGGER.debug("launchVec speed=" + launchVec.length());
 											Vec3 deltaMov = player.getDeltaMovement();
 											player.setOnGround(false);
+											if (desiredY <= 0.0f) {
+												Vec3 pos = player.position();
+												player.setPos(pos.x, pos.y + 0.33, pos.z);
+												BioMech.LOGGER.debug("Launch with ground boost");
+											}
 											player.setDeltaMovement(new Vec3(deltaMov.x + launchVec.x, deltaMov.y + launchVec.y, deltaMov.z + launchVec.z));
 											BioMech.LOGGER.debug("player starting loc = " + player.position());
 											BioMech.LOGGER.debug("player starting deltaMov = " + player.getDeltaMovement());
@@ -341,6 +366,9 @@ public abstract class GrappleArmArmor extends ArmorBase {
 									}
 								}
 							}
+						} else {
+							BioMech.allowFlyingForPlayer(player);
+							player.resetFallDistance();
 						}
 						//BioMech.LOGGER.info("grappleEntity=" + grappleInfo.grappleEntity);
 						if (grappleInfo.grappleEntity != null) {
@@ -363,6 +391,12 @@ public abstract class GrappleArmArmor extends ArmorBase {
 				}
 			}
 		}
+	}
+
+	private float shortenTetherToCurrent(Player player, GrappleInfo grappleInfo) {
+		float oldTetherDist = grappleInfo.grappleTetherDistance;
+		grappleInfo.grappleTetherDistance = (float) this.getDistanceToHook(player, grappleInfo.hookPos);
+		return oldTetherDist;
 	}
 	
 	@Override
