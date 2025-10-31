@@ -65,6 +65,7 @@ import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTarge
 import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundOpenPortableStorageUnitPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundPressHotkeyPacket;
+import com.dairymoose.biomech.packet.serverbound.ServerboundResetFallDamagePacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundTeleportationCrystalPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundUpdateVisibilityPacket;
 import com.dairymoose.biomech.particle.ForceFieldParticle;
@@ -326,6 +327,7 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundPressHotkeyPacket.class, ServerboundPressHotkeyPacket::write, ServerboundPressHotkeyPacket::new, ServerboundPressHotkeyPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundPressHotkeyPacket.class, ClientboundPressHotkeyPacket::write, ClientboundPressHotkeyPacket::new, ClientboundPressHotkeyPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundUpdateVisibilityPacket.class, ServerboundUpdateVisibilityPacket::write, ServerboundUpdateVisibilityPacket::new, ServerboundUpdateVisibilityPacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundResetFallDamagePacket.class, ServerboundResetFallDamagePacket::write, ServerboundResetFallDamagePacket::new, ServerboundResetFallDamagePacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {

@@ -197,7 +197,10 @@ public class GrapplingHook extends ThrowableItemProjectile {
 			//BioMech.fallingDeltaY = entityOwner.getDeltaMovement().y;
 		}
 		
-		LOGGER.debug("Got hit at location " + loc + " with distance " + tetherDistance);
+		if (this.entityOwner != null) {
+			this.entityOwner.resetFallDistance();
+		}
+		LOGGER.debug("Got hit at location " + loc + " with distance " + tetherDistance + " and horizontalDist=" + loc.subtract(entityOwner.position()).horizontalDistance());
 	}
 	
 	private GrappleInfo getOrCreateGrappleInfoForEntity(Entity entity) {

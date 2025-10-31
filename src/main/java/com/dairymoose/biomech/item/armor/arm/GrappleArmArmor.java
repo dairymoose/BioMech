@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
@@ -14,6 +15,7 @@ import com.dairymoose.biomech.entity.GrapplingHook;
 import com.dairymoose.biomech.item.anim.GrappleArmDispatcher;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
+import com.dairymoose.biomech.packet.serverbound.ServerboundResetFallDamagePacket;
 
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.nbt.CompoundTag;
@@ -87,6 +89,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 		return straightLineDistance;
 	}
 	
+	private int lastResetFallDistTick = -1;
 	public static MechPart clientLastUsedArm = MechPart.RightArm;
 	private float localPlayerLastFallDist = -1.0f;
 	private boolean justDidRecalculate = false;
@@ -152,6 +155,8 @@ public abstract class GrappleArmArmor extends ArmorBase {
 									if (!player.shouldDiscardFriction()) {
 										float oldTetherDist = shortenTetherToCurrent(player, grappleInfo);
 										player.setDiscardFriction(true);
+										
+										serverResetFallDistance(player);
 									}
 									double m = 1.0;
 									double g = -player.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
@@ -162,8 +167,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 
 									//https://www.acs.psu.edu/drussell/Demos/Pendulum/Pendulum.html
 									double distToHook = this.getDistanceToHook(player, grappleInfo.hookPos);
-									double straightLineDistance = this.getStraightLineDistanceToHook(player, grappleInfo.hookPos);
-									double angleToHook = 90.0 - Math.toDegrees(Math.atan2(diffY, straightLineDistance));
+									double angleToHook = computeAngleToHook(player, grappleInfo);
 									
 									Vec3 deltaMov = player.getDeltaMovement();
 									
@@ -205,10 +209,15 @@ public abstract class GrappleArmArmor extends ArmorBase {
 									double beyondTetherLengthAdjustment = projectedDistToHook > grappleInfo.grappleTetherDistance ? (projectedDistToHook - grappleInfo.grappleTetherDistance)*Math.cos(Math.toRadians(angleToHook)) : 0.0;
 									if (beyondTetherLengthAdjustment > 0.0) {
 										BioMech.LOGGER.debug("beyond tether length adjustment: " + beyondTetherLengthAdjustment);
+										int tickDiff = player.tickCount - lastResetFallDistTick;
+										if (tickDiff < 0 || tickDiff >= 4) {
+											serverResetFallDistance(player);
+										}
 									}
 									double deltaY = yComponent + beyondTetherLengthAdjustment;
 									
 									player.setDeltaMovement(deltaX, deltaY, deltaZ);
+									
 									//BioMech.LOGGER.debug("inline force=" + inlineForce + " with deltaY=" + deltaY + " with yComponent=" + yComponent + " and cetripetalY=" + centripetalY + " for " + angleToHook);
 								} else {
 									player.setDiscardFriction(false);
@@ -249,7 +258,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 						}
 					} else if (active && useTicks > startUsingTickCount && grappleInfo != null && grappleInfo.hookPos != null) {
 						BioMech.allowFlyingForPlayer(player);
-						player.resetFallDistance();
+						//player.resetFallDistance();
 					}
 				}
 				
@@ -268,22 +277,38 @@ public abstract class GrappleArmArmor extends ArmorBase {
 									if (useTicks > startUsingTickCount) {
 										tag.putInt(USE_TICKS, 0);
 										//launch player towards hook if they are looking at it
+										player.setOnGround(false);
+										
 										Vec3 vecToHook = grappleInfo.hookPos.subtract(player.position());
+										boolean shouldLaunchWithGroundBoost = false;
+										if (vecToHook.y < 0.0) {
+											shouldLaunchWithGroundBoost = true;
+											
+											vecToHook = grappleInfo.hookPos.subtract(player.position().add(0.0, 0.5, 0.0));
+										}
+										
 										Vec3 vecToHookNormalized = vecToHook.normalize();
 										Vec3 viewVec = player.getViewVector(1.0f);
 										float launchLookAtThreshold = 0.8f;
 										double dotProduct = viewVec.dot(vecToHookNormalized);
 										BioMech.LOGGER.debug("dotProduct=" + dotProduct + " and vecToHook len=" + vecToHook.length());
 										if (dotProduct >= launchLookAtThreshold || vecToHook.length() <= 3.0) {
+											if (shouldLaunchWithGroundBoost) {
+												Vec3 pos = player.position();
+												player.setPos(pos.x, pos.y + 0.50, pos.z);
+												BioMech.LOGGER.debug("Launch with ground boost");
+											}
+											
 											Vec3 averageVec = vecToHookNormalized.add(viewVec).normalize();
 											
 											Vec3 targetLocationVec = averageVec.scale(vecToHook.length());
 											double xzOvershoot = 1.0;
 											double yOvershoot = 3.5;
-											if (targetLocationVec.y < 0.0) {
-												xzOvershoot = 5.0;
+											double angleToHook = computeAngleToHook(player, grappleInfo);
+											if (targetLocationVec.y < 0.0 && angleToHook >= 95.0) {
+												xzOvershoot = 6.0;
 												yOvershoot = 5.0;
-												BioMech.LOGGER.debug("Use xzOvershoot of " + xzOvershoot + " for downward target");
+												BioMech.LOGGER.debug("Use xzOvershoot of " + xzOvershoot + " for downward target with angleToHook=" + angleToHook);
 											}
 											Vec3 overshootVec = targetLocationVec.with(Axis.Y, 0.0).normalize().scale(xzOvershoot).with(Axis.Y, yOvershoot);
 											targetLocationVec = targetLocationVec.add(overshootVec);
@@ -300,7 +325,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 											//\(n\) is the number of terms
 											//a = sum*(1-r)/(1-r^n)
 											//v = dist*(1-airFriction)
-											int n = 15;
+											int n = 50;
 											//double launchVelocity = launchDistance/((1-Math.pow(airFriction, n+1))/(1-airFriction));
 											double launchVelocity = launchDistance/((1-Math.pow(airFriction, n+1))/(1-airFriction));
 											double predictedDistanceIn5Sec = launchVelocity * ((1-Math.pow(airFriction, n+1))/(1-airFriction));
@@ -338,9 +363,9 @@ public abstract class GrappleArmArmor extends ArmorBase {
 													yDistTravelled += ySimulation;
 													ySimulation -= g;
 													ySimulation *= 0.98;
-													BioMech.LOGGER.debug("travelled dist = " + yDistTravelled);
-													if (yDistTravelled >= desiredY) {
-														BioMech.LOGGER.debug("breaking early due to meeting goal = " + desiredY);
+													BioMech.LOGGER.trace("travelled dist = " + yDistTravelled);
+													if (yDistTravelled > 0.0 && yDistTravelled >= desiredY) {
+														BioMech.LOGGER.debug("breaking early due to meeting goal = " + desiredY + " with travelledDist=" + yDistTravelled);
 														break;
 													}
 												}
@@ -353,12 +378,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 											BioMech.LOGGER.debug("dist = " + launchDistance + " and launchVec=" + launchVec + " having finalLaunchScale=" + finalLaunchScale + " and launchVelocity=" + launchVelocity + " with predictedDist=" + predictedDistanceIn5Sec + " and calcDist5=" + calcDist5Sec);
 											BioMech.LOGGER.debug("launchVec speed=" + launchVec.length());
 											Vec3 deltaMov = player.getDeltaMovement();
-											player.setOnGround(false);
-											if (desiredY <= 0.0f) {
-												Vec3 pos = player.position();
-												player.setPos(pos.x, pos.y + 0.33, pos.z);
-												BioMech.LOGGER.debug("Launch with ground boost");
-											}
+											
 											player.setDeltaMovement(new Vec3(deltaMov.x + launchVec.x, deltaMov.y + launchVec.y, deltaMov.z + launchVec.z));
 											BioMech.LOGGER.debug("player starting loc = " + player.position());
 											BioMech.LOGGER.debug("player starting deltaMov = " + player.getDeltaMovement());
@@ -368,7 +388,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 							}
 						} else {
 							BioMech.allowFlyingForPlayer(player);
-							player.resetFallDistance();
+							//player.resetFallDistance();
 						}
 						//BioMech.LOGGER.info("grappleEntity=" + grappleInfo.grappleEntity);
 						if (grappleInfo.grappleEntity != null) {
@@ -391,6 +411,17 @@ public abstract class GrappleArmArmor extends ArmorBase {
 				}
 			}
 		}
+	}
+
+	private void serverResetFallDistance(Player player) {
+		lastResetFallDistTick = player.tickCount;
+		BioMechNetwork.INSTANCE.sendToServer(new ServerboundResetFallDamagePacket());
+	}
+
+	private double computeAngleToHook(Player player, GrappleInfo grappleInfo) {
+		double diffY = grappleInfo.hookPos.y - player.position().y;
+		double straightLineDistance = this.getStraightLineDistanceToHook(player, grappleInfo.hookPos);
+		return 90.0 - Math.toDegrees(Math.atan2(diffY, straightLineDistance));
 	}
 
 	private float shortenTetherToCurrent(Player player, GrappleInfo grappleInfo) {
