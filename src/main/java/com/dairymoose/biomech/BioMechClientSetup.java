@@ -74,6 +74,7 @@ import com.dairymoose.biomech.item.renderer.DrillItemRenderer;
 import com.dairymoose.biomech.item.renderer.ExtendoArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.GatlingItemRenderer;
 import com.dairymoose.biomech.item.renderer.GrappleArmItemRenderer;
+import com.dairymoose.biomech.item.renderer.GrappleHookItemRenderer;
 import com.dairymoose.biomech.item.renderer.HarvesterArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.HerosArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.IronMechArmItemRenderer;
@@ -217,6 +218,10 @@ public class BioMechClientSetup {
     	//BioMech Station only
     	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());
     	//BioMech Station only
+    	
+    	//Grappling hook item only
+    	AzItemRendererRegistry.register(GrappleHookItemRenderer::new, BioMechRegistry.ITEM_GRAPPLING_HOOK.get());
+    	//Grappling hook item only
 	}
 	
 }

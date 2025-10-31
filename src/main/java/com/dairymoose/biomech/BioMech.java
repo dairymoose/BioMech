@@ -22,8 +22,10 @@ import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.config.BioMechCommonConfig;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
+import com.dairymoose.biomech.entity.GrapplingHook;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
+import com.dairymoose.biomech.item.GrapplingHookItem;
 import com.dairymoose.biomech.item.IlluminantBlockItem;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.CpuArmor;
@@ -48,6 +50,8 @@ import com.dairymoose.biomech.item.armor.RepulsorLiftArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.item.armor.TeleportationCrystalArmor;
 import com.dairymoose.biomech.item.armor.arm.GatlingArmArmor;
+import com.dairymoose.biomech.item.armor.arm.GrappleArmArmor;
+import com.dairymoose.biomech.item.armor.arm.GrappleArmArmor.GrappleInfo;
 import com.dairymoose.biomech.item.armor.arm.PowerArmArmor;
 import com.dairymoose.biomech.menu.BioMechStationMenu;
 import com.dairymoose.biomech.packet.clientbound.ClientboundEnergySyncPacket;
@@ -71,6 +75,7 @@ import com.dairymoose.biomech.particle.MuzzleFlashParticle;
 import com.dairymoose.biomech.particle.RepulsorParticle;
 import com.dairymoose.biomech.particle.ThickerLaserParticle;
 import com.dairymoose.biomech.particle.ThickestLaserParticle;
+import com.dairymoose.entity.renderer.GrapplingHookEntityRenderer;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -124,12 +129,12 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -152,12 +157,14 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ComputeFovModifierEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.InputEvent.MouseScrollingEvent;
+import net.minecraftforge.client.event.MovementInputUpdateEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
@@ -259,6 +266,7 @@ public class BioMech
     public static final Logger LOGGER = LogUtils.getLogger();
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MODID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, MODID);
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, MODID);
@@ -290,6 +298,7 @@ public class BioMech
 
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
+        ENTITIES.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         BLOCK_ENTITY_TYPES.register(modEventBus);
         MENUS.register(modEventBus);
@@ -360,10 +369,12 @@ public class BioMech
 									shouldAdd = false;
 								} else if (item instanceof IlluminantBlockItem illuminant) {
 									shouldAdd = false;
+								} else if (item instanceof GrapplingHookItem grappling) {
+									shouldAdd = false;
 								}
 								
 								if (shouldAdd) {
-									LOGGER.debug("Value is: " + item);
+									LOGGER.trace("Value is: " + item);
 									event.accept(value);
 								}
 							}
@@ -694,6 +705,10 @@ public class BioMech
     	
     	if (event.phase == TickEvent.Phase.START) {
     		if (!event.player.isDeadOrDying() && !event.player.isSpectator()) {
+//    			if (event.player.level().isClientSide) {
+//    				BioMech.LOGGER.info("loc=" + event.player.position() + ", deltaMov=" + event.player.getDeltaMovement());
+//    			}
+    			
     			BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
         		if (playerData != null) {
         			if (FMLEnvironment.dist == Dist.CLIENT) {
@@ -1499,6 +1514,8 @@ public class BioMech
     
     public static boolean requireModifierKeyForArmUsage = true;
     
+    public static long clientTick = 0;
+    
     public enum OutlinerType {
     	SPAWNER,
     	CHEST
@@ -1593,6 +1610,53 @@ public class BioMech
 //    			}
 //    		}
 //    	}
+    	
+    	private boolean preventedMovementLastTick = false;
+    	@SubscribeEvent
+    	public void onMovementInput(MovementInputUpdateEvent event) {
+    		//BioMech.LOGGER.info("movement input event: " + GrappleArmArmor.atTheEdgeOfYourRope);
+    		//if (GrappleArmArmor.atTheEdgeOfYourRope) {
+    			if (Minecraft.getInstance().player != null) {
+    				Player player = Minecraft.getInstance().player;
+    				
+					GrappleInfo grappleInfo = GrappleArmArmor.grappleInfoMap.get(player.getUUID());
+					if (grappleInfo != null && grappleInfo.hookPos != null) {
+						Vec2 movVec = event.getInput().getMoveVector();
+						boolean wouldMoveOutsideTetherRange = motionWouldMoveOutsideTether(movVec, player, grappleInfo);
+						
+						if (wouldMoveOutsideTetherRange) {
+							preventedMovementLastTick = true;
+							
+							Vec2 fwdMovVec = new Vec2(0.0f, movVec.y);
+							Vec2 leftMovVec = new Vec2(movVec.x, 0.0f);
+							if (motionWouldMoveOutsideTether(fwdMovVec, player, grappleInfo))
+								event.getInput().forwardImpulse = 0.0f;
+							if (motionWouldMoveOutsideTether(leftMovVec, player, grappleInfo))
+								event.getInput().leftImpulse = 0.0f;
+						} else {
+							if (!player.onGround()) {
+								float swingInfluence = 0.22f;
+								event.getInput().forwardImpulse *= swingInfluence;
+			    	    		event.getInput().leftImpulse *= swingInfluence;
+							}
+							preventedMovementLastTick = false;
+						}
+					}
+    			}
+    		//}
+    	}
+
+		private boolean motionWouldMoveOutsideTether(Vec2 movVec, Player player, GrappleInfo grappleInfo) {
+			double xComp = player.getSpeed() * movVec.y * -Math.sin(Math.toRadians(player.getYRot())) + player.getSpeed() * movVec.x * -Math.sin(Math.toRadians(player.getYRot()-90.0));
+			double zComp = player.getSpeed() * movVec.y * Math.cos(Math.toRadians(player.getYRot())) + player.getSpeed() * movVec.x * Math.cos(Math.toRadians(player.getYRot()-90.0));
+			Vec3 inputVec = new Vec3(xComp, 0.0, zComp);
+			if (preventedMovementLastTick) {
+				inputVec = inputVec.scale(5.0);
+			}
+			Vec3 newLoc = player.position().add(inputVec);
+			boolean wouldMoveOutsideTetherRange = newLoc.distanceTo(grappleInfo.hookPos) > grappleInfo.grappleTetherDistance;
+			return wouldMoveOutsideTetherRange;
+		}
     	
     	@SubscribeEvent
     	public void onClickInput(InputEvent.InteractionKeyMappingTriggered event) {
@@ -1915,7 +1979,7 @@ public class BioMech
     		
     		return null;
     	}
-    	
+
     	boolean backKeyPriorStatus = false;
     	boolean headKeyPriorStatus = false;
     	boolean chestKeyPriorStatus = false;
@@ -1923,6 +1987,8 @@ public class BioMech
     	@SubscribeEvent
         public void onClientTick(final ClientTickEvent event) {
         	if (event.phase == TickEvent.Phase.START) {
+        		++clientTick;
+        		
         		HandActiveStatus has = this.getLocalHandActiveStatus();
         		if (has != null) {
         			boolean initialRight = has.rightHandActive;
@@ -2018,6 +2084,7 @@ public class BioMech
         @SubscribeEvent
 		public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
 			event.registerBlockEntityRenderer(BioMechRegistry.BLOCK_ENTITY_BIOMECH_STATION.get(), context -> new BioMechStationRenderer());
+			event.registerEntityRenderer(BioMechRegistry.ENTITY_GRAPPLING_HOOK.get(), GrapplingHookEntityRenderer::new);
 		}
         
         public BioMechPlayerData getDataForLocalPlayer() {

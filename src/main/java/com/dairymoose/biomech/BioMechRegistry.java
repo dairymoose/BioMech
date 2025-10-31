@@ -3,8 +3,10 @@ package com.dairymoose.biomech;
 import com.dairymoose.biomech.block.BioMechStationBlock;
 import com.dairymoose.biomech.block.IlluminantBlock;
 import com.dairymoose.biomech.block_entity.BioMechStationBlockEntity;
+import com.dairymoose.biomech.entity.GrapplingHook;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
+import com.dairymoose.biomech.item.GrapplingHookItem;
 import com.dairymoose.biomech.item.IlluminantBlockItem;
 import com.dairymoose.biomech.item.armor.BatteryPackArmor;
 import com.dairymoose.biomech.item.armor.ColossusChestplateArmor;
@@ -81,6 +83,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ArmorItem.Type;
@@ -141,6 +144,10 @@ public class BioMechRegistry {
 	public static final ResourceKey<DamageType> BIOMECH_BONUS_DAMAGE = ResourceKey.create(Registries.DAMAGE_TYPE, ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "biomech_bonus_damage"));
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_STATION = BioMech.ITEMS.register("biomech_station", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_STATION.get(), new Item.Properties()));
+
+	public static RegistryObject<EntityType<GrapplingHook>> ENTITY_GRAPPLING_HOOK = BioMech.ENTITIES.register("grappling_hook", () -> GrapplingHook.GRAPPLING_HOOK_ENTITY);
+	
+	public static RegistryObject<Item> ITEM_GRAPPLING_HOOK = BioMech.ITEMS.register("grappling_hook", () -> new GrapplingHookItem(new Item.Properties()));
 	
 	public static RegistryObject<Item> ITEM_BIOMECH_SCRAP = BioMech.ITEMS.register("biomech_scrap", () -> new Item(new Item.Properties().stacksTo(255)));
 	public static RegistryObject<Item> ITEM_BIOMECH_SCRAP_BLOCK = BioMech.ITEMS.register("biomech_scrap_block", () -> new BlockItem(BioMechRegistry.BLOCK_BIOMECH_SCRAP.get(), new Item.Properties()));

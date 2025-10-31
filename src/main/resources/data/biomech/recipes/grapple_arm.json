@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " a ",
+    "#b#",
+    "   "
+  ],
+  "key": {
+    "#": {
+      "item": "biomech:biomech_scrap_block"
+    },
+	"b": {
+      "item": "minecraft:tripwire_hook"
+    },
+	"a": {
+	  "item": "minecraft:chain"
+	}
+  },
+  "result": {
+    "item": "biomech:grapple_arm",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableGrappleArmCrafting"
+    }
+  ]
+} 

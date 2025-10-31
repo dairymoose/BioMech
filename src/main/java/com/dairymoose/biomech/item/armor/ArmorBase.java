@@ -11,6 +11,7 @@ import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BroadcastType;
 import com.dairymoose.biomech.client.screen.BioMechStationScreen;
+import com.dairymoose.biomech.item.armor.arm.GrappleArmArmor;
 import com.dairymoose.biomech.item.armor.arm.MiningLaserArmArmor;
 import com.dairymoose.biomech.packet.serverbound.ServerboundPressHotkeyPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundTeleportationCrystalPacket;
@@ -294,6 +295,7 @@ public class ArmorBase extends ArmorItem {
 			replaced = replaced.replaceAll("\\{bonus_entity_reach\\}", nf.format(this.getBonusEntityReach()));
 			replaced = replaced.replaceAll("\\{forcefield_duration\\}", nf.format(this.getForcefieldDuration()));
 			replaced = replaced.replaceAll("\\{forcefield_cooldown\\}", nf.format(this.getForcefieldCooldown()));
+			replaced = replaced.replaceAll("\\{energy_to_grapple\\}", nf.format(GrappleArmArmor.energyToLaunch));
 		}
 		
 		return replaced;
