@@ -33,6 +33,7 @@ public class GrapplingHook extends ThrowableItemProjectile {
 	public MechPart mechPart = null;
 	public Entity entityOwner = null;
 	public boolean didHit = false;
+	public int computedPackedLight = -1;
 	public int lifeSpan = -1;
 	public static final int DISCARD_LIFE_SPAN = -1;
 	public long clientHitTick = -1;

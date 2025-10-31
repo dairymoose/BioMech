@@ -25,6 +25,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.phys.Vec3;
 
 public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook> {
@@ -56,7 +57,6 @@ public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook>
 		return true;
 	}
 	
-	int x=44;
 	@Override
 	public void render(@NotNull GrapplingHook entity, float entityYaw, float partialTick, @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight) {
 		if (entity.tickCount <= 1) {
@@ -64,8 +64,21 @@ public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook>
 		}
 		
 		if (entity.didHit) {
-			//override lightning because sometimes, after we hit, it goes inside a block and becomes fully dark
-			packedLight = LightTexture.FULL_BRIGHT;
+			if (entity.computedPackedLight == -1) {
+				//override lightning because sometimes, after we hit, it goes inside a block and becomes fully dark
+				int blockBright = 0;
+				int skyBright = 0;
+				for (int x=-1; x<=1; ++x) {
+					for (int y=-1; y<=1; ++y) {
+						for (int z=-1; z<=1; ++z) {
+							blockBright = Math.max(blockBright, entity.level().getBrightness(LightLayer.BLOCK, entity.blockPosition().offset(x, y, z)));
+							skyBright = Math.max(skyBright, entity.level().getBrightness(LightLayer.SKY, entity.blockPosition().offset(x, y, z)));
+						}
+					}
+				}
+				entity.computedPackedLight = LightTexture.pack(blockBright, skyBright); 
+			}
+			packedLight = entity.computedPackedLight;
 		}
 		poseStack.pushPose();
 		float xRot = entity.getXRot() + 90.0f;
@@ -133,8 +146,10 @@ public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook>
 		float f6 = f * f4;
 		BlockPos blockpos = BlockPos.containing(entity.getEyePosition(partialTick));
 		BlockPos blockpos1 = BlockPos.containing(holder.getEyePosition(partialTick));
-		int playerBrightness = entity.level().getMaxLocalRawBrightness(blockpos1);
-		int targetBrightness = entity.level().getMaxLocalRawBrightness(blockpos);
+		int skyDarken = (int)(15*(1.0f-Minecraft.getInstance().level.getSkyDarken(1.0f)));
+		int playerBrightness = Math.max(entity.level().getBrightness(LightLayer.SKY, blockpos1)-skyDarken, entity.level().getBrightness(LightLayer.BLOCK, blockpos1));
+		int targetBrightness = Math.max(entity.level().getBrightness(LightLayer.SKY, blockpos)-skyDarken, entity.level().getBrightness(LightLayer.BLOCK, blockpos));
+		BioMech.LOGGER.info("bright=" + playerBrightness + " with s=" + entity.level().getBrightness(LightLayer.SKY, blockpos1) + " and b=" + entity.level().getBrightness(LightLayer.BLOCK, blockpos1) + " dark=" + skyDarken);
 		// int i = this.getBlockLightLevel(p_115462_, blockpos);
 		// int j =
 		// this.entityRenderDispatcher.getRenderer(p_115466_).getBlockLightLevel(p_115466_,
@@ -144,11 +159,11 @@ public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook>
 		
 		//int i = targetBrightness;
 		//int k = targetBrightness;
-		int i = playerBrightness;
-		int k = playerBrightness;
+		int i = entity.level().getBrightness(LightLayer.BLOCK, blockpos);
+		int k = entity.level().getBrightness(LightLayer.SKY, blockpos);
 		
-		int j = playerBrightness;
-		int l = playerBrightness;
+		int j = entity.level().getBrightness(LightLayer.BLOCK, blockpos1);
+		int l = entity.level().getBrightness(LightLayer.SKY, blockpos1);
 
 		for (int i1 = 0; i1 <= 24; ++i1) {
 			addVertexPair(vertexconsumer, matrix4f, f, f1, f2, i, j, k, l, 0.025F, 0.025F, f5, f6, i1, false);
