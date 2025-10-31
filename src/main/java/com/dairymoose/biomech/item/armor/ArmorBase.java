@@ -96,6 +96,10 @@ public class ArmorBase extends ArmorItem {
 		
 	}
 	
+	public void postHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick, boolean bothHandsInactive, boolean bothHandsActive) {
+		
+	}
+	
 	public boolean onPlayerDamageTaken(DamageSource damageSource, float amount, ItemStack itemStack, Player player, MechPart handPart) {
 		return false;
 	}

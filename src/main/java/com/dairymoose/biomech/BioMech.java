@@ -721,7 +721,7 @@ public class BioMech
         			
         			playerData.tickEnergy(event.player);
         			tickInventoryForPlayer(event.player, playerData);
-        			tickHandsForPlayer(event.player, playerData);
+        			tickHandsForPlayer(event.player, playerData, false);
         			removePermanentModifiers(event.player, playerData);
         			removeIlluminantBlocksIfNoArmor(event.player, playerData);
         			//removeInvulnerable(event.player, playerData);
@@ -769,6 +769,11 @@ public class BioMech
     		}
     	}
     	if (event.phase == TickEvent.Phase.END) {
+    		BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
+    		if (playerData != null) {
+    			tickHandsForPlayer(event.player, playerData, true);
+    		}
+    		
     		if (tempChestItemC != null) {
     			if (event.player.level().isClientSide) {
     				event.player.setItemSlot(EquipmentSlot.CHEST, tempChestItemC);
@@ -836,7 +841,7 @@ public class BioMech
 		return itemStack;
 	}
     
-	private void tickHandsForPlayer(final Player player, BioMechPlayerData playerData) {
+	private void tickHandsForPlayer(final Player player, BioMechPlayerData playerData, boolean postTick) {
 		InteractionHand[] hands = { InteractionHand.MAIN_HAND, InteractionHand.OFF_HAND };
 		
 		HandActiveStatus has = handActiveMap.computeIfAbsent(player.getUUID(), (uuid) -> new HandActiveStatus());
@@ -866,7 +871,11 @@ public class BioMech
 				if (isMechArmActive(player, playerData, handPart)) {
 					itemStack = getFirstPersonArmItemStack(playerData, itemStack, handPart);
 					float partialTick = 1.0f;
-					base.onHandTick(currentArmActive, itemStack, player, handPart, partialTick, bothHandsInactive, bothHandsActive);
+					if (postTick) {
+						base.postHandTick(currentArmActive, itemStack, player, handPart, partialTick, bothHandsInactive, bothHandsActive);
+					} else {
+						base.onHandTick(currentArmActive, itemStack, player, handPart, partialTick, bothHandsInactive, bothHandsActive);
+					}
 				}
 			}
 		}

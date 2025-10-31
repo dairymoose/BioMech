@@ -100,7 +100,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 			if (playerData.getSuitEnergy() < energyToLaunch) {
 				active = false;
 			}
-			
+
 			if (active) {
 				int useTicks = thirdPersonItemStack.getTag().getInt(USE_TICKS);
 				if (FMLEnvironment.dist == Dist.CLIENT) {
@@ -249,21 +249,6 @@ public abstract class GrappleArmArmor extends ArmorBase {
 					}
 				}
 				
-				if (active && useTicks == (startUsingTickCount + 1)) {
-					playerData.spendSuitEnergy(player, energyToLaunch);
-				}
-				
-//				if (useTicks > startUsingTickCount) {
-//					if (didHit) {
-//						if (energyPerTick > 0.0f)
-//							playerData.spendSuitEnergy(player, energyPerTick);
-//					} else {
-//						if (energyPerTickMiss > 0.0f)
-//							playerData.spendSuitEnergy(player, energyPerTickMiss);
-//					}
-//				}
-				
-				
 			} else {
 				if (bothHandsInactive) {
 					justDidRecalculate = false;
@@ -332,28 +317,26 @@ public abstract class GrappleArmArmor extends ArmorBase {
 												ySimulation = ySimulationInitial + desiredY * 0.02;
 												ySimulationInitial = ySimulation;
 												
-												BioMech.LOGGER.info("new attempt with launch velocity = " + ySimulationInitial + " for goal=" + desiredY + " with overshootVec=" + overshootVec);
+												BioMech.LOGGER.debug("new attempt with launch velocity = " + ySimulationInitial + " for goal=" + desiredY + " with overshootVec=" + overshootVec);
 												for (int i=0; i<15; ++i) {
 													yDistTravelled += ySimulation;
 													ySimulation -= g;
 													ySimulation *= 0.98;
-													BioMech.LOGGER.info("travelled dist = " + yDistTravelled);
+													BioMech.LOGGER.debug("travelled dist = " + yDistTravelled);
 												}
 											}
 											if (yDistTravelled >= desiredY) {
-												BioMech.LOGGER.info("met y goal with yDistTravelled=" + yDistTravelled + " vs desiredY=" + desiredY);
+												BioMech.LOGGER.debug("met y goal with yDistTravelled=" + yDistTravelled + " vs desiredY=" + desiredY);
 											}
 											launchVec = launchVec.with(Axis.Y, ySimulationInitial);
 											
-											BioMech.LOGGER.info("dist = " + launchDistance + " and launchVec=" + launchVec + " having finalLaunchScale=" + finalLaunchScale + " and launchVelocity=" + launchVelocity + " with predictedDist=" + predictedDistanceIn5Sec + " and calcDist5=" + calcDist5Sec);
-											BioMech.LOGGER.info("launchVec speed=" + launchVec.length());
+											BioMech.LOGGER.debug("dist = " + launchDistance + " and launchVec=" + launchVec + " having finalLaunchScale=" + finalLaunchScale + " and launchVelocity=" + launchVelocity + " with predictedDist=" + predictedDistanceIn5Sec + " and calcDist5=" + calcDist5Sec);
+											BioMech.LOGGER.debug("launchVec speed=" + launchVec.length());
 											Vec3 deltaMov = player.getDeltaMovement();
 											player.setOnGround(false);
 											player.setDeltaMovement(new Vec3(deltaMov.x + launchVec.x, deltaMov.y + launchVec.y, deltaMov.z + launchVec.z));
-											BioMech.LOGGER.info("player starting loc = " + player.position());
-											BioMech.LOGGER.info("player starting deltaMov = " + player.getDeltaMovement());
-											//player.setDeltaMovement(1.0, 0.0, 0.0);
-											BioMech.LOGGER.info("player deltaMov now = " + player.getDeltaMovement());
+											BioMech.LOGGER.debug("player starting loc = " + player.position());
+											BioMech.LOGGER.debug("player starting deltaMov = " + player.getDeltaMovement());
 										}
 									}
 								}
@@ -377,6 +360,27 @@ public abstract class GrappleArmArmor extends ArmorBase {
 					if (player.level().isClientSide) {
 						BioMech.clientSideItemAnimation(itemStack, this.dispatcher.INERT_COMMAND.cmd);
 					}
+				}
+			}
+		}
+	}
+	
+	@Override
+	public void postHandTick(boolean active, ItemStack itemStack, Player player, MechPart handPart, float partialTick, boolean bothHandsInactive, boolean bothHandsActive) {
+		BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
+		if (playerData != null) {
+			ItemStack thirdPersonItemStack = BioMech.getThirdPersonArmItemStack(playerData, handPart);
+
+			if (playerData.getSuitEnergy() < energyToLaunch) {
+				active = false;
+			}
+			
+			CompoundTag tag = thirdPersonItemStack.getTag();
+			if (tag != null) {
+				int useTicks = tag.getInt(USE_TICKS);
+				//+2 is required as this doesn't execute in the expected order in single-player
+				if (active && useTicks == (startUsingTickCount + 2)) {
+					playerData.spendSuitEnergy(player, energyToLaunch);
 				}
 			}
 		}
