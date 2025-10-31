@@ -146,10 +146,6 @@ public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook>
 		float f6 = f * f4;
 		BlockPos blockpos = BlockPos.containing(entity.getEyePosition(partialTick));
 		BlockPos blockpos1 = BlockPos.containing(holder.getEyePosition(partialTick));
-		int skyDarken = (int)(15*(1.0f-Minecraft.getInstance().level.getSkyDarken(1.0f)));
-		int playerBrightness = Math.max(entity.level().getBrightness(LightLayer.SKY, blockpos1)-skyDarken, entity.level().getBrightness(LightLayer.BLOCK, blockpos1));
-		int targetBrightness = Math.max(entity.level().getBrightness(LightLayer.SKY, blockpos)-skyDarken, entity.level().getBrightness(LightLayer.BLOCK, blockpos));
-		BioMech.LOGGER.info("bright=" + playerBrightness + " with s=" + entity.level().getBrightness(LightLayer.SKY, blockpos1) + " and b=" + entity.level().getBrightness(LightLayer.BLOCK, blockpos1) + " dark=" + skyDarken);
 		// int i = this.getBlockLightLevel(p_115462_, blockpos);
 		// int j =
 		// this.entityRenderDispatcher.getRenderer(p_115466_).getBlockLightLevel(p_115466_,
