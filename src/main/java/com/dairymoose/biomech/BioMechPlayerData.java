@@ -50,6 +50,9 @@ public class BioMechPlayerData {
 	public static String ITEMS = "Items";
 	public static String SLOT = "Slot";
 	public static String VISIBLE = "Visible";
+	public static String ILLUMINATOR_TOGGLED = "IlluminatorToggled";
+	
+	public ToggledStatus illuminatorToggledStatus = new ToggledStatus(true);
 	
 	public static class SlottedItem {
 		public SlottedItem(MechPart mechPart) {
@@ -225,6 +228,7 @@ public class BioMechPlayerData {
 		result.putFloat(SUIT_ENERGY, data.suitEnergy);
 		result.putFloat(SUIT_ENERGY_MAX, data.suitEnergyMax);
 		result.putFloat(SUIT_ENERGY_PER_SEC, data.suitEnergyPerSec);
+		result.putBoolean(ILLUMINATOR_TOGGLED, data.illuminatorToggledStatus.toggledOn);
 		return result;
 	}
 	
@@ -272,6 +276,9 @@ public class BioMechPlayerData {
 				data.suitEnergy = tag.getFloat(SUIT_ENERGY);
 				data.suitEnergyMax = tag.getFloat(SUIT_ENERGY_MAX);
 				data.suitEnergyPerSec = tag.getFloat(SUIT_ENERGY_PER_SEC);
+				if (tag.contains(ILLUMINATOR_TOGGLED)) {
+					data.illuminatorToggledStatus.toggledOn = tag.getBoolean(ILLUMINATOR_TOGGLED);
+				}
 			}
 		}
 		

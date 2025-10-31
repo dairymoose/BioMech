@@ -127,8 +127,10 @@ public abstract class GrappleArmArmor extends ArmorBase {
 						BioMech.clientSideItemAnimation(itemStack, this.dispatcher.LAUNCH_COMMAND.cmd);
 						// send packet to server asking for start_using anim
 
+						BioMech.clientSideItemAnimation(thirdPersonItemStack, this.dispatcher.LAUNCH_3D_COMMAND.cmd);
 						//this.thirdPersonStartUsingAnimation(thirdPersonItemStack);
-						//player.setYBodyRot(player.getYHeadRot());
+						if (player.onGround() && player.getDeltaMovement().horizontalDistanceSqr() <= 0.1*0.1)
+							player.setYBodyRot(player.getYHeadRot());
 						player.setDiscardFriction(false);
 					} else {
 						//this.miningAnimation(itemStack);
@@ -136,6 +138,8 @@ public abstract class GrappleArmArmor extends ArmorBase {
 						// send packet to server asking for mining anim
 						//this.thirdPersonMiningAnimation(thirdPersonItemStack);
 						//player.setYBodyRot(player.getYHeadRot());
+						if (player.onGround() && player.getDeltaMovement().horizontalDistanceSqr() <= 0.1*0.1)
+							player.setYBodyRot(player.getYHeadRot());
 						
 						clientLastUsedArm = handPart;
 						if (player.isLocalPlayer()) {
@@ -407,6 +411,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 					}
 					if (player.level().isClientSide) {
 						BioMech.clientSideItemAnimation(itemStack, this.dispatcher.INERT_COMMAND.cmd);
+						BioMech.clientSideItemAnimation(thirdPersonItemStack, this.dispatcher.INERT_COMMAND.cmd);
 					}
 				}
 			}

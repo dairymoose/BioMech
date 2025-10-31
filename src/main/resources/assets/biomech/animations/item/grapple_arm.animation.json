@@ -34,6 +34,25 @@
 					}
 				}
 			}
+		},
+		"animation.grapple_arm.launch_third_person": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.1667,
+			"bones": {
+				"grapple_midpoint": {
+					"scale": {
+						"0.0": [1, 1, 1],
+						"0.125": [1, 1, 1],
+						"0.1667": [0, 0, 0]
+					}
+				},
+				"mech_body": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.1667": [-95, 0, 0]
+					}
+				}
+			}
 		}
 	},
 	"azurelib_format_version": 2

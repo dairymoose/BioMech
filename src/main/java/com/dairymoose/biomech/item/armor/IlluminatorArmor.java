@@ -52,11 +52,10 @@ public class IlluminatorArmor extends ArmorBase {
 	
 	public static long updateTickPeriod = 1;
 	
-	private Map<UUID, ToggledStatus> toggledOnMap = new HashMap<>();
 	@Override
 	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, int bonusData, boolean serverOriginator) {
 		if (keyIsDown) {
-			ToggledStatus status = toggledOnMap.get(player.getUUID());
+			ToggledStatus status = playerData.illuminatorToggledStatus;
 			if (status != null) {
 				if (bonusData == -1) {
 					if (FMLEnvironment.dist == Dist.CLIENT) {
@@ -96,7 +95,7 @@ public class IlluminatorArmor extends ArmorBase {
 						if (playerData != null) {
 						
 							if (playerData.tickCount % updateTickPeriod == 0) {
-								ToggledStatus status = toggledOnMap.computeIfAbsent(player.getUUID(), (uuid) -> new ToggledStatus(true));
+								ToggledStatus status = playerData.illuminatorToggledStatus;
 								
 								if (!status.toggledOn) {
 									BioMech.clientSideItemAnimation(itemStack, dispatcher.OFF_COMMAND.cmd);

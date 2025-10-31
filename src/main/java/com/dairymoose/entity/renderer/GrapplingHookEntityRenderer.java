@@ -90,21 +90,24 @@ public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook>
 	}
 
 	public Vec3 getRopeHoldPositionForPlayer(Entity grappleHook, Entity holder, float partialTick) {
-      if (holder.isControlledByLocalInstance() && Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
-         float f = Mth.lerp(partialTick * 0.5F, holder.getYRot(), holder.yRotO) * ((float)Math.PI / 180F);
-         float f1 = Mth.lerp(partialTick * 0.5F, holder.getXRot(), holder.xRotO) * ((float)Math.PI / 180F);
-         boolean rightArm = true;
-         if (grappleHook instanceof GrapplingHook hook) {
-        	 if (hook.mechPart == MechPart.LeftArm) {
-        		 rightArm = false;
-        	 }
-         }
-         double d0 = rightArm ? -1.0D : 1.0D;
-         Vec3 vec3 = new Vec3(0.39D * d0, -0.6D, 0.3D);
-         return vec3.xRot(-f1).yRot(-f).add(holder.getEyePosition(partialTick));
-      	} else {
-      		return holder.getRopeHoldPosition(partialTick);
-      	}
+		float f = Mth.lerp(partialTick * 0.5F, holder.getYRot(), holder.yRotO) * ((float) Math.PI / 180F);
+		float f1 = Mth.lerp(partialTick * 0.5F, holder.getXRot(), holder.xRotO) * ((float) Math.PI / 180F);
+		boolean rightArm = true;
+		if (grappleHook instanceof GrapplingHook hook) {
+			if (hook.mechPart == MechPart.LeftArm) {
+				rightArm = false;
+			}
+		}
+		double d0 = rightArm ? -1.0D : 1.0D;
+
+		if (holder.isControlledByLocalInstance() && Minecraft.getInstance().options.getCameraType().isFirstPerson()) {
+			Vec3 vec3 = new Vec3(0.39 * d0, -0.6, 0.3);
+			return vec3.xRot(-f1).yRot(-f).add(holder.getEyePosition(partialTick));
+		} else {
+			Vec3 vec3 = new Vec3(0.39 * d0, -0.18, -0.1);
+			return vec3.xRot(-f1).yRot(-f).add(holder.getEyePosition(partialTick));
+			//holder.getRopeHoldPosition(partialTick);
+		}
 	}
 	
 	private <E extends Entity> void renderLeash(Entity entity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, E holder) {
