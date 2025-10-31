@@ -146,15 +146,7 @@ public class GrapplingHookEntityRenderer extends AzEntityRenderer<GrapplingHook>
 		float f6 = f * f4;
 		BlockPos blockpos = BlockPos.containing(entity.getEyePosition(partialTick));
 		BlockPos blockpos1 = BlockPos.containing(holder.getEyePosition(partialTick));
-		// int i = this.getBlockLightLevel(p_115462_, blockpos);
-		// int j =
-		// this.entityRenderDispatcher.getRenderer(p_115466_).getBlockLightLevel(p_115466_,
-		// blockpos1);
-		// int k = p_115462_.level().getBrightness(LightLayer.SKY, blockpos);
-		// int l = p_115462_.level().getBrightness(LightLayer.SKY, blockpos1);
-		
-		//int i = targetBrightness;
-		//int k = targetBrightness;
+
 		int i = entity.level().getBrightness(LightLayer.BLOCK, blockpos);
 		int k = entity.level().getBrightness(LightLayer.SKY, blockpos);
 		
