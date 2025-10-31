@@ -123,7 +123,7 @@
 	
 	// *** LOAD LIFTER
 	"item.biomech.optics_unit": "§5Optics Unit§0",
-	"item.biomech.optics_unit.tooltip1": "Hold {key_head} to zoom in.",
+	"item.biomech.optics_unit.tooltip1": "Hold '{key_head}' to zoom in.",
 	"item.biomech.optics_unit.tooltip2": "Also highlights nearby spawners and treasure chests.",
 	"item.biomech.optics_unit.tooltip3": "§6I don't want to survive, I want to live!",
 	
