@@ -292,11 +292,12 @@ public abstract class GrappleArmArmor extends ArmorBase {
 										}
 										
 										Vec3 vecToHookNormalized = vecToHook.normalize();
-										Vec3 viewVec = player.getViewVector(1.0f);
+										Vec3 viewVec = player.getViewVector(1.0f).normalize();
 										float launchLookAtThreshold = 0.8f;
+										float closeUpLookAtThreshold = 0.15f;
 										double dotProduct = viewVec.dot(vecToHookNormalized);
 										BioMech.LOGGER.debug("dotProduct=" + dotProduct + " and vecToHook len=" + vecToHook.length());
-										if (dotProduct >= launchLookAtThreshold || vecToHook.length() <= 3.0) {
+										if (dotProduct >= launchLookAtThreshold || (vecToHook.length() <= 3.0 && dotProduct >= closeUpLookAtThreshold)) {
 											if (shouldLaunchWithGroundBoost) {
 												Vec3 pos = player.position();
 												player.setPos(pos.x, pos.y + 0.50, pos.z);
