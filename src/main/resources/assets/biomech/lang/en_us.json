@@ -12,6 +12,8 @@
 	
 	"tooltip.biomech.slot.tooltip": "Slot",
 	
+	"entity.biomech.grappling_hook": "Grappling Hook",
+	
 	"entity.subtitle.laser_loop": "Laser Burns",
 	"entity.subtitle.jetpack_loop": "Jetpack Burns",
 	"entity.subtitle.mining_drill": "Drill Mines",

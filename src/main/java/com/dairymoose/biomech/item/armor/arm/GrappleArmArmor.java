@@ -418,7 +418,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 							GrappleArmArmor.grappleInfoMap.remove(player.getUUID());
 						}
 					}
-					if (thirdPersonItemStack.getTag() != null && thirdPersonItemStack.getTag().contains(USE_TICKS)) {
+					if (thirdPersonItemStack.getOrCreateTag() != null) {
 						thirdPersonItemStack.getTag().putInt(USE_TICKS, 0);
 					}
 					if (player.level().isClientSide) {

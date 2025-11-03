@@ -140,6 +140,10 @@ public class GrapplingHook extends ThrowableItemProjectile {
 	@Override
 	public void tick() {
 		super.tick();
+		
+//		if (!this.didHit && this.tickCount >= 40) {
+//			this.addDeltaMovement(new Vec3(0.0, -0.12, 0.0));
+//		}
 	
 		if (entityOwner != null) {
 			if (!this.level().isClientSide) {
@@ -207,6 +211,10 @@ public class GrapplingHook extends ThrowableItemProjectile {
 	}
 	
 	private GrappleInfo getOrCreateGrappleInfoForEntity(Entity entity) {
+		if (entity == null || this.isRemoved()) {
+			return null;
+		}
+		
 		GrappleInfo grappleInfo = GrappleArmArmor.grappleInfoMap.get(entityOwner.getUUID());
 		if (grappleInfo != null) {
 			LOGGER.debug("Got existing map entry for entity=" + entity);

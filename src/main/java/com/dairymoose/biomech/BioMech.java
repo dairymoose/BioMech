@@ -1646,7 +1646,7 @@ public class BioMech
 								event.getInput().leftImpulse = 0.0f;
 						} else {
 							if (!player.onGround()) {
-								float swingInfluence = 0.22f;
+								float swingInfluence = 0.23f;
 								event.getInput().forwardImpulse *= swingInfluence;
 			    	    		event.getInput().leftImpulse *= swingInfluence;
 							}
