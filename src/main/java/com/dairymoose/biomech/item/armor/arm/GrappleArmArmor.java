@@ -60,6 +60,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 	public static Map<UUID, GrappleInfo> grappleInfoMap = new HashMap<>();
 	
 	public static class GrappleInfo {
+		public boolean justLaunchedHook = false;
 		public Vec3 hookPos;
 		public GrapplingHook grappleEntity;
 		public float grappleTetherDistance;
@@ -217,6 +218,15 @@ public abstract class GrappleArmArmor extends ArmorBase {
 										if (tickDiff < 0 || tickDiff >= 4) {
 											serverResetFallDistance(player);
 										}
+										
+										Vec3 newProjectedLocation = player.position().add(deltaX, yComponent + beyondTetherLengthAdjustment, deltaZ);
+										double newProjectedDistToHook = newProjectedLocation.distanceTo(grappleInfo.hookPos);
+										double beyondTetherLengthAdjustmentXZ = newProjectedDistToHook > grappleInfo.grappleTetherDistance ? (newProjectedDistToHook - grappleInfo.grappleTetherDistance) : 0.0;
+										if (beyondTetherLengthAdjustmentXZ > 0.0) {
+											BioMech.LOGGER.debug("beyond tether xz adjustment: " + beyondTetherLengthAdjustmentXZ);
+											deltaX = deltaX + -(beyondTetherLengthAdjustmentXZ*swingX);
+											deltaZ = deltaZ + -(beyondTetherLengthAdjustmentXZ*swingZ);
+										}
 									}
 									double deltaY = yComponent + beyondTetherLengthAdjustment;
 									
@@ -243,6 +253,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 							}
 							grappleInfo.grappleTetherDistance = 0.0f;
 							if (!level.isClientSide && grappleInfo.grappleEntity == null) {
+								grappleInfo.justLaunchedHook = true;
 								BioMech.LOGGER.debug("launch grapple for player: " + player);
 								itemStack.getOrCreateTag().putBoolean("Launched", true);
 								GrapplingHook launched = new GrapplingHook(level, player);
@@ -451,7 +462,11 @@ public abstract class GrappleArmArmor extends ArmorBase {
 				int useTicks = tag.getInt(USE_TICKS);
 				//+2 is required as this doesn't execute in the expected order in single-player
 				if (active && useTicks == (startUsingTickCount + 2)) {
-					playerData.spendSuitEnergy(player, energyToLaunch);
+					GrappleInfo grappleInfo = grappleInfoMap.get(player.getUUID());
+					if (grappleInfo != null && grappleInfo.justLaunchedHook) {
+						grappleInfo.justLaunchedHook = false;
+						playerData.spendSuitEnergy(player, energyToLaunch);
+					}
 				}
 			}
 		}
