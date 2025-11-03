@@ -165,7 +165,9 @@ public class GrapplingHook extends ThrowableItemProjectile {
 		
 		if (!this.level().isClientSide) {
 			if (this.getEntityData().get(DATA_MECH_PART_ORDINAL).intValue() == -1) {
-				this.getEntityData().set(DATA_MECH_PART_ORDINAL, this.mechPart.ordinal());
+				if (this.mechPart != null) {
+					this.getEntityData().set(DATA_MECH_PART_ORDINAL, this.mechPart.ordinal());
+				}
 			}
 			
 			if (lifeSpan > 0) {
