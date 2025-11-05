@@ -1,0 +1,35 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.elytra_mech_chestplate.idle": {
+			"loop": "hold_on_last_frame"
+		},
+		"animation.elytra_mech_chestplate.fly": {
+			"loop": "hold_on_last_frame",
+			"animation_length": 0.25,
+			"bones": {
+				"left_wing": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.25": [0, 0, -90]
+					},
+					"position": {
+						"0.0": [0, 0, 0],
+						"0.25": [0, -2, 0]
+					}
+				},
+				"right_wing": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"0.25": [0, 0, 90]
+					},
+					"position": {
+						"0.0": [0, 0, 0],
+						"0.25": [0, -2, 0]
+					}
+				}
+			}
+		}
+	},
+	"azurelib_format_version": 2
+}

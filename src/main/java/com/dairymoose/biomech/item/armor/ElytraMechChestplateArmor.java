@@ -3,8 +3,10 @@ package com.dairymoose.biomech.item.armor;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.BioMechRegistry;
+import com.dairymoose.biomech.item.anim.ElytraMechChestplateDispatcher;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -16,12 +18,16 @@ import net.minecraft.world.level.Level;
 
 public class ElytraMechChestplateArmor extends ArmorBase {
 
+	final ElytraMechChestplateDispatcher dispatcher;
+	
 	public ElytraMechChestplateArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 80;
 		this.hidePlayerModel = true;
 		this.mechPart = MechPart.Chest;
 		this.backArmorTranslation = 0.195;
+		
+		this.dispatcher = new ElytraMechChestplateDispatcher();
 	}
 
 	public static boolean jetpackPreviouslyActive = false;
@@ -34,7 +40,11 @@ public class ElytraMechChestplateArmor extends ArmorBase {
 			player.getArmorSlots().forEach((armorItemStack) -> armorItems.add(((armorItemStack).getItem())));
 			if (armorItems.contains(BioMechRegistry.ITEM_ELYTRA_MECH_CHESTPLATE.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
-					;
+					if (player.isFallFlying()) {
+						BioMech.clientSideItemAnimation(itemStack, this.dispatcher.FLY_COMMAND.cmd);
+					} else {
+						BioMech.clientSideItemAnimation(itemStack, this.dispatcher.IDLE_COMMAND.cmd);
+					}
 				}
 			}
 		}

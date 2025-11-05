@@ -1,6 +1,7 @@
 package com.dairymoose.biomech.armor.renderer;
 
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.item.anim.ElytraMechChestplateAnimator;
 
 import mod.azure.azurelib.render.armor.AzArmorRenderer;
 import mod.azure.azurelib.render.armor.AzArmorRendererConfig;
@@ -18,6 +19,8 @@ public class ElytraMechChestplateRenderer extends AzArmorRenderer {
     );
 
     public ElytraMechChestplateRenderer() {
-        super(AzArmorRendererConfig.builder(GEO, TEX).build());
+        super(AzArmorRendererConfig.builder(GEO, TEX)
+        		.setAnimatorProvider(ElytraMechChestplateAnimator::new)
+        		.build());
     }
 }
