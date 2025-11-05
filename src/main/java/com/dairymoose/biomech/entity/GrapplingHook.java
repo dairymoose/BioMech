@@ -137,7 +137,7 @@ public class GrapplingHook extends ThrowableItemProjectile {
         this.getEntityData().define(DATA_MECH_PART_ORDINAL, -1);
      }
 
-    public static int BEGIN_FALL_DIST = 70;
+    public static int BEGIN_FALL_DIST = 60;
     public static int BEGIN_FALL_DIST_SQR = BEGIN_FALL_DIST*BEGIN_FALL_DIST;
 	@Override
 	public void tick() {
