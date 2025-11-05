@@ -795,7 +795,7 @@ public class BioMech
 		} else if (!has.jumpActive && maj.lastJumpActiveStatus) {
 			maj.primedForMidAirJump = true;
 			//primedForMidairJump = true;
-		} else if (player.fallDistance >= 2.5f) {
+		} else if (player.fallDistance >= 1.0f) {
 			maj.primedForMidAirJump = true;
 		}
     	
