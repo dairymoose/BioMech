@@ -100,7 +100,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 
 		if (playerData != null) {
 			ItemStack thirdPersonItemStack = BioMech.getThirdPersonArmItemStack(playerData, handPart);
-
+			BioMech.LOGGER.trace("onHandTick called with active=" + active);
 			if (playerData.getSuitEnergy() < energyToLaunch) {
 				active = false;
 			}
@@ -123,7 +123,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 						if (useTicks == 1) {
 							//this.startUsingSound(player);
 						}
-						// BioMech.LOGGER.info("useTicks=" + useTicks);
+						// BioMech.LOGGER.trace("useTicks=" + useTicks);
 						//this.startUsingAnimation(itemStack);
 						BioMech.clientSideItemAnimation(itemStack, this.dispatcher.LAUNCH_COMMAND.cmd);
 						// send packet to server asking for start_using anim
@@ -182,57 +182,61 @@ public abstract class GrappleArmArmor extends ArmorBase {
 									
 									double yawTo = Math.toDegrees(Math.atan2(diffZ, diffX));
 									
-									if (angleToHook > 90.0) {
-										inlineForce = 0.0;
-										gravityForce = deltaMov.y;
-									}
-									
-									//https://en.wikipedia.org/wiki/Centripetal_force
-									//A(c) = v^2 / r
-									//vector directed towards center of curvature
-									double centripetalAcceleration = inlineForce*inlineForce / distToHook;
-									double centripetalY = centripetalAcceleration * Math.cos(Math.toRadians(angleToHook));
-									double centripetalXZ = centripetalAcceleration * Math.sin(Math.toRadians(angleToHook));
-									double centripetalX = (float)(centripetalXZ * -Math.sin(Math.toRadians(yawTo)));
-									double centripetalZ = (float)(centripetalXZ * Math.cos(Math.toRadians(yawTo)));
-									//double yComponent = gravityForce + deltaMov.y;
-									double yComponent = gravityForce;
-									
-									double movementFriction = 0.9965;
-									//double movementFriction = 1.0;
-									double swingX = Math.cos(Math.toRadians(yawTo + 180.0));
-									double swingZ = Math.sin(Math.toRadians(yawTo + 180.0));
-									double deltaX = swingX*straightLineForce + (float)deltaMov.x*movementFriction;
-									double deltaZ = swingZ*straightLineForce + (float)deltaMov.z*movementFriction;
-									
-									deltaX += centripetalX;
-									yComponent += centripetalY;
-									deltaZ += centripetalZ;
-									
-									Vec3 projectedLocation = player.position().add(deltaX, yComponent, deltaZ);
-									double projectedDistToHook = projectedLocation.distanceTo(grappleInfo.hookPos);
-									double beyondTetherLengthAdjustment = projectedDistToHook > grappleInfo.grappleTetherDistance ? (projectedDistToHook - grappleInfo.grappleTetherDistance)*Math.cos(Math.toRadians(angleToHook)) : 0.0;
-									if (beyondTetherLengthAdjustment > 0.0) {
-										BioMech.LOGGER.debug("beyond tether length adjustment: " + beyondTetherLengthAdjustment);
-										int tickDiff = player.tickCount - lastResetFallDistTick;
-										if (tickDiff < 0 || tickDiff >= 4) {
-											serverResetFallDistance(player);
-										}
+									if (angleToHook <= 110.0) {
+										//https://en.wikipedia.org/wiki/Centripetal_force
+										//A(c) = v^2 / r
+										//vector directed towards center of curvature
+										double centripetalAcceleration = inlineForce*inlineForce / distToHook;
+										double centripetalY = centripetalAcceleration * Math.cos(Math.toRadians(angleToHook));
+										double centripetalXZ = centripetalAcceleration * Math.sin(Math.toRadians(angleToHook));
+										double centripetalX = (float)(centripetalXZ * -Math.sin(Math.toRadians(yawTo)));
+										double centripetalZ = (float)(centripetalXZ * Math.cos(Math.toRadians(yawTo)));
+										//double yComponent = gravityForce + deltaMov.y;
+										double yComponent = gravityForce;
 										
-										Vec3 newProjectedLocation = player.position().add(deltaX, yComponent + beyondTetherLengthAdjustment, deltaZ);
-										double newProjectedDistToHook = newProjectedLocation.distanceTo(grappleInfo.hookPos);
-										double beyondTetherLengthAdjustmentXZ = newProjectedDistToHook > grappleInfo.grappleTetherDistance ? (newProjectedDistToHook - grappleInfo.grappleTetherDistance) : 0.0;
-										if (beyondTetherLengthAdjustmentXZ > 0.0) {
-											BioMech.LOGGER.debug("beyond tether xz adjustment: " + beyondTetherLengthAdjustmentXZ);
-											deltaX = deltaX + -(beyondTetherLengthAdjustmentXZ*swingX);
-											deltaZ = deltaZ + -(beyondTetherLengthAdjustmentXZ*swingZ);
+										double movementFriction = 0.9965;
+										//double movementFriction = 1.0;
+										if (angleToHook <= 90.0) {
+											yawTo += 180.0;
 										}
+										double swingX = Math.cos(Math.toRadians(yawTo));
+										double swingZ = Math.sin(Math.toRadians(yawTo));
+										double deltaX = swingX*straightLineForce + (float)deltaMov.x*movementFriction;
+										double deltaZ = swingZ*straightLineForce + (float)deltaMov.z*movementFriction;
+										
+										deltaX += centripetalX;
+										yComponent += centripetalY;
+										deltaZ += centripetalZ;
+										
+										Vec3 projectedLocation = player.position().add(deltaX, yComponent, deltaZ);
+										double projectedDistToHook = projectedLocation.distanceTo(grappleInfo.hookPos);
+										double beyondTetherLengthAdjustment = projectedDistToHook > grappleInfo.grappleTetherDistance ? (projectedDistToHook - grappleInfo.grappleTetherDistance)*Math.cos(Math.toRadians(angleToHook)) : 0.0;
+										if (beyondTetherLengthAdjustment > 0.0) {
+											BioMech.LOGGER.debug("beyond tether length adjustment: " + beyondTetherLengthAdjustment);
+											int tickDiff = player.tickCount - lastResetFallDistTick;
+											if (tickDiff < 0 || tickDiff >= 4) {
+												serverResetFallDistance(player);
+											}
+											
+											Vec3 newProjectedLocation = player.position().add(deltaX, yComponent + beyondTetherLengthAdjustment, deltaZ);
+											double newProjectedDistToHook = newProjectedLocation.distanceTo(grappleInfo.hookPos);
+											double beyondTetherLengthAdjustmentXZ = newProjectedDistToHook > grappleInfo.grappleTetherDistance ? (newProjectedDistToHook - grappleInfo.grappleTetherDistance) : 0.0;
+											if (beyondTetherLengthAdjustmentXZ > 0.0) {
+												BioMech.LOGGER.debug("beyond tether xz adjustment: " + beyondTetherLengthAdjustmentXZ);
+												deltaX = deltaX + -(beyondTetherLengthAdjustmentXZ*swingX);
+												deltaZ = deltaZ + -(beyondTetherLengthAdjustmentXZ*swingZ);
+											}
+										}
+										double deltaY = yComponent + beyondTetherLengthAdjustment;
+										
+										player.setDeltaMovement(deltaX, deltaY, deltaZ);
+										
+										//BioMech.LOGGER.debug("inline force=" + inlineForce + " with deltaY=" + deltaY + " with yComponent=" + yComponent + " and cetripetalY=" + centripetalY + " for " + angleToHook);
+										
+										//inlineForce = 0.0;
+										//straightLineForce = 0.0;
+										//gravityForce = deltaMov.y;
 									}
-									double deltaY = yComponent + beyondTetherLengthAdjustment;
-									
-									player.setDeltaMovement(deltaX, deltaY, deltaZ);
-									
-									//BioMech.LOGGER.debug("inline force=" + inlineForce + " with deltaY=" + deltaY + " with yComponent=" + yComponent + " and cetripetalY=" + centripetalY + " for " + angleToHook);
 								} else {
 									player.setDiscardFriction(false);
 									justDidRecalculate = false;
@@ -245,6 +249,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 				if (!player.level().isClientSide) {
 					Level level = player.level();
 					if (active && useTicks == (startUsingTickCount + 1)) {
+						BioMech.LOGGER.trace("active: " + useTicks);
 						if (grappleInfo == null || (grappleInfo != null && grappleInfo.hookPos == null)) {
 							level.playSound((Player) null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARMOR_EQUIP_CHAIN, SoundSource.PLAYERS, 1.0f, 1.2f);
 							if (grappleInfo == null) {
@@ -272,12 +277,14 @@ public abstract class GrappleArmArmor extends ArmorBase {
 							}
 						}
 					} else if (active && useTicks > startUsingTickCount && grappleInfo != null && grappleInfo.hookPos != null) {
+						BioMech.LOGGER.trace("actve with useTicks>start: " + useTicks);
 						BioMech.allowFlyingForPlayer(player);
 						//player.resetFallDistance();
 					}
 				}
 				
 			} else {
+				BioMech.LOGGER.trace("not active");
 				if (bothHandsInactive) {
 					justDidRecalculate = false;
 					player.setDiscardFriction(false);
@@ -290,6 +297,8 @@ public abstract class GrappleArmArmor extends ArmorBase {
 									int useTicks = tag.getInt(USE_TICKS);
 									
 									if (useTicks > startUsingTickCount) {
+										serverResetFallDistance(player);
+										
 										tag.putInt(USE_TICKS, 0);
 										//launch player towards hook if they are looking at it
 										player.setOnGround(false);
@@ -406,7 +415,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 							BioMech.allowFlyingForPlayer(player);
 							//player.resetFallDistance();
 						}
-						//BioMech.LOGGER.info("grappleEntity=" + grappleInfo.grappleEntity);
+						//BioMech.LOGGER.trace("grappleEntity=" + grappleInfo.grappleEntity);
 						if (grappleInfo.grappleEntity != null) {
 							if (!player.level().isClientSide) {
 								grappleInfo.grappleEntity.discard();
@@ -419,6 +428,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 						}
 					}
 					if (thirdPersonItemStack.getOrCreateTag() != null) {
+						BioMech.LOGGER.trace("reset useTicks to 0");
 						thirdPersonItemStack.getTag().putInt(USE_TICKS, 0);
 					}
 					if (player.level().isClientSide) {
