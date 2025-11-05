@@ -22,7 +22,6 @@ import com.dairymoose.biomech.client.screen.BioMechStationScreen;
 import com.dairymoose.biomech.config.BioMechCommonConfig;
 import com.dairymoose.biomech.config.BioMechConfig;
 import com.dairymoose.biomech.config.BioMechCraftingFlags;
-import com.dairymoose.biomech.entity.GrapplingHook;
 import com.dairymoose.biomech.item.BioMechActivator;
 import com.dairymoose.biomech.item.BioMechDeactivator;
 import com.dairymoose.biomech.item.GrapplingHookItem;
@@ -514,7 +513,6 @@ public class BioMech
     		lootBioMechInAncientCity = BioMechConfig.COMMON.lootBioMechInAncientCity.get().floatValue();
     		lootBioMechInShipwreck = BioMechConfig.COMMON.lootBioMechInShipwreck.get().floatValue();
     		lootBioMechInNetherFortress = BioMechConfig.COMMON.lootBioMechInNetherFortress.get().floatValue();
-    		boolean addElytraChestToLootPool = BioMechConfig.COMMON.elytraMechChestplateCanBeLooted.get().booleanValue();
     		
     		{
     			AddToLootPool atlp = new AddToLootPool();
@@ -569,12 +567,7 @@ public class BioMech
 							if (value.get() instanceof ArmorBase base) {
 								if (base.shouldAddToLootTable()) {
 									boolean shouldAdd = true;
-									if (base instanceof ElytraMechChestplateArmor armor) {
-										if (!addElytraChestToLootPool) {
-											shouldAdd = false;
-										}
-									}
-									
+
 									boolean isDisabled = BioMech.isDisabledByConfig(base, disabled);
 									if (isDisabled) {
 										shouldAdd = false;
@@ -751,9 +744,12 @@ public class BioMech
     				
     				if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ElytraMechChestplateArmor armor) {
     					if (event.player.level().isClientSide) {
-    						elytraItemStackC.setDamageValue(0);
-    						tempChestItemC = event.player.getItemBySlot(EquipmentSlot.CHEST);
-    						event.player.setItemSlot(EquipmentSlot.CHEST, elytraItemStackC);
+    						MidAirJumpStatus majs = primedForMidAirJumpMap.get(event.player.getUUID());
+    						if (majs != null && majs.primedForMidAirJump) {
+    							elytraItemStackC.setDamageValue(0);
+        						tempChestItemC = event.player.getItemBySlot(EquipmentSlot.CHEST);
+        						event.player.setItemSlot(EquipmentSlot.CHEST, elytraItemStackC);
+    						}
     					}
     				}
     				
