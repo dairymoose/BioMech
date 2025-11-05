@@ -137,13 +137,20 @@ public class GrapplingHook extends ThrowableItemProjectile {
         this.getEntityData().define(DATA_MECH_PART_ORDINAL, -1);
      }
 
+    public static int BEGIN_FALL_DIST = 70;
+    public static int BEGIN_FALL_DIST_SQR = BEGIN_FALL_DIST*BEGIN_FALL_DIST;
 	@Override
 	public void tick() {
 		super.tick();
 		
-//		if (!this.didHit && this.tickCount >= 40) {
-//			this.addDeltaMovement(new Vec3(0.0, -0.12, 0.0));
-//		}
+		if (!this.didHit && entityOwner != null) {
+			Vec3 ownerPos = entityOwner.position();
+			Vec3 thisPos = this.position();
+			Vec3 vecToHook = thisPos.subtract(ownerPos);
+			if (vecToHook.horizontalDistanceSqr() >= BEGIN_FALL_DIST_SQR) {
+				this.addDeltaMovement(new Vec3(0.0, -0.12, 0.0));
+			}
+		}
 	
 		if (entityOwner != null) {
 			if (!this.level().isClientSide) {
