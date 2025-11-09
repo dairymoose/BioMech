@@ -2392,8 +2392,8 @@ public class BioMech
         		    	if (playerData.getForSlot(MechPart.Back).itemStack.getItem() instanceof TransformerModuleHelicopterArmor armor) {
             				if (playerData.helicopterModeEnabled.toggledOn) {
             					event.getPoseStack().mulPose(Axis.YP.rotationDegrees(-renderEntity.getYRot()));
-            					event.getPoseStack().mulPose(Axis.XP.rotationDegrees(20.0f * armor.fwdSpeed/armor.maxFwdSpeed));
-            					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(-20.0f * armor.lateralSpeed/armor.maxLateralSpeed));
+            					event.getPoseStack().mulPose(Axis.XP.rotationDegrees(25.0f * armor.fwdSpeed/armor.maxFwdSpeed));
+            					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(-30.0f * armor.lateralSpeed/armor.maxLateralSpeed));
             					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(0.37f * (renderEntity.getYRot() - renderEntity.yBodyRot) * (float)renderEntity.getDeltaMovement().horizontalDistance()*0.4f));
             					event.getPoseStack().mulPose(Axis.YP.rotationDegrees(renderEntity.getYRot()));
             				}

@@ -78,9 +78,10 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 	public float ySpeed = 0.0f;
 	
 	public float maxFwdSpeed = 0.12f;
-	public float maxLateralSpeed = 0.05f;
-	public float maxYSpeed = 0.04f;
+	public float maxLateralSpeed = 0.07f;
+	public float maxYSpeed = 0.105f;
 	
+	public static float addedYPerTick = 0.0012f;
 	public static float ROT_PER_TICK = 120.0f;
 	//public static float ROT_PER_TICK = 0.0f;
 	public float rightArmRot = 0.0f;
@@ -98,15 +99,9 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 						if (playerData.helicopterModeEnabled.toggledOn) {
 							if (level.isClientSide) {
 								if (player.getForcedPose() == Pose.FALL_FLYING && !player.isFallFlying()) {
-									
+
 									player.setOnGround(false);
-//									AttributeModifier mod = player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).getModifier(UUID.fromString(uuidGravity));
-//									if (mod == null) {
-//										savedGravity = player.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
-//										player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).addTransientModifier(new AttributeModifier(UUID.fromString(uuidGravity), "noGrav", 0.0, AttributeModifier.Operation.MULTIPLY_TOTAL));
-//									}
-									//player.setNoGravity(true);
-									
+
 									float g = (float) player.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
 									Vec3 delta = player.getDeltaMovement();
 									
@@ -167,36 +162,32 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 									double dz = delta.z + zComp;
 									
 									if (BioMech.localPlayerJumping || player.isCrouching()) {
-										float toAdd = 0.0025f;
+										float toAdd = addedYPerTick;
 										if (player.isCrouching()) {
 											toAdd = -toAdd;
 										}
+
+										boolean reversing = false;
+										if (toAdd < 0.0f && ySpeed > 0.0f && delta.y > 0.0f) {
+											reversing = true;
+										} else if (toAdd > 0.0f && ySpeed < 0.0f && delta.y < 0.0f) {
+											reversing = true;
+										}
+										if (reversing) {
+											toAdd *= 8.0f;
+										}
+										
 										ySpeed += toAdd;
 										
 										ySpeed = Math.min(maxYSpeed, ySpeed);
 										ySpeed = Math.max(-maxYSpeed, ySpeed);
-
-										boolean limiter = false;
-										if (ySpeed > 0.0f && delta.y > 0.0f) {
-											limiter = true;
-										} else if (ySpeed < 0.0f && delta.y < 0.0f) {
-											limiter = true;
-										}
+										
 										double newY = delta.y;
 										newY += g;
 										
-										if (limiter)
-											newY += ySpeed*Math.pow(1.0 - Math.min(1.0f, Math.abs(delta.y/maxYSpeed*5)), 0.9);
-										else
-											newY += 2.0f*ySpeed;
-										//if (player.isCrouching()) {
-											//counteract the additive effect of gravity
-											
-										//}
-										
-//										if (BioMech.localPlayerJumping && delta.y <= 0.12) {
-//											newY = delta.y + toAddInitial;
-//										}
+										double yFinal = ySpeed*Math.pow(1.0 - Math.min(1.0f, Math.abs(newY/(maxYSpeed*4.5f))), 0.9);
+										newY += yFinal;
+										BioMech.LOGGER.trace("delta.y=" + delta.y + ", ySpeed=" + ySpeed +", limiter=" + Math.pow(1.0 - Math.min(1.0f, Math.abs(delta.y/(maxYSpeed*5))), 0.9) + ", total = " + yFinal + ", newY=" + newY);
 
 										player.setDeltaMovement(dx, newY, dz);
 									} else {
@@ -213,12 +204,13 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 											if (Math.abs(dy) <= 0.02) {
 												dy = 0.0;
 											} else {
-												if (delta.y < 0.0) {
-													dy *= 0.975;
-												}
-												else {
-													dy *= 0.999;
-												}
+												dy *= 0.989;
+//												if (delta.y < 0.0) {
+//													dy *= 0.975;
+//												}
+//												else {
+//													dy *= 0.999;
+//												}
 											}
 										}
 										player.setDeltaMovement(dx, dy, dz);
