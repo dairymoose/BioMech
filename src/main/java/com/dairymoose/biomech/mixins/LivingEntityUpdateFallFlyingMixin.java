@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.item.armor.ElytraEnabledArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
 
@@ -27,7 +28,9 @@ public abstract class LivingEntityUpdateFallFlyingMixin extends Entity {
 		BioMechPlayerData playerData = BioMech.globalPlayerData.get(this.getUUID());
 		if (playerData != null) {
 			SlottedItem chestSlot = playerData.getForSlot(MechPart.Chest);
-			if (chestSlot.itemStack.getItem() instanceof ElytraMechChestplateArmor base) {
+			SlottedItem backSlot = playerData.getForSlot(MechPart.Back);
+			if (chestSlot.itemStack.getItem() instanceof ElytraEnabledArmor base ||
+					backSlot.itemStack.getItem() instanceof ElytraEnabledArmor base2) {
 				boolean flag = this.getSharedFlag(7);
 				if (flag && !this.onGround() && !this.isPassenger() && !((LivingEntity)(Entity)this).hasEffect(MobEffects.LEVITATION)) {
 					;

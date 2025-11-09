@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " i ",
+    "#z#",
+    "   "
+  ],
+  "key": {
+    "#": {
+      "item": "biomech:biomech_scrap_block"
+    },
+	"i": {
+      "item": "minecraft:iron_block"
+    },
+	"z": {
+	  "item": "minecraft:elytra"
+	}
+  },
+  "result": {
+    "item": "biomech:transformer_module_helicopter",
+    "count": 1
+  },
+  "conditions": [
+    {
+      "type": "biomech:crafting_flag",
+        "crafting_flag": "enableTransformerModuleHelicopterCrafting"
+    }
+  ]
+} 

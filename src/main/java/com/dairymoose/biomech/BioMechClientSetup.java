@@ -36,6 +36,7 @@ import com.dairymoose.biomech.armor.renderer.RepulsorLiftRenderer;
 import com.dairymoose.biomech.armor.renderer.SpiderWalkersRenderer;
 import com.dairymoose.biomech.armor.renderer.SpringLoadedLeggingsRenderer;
 import com.dairymoose.biomech.armor.renderer.TeleportationCrystalRenderer;
+import com.dairymoose.biomech.armor.renderer.TransformerModuleHelicopterRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.BuzzsawLeftArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.BuzzsawRightArmRenderer;
 import com.dairymoose.biomech.armor.renderer.arm.DiamondMechLeftArmRenderer;
@@ -133,6 +134,7 @@ public class BioMechClientSetup {
     	AzArmorRendererRegistry.register(HarvesterLeftArmRenderer::new, BioMechRegistry.ITEM_HARVESTER_LEFT_ARM.get());
     	AzArmorRendererRegistry.register(GrappleRightArmRenderer::new, BioMechRegistry.ITEM_GRAPPLE_ARM.get());
     	AzArmorRendererRegistry.register(GrappleLeftArmRenderer::new, BioMechRegistry.ITEM_GRAPPLE_LEFT_ARM.get());
+    	AzArmorRendererRegistry.register(TransformerModuleHelicopterRenderer::new, BioMechRegistry.ITEM_TRANSFORMER_MODULE_HELICOPTER.get());
     	
     	//LOAD LIFTER
     	AzArmorRendererRegistry.register(OpticsUnitRenderer::new, BioMechRegistry.ITEM_OPTICS_UNIT.get());
@@ -206,6 +208,7 @@ public class BioMechClientSetup {
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_ILLUMINATOR.get());
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_GRAPPLE_ARM.get(), BioMechRegistry.ITEM_GRAPPLE_LEFT_ARM.get());
     	AzIdentityRegistry.register(BioMechRegistry.ITEM_ELYTRA_MECH_CHESTPLATE.get());
+    	AzIdentityRegistry.register(BioMechRegistry.ITEM_TRANSFORMER_MODULE_HELICOPTER.get());
     	//------ All Animated ------
     	
     	

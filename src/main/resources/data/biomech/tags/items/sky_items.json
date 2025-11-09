@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
 	 "biomech:jetpack",
-	 "biomech:elytra_mech_chestplate"
+	 "biomech:elytra_mech_chestplate",
+	 "biomech:transformer_module_helicopter"
   ]
 }

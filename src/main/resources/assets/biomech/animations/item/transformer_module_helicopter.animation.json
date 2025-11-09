@@ -1,0 +1,17 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.transformer_module_helicopter.inactive": {
+			"loop": "hold_on_last_frame"
+		},
+		"animation.transformer_module_helicopter.active": {
+			"loop": "hold_on_last_frame",
+			"bones": {
+				"recessed": {
+					"position": [0, 0, 0.5]
+				}
+			}
+		}
+	},
+	"azurelib_format_version": 2
+}

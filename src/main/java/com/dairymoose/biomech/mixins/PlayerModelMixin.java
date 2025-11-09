@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.mixins;
 
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -13,14 +14,17 @@ import com.dairymoose.biomech.HandActiveStatus;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
+import com.dairymoose.biomech.item.armor.TransformerModuleHelicopterArmor;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(PlayerModel.class)
@@ -135,6 +139,39 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 						this.rightLeg.xRot = 0.0f;
 						this.leftLeg.xRot = 0.0f;
 					}
+				}
+			}
+			
+			Item backItem = playerData.getForSlot(MechPart.Back).itemStack.getItem();
+			if (backItem instanceof TransformerModuleHelicopterArmor armor) {
+				if (playerData.helicopterModeEnabled.toggledOn) {
+					float armBackwardsAngle = 45.0f;
+					float armDist = 0.0f;
+					float armY = 3.0f;
+					float shoulderDisplacement = 1.0f;
+					float armScale = 1.1f;
+					
+					this.rightArm.xRot = armBackwardsAngle * Mth.DEG_TO_RAD;
+					this.rightArm.yRot = 0.0f;
+					this.rightArm.zRot = (armor.rightArmRot - Minecraft.getInstance().getPartialTick()*armor.ROT_PER_TICK) * Mth.DEG_TO_RAD;
+					this.rightArm.x += armDist; //positive value moves arm left
+					this.rightArm.y += shoulderDisplacement; //positive values move arms downwards away from shoulders
+					this.rightArm.z += armY; //positive value moves arm upwards
+					this.rightArm.yScale = armScale;
+					
+					this.leftArm.xRot = armBackwardsAngle * Mth.DEG_TO_RAD;
+					this.leftArm.yRot = 0.0f;
+					this.leftArm.zRot = (armor.leftArmRot + Minecraft.getInstance().getPartialTick()*armor.ROT_PER_TICK) * Mth.DEG_TO_RAD;
+					this.leftArm.x += -armDist;
+					this.leftArm.y += shoulderDisplacement;
+					this.leftArm.z += armY;
+					this.leftArm.yScale = armScale;
+					
+					this.rightLeg.xRot = 0.0f;
+					this.leftLeg.xRot = 0.0f;
+				} else {
+					this.rightArm.yScale = 1.0f;
+					this.leftArm.yScale = 1.0f;
 				}
 			}
 			

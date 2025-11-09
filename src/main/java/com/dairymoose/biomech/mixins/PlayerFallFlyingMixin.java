@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
+import com.dairymoose.biomech.item.armor.ElytraEnabledArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.MechPart;
 
@@ -26,7 +27,9 @@ public abstract class PlayerFallFlyingMixin extends LivingEntity {
 		BioMechPlayerData playerData = BioMech.globalPlayerData.get(this.getUUID());
 		if (playerData != null) {
 			SlottedItem chestSlot = playerData.getForSlot(MechPart.Chest);
-			if (chestSlot.itemStack.getItem() instanceof ElytraMechChestplateArmor base) {
+			SlottedItem backSlot = playerData.getForSlot(MechPart.Back);
+			if (chestSlot.itemStack.getItem() instanceof ElytraEnabledArmor base ||
+					backSlot.itemStack.getItem() instanceof ElytraEnabledArmor base2) {
 				((Player)(LivingEntity)this).startFallFlying();
 				cir.setReturnValue(true);
 				cir.cancel();

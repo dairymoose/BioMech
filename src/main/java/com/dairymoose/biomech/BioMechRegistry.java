@@ -44,6 +44,7 @@ import com.dairymoose.biomech.item.armor.ScubaTankArmor;
 import com.dairymoose.biomech.item.armor.SpiderWalkersArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.item.armor.TeleportationCrystalArmor;
+import com.dairymoose.biomech.item.armor.TransformerModuleHelicopterArmor;
 import com.dairymoose.biomech.item.armor.arm.BuzzsawLeftArmArmor;
 import com.dairymoose.biomech.item.armor.arm.BuzzsawRightArmArmor;
 import com.dairymoose.biomech.item.armor.arm.DiamondMechLeftArmArmor;
@@ -162,6 +163,8 @@ public class BioMechRegistry {
 	public static RegistryObject<Item> ITEM_EXTENDO_ARM = BioMech.ITEMS.register("extendo_arm", () -> new ExtendoRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_GRAPPLE_ARM = BioMech.ITEMS.register("grapple_arm", () -> new GrappleRightArmArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
+	
+	public static RegistryObject<Item> ITEM_TRANSFORMER_MODULE_HELICOPTER = BioMech.ITEMS.register("transformer_module_helicopter", () -> new TransformerModuleHelicopterArmor(ArmorMaterials.IRON, Type.CHESTPLATE, (new Item.Properties())));
 	
 	public static RegistryObject<Item> ITEM_SPIDER_WALKERS = BioMech.ITEMS.register("spider_walkers", () -> new SpiderWalkersArmor(ArmorMaterials.IRON, Type.LEGGINGS, (new Item.Properties())));
 	

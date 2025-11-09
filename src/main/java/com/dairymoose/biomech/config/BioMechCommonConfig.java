@@ -63,6 +63,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableSpiderWalkersCrafting;
 	public final ForgeConfigSpec.BooleanValue enableSpringLoadedLeggingsCrafting;
 	public final ForgeConfigSpec.BooleanValue enableTeleportationCrystalCrafting;
+	public final ForgeConfigSpec.BooleanValue enableTransfomerModuleHelicopterCrafting;
 
 	public final ForgeConfigSpec.BooleanValue enableBatteryPackLooting;
 	public final ForgeConfigSpec.BooleanValue enableBuzzsawArmLooting;
@@ -106,6 +107,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableSpiderWalkersLooting;
 	public final ForgeConfigSpec.BooleanValue enableSpringLoadedLeggingsLooting;
 	public final ForgeConfigSpec.BooleanValue enableTeleportationCrystalLooting;
+	public final ForgeConfigSpec.BooleanValue enableTransfomerModuleHelicopterLooting;
 	
 	public final ConfigValue<Double> lootBioMechInChest;
 	public final ConfigValue<Double> lootBioMechInMineshaft;
@@ -173,6 +175,7 @@ public class BioMechCommonConfig {
 		this.enableSpiderWalkersCrafting = builder.comment("enableSpiderWalkersCrafting").translation("config.biomech.enableSpiderWalkersCrafting").define("enableSpiderWalkersCrafting", true);
 		this.enableSpringLoadedLeggingsCrafting = builder.comment("enableSpringLoadedLeggingsCrafting").translation("config.biomech.enableSpringLoadedLeggingsCrafting").define("enableSpringLoadedLeggingsCrafting", true);
 		this.enableTeleportationCrystalCrafting = builder.comment("enableTeleportationCrystalCrafting").translation("config.biomech.enableTeleportationCrystalCrafting").define("enableTeleportationCrystalCrafting", true);
+		this.enableTransfomerModuleHelicopterCrafting = builder.comment("enableTransfomerModuleHelicopterCrafting").translation("config.biomech.enableTransfomerModuleHelicopterCrafting").define("enableTransfomerModuleHelicopterCrafting", true);
 		builder.pop();
 		
 		builder.push("looting");
@@ -218,6 +221,7 @@ public class BioMechCommonConfig {
 		this.enableSpiderWalkersLooting = builder.comment("enableSpiderWalkersLooting").translation("config.biomech.enableSpiderWalkersLooting").define("enableSpiderWalkersLooting", true);
 		this.enableSpringLoadedLeggingsLooting = builder.comment("enableSpringLoadedLeggingsLooting").translation("config.biomech.enableSpringLoadedLeggingsLooting").define("enableSpringLoadedLeggingsLooting", true);
 		this.enableTeleportationCrystalLooting = builder.comment("enableTeleportationCrystalLooting").translation("config.biomech.enableTeleportationCrystalLooting").define("enableTeleportationCrystalLooting", true);
+		this.enableTransfomerModuleHelicopterLooting = builder.comment("enableTransfomerModuleHelicopterLooting").translation("config.biomech.enableTransfomerModuleHelicopterLooting").define("enableTransfomerModuleHelicopterLooting", true);
 		builder.pop();
 		
 		builder.push("loot_chances");

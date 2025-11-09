@@ -51,8 +51,13 @@ public class BioMechPlayerData {
 	public static String SLOT = "Slot";
 	public static String VISIBLE = "Visible";
 	public static String ILLUMINATOR_TOGGLED = "IlluminatorToggled";
+	public static String HELICOPTER_MODE_TOGGLED = "HelicopterModeToggled";
 	
 	public ToggledStatus illuminatorToggledStatus = new ToggledStatus(true);
+	public ToggledStatus helicopterModeEnabled = new ToggledStatus(false);
+	
+	public ToggledStatus[] toggleList = {illuminatorToggledStatus, helicopterModeEnabled};
+	public String[] toggleListKeys = {ILLUMINATOR_TOGGLED, HELICOPTER_MODE_TOGGLED};
 	
 	public static class SlottedItem {
 		public SlottedItem(MechPart mechPart) {
@@ -228,7 +233,10 @@ public class BioMechPlayerData {
 		result.putFloat(SUIT_ENERGY, data.suitEnergy);
 		result.putFloat(SUIT_ENERGY_MAX, data.suitEnergyMax);
 		result.putFloat(SUIT_ENERGY_PER_SEC, data.suitEnergyPerSec);
-		result.putBoolean(ILLUMINATOR_TOGGLED, data.illuminatorToggledStatus.toggledOn);
+		for (int i=0; i<data.toggleList.length; ++i) {
+			result.putBoolean(data.toggleListKeys[i], data.toggleList[i].toggledOn);
+		}
+		
 		return result;
 	}
 	
@@ -276,8 +284,10 @@ public class BioMechPlayerData {
 				data.suitEnergy = tag.getFloat(SUIT_ENERGY);
 				data.suitEnergyMax = tag.getFloat(SUIT_ENERGY_MAX);
 				data.suitEnergyPerSec = tag.getFloat(SUIT_ENERGY_PER_SEC);
-				if (tag.contains(ILLUMINATOR_TOGGLED)) {
-					data.illuminatorToggledStatus.toggledOn = tag.getBoolean(ILLUMINATOR_TOGGLED);
+				for (int i=0; i<data.toggleList.length; ++i) {
+					if (tag.contains(data.toggleListKeys[i])) {
+						data.toggleList[i].toggledOn = tag.getBoolean(data.toggleListKeys[i]);
+					}
 				}
 			}
 		}

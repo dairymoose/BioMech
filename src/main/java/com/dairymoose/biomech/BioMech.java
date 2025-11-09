@@ -28,6 +28,7 @@ import com.dairymoose.biomech.item.GrapplingHookItem;
 import com.dairymoose.biomech.item.IlluminantBlockItem;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.CpuArmor;
+import com.dairymoose.biomech.item.armor.ElytraEnabledArmor;
 import com.dairymoose.biomech.item.armor.ElytraMechChestplateArmor;
 import com.dairymoose.biomech.item.armor.EmergencyForcefieldUnitArmor;
 import com.dairymoose.biomech.item.armor.EmergencyForcefieldUnitArmor.DurationInfo;
@@ -48,6 +49,7 @@ import com.dairymoose.biomech.item.armor.PowerHelmetArmor;
 import com.dairymoose.biomech.item.armor.RepulsorLiftArmor;
 import com.dairymoose.biomech.item.armor.SpringLoadedLeggingsArmor;
 import com.dairymoose.biomech.item.armor.TeleportationCrystalArmor;
+import com.dairymoose.biomech.item.armor.TransformerModuleHelicopterArmor;
 import com.dairymoose.biomech.item.armor.arm.GatlingArmArmor;
 import com.dairymoose.biomech.item.armor.arm.GrappleArmArmor;
 import com.dairymoose.biomech.item.armor.arm.GrappleArmArmor.GrappleInfo;
@@ -138,6 +140,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -696,7 +699,8 @@ public class BioMech
 	private ItemStack tempChestItemC = null;
     public static int RESYNC_ENERGY_TICK_PERIOD = 60;
     public static Map<UUID, HandActiveStatus> handActiveMap = new HashMap<>();
-    @SubscribeEvent
+    @SuppressWarnings("deprecation")
+	@SubscribeEvent
     public void onPlayerTick(final PlayerTickEvent event) {
     	if (event.player == null) {
     		return;
@@ -746,19 +750,42 @@ public class BioMech
     					}
         			}
     				
-    				if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ElytraMechChestplateArmor armor) {
+    				Item chestItem = playerData.getForSlot(MechPart.Chest).itemStack.getItem();
+    				Item backItem = playerData.getForSlot(MechPart.Back).itemStack.getItem();
+    				if (chestItem instanceof ElytraEnabledArmor armor ||
+    						backItem instanceof ElytraEnabledArmor) {
     					if (event.player.level().isClientSide) {
-    						MidAirJumpStatus majs = primedForMidAirJumpMap.get(event.player.getUUID());
-    						if (majs != null && majs.primedForMidAirJump) {
-    							elytraItemStackC.setDamageValue(0);
+    						boolean engageElytra = false;
+    						
+							if (backItem instanceof TransformerModuleHelicopterArmor) {
+								if (playerData.helicopterModeEnabled.toggledOn) {
+									if (event.player.getForcedPose() != Pose.FALL_FLYING) {
+										event.player.setForcedPose(Pose.FALL_FLYING);
+									}									
+								} else {
+									event.player.setForcedPose(null);
+								}
+								engageElytra = false;
+								
+							} else if (chestItem instanceof ElytraMechChestplateArmor chest) {
+								MidAirJumpStatus majs = primedForMidAirJumpMap.get(event.player.getUUID());
+								if (majs != null && majs.primedForMidAirJump) {
+									engageElytra = true;
+								}
+							}
+							
+							if (engageElytra) {
+								elytraItemStackC.setDamageValue(0);
         						tempChestItemC = event.player.getItemBySlot(EquipmentSlot.CHEST);
         						event.player.setItemSlot(EquipmentSlot.CHEST, elytraItemStackC);
-    						}
+							}
     					}
     					
-    					event.player.setTicksFrozen(0);
-    					event.player.isInPowderSnow = false;
-    					event.player.wasInPowderSnow = false;
+    					if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ElytraMechChestplateArmor chest) {
+    						event.player.setTicksFrozen(0);
+    						event.player.isInPowderSnow = false;
+    						event.player.wasInPowderSnow = false;
+    					}
     				}
     				
     				if (!(playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof OpticsUnitArmor armor)) {
@@ -1657,6 +1684,17 @@ public class BioMech
 							preventedMovementLastTick = false;
 						}
 					}
+					
+//					if (!player.isFallFlying()) {
+//						BioMechPlayerData playerData = this.getDataForLocalPlayer();
+//						
+//						if (playerData != null) {
+//							Item backItem = playerData.getForSlot(MechPart.Back).itemStack.getItem();
+//							if (backItem instanceof TransformerModuleHelicopterArmor && playerData.helicopterModeEnabled.toggledOn) {
+//								event.getInput().jumping = true;
+//							}
+//						}
+//					}
     			}
     		//}
     	}
@@ -2351,6 +2389,16 @@ public class BioMech
         		    			}
         		    		}
         		    	});
+        		    	
+        		    	if (playerData.getForSlot(MechPart.Back).itemStack.getItem() instanceof TransformerModuleHelicopterArmor armor) {
+            				if (playerData.helicopterModeEnabled.toggledOn) {
+            					event.getPoseStack().mulPose(Axis.YP.rotationDegrees(-renderEntity.getYRot()));
+            					event.getPoseStack().mulPose(Axis.XP.rotationDegrees(20.0f * armor.fwdSpeed/armor.maxFwdSpeed));
+            					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(-20.0f * armor.lateralSpeed/armor.maxLateralSpeed));
+            					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(0.37f * (renderEntity.getYRot() - renderEntity.yBodyRot)));
+            					event.getPoseStack().mulPose(Axis.YP.rotationDegrees(renderEntity.getYRot()));
+            				}
+        		    	}
         		    }
         		} catch (Exception e) {
         			LOGGER.error("render error", e);
