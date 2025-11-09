@@ -189,7 +189,6 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 									if (player.horizontalCollision) {
 										float horizontalSpeed = (float)Math.sqrt(this.fwdSpeed*this.fwdSpeed + this.lateralSpeed*this.lateralSpeed);
 										float calcDmg = horizontalSpeed * 8.0f;
-										BioMech.LOGGER.info("collision with speed=" + horizontalSpeed + " with damage=" + calcDmg);
 										if (horizontalSpeed >= 0.05f) {
 											BioMechNetwork.INSTANCE.sendToServer(new ServerboundHurtMePacket(calcDmg));
 										}
@@ -202,7 +201,6 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 									if (player.verticalCollision) {
 										float verticalSpeed = this.ySpeed;
 										float calcDmg = verticalSpeed * 8.0f;
-										BioMech.LOGGER.info("vert collision with speed=" + verticalSpeed + " with damage=" + calcDmg);
 										if (Math.abs(verticalSpeed) >= 0.05f) {
 											BioMechNetwork.INSTANCE.sendToServer(new ServerboundHurtMePacket(calcDmg));
 										}
