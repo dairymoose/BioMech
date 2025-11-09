@@ -63,7 +63,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableSpiderWalkersCrafting;
 	public final ForgeConfigSpec.BooleanValue enableSpringLoadedLeggingsCrafting;
 	public final ForgeConfigSpec.BooleanValue enableTeleportationCrystalCrafting;
-	public final ForgeConfigSpec.BooleanValue enableTransfomerModuleHelicopterCrafting;
+	public final ForgeConfigSpec.BooleanValue enableTransformerModuleHelicopterCrafting;
 
 	public final ForgeConfigSpec.BooleanValue enableBatteryPackLooting;
 	public final ForgeConfigSpec.BooleanValue enableBuzzsawArmLooting;
@@ -107,7 +107,7 @@ public class BioMechCommonConfig {
 	public final ForgeConfigSpec.BooleanValue enableSpiderWalkersLooting;
 	public final ForgeConfigSpec.BooleanValue enableSpringLoadedLeggingsLooting;
 	public final ForgeConfigSpec.BooleanValue enableTeleportationCrystalLooting;
-	public final ForgeConfigSpec.BooleanValue enableTransfomerModuleHelicopterLooting;
+	public final ForgeConfigSpec.BooleanValue enableTransformerModuleHelicopterLooting;
 	
 	public final ConfigValue<Double> lootBioMechInChest;
 	public final ConfigValue<Double> lootBioMechInMineshaft;
@@ -115,7 +115,6 @@ public class BioMechCommonConfig {
 	public final ConfigValue<Double> lootBioMechInAncientCity;
 	public final ConfigValue<Double> lootBioMechInShipwreck;
 	public final ConfigValue<Double> lootBioMechInNetherFortress;
-	public final ForgeConfigSpec.BooleanValue elytraMechChestplateCanBeLooted;
 	
 	public final ForgeConfigSpec.BooleanValue walkToBioMechStation;
 	
@@ -175,7 +174,7 @@ public class BioMechCommonConfig {
 		this.enableSpiderWalkersCrafting = builder.comment("enableSpiderWalkersCrafting").translation("config.biomech.enableSpiderWalkersCrafting").define("enableSpiderWalkersCrafting", true);
 		this.enableSpringLoadedLeggingsCrafting = builder.comment("enableSpringLoadedLeggingsCrafting").translation("config.biomech.enableSpringLoadedLeggingsCrafting").define("enableSpringLoadedLeggingsCrafting", true);
 		this.enableTeleportationCrystalCrafting = builder.comment("enableTeleportationCrystalCrafting").translation("config.biomech.enableTeleportationCrystalCrafting").define("enableTeleportationCrystalCrafting", true);
-		this.enableTransfomerModuleHelicopterCrafting = builder.comment("enableTransfomerModuleHelicopterCrafting").translation("config.biomech.enableTransfomerModuleHelicopterCrafting").define("enableTransfomerModuleHelicopterCrafting", true);
+		this.enableTransformerModuleHelicopterCrafting = builder.comment("enableTransformerModuleHelicopterCrafting").translation("config.biomech.enableTransformerModuleHelicopterCrafting").define("enableTransformerModuleHelicopterCrafting", true);
 		builder.pop();
 		
 		builder.push("looting");
@@ -221,7 +220,7 @@ public class BioMechCommonConfig {
 		this.enableSpiderWalkersLooting = builder.comment("enableSpiderWalkersLooting").translation("config.biomech.enableSpiderWalkersLooting").define("enableSpiderWalkersLooting", true);
 		this.enableSpringLoadedLeggingsLooting = builder.comment("enableSpringLoadedLeggingsLooting").translation("config.biomech.enableSpringLoadedLeggingsLooting").define("enableSpringLoadedLeggingsLooting", true);
 		this.enableTeleportationCrystalLooting = builder.comment("enableTeleportationCrystalLooting").translation("config.biomech.enableTeleportationCrystalLooting").define("enableTeleportationCrystalLooting", true);
-		this.enableTransfomerModuleHelicopterLooting = builder.comment("enableTransfomerModuleHelicopterLooting").translation("config.biomech.enableTransfomerModuleHelicopterLooting").define("enableTransfomerModuleHelicopterLooting", true);
+		this.enableTransformerModuleHelicopterLooting = builder.comment("enableTransformerModuleHelicopterLooting").translation("config.biomech.enableTransformerModuleHelicopterLooting").define("enableTransformerModuleHelicopterLooting", true);
 		builder.pop();
 		
 		builder.push("loot_chances");
@@ -231,7 +230,6 @@ public class BioMechCommonConfig {
 		this.lootBioMechInAncientCity = builder.comment("lootBioMechInAncientCity").translation("config.biomech.lootBioMechInAncientCity").define("lootBioMechInAncientCity", defaultAncientCityLootChance);
 		this.lootBioMechInShipwreck = builder.comment("lootBioMechInShipwreck").translation("config.biomech.lootBioMechInShipwreck").define("lootBioMechInShipwreck", defaultShipwreckLootChance);
 		this.lootBioMechInNetherFortress = builder.comment("lootBioMechInNetherFortress").translation("config.biomech.lootBioMechInNetherFortress").define("lootBioMechInNetherFortress", defaultNetherFortressLootChance);
-		this.elytraMechChestplateCanBeLooted = builder.comment("elytraMechChestplateCanBeLooted").translation("config.biomech.elytraMechChestplateCanBeLooted").define("elytraMechChestplateCanBeLooted", true);
 		builder.pop();
 		
 		builder.push("items");

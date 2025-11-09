@@ -151,6 +151,7 @@
 	"item.biomech.transformer_module_helicopter.tooltip1": "Press '{key_back}' to transform into a helicopter.",
 	"item.biomech.transformer_module_helicopter.tooltip2": "Hold spacebar to move upwards.",
 	"item.biomech.transformer_module_helicopter.tooltip3": "Hold crouch to move downwards.",
+	"item.biomech.transformer_module_helicopter.tooltip4": "Consumes energy while active.",
 	
 	"item.biomech.spider_walkers": "§5Spider Walkers§0",
 	"item.biomech.spider_walkers.tooltip1": "Hold '{alt}' while walking into a wall to activate.",

@@ -5,6 +5,7 @@ import java.text.NumberFormat;
 import java.util.List;
 import java.util.UUID;
 
+import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMech.ClientModEvents;
 import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
@@ -88,6 +89,10 @@ public class ArmorBase extends ArmorItem {
 	}
 	
 	public void onHotkeyHeld(Player player, BioMechPlayerData playerData) {
+		
+	}
+	
+	public void onUnequip(BioMechPlayerData playerData, Player player, ItemStack itemStack, MechPart mechPart) {
 		
 	}
 	

@@ -64,6 +64,11 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 				} else {
 					status.toggledOn = (bonusData == 1 ? true : false);
 				}
+				if (!status.toggledOn) {
+					if (player.getForcedPose() == Pose.FALL_FLYING) {
+						player.setForcedPose(null);
+					}
+				}
 				
 				this.sendHotkeyToServer(player, keyIsDown, status.toggledOn ? 1 : 0, BroadcastType.SEND_TO_ALL_CLIENTS, serverOriginator);
 			}
@@ -71,6 +76,13 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 		super.onHotkeyPressed(player, playerData, keyIsDown, bonusData, serverOriginator);
 	}
 
+	@Override
+	public void onUnequip(BioMechPlayerData playerData, Player player, ItemStack itemStack, MechPart mechPart) {
+		super.onUnequip(playerData, player, itemStack, mechPart);
+		
+		this.onHotkeyPressed(player, playerData, true, 0, false);
+	}
+	
 	double savedGravity = 0.0;
 	public float fwdSpeed = 0.0f;
 	public float lateralSpeed = 0.0f;
@@ -78,13 +90,19 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 	
 	public float maxFwdSpeed = 0.12f;
 	public float maxLateralSpeed = 0.06f;
-	public float maxYSpeed = 0.12f;
+	public float maxYSpeed = 0.11f;
 	
-	public static float addedYPerTick = 0.0014f;
+	public static float addedFwdSpeedPerTick = 0.0045f;
+	public static float addedLateralSpeedPerTick = 0.0045f;
+	public static float addedYPerTick = 0.0012f;
 	public static float ROT_PER_TICK = 120.0f;
 
 	public float rightArmRot = 0.0f;
 	public float leftArmRot = 0.0f;
+	
+	protected float energyPerSec = 3.0f;
+	protected float energyPerTick = energyPerSec/20.0f;
+	
 	@SuppressWarnings("deprecation")
 	@Override
 	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
@@ -95,7 +113,16 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 				if (entity instanceof LivingEntity living) {
 					BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 					if (playerData != null) {
-						if (playerData.helicopterModeEnabled.toggledOn) {
+						boolean active = playerData.helicopterModeEnabled.toggledOn;
+						
+						if (playerData.getSuitEnergy() < energyPerTick) {
+							active = false;
+							this.onUnequip(playerData, player, itemStack, mechPart);
+						}
+						
+						if (active) {
+							playerData.spendSuitEnergy(player, energyPerTick);
+							
 							if (level.isClientSide) {
 								if (player.getForcedPose() == Pose.FALL_FLYING && !player.isFallFlying()) {
 
@@ -126,8 +153,8 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 									double zComp = 0.0;
 									if (player.isLocalPlayer()) { // && ic.hasImpulse && ic.movementVec != null) {
 										if (ic.hasImpulse) {
-											fwdSpeed += ic.movementVec.y * 0.006f;
-											lateralSpeed += ic.movementVec.x * 0.006f;
+											fwdSpeed += ic.movementVec.y * addedFwdSpeedPerTick;
+											lateralSpeed += ic.movementVec.x * addedLateralSpeedPerTick;
 										}
 										
 										if (!ic.hasImpulse || Math.abs(ic.movementVec.y) <= 1E-6)
@@ -211,9 +238,11 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 											if (Math.abs(dy) <= 0.02) {
 												dy = 0.0;
 											} else {
-												dy *= 0.989;
+												dy *= 0.982;
 											}
 										}
+										BioMech.LOGGER.info("set dy to: " + dy + " from delta.y=" + delta.y);
+										
 										player.setDeltaMovement(dx, dy, dz);
 									}
 									player.resetFallDistance();

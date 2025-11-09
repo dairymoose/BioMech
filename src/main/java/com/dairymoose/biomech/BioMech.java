@@ -752,8 +752,10 @@ public class BioMech
     				
     				Item chestItem = playerData.getForSlot(MechPart.Chest).itemStack.getItem();
     				Item backItem = playerData.getForSlot(MechPart.Back).itemStack.getItem();
+    				boolean isHeli = false;
     				if (backItem instanceof TransformerModuleHelicopterArmor) {
 						if (playerData.helicopterModeEnabled.toggledOn) {
+							isHeli = true;
 							if (event.player.getForcedPose() != Pose.FALL_FLYING) {
 								event.player.setForcedPose(Pose.FALL_FLYING);
 							}									
@@ -769,7 +771,9 @@ public class BioMech
 							if (chestItem instanceof ElytraMechChestplateArmor chest) {
 								MidAirJumpStatus majs = primedForMidAirJumpMap.get(event.player.getUUID());
 								if (majs != null && majs.primedForMidAirJump) {
-									engageElytra = true;
+									if (!isHeli) {
+										engageElytra = true;
+									}
 								}
 							}
 							
@@ -2392,7 +2396,7 @@ public class BioMech
         		    	if (playerData.getForSlot(MechPart.Back).itemStack.getItem() instanceof TransformerModuleHelicopterArmor armor) {
             				if (playerData.helicopterModeEnabled.toggledOn) {
             					event.getPoseStack().mulPose(Axis.YP.rotationDegrees(-renderEntity.getYRot()));
-            					event.getPoseStack().mulPose(Axis.XP.rotationDegrees(25.0f * armor.fwdSpeed/armor.maxFwdSpeed));
+            					event.getPoseStack().mulPose(Axis.XP.rotationDegrees(22.0f * armor.fwdSpeed/armor.maxFwdSpeed));
             					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(-30.0f * armor.lateralSpeed/armor.maxLateralSpeed));
             					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(0.37f * (renderEntity.getYRot() - renderEntity.yBodyRot) * (float)renderEntity.getDeltaMovement().horizontalDistance()*0.4f));
             					event.getPoseStack().mulPose(Axis.YP.rotationDegrees(renderEntity.getYRot()));

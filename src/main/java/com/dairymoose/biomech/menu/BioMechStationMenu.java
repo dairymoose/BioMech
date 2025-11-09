@@ -50,18 +50,18 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 			this.container.setItem(slotIdCounter, playerData.getForSlot(mechPart).itemStack);
 
 			this.addSlot(new Slot(stationContainer, slotIdCounter, xCoordinatesBySlot[slotIdCounter], yCoordinatesBySlot[slotIdCounter]) {
-				public void setByPlayer(ItemStack p_270969_) {
-					BioMechStationMenu.onEquipItem(inventory.player, mechPart, p_270969_, this.getItem());
-					super.setByPlayer(p_270969_);
+				public void setByPlayer(ItemStack newItem) {
+					BioMechStationMenu.onEquipItem(inventory.player, mechPart, newItem);
+					super.setByPlayer(newItem);
 				}
 
 				public int getMaxStackSize() {
 					return 1;
 				}
 
-				public boolean mayPlace(ItemStack p_39746_) {
-					return (p_39746_.getItem() instanceof ArmorBase && ((ArmorBase) p_39746_.getItem()).getMechPart() == mechPart) ||
-							(mechPart == MechPart.LeftArm && (p_39746_.getItem() instanceof ArmorBase && ((ArmorBase) p_39746_.getItem()).getMechPart() == MechPart.RightArm));
+				public boolean mayPlace(ItemStack newItem) {
+					return (newItem.getItem() instanceof ArmorBase && ((ArmorBase) newItem.getItem()).getMechPart() == mechPart) ||
+							(mechPart == MechPart.LeftArm && (newItem.getItem() instanceof ArmorBase && ((ArmorBase) newItem.getItem()).getMechPart() == MechPart.RightArm));
 				}
 
 				public boolean mayPickup(Player p_39744_) {
@@ -99,10 +99,15 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 		return null;
 	}
 
-	static void onEquipItem(Player player, MechPart mechPart, ItemStack newItem, ItemStack oldItem) {
+	static void onEquipItem(Player player, MechPart mechPart, ItemStack newItem) {
 		BioMechPlayerData playerData = BioMech.globalPlayerData.computeIfAbsent(player.getUUID(), (uuid) -> new BioMechPlayerData());
 		if (playerData != null) {
-			BioMech.LOGGER.debug("onEquipItem: " + mechPart + " with " + newItem);
+			ItemStack oldItem = playerData.getForSlot(mechPart).itemStack;
+			if (oldItem.getItem() instanceof ArmorBase base) {
+				base.onUnequip(playerData, player, oldItem, mechPart);
+			}
+			
+			BioMech.LOGGER.debug("onEquipItem: " + mechPart + " with " + newItem + " from oldItem=" + oldItem);
 			playerData.setForSlot(mechPart, newItem);
 		}
 		if (!player.level().isClientSide)
