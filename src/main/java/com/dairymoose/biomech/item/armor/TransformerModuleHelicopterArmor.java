@@ -94,9 +94,11 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 	public float maxLateralSpeed = 0.06f;
 	public float maxYSpeed = 0.13f;
 	
+	public static float reverseYFactor = 13.0f;
+	
 	public static float addedFwdSpeedPerTick = 0.0041f;
 	public static float addedLateralSpeedPerTick = 0.0041f;
-	public static float addedYPerTick = 0.0013f;
+	public static float addedYPerTick = 0.0012f;
 	public static float ROT_PER_TICK = 120.0f;
 
 	public float rightArmRot = 0.0f;
@@ -224,7 +226,7 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 											reversing = true;
 										}
 										if (reversing) {
-											toAdd *= 12.0f;
+											toAdd *= reverseYFactor;
 										}
 										
 										ySpeed += toAdd;
