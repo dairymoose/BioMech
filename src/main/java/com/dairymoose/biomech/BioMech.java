@@ -61,6 +61,7 @@ import com.dairymoose.biomech.packet.clientbound.ClientboundPressHotkeyPacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundProjectileDodgePacket;
 import com.dairymoose.biomech.packet.clientbound.ClientboundUpdateSlottedItemPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundHandStatusPacket;
+import com.dairymoose.biomech.packet.serverbound.ServerboundHurtMePacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmBlockTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMiningArmEntityTargetPacket;
 import com.dairymoose.biomech.packet.serverbound.ServerboundMobilityTreadsPacket;
@@ -334,6 +335,7 @@ public class BioMech
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundPressHotkeyPacket.class, ClientboundPressHotkeyPacket::write, ClientboundPressHotkeyPacket::new, ClientboundPressHotkeyPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundUpdateVisibilityPacket.class, ServerboundUpdateVisibilityPacket::write, ServerboundUpdateVisibilityPacket::new, ServerboundUpdateVisibilityPacket::handle);
 		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundResetFallDamagePacket.class, ServerboundResetFallDamagePacket::write, ServerboundResetFallDamagePacket::new, ServerboundResetFallDamagePacket::handle);
+		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundHurtMePacket.class, ServerboundHurtMePacket::write, ServerboundHurtMePacket::new, ServerboundHurtMePacket::handle);
     }
     
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
@@ -2396,7 +2398,7 @@ public class BioMech
         		    	if (playerData.getForSlot(MechPart.Back).itemStack.getItem() instanceof TransformerModuleHelicopterArmor armor) {
             				if (playerData.helicopterModeEnabled.toggledOn) {
             					event.getPoseStack().mulPose(Axis.YP.rotationDegrees(-renderEntity.getYRot()));
-            					event.getPoseStack().mulPose(Axis.XP.rotationDegrees(22.0f * armor.fwdSpeed/armor.maxFwdSpeed));
+            					event.getPoseStack().mulPose(Axis.XP.rotationDegrees(18.0f * armor.fwdSpeed/armor.maxFwdSpeed));
             					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(-30.0f * armor.lateralSpeed/armor.maxLateralSpeed));
             					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(0.37f * (renderEntity.getYRot() - renderEntity.yBodyRot) * (float)renderEntity.getDeltaMovement().horizontalDistance()*0.4f));
             					event.getPoseStack().mulPose(Axis.YP.rotationDegrees(renderEntity.getYRot()));

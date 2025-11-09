@@ -7,7 +7,9 @@ import java.util.UUID;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 import com.dairymoose.biomech.item.anim.ElytraMechChestplateDispatcher;
 import com.dairymoose.biomech.item.anim.TransformerModuleHelicopterDispatcher;
+import com.dairymoose.biomech.packet.serverbound.ServerboundHurtMePacket;
 import com.dairymoose.biomech.BioMech;
+import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.BroadcastType;
@@ -90,11 +92,11 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 	
 	public float maxFwdSpeed = 0.12f;
 	public float maxLateralSpeed = 0.06f;
-	public float maxYSpeed = 0.11f;
+	public float maxYSpeed = 0.13f;
 	
-	public static float addedFwdSpeedPerTick = 0.0045f;
-	public static float addedLateralSpeedPerTick = 0.0045f;
-	public static float addedYPerTick = 0.0012f;
+	public static float addedFwdSpeedPerTick = 0.0041f;
+	public static float addedLateralSpeedPerTick = 0.0041f;
+	public static float addedYPerTick = 0.0013f;
 	public static float ROT_PER_TICK = 120.0f;
 
 	public float rightArmRot = 0.0f;
@@ -185,12 +187,26 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 									}
 									
 									if (player.horizontalCollision) {
+										float horizontalSpeed = (float)Math.sqrt(this.fwdSpeed*this.fwdSpeed + this.lateralSpeed*this.lateralSpeed);
+										float calcDmg = horizontalSpeed * 8.0f;
+										BioMech.LOGGER.info("collision with speed=" + horizontalSpeed + " with damage=" + calcDmg);
+										if (horizontalSpeed >= 0.05f) {
+											BioMechNetwork.INSTANCE.sendToServer(new ServerboundHurtMePacket(calcDmg));
+										}
+										
 										xComp = 0.0;
 										zComp = 0.0;
 										fwdSpeed = 0.0f;
 										lateralSpeed = 0.0f;
 									}
 									if (player.verticalCollision) {
+										float verticalSpeed = this.ySpeed;
+										float calcDmg = verticalSpeed * 8.0f;
+										BioMech.LOGGER.info("vert collision with speed=" + verticalSpeed + " with damage=" + calcDmg);
+										if (Math.abs(verticalSpeed) >= 0.05f) {
+											BioMechNetwork.INSTANCE.sendToServer(new ServerboundHurtMePacket(calcDmg));
+										}
+										
 										ySpeed = 0.0f;
 									}
 									
@@ -235,13 +251,12 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 										if (belowState.isFaceSturdy(level, belowPos, Direction.UP)) {
 											dy = 0.06;
 										} else {
-											if (Math.abs(dy) <= 0.02) {
+											if (Math.abs(dy) <= 0.045) {
 												dy = 0.0;
 											} else {
 												dy *= 0.982;
 											}
 										}
-										BioMech.LOGGER.info("set dy to: " + dy + " from delta.y=" + delta.y);
 										
 										player.setDeltaMovement(dx, dy, dz);
 									}
