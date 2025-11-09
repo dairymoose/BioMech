@@ -128,6 +128,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -173,6 +174,9 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.gui.overlay.GuiOverlayManager;
+import net.minecraftforge.client.gui.overlay.NamedGuiOverlay;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
@@ -751,6 +755,10 @@ public class BioMech
         						event.player.setItemSlot(EquipmentSlot.CHEST, elytraItemStackC);
     						}
     					}
+    					
+    					event.player.setTicksFrozen(0);
+    					event.player.isInPowderSnow = false;
+    					event.player.wasInPowderSnow = false;
     				}
     				
     				if (!(playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof OpticsUnitArmor armor)) {
@@ -1880,100 +1888,109 @@ public class BioMech
     	private int GUI_SUIT_ENERGY_BORDER_HEIGHT = 8;
 		@SubscribeEvent
 		public void renderOverlayEvent(RenderGuiOverlayEvent.Pre overlayEvent) {
-			BioMechPlayerData playerData = this.getDataForLocalPlayer();
+			if (overlayEvent.getOverlay() == GuiOverlayManager.findOverlay(VanillaGuiOverlay.EXPERIENCE_BAR.id())) {
+				BioMechPlayerData playerData = this.getDataForLocalPlayer();
 
-			if (playerData != null) {
-				boolean hasAnyBioMechArmor = playerData.getAllSlots().stream()
-						.anyMatch((slotted) -> !slotted.itemStack.isEmpty());
-				if (hasAnyBioMechArmor) {
-					float suitEnergy = playerData.getSuitEnergy();
-					
-					Window window = overlayEvent.getWindow();
-					RenderSystem.setShader(GameRenderer::getPositionTexShader);
-					float xScale = BioMechConfig.CLIENT.energySuitGuiXScale.get().floatValue();
-					float yScale = BioMechConfig.CLIENT.energySuitGuiYScale.get().floatValue();
-					if (xScale > 0.0f && yScale > 0.0f && playerData.suitEnergyMax > 0.0f) {
-						float suitEnergyPct = suitEnergy/playerData.suitEnergyMax;
-						float visibleThreshold = BioMechConfig.CLIENT.showEnergySuitGuiThreshold.get().floatValue();
+				if (playerData != null) {
+					boolean hasAnyBioMechArmor = playerData.getAllSlots().stream()
+							.anyMatch((slotted) -> !slotted.itemStack.isEmpty());
+					if (hasAnyBioMechArmor) {
+						float suitEnergy = playerData.getSuitEnergy();
 						
-						long ticksSinceRecalculate = playerData.tickCount - BioMechStationMenu.RECALCULATE_TICK;
-						if (suitEnergyPct <= visibleThreshold || ticksSinceRecalculate <= 100) {
-							float xScaleInv = 1.0f/xScale;
-							float yScaleInv = 1.0f/yScale;
-							int xStart = (int) ((window.getGuiScaledWidth() * BioMechConfig.CLIENT.energySuitGuiXPos.get().floatValue() * xScaleInv));
-							int yStart = (int) ((window.getGuiScaledHeight() * BioMechConfig.CLIENT.energySuitGuiYPos.get().floatValue() * yScaleInv));
-							float xStartTexture = 0.0f;
-							float yStartTexture = 0.0f;
+						Window window = overlayEvent.getWindow();
+						RenderSystem.setShader(GameRenderer::getPositionTexShader);
+						float xScale = BioMechConfig.CLIENT.energySuitGuiXScale.get().floatValue();
+						float yScale = BioMechConfig.CLIENT.energySuitGuiYScale.get().floatValue();
+						if (xScale > 0.0f && yScale > 0.0f && playerData.suitEnergyMax > 0.0f) {
+							float suitEnergyPct = suitEnergy/playerData.suitEnergyMax;
+							float visibleThreshold = BioMechConfig.CLIENT.showEnergySuitGuiThreshold.get().floatValue();
 							
-							//RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, BioMechConfig.CLIENT.energySuitGuiOpacity.get().floatValue());
-							overlayEvent.getGuiGraphics().pose().pushPose();
-							overlayEvent.getGuiGraphics().pose().scale(xScale, yScale, 1.0f);
-							//draw border
-							overlayEvent.getGuiGraphics().blit(this.GUI_SUIT_ENERGY_LOCATION, xStart, yStart, xStartTexture,
-									yStartTexture, GUI_SUIT_ENERGY_TEX_SIZE, GUI_SUIT_ENERGY_BORDER_HEIGHT, GUI_SUIT_ENERGY_TEX_SIZE,
-									GUI_SUIT_ENERGY_TEX_SIZE);
-							//draw bar
-							overlayEvent.getGuiGraphics().blit(this.GUI_SUIT_ENERGY_LOCATION, xStart, yStart, xStartTexture,
-									(float) GUI_SUIT_ENERGY_BORDER_HEIGHT,
-									1 + (int) Math.ceil((GUI_SUIT_ENERGY_TEX_SIZE - 2) * suitEnergyPct), GUI_SUIT_ENERGY_BORDER_HEIGHT,
-									GUI_SUIT_ENERGY_TEX_SIZE, GUI_SUIT_ENERGY_TEX_SIZE);
-							
-							float textXScale = BioMechConfig.CLIENT.suitEnergyTextXScale.get().floatValue();
-							float textYScale = BioMechConfig.CLIENT.suitEnergyTextYScale.get().floatValue();
-							overlayEvent.getGuiGraphics().pose().scale(textXScale, textYScale, 1.0f);
-							if (BioMechConfig.CLIENT.showSuitEnergyText.get().booleanValue()) {
-								float textXScaleInv = 1.0f/textXScale;
-								float textYScaleInv = 1.0f/textYScale;
-								float barHeight = GUI_SUIT_ENERGY_BORDER_HEIGHT * yScale;
-								int halfBarHeight = (int)(barHeight / 2.0f);
-								int leftMargin = (int)(3.0f*xScale);
+							long ticksSinceRecalculate = playerData.tickCount - BioMechStationMenu.RECALCULATE_TICK;
+							if (suitEnergyPct <= visibleThreshold || ticksSinceRecalculate <= 100) {
+								float xScaleInv = 1.0f/xScale;
+								float yScaleInv = 1.0f/yScale;
+								int xStart = (int) ((window.getGuiScaledWidth() * BioMechConfig.CLIENT.energySuitGuiXPos.get().floatValue() * xScaleInv));
+								int yStart = (int) ((window.getGuiScaledHeight() * BioMechConfig.CLIENT.energySuitGuiYPos.get().floatValue() * yScaleInv));
+								float xStartTexture = 0.0f;
+								float yStartTexture = 0.0f;
 								
-								float pixelXDiff = xStart*textXScaleInv - xStart;
-								float pixelYDiff = yStart*textYScaleInv - yStart;
-								overlayEvent.getGuiGraphics().pose().translate(pixelXDiff, pixelYDiff, 0.0f);
-								overlayEvent.getGuiGraphics().pose().translate(leftMargin, halfBarHeight, 0.0f);
-								//print suit energy
-								Component component1 = MutableComponent
-										.create(new LiteralContents(String.valueOf((int)suitEnergy)))
-										.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xFFFFFF)));
-								overlayEvent.getGuiGraphics().drawString(Minecraft.getInstance().font, component1,
-										xStart,
-										yStart, 0, true);
-							}
-							if (BioMechConfig.CLIENT.showEnergyDrainRate.get().booleanValue()) {
-								NumberFormat nf = new DecimalFormat("#.#");
-								//print suit energy gain/loss
-								Component component2 = null;
-								if (calcEnergyDiffOnePeriod >= 0.0f) {
-									component2 = MutableComponent
-									.create(new LiteralContents(nf.format(calcEnergyDiffOnePeriod)))
-									.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0x00FF00)));
-								} else {
-									component2 = MutableComponent
-									.create(new LiteralContents(nf.format(calcEnergyDiffOnePeriod)))
-									.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xFF0000)));
+								//RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, BioMechConfig.CLIENT.energySuitGuiOpacity.get().floatValue());
+								overlayEvent.getGuiGraphics().pose().pushPose();
+								overlayEvent.getGuiGraphics().pose().scale(xScale, yScale, 1.0f);
+								//draw border
+								overlayEvent.getGuiGraphics().blit(this.GUI_SUIT_ENERGY_LOCATION, xStart, yStart, xStartTexture,
+										yStartTexture, GUI_SUIT_ENERGY_TEX_SIZE, GUI_SUIT_ENERGY_BORDER_HEIGHT, GUI_SUIT_ENERGY_TEX_SIZE,
+										GUI_SUIT_ENERGY_TEX_SIZE);
+								//draw bar
+								overlayEvent.getGuiGraphics().blit(this.GUI_SUIT_ENERGY_LOCATION, xStart, yStart, xStartTexture,
+										(float) GUI_SUIT_ENERGY_BORDER_HEIGHT,
+										1 + (int) Math.ceil((GUI_SUIT_ENERGY_TEX_SIZE - 2) * suitEnergyPct), GUI_SUIT_ENERGY_BORDER_HEIGHT,
+										GUI_SUIT_ENERGY_TEX_SIZE, GUI_SUIT_ENERGY_TEX_SIZE);
+								
+								float textXScale = BioMechConfig.CLIENT.suitEnergyTextXScale.get().floatValue();
+								float textYScale = BioMechConfig.CLIENT.suitEnergyTextYScale.get().floatValue();
+								overlayEvent.getGuiGraphics().pose().scale(textXScale, textYScale, 1.0f);
+								if (BioMechConfig.CLIENT.showSuitEnergyText.get().booleanValue()) {
+									float textXScaleInv = 1.0f/textXScale;
+									float textYScaleInv = 1.0f/textYScale;
+									float barHeight = GUI_SUIT_ENERGY_BORDER_HEIGHT * yScale;
+									int halfBarHeight = (int)(barHeight / 2.0f);
+									int leftMargin = (int)(3.0f*xScale);
+									
+									float pixelXDiff = xStart*textXScaleInv - xStart;
+									float pixelYDiff = yStart*textYScaleInv - yStart;
+									overlayEvent.getGuiGraphics().pose().translate(pixelXDiff, pixelYDiff, 0.0f);
+									overlayEvent.getGuiGraphics().pose().translate(leftMargin, halfBarHeight, 0.0f);
+									//print suit energy
+									Component component1 = MutableComponent
+											.create(new LiteralContents(String.valueOf((int)suitEnergy)))
+											.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xFFFFFF)));
+									overlayEvent.getGuiGraphics().drawString(Minecraft.getInstance().font, component1,
+											xStart,
+											yStart, 0, true);
 								}
-								overlayEvent.getGuiGraphics().drawString(Minecraft.getInstance().font, component2,
-										(int)(xStart + GUI_SUIT_ENERGY_TEX_SIZE*xScale - 0.2f*xScale),
-										yStart, 0, true);
+								if (BioMechConfig.CLIENT.showEnergyDrainRate.get().booleanValue()) {
+									NumberFormat nf = new DecimalFormat("#.#");
+									//print suit energy gain/loss
+									Component component2 = null;
+									if (calcEnergyDiffOnePeriod >= 0.0f) {
+										component2 = MutableComponent
+										.create(new LiteralContents(nf.format(calcEnergyDiffOnePeriod)))
+										.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0x00FF00)));
+									} else {
+										component2 = MutableComponent
+										.create(new LiteralContents(nf.format(calcEnergyDiffOnePeriod)))
+										.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xFF0000)));
+									}
+									overlayEvent.getGuiGraphics().drawString(Minecraft.getInstance().font, component2,
+											(int)(xStart + GUI_SUIT_ENERGY_TEX_SIZE*xScale - 0.2f*xScale),
+											yStart, 0, true);
+								}
+								overlayEvent.getGuiGraphics().pose().scale(1.0f, 1.0f, 1.0f);
+								
+								overlayEvent.getGuiGraphics().pose().popPose();
+								//RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 							}
-							overlayEvent.getGuiGraphics().pose().scale(1.0f, 1.0f, 1.0f);
-							
-							overlayEvent.getGuiGraphics().pose().popPose();
-							//RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 						}
+						
+						//draw ENERGY text
+//						RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 0.5f);
+//						overlayEvent.getGuiGraphics().blit(this.GUI_SUIT_ENERGY_LOCATION, xStart, yStart, xStartTexture,
+//								(float) GUI_SUIT_ENERGY_BORDER_HEIGHT * 2, GUI_SUIT_ENERGY_TEX_SIZE,
+//								GUI_SUIT_ENERGY_BORDER_HEIGHT, GUI_SUIT_ENERGY_TEX_SIZE, GUI_SUIT_ENERGY_TEX_SIZE);
+	//
+//						RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 					}
-					
-					//draw ENERGY text
-//					RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 0.5f);
-//					overlayEvent.getGuiGraphics().blit(this.GUI_SUIT_ENERGY_LOCATION, xStart, yStart, xStartTexture,
-//							(float) GUI_SUIT_ENERGY_BORDER_HEIGHT * 2, GUI_SUIT_ENERGY_TEX_SIZE,
-//							GUI_SUIT_ENERGY_BORDER_HEIGHT, GUI_SUIT_ENERGY_TEX_SIZE, GUI_SUIT_ENERGY_TEX_SIZE);
-//
-//					RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+				}
+			} else if (overlayEvent.getOverlay() == GuiOverlayManager.findOverlay(VanillaGuiOverlay.FROSTBITE.id())) {
+				BioMechPlayerData playerData = this.getDataForLocalPlayer();
+
+				if (playerData != null) {
+					if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ElytraMechChestplateArmor elytra) {
+						overlayEvent.setCanceled(true);
+					}
 				}
 			}
-
 		}
     	
     	public HandActiveStatus getLocalHandActiveStatus() {

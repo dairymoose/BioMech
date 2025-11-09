@@ -145,6 +145,7 @@
 	
 	"item.biomech.elytra_mech_chestplate": "§5Elytra Mech Chestplate§0",
 	"item.biomech.elytra_mech_chestplate.tooltip1": "Grants elytra flight.",
+	"item.biomech.elytra_mech_chestplate.tooltip2": "Warm and comfy - it prevents frostbite.",
 	
 	"item.biomech.spider_walkers": "§5Spider Walkers§0",
 	"item.biomech.spider_walkers.tooltip1": "Hold '{alt}' while walking into a wall to activate.",
