@@ -752,22 +752,21 @@ public class BioMech
     				
     				Item chestItem = playerData.getForSlot(MechPart.Chest).itemStack.getItem();
     				Item backItem = playerData.getForSlot(MechPart.Back).itemStack.getItem();
-    				if (chestItem instanceof ElytraEnabledArmor armor ||
-    						backItem instanceof ElytraEnabledArmor) {
+    				if (backItem instanceof TransformerModuleHelicopterArmor) {
+						if (playerData.helicopterModeEnabled.toggledOn) {
+							if (event.player.getForcedPose() != Pose.FALL_FLYING) {
+								event.player.setForcedPose(Pose.FALL_FLYING);
+							}									
+						} else {
+							event.player.setForcedPose(null);
+						}
+					}
+    				
+    				if (chestItem instanceof ElytraEnabledArmor armor) {
     					if (event.player.level().isClientSide) {
     						boolean engageElytra = false;
     						
-							if (backItem instanceof TransformerModuleHelicopterArmor) {
-								if (playerData.helicopterModeEnabled.toggledOn) {
-									if (event.player.getForcedPose() != Pose.FALL_FLYING) {
-										event.player.setForcedPose(Pose.FALL_FLYING);
-									}									
-								} else {
-									event.player.setForcedPose(null);
-								}
-								engageElytra = false;
-								
-							} else if (chestItem instanceof ElytraMechChestplateArmor chest) {
+							if (chestItem instanceof ElytraMechChestplateArmor chest) {
 								MidAirJumpStatus majs = primedForMidAirJumpMap.get(event.player.getUUID());
 								if (majs != null && majs.primedForMidAirJump) {
 									engageElytra = true;
@@ -2395,7 +2394,7 @@ public class BioMech
             					event.getPoseStack().mulPose(Axis.YP.rotationDegrees(-renderEntity.getYRot()));
             					event.getPoseStack().mulPose(Axis.XP.rotationDegrees(20.0f * armor.fwdSpeed/armor.maxFwdSpeed));
             					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(-20.0f * armor.lateralSpeed/armor.maxLateralSpeed));
-            					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(0.37f * (renderEntity.getYRot() - renderEntity.yBodyRot)));
+            					event.getPoseStack().mulPose(Axis.ZP.rotationDegrees(0.37f * (renderEntity.getYRot() - renderEntity.yBodyRot) * (float)renderEntity.getDeltaMovement().horizontalDistance()*0.4f));
             					event.getPoseStack().mulPose(Axis.YP.rotationDegrees(renderEntity.getYRot()));
             				}
         		    	}

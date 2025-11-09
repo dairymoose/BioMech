@@ -34,7 +34,7 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
-public class TransformerModuleHelicopterArmor extends ArmorBase implements ElytraEnabledArmor {
+public class TransformerModuleHelicopterArmor extends ArmorBase {
 
 	final TransformerModuleHelicopterDispatcher dispatcher;
 	
@@ -75,8 +75,11 @@ public class TransformerModuleHelicopterArmor extends ArmorBase implements Elytr
 	double savedGravity = 0.0;
 	public float fwdSpeed = 0.0f;
 	public float lateralSpeed = 0.0f;
+	public float ySpeed = 0.0f;
+	
 	public float maxFwdSpeed = 0.12f;
 	public float maxLateralSpeed = 0.05f;
+	public float maxYSpeed = 0.04f;
 	
 	public static float ROT_PER_TICK = 120.0f;
 	//public static float ROT_PER_TICK = 0.0f;
@@ -94,7 +97,7 @@ public class TransformerModuleHelicopterArmor extends ArmorBase implements Elytr
 					if (playerData != null) {
 						if (playerData.helicopterModeEnabled.toggledOn) {
 							if (level.isClientSide) {
-								if (player.getForcedPose() == Pose.FALL_FLYING) {
+								if (player.getForcedPose() == Pose.FALL_FLYING && !player.isFallFlying()) {
 									
 									player.setOnGround(false);
 //									AttributeModifier mod = player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).getModifier(UUID.fromString(uuidGravity));
@@ -134,14 +137,20 @@ public class TransformerModuleHelicopterArmor extends ArmorBase implements Elytr
 										}
 										
 										if (!ic.hasImpulse || ic.movementVec.y <= 1E-6)
-											fwdSpeed *= 0.992;
+											fwdSpeed *= 0.988;
 										if (!ic.hasImpulse || ic.movementVec.x <= 1E-6)
 											lateralSpeed *= 0.85;
+										if (!BioMech.localPlayerJumping && !player.isCrouching()) {
+											ySpeed *= 0.95f;
+										}
 										if (Math.abs(fwdSpeed) <= 1E-6) {
 											fwdSpeed = 0.0f;
 										}
 										if (Math.abs(lateralSpeed) <= 1E-6) {
 											lateralSpeed = 0.0f;
+										}
+										if (Math.abs(ySpeed) <= 1E-6) {
+											ySpeed = 0.0f;
 										}
 										
 										fwdSpeed = Math.min(maxFwdSpeed, fwdSpeed);
@@ -158,24 +167,37 @@ public class TransformerModuleHelicopterArmor extends ArmorBase implements Elytr
 									double dz = delta.z + zComp;
 									
 									if (BioMech.localPlayerJumping || player.isCrouching()) {
-										float toAdd = 0.15f;
-										float toAddInitial = 0.10f;
+										float toAdd = 0.0025f;
 										if (player.isCrouching()) {
 											toAdd = -toAdd;
 										}
-
-										BioMech.LOGGER.info("add val=" + toAdd*Math.pow(1.0 - Math.min(1.0f, Math.abs(delta.y/0.60)), 0.7));
-										double newY = delta.y + toAdd*Math.pow(1.0 - Math.min(1.0f, Math.abs(delta.y/0.60)), 0.7);
-										if (player.isCrouching()) {
-											//counteract the additive effect of gravity
-											newY += g;
-										}
+										ySpeed += toAdd;
 										
-										if (BioMech.localPlayerJumping && delta.y <= 0.12) {
-											newY = delta.y + toAddInitial;
-										}
+										ySpeed = Math.min(maxYSpeed, ySpeed);
+										ySpeed = Math.max(-maxYSpeed, ySpeed);
 
-										BioMech.LOGGER.info("set newY=" + newY);
+										boolean limiter = false;
+										if (ySpeed > 0.0f && delta.y > 0.0f) {
+											limiter = true;
+										} else if (ySpeed < 0.0f && delta.y < 0.0f) {
+											limiter = true;
+										}
+										double newY = delta.y;
+										newY += g;
+										
+										if (limiter)
+											newY += ySpeed*Math.pow(1.0 - Math.min(1.0f, Math.abs(delta.y/maxYSpeed*5)), 0.9);
+										else
+											newY += 2.0f*ySpeed;
+										//if (player.isCrouching()) {
+											//counteract the additive effect of gravity
+											
+										//}
+										
+//										if (BioMech.localPlayerJumping && delta.y <= 0.12) {
+//											newY = delta.y + toAddInitial;
+//										}
+
 										player.setDeltaMovement(dx, newY, dz);
 									} else {
 										
@@ -201,6 +223,7 @@ public class TransformerModuleHelicopterArmor extends ArmorBase implements Elytr
 										}
 										player.setDeltaMovement(dx, dy, dz);
 									}
+									player.resetFallDistance();
 								}
 							} else {
 								BioMech.allowFlyingForPlayer(player);
@@ -211,6 +234,7 @@ public class TransformerModuleHelicopterArmor extends ArmorBase implements Elytr
 						} else {
 							fwdSpeed = 0.0f;
 							lateralSpeed = 0.0f;
+							ySpeed = 0.0f;
 //							AttributeModifier mod = player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).getModifier(UUID.fromString(uuidGravity));
 //							if (mod != null) {
 //								player.getAttribute(ForgeMod.ENTITY_GRAVITY.get()).removeModifier(UUID.fromString(uuidGravity));
