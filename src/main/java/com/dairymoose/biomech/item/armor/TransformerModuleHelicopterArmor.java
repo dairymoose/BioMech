@@ -90,7 +90,7 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 	public float lateralSpeed = 0.0f;
 	public float ySpeed = 0.0f;
 	
-	public float maxFwdSpeed = 0.12f;
+	public float maxFwdSpeed = 0.115f;
 	public float maxLateralSpeed = 0.06f;
 	public float maxYSpeed = 0.13f;
 	
