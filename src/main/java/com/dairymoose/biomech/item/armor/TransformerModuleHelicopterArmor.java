@@ -159,13 +159,18 @@ public class TransformerModuleHelicopterArmor extends ArmorBase implements Elytr
 									
 									if (BioMech.localPlayerJumping || player.isCrouching()) {
 										float toAdd = 0.15f;
-										float toAddInitial = 0.09f;
+										float toAddInitial = 0.10f;
 										if (player.isCrouching()) {
-											toAdd = -toAdd/4.0f + g;
+											toAdd = -toAdd;
 										}
 
 										BioMech.LOGGER.info("add val=" + toAdd*Math.pow(1.0 - Math.min(1.0f, Math.abs(delta.y/0.60)), 0.7));
 										double newY = delta.y + toAdd*Math.pow(1.0 - Math.min(1.0f, Math.abs(delta.y/0.60)), 0.7);
+										if (player.isCrouching()) {
+											//counteract the additive effect of gravity
+											newY += g;
+										}
+										
 										if (BioMech.localPlayerJumping && delta.y <= 0.12) {
 											newY = delta.y + toAddInitial;
 										}
@@ -191,7 +196,6 @@ public class TransformerModuleHelicopterArmor extends ArmorBase implements Elytr
 												}
 												else {
 													dy *= 0.999;
-													BioMech.LOGGER.info("slow dy to=" + dy);
 												}
 											}
 										}
