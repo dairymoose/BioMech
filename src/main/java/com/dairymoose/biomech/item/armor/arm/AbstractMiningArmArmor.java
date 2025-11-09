@@ -68,6 +68,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 		public static float progressMax = 100.0f;
 	}
 
+	protected double firstPersonStandNextToDist = 0.20;
 	protected boolean spawnsBlockMiningParticles = true;
 	protected float minSpeedMult = 2.5f;
 	protected float maxSpeedMult = minSpeedMult * 6.0f;
@@ -286,11 +287,12 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 							float xComp3 = (float)(horizontalComponent * -Math.sin(Math.toRadians(yRot)));
 							float zComp3 = (float)(horizontalComponent * Math.cos(Math.toRadians(yRot)));
 
-							//double firstPersonStandNextToDist = 0.25;
-							double firstPersonStandNextToDist = 0.20;
-							firstPersonStandNextToDist /= fovScalingCalc;
-							xComp = firstPersonStandNextToDist * -Math.sin(Math.toRadians(yaw));
-							zComp = firstPersonStandNextToDist * Math.cos(Math.toRadians(yaw));
+							double scaledFirstPersonDist = this.firstPersonStandNextToDist;
+							scaledFirstPersonDist /= fovScalingCalc;
+							//.2/.8
+							//0.2/0.77836491192416001194034993611648 = 0.1556729823848320023880699872233
+							xComp = scaledFirstPersonDist * -Math.sin(Math.toRadians(yaw));
+							zComp = scaledFirstPersonDist * Math.cos(Math.toRadians(yaw));
 							
 							//positioned next to the player, we'll look in the exact same direction as the player, but slightly lower
 							startLoc = player.getEyePosition(partialTick).add(xComp, 0.0, zComp).add(new Vec3(xComp3, yComp3, zComp3));

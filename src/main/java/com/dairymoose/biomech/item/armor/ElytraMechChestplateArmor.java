@@ -30,9 +30,6 @@ public class ElytraMechChestplateArmor extends ArmorBase {
 		this.dispatcher = new ElytraMechChestplateDispatcher();
 	}
 
-	public static boolean jetpackPreviouslyActive = false;
-	public static boolean jetpackInputActive = false;
-	
 	@Override
 	public void biomechInventoryTick(SlottedItem slottedItem, ItemStack itemStack, Level level, Entity entity, int slotId, boolean isSelected) {
 		if (entity instanceof Player player) {

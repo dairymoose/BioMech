@@ -32,6 +32,8 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArmArmor {
 		
 		this.energyPerSec = 4.0f;
 		this.blockReachMult = 1.7;
+		
+		this.firstPersonStandNextToDist = 0.195;
 	}
 
 	public static float laserDamageAtMaxPower = 7.4f;
