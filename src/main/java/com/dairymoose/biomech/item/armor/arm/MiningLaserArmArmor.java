@@ -33,10 +33,10 @@ public abstract class MiningLaserArmArmor extends AbstractMiningArmArmor {
 		this.energyPerSec = 4.0f;
 		this.blockReachMult = 1.7;
 		
-		this.firstPersonStandNextToDist = 0.195;
+		this.firstPersonStandNextToDist = 0.1945;
 	}
 
-	public static float laserDamageAtMaxPower = 7.4f;
+	public static float laserDamageAtMaxPower = 7.6f;
 	
 	@Override
 	protected void playSound(ItemStack itemStack, Player player, int useTicks, boolean didHit) {
