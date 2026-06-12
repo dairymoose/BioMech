@@ -3,7 +3,6 @@ package com.dairymoose.biomech.packet.clientbound;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -52,7 +51,7 @@ public class ClientboundEnergySyncPacket implements CustomPacketPayload {
 	public void handle(IPayloadContext context) {
 		context.enqueueWork(() -> {
 			BioMech.LOGGER.trace("Handle ClientboundEnergySyncPacket");
-			BioMechPlayerData playerData = BioMech.globalPlayerData.get(Minecraft.getInstance().player.getUUID());
+			BioMechPlayerData playerData = BioMech.globalPlayerData.get(context.player().getUUID());
 			if (playerData != null) {
 				playerData.suitEnergyMax = suitEnergyMax;
 				playerData.setSuitEnergy(suitEnergy);

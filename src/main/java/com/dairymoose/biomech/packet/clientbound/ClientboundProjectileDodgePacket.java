@@ -3,7 +3,6 @@ package com.dairymoose.biomech.packet.clientbound;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -47,7 +46,7 @@ public class ClientboundProjectileDodgePacket implements CustomPacketPayload {
 	public void handle(IPayloadContext context) {
 		context.enqueueWork(() -> {
 			BioMech.LOGGER.trace("Handle ClientboundProjectileDodgePacket");
-			Level world = Minecraft.getInstance().level;
+			Level world = context.player().level();
 			if (world != null) {
 				Entity e = world.getEntity(playerId);
 				if (e instanceof Player p) {

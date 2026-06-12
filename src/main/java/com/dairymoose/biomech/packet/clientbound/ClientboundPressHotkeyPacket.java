@@ -7,7 +7,6 @@ import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.item.armor.ArmorBase;
 import com.dairymoose.biomech.item.armor.MechPart;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -62,7 +61,7 @@ public class ClientboundPressHotkeyPacket implements CustomPacketPayload {
 	public void handle(IPayloadContext context) {
 		context.enqueueWork(() -> {
 			BioMech.LOGGER.trace("Handle ClientboundPressHotkeyPacket");
-			Level world = Minecraft.getInstance().level;
+			Level world = context.player().level();
 			if (world != null) {
 				try {
 					Player player = world.getPlayerByUUID(playerUuid);
