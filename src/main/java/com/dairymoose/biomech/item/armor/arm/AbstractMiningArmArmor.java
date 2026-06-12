@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.item.armor.arm;
 
+import com.dairymoose.biomech.ItemNbtHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -40,16 +42,16 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.api.distmarker.Dist;
+import com.dairymoose.biomech.DistExec;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public abstract class AbstractMiningArmArmor extends ArmorBase {
 
 	protected static final String USE_TICKS = "useTicks";
 
-	public AbstractMiningArmArmor(ArmorMaterial material, Type type, Properties props) {
+	public AbstractMiningArmArmor(Holder<ArmorMaterial> material, Type type, Properties props) {
 		super(material, type, props);
 	}
 	
@@ -170,15 +172,16 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 			}
 			
 			if (active) {
-				int useTicks = thirdPersonItemStack.getTag().getInt(USE_TICKS);
+				int useTicks = ItemNbtHelper.getTagOrNull(thirdPersonItemStack).getInt(USE_TICKS);
 				if (FMLEnvironment.dist == Dist.CLIENT) {
 					if (player.level().isClientSide)
 						++useTicks;
 				} else {
 					++useTicks;
 				}
-				
-				thirdPersonItemStack.getTag().putInt(USE_TICKS, useTicks);
+
+				final int useTicksF = useTicks;
+				ItemNbtHelper.update(thirdPersonItemStack, t -> t.putInt(USE_TICKS, useTicksF));
 
 				boolean didHit = false;
 				if (player.level().isClientSide) {
@@ -203,7 +206,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 
 						HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
 								(e) -> (e instanceof LivingEntity && !((LivingEntity)e).isDeadOrDying()) && !e.isRemoved() && !e.isSpectator(),
-								player.getBlockReach() * blockReachMult);
+								player.blockInteractionRange() * blockReachMult);
 
 						double handMult = -1.0;
 						if (handPart == MechPart.RightArm)
@@ -243,7 +246,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 							int currentFov = 60;
 						}
 						FirstPersonCameraChecker cc = new FirstPersonCameraChecker();
-						DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
+						DistExec.runWhenOn(Dist.CLIENT, () -> new Runnable() {
 							@Override
 							public void run() {
 								cc.isFirstPerson = Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON;
@@ -322,8 +325,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 
 									//mineAllBlocks(dbpMapClient, player, miningPower, bhr);
 									
-									ParticleType particles = ForgeRegistries.PARTICLE_TYPES
-											.getValue(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.BLOCK));
+									ParticleType particles = ParticleTypes.BLOCK;
 									if (particles != null && blockDestroySpeed > 0.0f) {
 										BlockParticleOption blockParticle = new BlockParticleOption(ParticleTypes.BLOCK,
 												blockState);
@@ -351,14 +353,14 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 							//our hitscan yielded a block
 							
 							if (previousClientTarget != newBlockTarget) {
-								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMiningArmBlockTargetPacket(newBlockTarget, hitLocation));
+								BioMechNetwork.sendToServer(new ServerboundMiningArmBlockTargetPacket(newBlockTarget, hitLocation));
 								previousClientTarget = newBlockTarget;
 							}
 						} else if (newEntityTarget != null) {
 							//our hitscan yielded an entity
 							
 							if (previousClientTarget != newEntityTarget) {
-								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMiningArmEntityTargetPacket(newEntityTarget, hitLocation));
+								BioMechNetwork.sendToServer(new ServerboundMiningArmEntityTargetPacket(newEntityTarget, hitLocation));
 								previousClientTarget = newEntityTarget;
 							}
 						}
@@ -380,7 +382,7 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 						if (entityTarget == null) {
 							HitResult hitResult = ProjectileUtil.getHitResultOnViewVector(player,
 									(e) -> (e instanceof LivingEntity && !((LivingEntity)e).isDeadOrDying()) && !e.isRemoved() && !e.isSpectator(),
-									player.getBlockReach() * blockReachMult);
+									player.blockInteractionRange() * blockReachMult);
 							
 							if (hitResult instanceof BlockHitResult bhr) {
 								if (serverEverChecksBlockHits) {
@@ -446,8 +448,8 @@ public abstract class AbstractMiningArmArmor extends ArmorBase {
 				
 				
 			} else {
-				if (thirdPersonItemStack.getTag() != null && thirdPersonItemStack.getTag().contains(USE_TICKS)) {
-					thirdPersonItemStack.getTag().putInt(USE_TICKS, 0);
+				if (ItemNbtHelper.getTagOrNull(thirdPersonItemStack) != null && ItemNbtHelper.getTagOrNull(thirdPersonItemStack).contains(USE_TICKS)) {
+					ItemNbtHelper.update(thirdPersonItemStack, t -> t.putInt(USE_TICKS, 0));
 				}
 				if (player.level().isClientSide) {
 					this.passiveAnimation(itemStack);

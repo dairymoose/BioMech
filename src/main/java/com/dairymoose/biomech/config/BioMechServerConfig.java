@@ -1,7 +1,7 @@
 package com.dairymoose.biomech.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 
 public class BioMechServerConfig {
 	
@@ -9,7 +9,7 @@ public class BioMechServerConfig {
 	public final ConfigValue<Double> gatlingDamage;
 	public final ConfigValue<Double> gatlingEnergyPerSec;
 
-	public BioMechServerConfig(ForgeConfigSpec.Builder builder) {		
+	public BioMechServerConfig(ModConfigSpec.Builder builder) {		
 		builder.push("hand_items");
 		this.gatlingMinFalloffFactor = builder.comment("gatlingMinFalloffFactor").translation("config.biomech.gatlingMinFalloffFactor").defineInRange("gatlingMinFalloffFactor", 0.5, 0.0, 1.0);
 		this.gatlingDamage = builder.comment("gatlingDamage").translation("config.biomech.gatlingDamage").define("gatlingDamage", 30.0);

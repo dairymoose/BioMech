@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.item.armor;
 
+import com.dairymoose.biomech.ItemNbtHelper;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -24,7 +26,7 @@ public class InterceptorArmsArmor extends ArmorBase {
 
 	InterceptorArmsDispatcher dispatcher;
 	
-	public InterceptorArmsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public InterceptorArmsArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 20;
 		this.suitEnergyPerSec = 0.5f;
@@ -63,12 +65,12 @@ public class InterceptorArmsArmor extends ArmorBase {
 			if (armorItems.contains(BioMechRegistry.ITEM_INTERCEPTOR_ARMS.get()) || slotId == -1) {
 				if (entity instanceof LivingEntity living) {
 					boolean setHasEntity = dodgedProjectileSet.contains(entity);
-					if ((itemStack.getTag() != null && itemStack.getTag().contains("DodgeTicks")) || setHasEntity) {
+					if ((ItemNbtHelper.getTagOrNull(itemStack) != null && ItemNbtHelper.getTagOrNull(itemStack).contains("DodgeTicks")) || setHasEntity) {
 						if (setHasEntity)
 							BioMech.clientSideItemAnimation(itemStack, this.dispatcher.PASSIVE_COMMAND.cmd);
 						dodgedProjectileSet.remove(entity);
 						
-						CompoundTag tag = itemStack.getOrCreateTag();
+						CompoundTag tag = ItemNbtHelper.getOrCreateTag(itemStack);
 						if (player.level().isClientSide) {
 							int ticks = 5;
 							if (tag.contains("DodgeTicks")) {
@@ -82,6 +84,7 @@ public class InterceptorArmsArmor extends ArmorBase {
 								tag.putInt("DodgeTicks", ticks);
 								BioMech.clientSideItemAnimation(itemStack, this.dispatcher.DEFLECT_COMMAND.cmd);
 							}
+							ItemNbtHelper.setTag(itemStack, tag);
 						}
 					} else {
 						BioMech.clientSideItemAnimation(itemStack, this.dispatcher.PASSIVE_COMMAND.cmd);

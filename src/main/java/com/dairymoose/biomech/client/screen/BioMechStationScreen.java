@@ -12,7 +12,7 @@ import com.dairymoose.biomech.packet.serverbound.ServerboundUpdateVisibilityPack
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.ImageButton;
+import com.dairymoose.biomech.client.widget.TexturedButton;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -20,8 +20,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class BioMechStationScreen extends AbstractContainerScreen<BioMechStationMenu> {
@@ -82,9 +82,8 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 		IntHolder intHolder = new IntHolder();
 		intHolder.counter = 0;
 		for (int i = 0; i < buttonStartX.length; ++i) {
-			ImageButton imageButton = new ImageButton(buttonStartX[intHolder.counter], buttonStartY[intHolder.counter],
-					visibilityButtonWidth, visibilityButtonHeight, visibiltyButtonTextureX, visibilityButtonTextureY,
-					visibilityButtonHeight, GUI_LOCATION, 256, 256, new Button.OnPress() {
+			TexturedButton imageButton = new TexturedButton(buttonStartX[intHolder.counter], buttonStartY[intHolder.counter],
+					visibilityButtonWidth, visibilityButtonHeight, visibiltyButtonTextureX, visibilityButtonTextureY, visibilityButtonHeight, GUI_LOCATION, 256, 256, new Button.OnPress() {
 						MechPart thisPart = mechParts[intHolder.counter];
 
 						@Override
@@ -103,7 +102,7 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 									}
 								}
 								
-								BioMechNetwork.INSTANCE.sendToServer(new ServerboundUpdateVisibilityPacket(BioMechPlayerData.serialize(playerData)));
+								BioMechNetwork.sendToServer(new ServerboundUpdateVisibilityPacket(BioMechPlayerData.serialize(playerData)));
 							}
 						}
 
@@ -120,9 +119,8 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 			int buttonHeight = 9;
 			int texStartX = 194;
 			int texStartY = 18;
-			ImageButton inventoryButton = new ImageButton(x, y,
-					buttonWidth, buttonHeight, texStartX, texStartY,
-					buttonHeight, GUI_LOCATION, 256, 256, new Button.OnPress() {
+			TexturedButton inventoryButton = new TexturedButton(x, y,
+					buttonWidth, buttonHeight, texStartX, texStartY, buttonHeight, GUI_LOCATION, 256, 256, new Button.OnPress() {
 						@Override
 						public void onPress(Button btn) {
 							Minecraft.getInstance().setScreen(new InventoryScreen(Minecraft.getInstance().player));
@@ -156,7 +154,7 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 	public static int TEX_DARK_X = 4;
 	public static int TEX_DARK_Y = 170;
 	public void render(GuiGraphics gui, int p_282102_, int p_282423_, float p_282621_) {
-		this.renderBackground(gui);
+		this.renderBackground(gui, p_282102_, p_282423_, p_282621_);
 		super.render(gui, p_282102_, p_282423_, p_282621_);
 		this.renderSlotIcons(gui, p_282621_, p_282102_, p_282423_);
 		this.renderTooltip(gui, p_282102_, p_282423_);
@@ -190,7 +188,7 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
 		p_281616_.blit(GUI_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
-		InventoryScreen.renderEntityInInventoryFollowsMouse(p_281616_, i + 144, j + 75, 30,
-				(float) (i + 144) - this.xMouse, (float) (j + 75 - 50) - this.yMouse, this.minecraft.player);
+		InventoryScreen.renderEntityInInventoryFollowsMouse(p_281616_, i + 144 - 25, j + 75 - 50, i + 144 + 25, j + 75, 30,
+				0.0625f, this.xMouse, this.yMouse, this.minecraft.player);
 	}
 }

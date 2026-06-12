@@ -1,34 +1,32 @@
 package com.dairymoose.biomech.config;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.dairymoose.biomech.BioMech;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.crafting.conditions.ICondition;
+import net.neoforged.neoforge.common.conditions.ICondition;
 
-public class CraftingFlagCondition implements ICondition {
+/**
+ * NeoForge 1.21 recipe condition: enables/disables a recipe based on a named BioMech crafting flag.
+ * Conditions are now codec-based; the codec is registered into the CONDITION_CODECS registry in BioMech.
+ */
+public record CraftingFlagCondition(String crafting_flag) implements ICondition {
 
-	private static final Logger LOGGER = LogManager.getLogger();
-	
-	String crafting_flag;
-	
-	CraftingFlagCondition(String crafting_flag) {
-		this.crafting_flag = crafting_flag;
-	}
-	
-	@Override
-	public ResourceLocation getID() {
-		return new ResourceLocation("biomech", "crafting_flag");
-	}
+	public static final MapCodec<CraftingFlagCondition> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
+			Codec.STRING.fieldOf("crafting_flag").forGetter(CraftingFlagCondition::crafting_flag))
+			.apply(builder, CraftingFlagCondition::new));
 
 	@Override
-	public boolean test(IContext paramIContext) {
+	public boolean test(IContext context) {
 		boolean result = BioMechCraftingFlags.getFlag(crafting_flag);
 		if (!result)
 			BioMech.LOGGER.debug(crafting_flag + ": disabled");
 		return result;
 	}
 
+	@Override
+	public MapCodec<? extends ICondition> codec() {
+		return CODEC;
+	}
 }

@@ -153,7 +153,7 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 					
 					this.rightArm.xRot = armBackwardsAngle * Mth.DEG_TO_RAD;
 					this.rightArm.yRot = 0.0f;
-					this.rightArm.zRot = (armor.rightArmRot - Minecraft.getInstance().getPartialTick()*armor.ROT_PER_TICK) * Mth.DEG_TO_RAD;
+					this.rightArm.zRot = (armor.rightArmRot - Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false)*armor.ROT_PER_TICK) * Mth.DEG_TO_RAD;
 					this.rightArm.x += armDist; //positive value moves arm left
 					this.rightArm.y += shoulderDisplacement; //positive values move arms downwards away from shoulders
 					this.rightArm.z += armY; //positive value moves arm upwards
@@ -161,7 +161,7 @@ public abstract class PlayerModelMixin extends HumanoidModel<LivingEntity> {
 					
 					this.leftArm.xRot = armBackwardsAngle * Mth.DEG_TO_RAD;
 					this.leftArm.yRot = 0.0f;
-					this.leftArm.zRot = (armor.leftArmRot + Minecraft.getInstance().getPartialTick()*armor.ROT_PER_TICK) * Mth.DEG_TO_RAD;
+					this.leftArm.zRot = (armor.leftArmRot + Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false)*armor.ROT_PER_TICK) * Mth.DEG_TO_RAD;
 					this.leftArm.x += -armDist;
 					this.leftArm.y += shoulderDisplacement;
 					this.leftArm.z += armY;

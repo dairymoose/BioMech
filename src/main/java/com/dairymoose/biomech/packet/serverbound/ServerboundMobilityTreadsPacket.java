@@ -1,27 +1,29 @@
 package com.dairymoose.biomech.packet.serverbound;
 
-import java.util.function.Supplier;
-
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
+import com.dairymoose.biomech.ItemNbtHelper;
 import com.dairymoose.biomech.item.armor.MechPart;
 import com.dairymoose.biomech.item.armor.MobilityTreadsArmor;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ServerboundMobilityTreadsPacket implements Packet<ServerGamePacketListener> {
+public class ServerboundMobilityTreadsPacket implements CustomPacketPayload {
+	public static final CustomPacketPayload.Type<ServerboundMobilityTreadsPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "mobility_treads"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundMobilityTreadsPacket> STREAM_CODEC = StreamCodec.ofMember(ServerboundMobilityTreadsPacket::write, ServerboundMobilityTreadsPacket::new);
+
 	private boolean speedBoost;
 
 	public ServerboundMobilityTreadsPacket() {
 	}
-	
+
 	public ServerboundMobilityTreadsPacket(FriendlyByteBuf buffer) {
 		this.read(buffer);
 	}
@@ -38,28 +40,24 @@ public class ServerboundMobilityTreadsPacket implements Packet<ServerGamePacketL
 		byteBuf.writeBoolean(speedBoost);
 	}
 
-	public void handle(Supplier<NetworkEvent.Context> ctx) {
-	    ctx.get().enqueueWork(() -> {
-	        ServerPlayer sender = ctx.get().getSender();
-	        this.handle((ServerGamePacketListener)ctx.get().getNetworkManager().getPacketListener());
-	    });
-	    ctx.get().setPacketHandled(true);
+	@Override
+	public CustomPacketPayload.Type<ServerboundMobilityTreadsPacket> type() {
+		return TYPE;
 	}
-	
-	public void handle(ServerGamePacketListener packetListener) {
-		BioMech.LOGGER.trace("Handle ServerboundMobilityTreadsPacket");
-		if (packetListener instanceof ServerGamePacketListenerImpl) {
-			ServerGamePacketListenerImpl serverHandler = (ServerGamePacketListenerImpl)packetListener;
-			Level world = serverHandler.player.level();
-			if (world != null) {
-				BioMechPlayerData playerData = BioMech.globalPlayerData.get(serverHandler.player.getUUID());
+
+	public void handle(IPayloadContext context) {
+		context.enqueueWork(() -> {
+			BioMech.LOGGER.trace("Handle ServerboundMobilityTreadsPacket");
+			Player player = context.player();
+			if (player.level() != null) {
+				BioMechPlayerData playerData = BioMech.globalPlayerData.get(player.getUUID());
 				if (playerData != null) {
 					ItemStack itemStack = playerData.getForSlot(MechPart.Leggings).itemStack;
 					if (itemStack.getItem() instanceof MobilityTreadsArmor armor) {
-						itemStack.getOrCreateTag().putBoolean("WantSpeedBoost", this.speedBoost);
+						ItemNbtHelper.update(itemStack, t -> t.putBoolean("WantSpeedBoost", this.speedBoost));
 					}
 				}
 			}
-		}
+		});
 	}
 }

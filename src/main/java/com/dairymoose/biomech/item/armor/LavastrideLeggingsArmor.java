@@ -11,6 +11,7 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -18,11 +19,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
+import net.neoforged.neoforge.common.NeoForgeMod;
 
 public class LavastrideLeggingsArmor extends ArmorBase {
 
-	public LavastrideLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public LavastrideLeggingsArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 4;
 		this.hidePlayerModel = true;
@@ -35,9 +36,9 @@ public class LavastrideLeggingsArmor extends ArmorBase {
 		
 		boolean lavaFound = false;
 		if (includeMagma) {
-			lavaFound = (blockState.getFluidState().getFluidType() == ForgeMod.LAVA_TYPE.get() || blockState.is(Blocks.MAGMA_BLOCK)) && aboveItState.getFluidState().getFluidType() != ForgeMod.LAVA_TYPE.get();
+			lavaFound = (blockState.getFluidState().getFluidType() == NeoForgeMod.LAVA_TYPE.value() || blockState.is(Blocks.MAGMA_BLOCK)) && aboveItState.getFluidState().getFluidType() != NeoForgeMod.LAVA_TYPE.value();
 		} else {
-			lavaFound = blockState.getFluidState().getFluidType() == ForgeMod.LAVA_TYPE.get() && aboveItState.getFluidState().getFluidType() != ForgeMod.LAVA_TYPE.get();
+			lavaFound = blockState.getFluidState().getFluidType() == NeoForgeMod.LAVA_TYPE.value() && aboveItState.getFluidState().getFluidType() != NeoForgeMod.LAVA_TYPE.value();
 		}
 		
 		return lavaFound;

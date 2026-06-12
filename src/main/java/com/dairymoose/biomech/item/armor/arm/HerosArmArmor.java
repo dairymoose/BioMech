@@ -3,12 +3,13 @@ package com.dairymoose.biomech.item.armor.arm;
 import com.dairymoose.biomech.BioMechRegistry;
 import com.dairymoose.biomech.item.armor.HerosArmorBase;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 
 public class HerosArmArmor extends HerosArmorBase {
 
-	public HerosArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public HerosArmArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 8;
 		this.alwaysHidePlayerHat = false;

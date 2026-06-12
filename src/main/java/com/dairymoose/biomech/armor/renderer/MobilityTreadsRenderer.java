@@ -1,14 +1,15 @@
 package com.dairymoose.biomech.armor.renderer;
 
+import com.dairymoose.biomech.ItemNbtHelper;
 import java.util.UUID;
 
 import com.dairymoose.biomech.BioMech;
 
-import mod.azure.azurelib.cache.texture.AnimatableTexture;
-import mod.azure.azurelib.render.AzRendererConfig;
-import mod.azure.azurelib.render.armor.AzArmorRenderer;
-import mod.azure.azurelib.render.armor.AzArmorRendererConfig;
-import mod.azure.azurelib.render.armor.AzArmorRendererPipeline;
+import mod.azure.azurelib.common.cache.texture.AnimatableTexture;
+import mod.azure.azurelib.common.render.AzRendererConfig;
+import mod.azure.azurelib.common.render.armor.AzArmorRenderer;
+import mod.azure.azurelib.common.render.armor.AzArmorRendererConfig;
+import mod.azure.azurelib.common.render.armor.AzArmorRendererPipeline;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -46,7 +47,7 @@ public class MobilityTreadsRenderer extends AzArmorRenderer {
 	        	
 	        	int tickUpdatePeriod = 0;
 	        	if (BioMech.currentRenderItemStackContext != null) {
-	        		CompoundTag tag = BioMech.currentRenderItemStackContext.getTag();
+	        		CompoundTag tag = ItemNbtHelper.getTagOrNull(BioMech.currentRenderItemStackContext);
 
 	        		if (tag.contains("CurrentSpeed")) {
 						currentSpeed = tag.getFloat("CurrentSpeed");

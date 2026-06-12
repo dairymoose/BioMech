@@ -1,28 +1,29 @@
 package com.dairymoose.biomech.packet.serverbound;
 
-import java.util.function.Supplier;
-
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.item.armor.arm.AbstractMiningArmArmor;
 import com.dairymoose.biomech.item.armor.arm.AbstractMiningArmArmor.EntityTargetInfo;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ServerboundMiningArmEntityTargetPacket implements Packet<ServerGamePacketListener> {
+public class ServerboundMiningArmEntityTargetPacket implements CustomPacketPayload {
+	public static final CustomPacketPayload.Type<ServerboundMiningArmEntityTargetPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "mining_arm_entity_target"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundMiningArmEntityTargetPacket> STREAM_CODEC = StreamCodec.ofMember(ServerboundMiningArmEntityTargetPacket::write, ServerboundMiningArmEntityTargetPacket::new);
+
 	private int entityId;
 	private Vec3 hitLocation;
 
 	public ServerboundMiningArmEntityTargetPacket() {
 	}
-	
+
 	public ServerboundMiningArmEntityTargetPacket(FriendlyByteBuf buffer) {
 		this.read(buffer);
 	}
@@ -31,7 +32,7 @@ public class ServerboundMiningArmEntityTargetPacket implements Packet<ServerGame
 		if (hitLocation == null) {
 			hitLocation = new Vec3(0, 0, 0);
 		}
-		
+
 		if (entity == null)
 			this.entityId = -1;
 		else
@@ -49,32 +50,28 @@ public class ServerboundMiningArmEntityTargetPacket implements Packet<ServerGame
 		byteBuf.writeVector3f(hitLocation.toVector3f());
 	}
 
-	public void handle(Supplier<NetworkEvent.Context> ctx) {
-	    ctx.get().enqueueWork(() -> {
-	        ServerPlayer sender = ctx.get().getSender();
-	        this.handle((ServerGamePacketListener)ctx.get().getNetworkManager().getPacketListener());
-	    });
-	    ctx.get().setPacketHandled(true);
+	@Override
+	public CustomPacketPayload.Type<ServerboundMiningArmEntityTargetPacket> type() {
+		return TYPE;
 	}
-	
-	public void handle(ServerGamePacketListener packetListener) {
-		BioMech.LOGGER.trace("Handle ServerboundMiningArmEntityTargetPacket");
-		if (packetListener instanceof ServerGamePacketListenerImpl) {
-			ServerGamePacketListenerImpl serverHandler = (ServerGamePacketListenerImpl)packetListener;
-			Level world = serverHandler.player.level();
-			if (world != null) {
+
+	public void handle(IPayloadContext context) {
+		context.enqueueWork(() -> {
+			BioMech.LOGGER.trace("Handle ServerboundMiningArmEntityTargetPacket");
+			Player player = context.player();
+			if (player.level() != null) {
 				Entity entity = null;
 				if (this.entityId != -1) {
-					entity = world.getEntity(this.entityId);
+					entity = player.level().getEntity(this.entityId);
 				}
-				
+
 				if (entity != null) {
-					AbstractMiningArmArmor.entityTargetMap.put(serverHandler.player, new EntityTargetInfo(entity, hitLocation));
-					AbstractMiningArmArmor.blockTargetMap.remove(serverHandler.player);
+					AbstractMiningArmArmor.entityTargetMap.put(player, new EntityTargetInfo(entity, hitLocation));
+					AbstractMiningArmArmor.blockTargetMap.remove(player);
+				} else {
+					AbstractMiningArmArmor.entityTargetMap.remove(player);
 				}
-				else
-					AbstractMiningArmArmor.entityTargetMap.remove(serverHandler.player);
 			}
-		}
+		});
 	}
 }

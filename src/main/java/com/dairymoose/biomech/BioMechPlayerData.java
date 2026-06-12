@@ -13,8 +13,8 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 public class BioMechPlayerData {
 	public static final int SLOT_COUNT = 6;
@@ -213,15 +213,15 @@ public class BioMechPlayerData {
 	}
 	
 	public static CompoundTag serialize(BioMechPlayerData data) {
+		net.minecraft.core.HolderLookup.Provider provider = BioMech.registryAccess();
 		CompoundTag result = new CompoundTag();
-		
+
 		CompoundTag items = new CompoundTag();
 		data.getAllSlots().forEach((slotted) ->
 			{
 				if (slotted != null) {
 					CompoundTag slotTag = new CompoundTag();
-					CompoundTag itemTag = new CompoundTag(); 
-					slotted.itemStack.save(itemTag);
+					net.minecraft.nbt.Tag itemTag = slotted.itemStack.saveOptional(provider);
 					slotTag.put(ITEM, itemTag);
 					slotTag.putBoolean(VISIBLE, slotted.visible);
 					items.put(slotted.mechPart.name() + SLOT, slotTag);
@@ -259,6 +259,7 @@ public class BioMechPlayerData {
 	}
 	
 	public static BioMechPlayerData deserialize(CompoundTag tag) {
+		net.minecraft.core.HolderLookup.Provider provider = BioMech.registryAccess();
 		BioMechPlayerData data = null;
 		if (tag != null) {
 			CompoundTag items = tag.getCompound(ITEMS);
@@ -271,7 +272,7 @@ public class BioMechPlayerData {
 						SlottedItem slottedItem = new SlottedItem(part);
 						
 						CompoundTag itemStackTag = slottedItemTag.getCompound(ITEM);
-						slottedItem.itemStack = ItemStack.of(itemStackTag);
+						slottedItem.itemStack = ItemStack.parseOptional(provider, itemStackTag);
 						
 						boolean visible = slottedItemTag.getBoolean(VISIBLE);
 						slottedItem.visible = visible;

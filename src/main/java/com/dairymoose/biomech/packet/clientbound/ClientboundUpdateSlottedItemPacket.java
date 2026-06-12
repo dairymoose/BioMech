@@ -1,27 +1,29 @@
 package com.dairymoose.biomech.packet.clientbound;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
-public class ClientboundUpdateSlottedItemPacket implements Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> {
+public class ClientboundUpdateSlottedItemPacket implements CustomPacketPayload {
+	public static final CustomPacketPayload.Type<ClientboundUpdateSlottedItemPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "update_slotted_item"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundUpdateSlottedItemPacket> STREAM_CODEC = StreamCodec.ofMember(ClientboundUpdateSlottedItemPacket::write, ClientboundUpdateSlottedItemPacket::new);
+
 	private UUID uuid;
 	private CompoundTag playerDataTag;
 
 	public ClientboundUpdateSlottedItemPacket() {
 	}
-	
+
 	public ClientboundUpdateSlottedItemPacket(FriendlyByteBuf buffer) {
 		this.read(buffer);
 	}
@@ -41,39 +43,29 @@ public class ClientboundUpdateSlottedItemPacket implements Packet<net.minecraft.
 		byteBuf.writeNbt(playerDataTag);
 	}
 
-	public void handle(Supplier<NetworkEvent.Context> ctx) {
-	    ctx.get().enqueueWork(() -> {
-	        this.handle((net.minecraft.network.protocol.game.ClientGamePacketListener)ctx.get().getNetworkManager().getPacketListener());
-	    });
-	    ctx.get().setPacketHandled(true);
+	@Override
+	public CustomPacketPayload.Type<ClientboundUpdateSlottedItemPacket> type() {
+		return TYPE;
 	}
-	
-	@SuppressWarnings("deprecation")
-	public void handle(net.minecraft.network.protocol.game.ClientGamePacketListener handler) {
-		BioMech.LOGGER.debug("Handle ClientboundUpdateSlottedItemPacket");
-		if (handler instanceof net.minecraft.client.multiplayer.ClientPacketListener) {
-			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
-				@Override
-				public void run() {
-					net.minecraft.client.multiplayer.ClientPacketListener clientHandler = (net.minecraft.client.multiplayer.ClientPacketListener)handler;
-					try {
-						BioMechPlayerData incomingPlayerData = BioMechPlayerData.deserialize(playerDataTag);
-						
-						BioMechPlayerData existingPlayerData = BioMech.globalPlayerData.get(uuid);
-						//in singleplayer the globalPlayerData is shared between client + server - if we overwrite this we lose the items in the backpack (they are not serialized)
-						if (ServerLifecycleHooks.getCurrentServer() == null || !ServerLifecycleHooks.getCurrentServer().isSingleplayer()) {
-							if (existingPlayerData == null) {
-								BioMech.globalPlayerData.put(uuid, incomingPlayerData);
-							}
-							else {
-								existingPlayerData.overwrite(incomingPlayerData);
-							}
-						}
-					} catch (Exception e) {
-						BioMech.LOGGER.error("Failed to deserialize data", e);
+
+	public void handle(IPayloadContext context) {
+		context.enqueueWork(() -> {
+			BioMech.LOGGER.debug("Handle ClientboundUpdateSlottedItemPacket");
+			try {
+				BioMechPlayerData incomingPlayerData = BioMechPlayerData.deserialize(playerDataTag);
+
+				BioMechPlayerData existingPlayerData = BioMech.globalPlayerData.get(uuid);
+				// in singleplayer the globalPlayerData is shared between client + server - if we overwrite this we lose the items in the backpack (they are not serialized)
+				if (ServerLifecycleHooks.getCurrentServer() == null || !ServerLifecycleHooks.getCurrentServer().isSingleplayer()) {
+					if (existingPlayerData == null) {
+						BioMech.globalPlayerData.put(uuid, incomingPlayerData);
+					} else {
+						existingPlayerData.overwrite(incomingPlayerData);
 					}
 				}
-				};});
-		}
+			} catch (Exception e) {
+				BioMech.LOGGER.error("Failed to deserialize data", e);
+			}
+		});
 	}
 }

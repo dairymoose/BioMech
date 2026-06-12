@@ -17,6 +17,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +29,7 @@ public class TeleportationCrystalArmor extends ArmorBase {
 	public final TeleportationCrystalDispatcher dispatcher;
 	public static int TELEPORT_HOLD_TIME_TICKS = 4*20;
 	
-	public TeleportationCrystalArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public TeleportationCrystalArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
@@ -52,7 +53,7 @@ public class TeleportationCrystalArmor extends ArmorBase {
 		
 		if (BioMech.holdingTeleportTicks >= TeleportationCrystalArmor.TELEPORT_HOLD_TIME_TICKS) {
 			BioMech.holdingTeleportTicks = 0;
-			BioMechNetwork.INSTANCE.sendToServer(new ServerboundTeleportationCrystalPacket());
+			BioMechNetwork.sendToServer(new ServerboundTeleportationCrystalPacket());
 		}
 	}
 	

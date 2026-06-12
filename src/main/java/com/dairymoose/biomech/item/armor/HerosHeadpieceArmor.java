@@ -7,11 +7,12 @@ import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
 
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 
 public class HerosHeadpieceArmor extends HerosArmorBase {
 
-	public HerosHeadpieceArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public HerosHeadpieceArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.alwaysHidePlayerHat = false;

@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.item.armor;
 
+import com.dairymoose.biomech.ItemNbtHelper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -18,7 +20,7 @@ import net.minecraft.world.phys.AABB;
 
 public class HerosArmorBase extends ArmorBase {
 
-	public HerosArmorBase(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public HerosArmorBase(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 	}
 
@@ -36,9 +38,9 @@ public class HerosArmorBase extends ArmorBase {
 					if (!player.level().isClientSide) {
 						List<Monster> monsters = level.getEntitiesOfClass(Monster.class, AABB.ofSize(player.position(), nearbyEnemiesDiameter, nearbyEnemiesDiameter, nearbyEnemiesDiameter), (e) -> !e.isDeadOrDying() && !e.isSpectator());	
 						if (!monsters.isEmpty()) {
-							stack.getOrCreateTag().putBoolean(HerosArmorBase.TAG_DAMAGE_BOOSTING, true);
+							ItemNbtHelper.update(stack, t -> t.putBoolean(HerosArmorBase.TAG_DAMAGE_BOOSTING, true));
 						} else {
-							stack.getOrCreateTag().putBoolean(HerosArmorBase.TAG_DAMAGE_BOOSTING, false);
+							ItemNbtHelper.update(stack, t -> t.putBoolean(HerosArmorBase.TAG_DAMAGE_BOOSTING, false));
 						}
 					}
 				}

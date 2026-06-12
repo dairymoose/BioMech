@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.item.armor;
 
+import com.dairymoose.biomech.ItemNbtHelper;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
@@ -27,15 +28,19 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import java.util.Map;
+import net.minecraft.core.Holder;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 public class ArmorBase extends ArmorItem {
 
@@ -45,7 +50,10 @@ public class ArmorBase extends ArmorItem {
 	protected boolean alwaysHidePlayerHat = false;
 	protected int suitEnergy = 0;
 	protected float suitEnergyPerSec = 0.0f;
-	private static ArmorMaterial NOTHING_MATERIAL = new NothingMaterial();
+	// 0-defense material; BioMech armor manages its own (energy-based) stats and renders custom GeckoLib models,
+	// so the vanilla armor material contributes no defense and no rendered layers. Built as a direct (unregistered) holder.
+	private static final Holder<ArmorMaterial> NOTHING_MATERIAL = Holder.direct(new ArmorMaterial(
+			Map.of(), 0, SoundEvents.ARMOR_EQUIP_IRON, () -> Ingredient.EMPTY, List.of(), 0.0f, 0.0f));
 	protected float armDistance = 5.0f;
 	protected float armY = 2.0f;
 	protected float headY = 0.0f;
@@ -72,7 +80,7 @@ public class ArmorBase extends ArmorItem {
 	
 	public boolean configDisabled = false;
 	
-	public ArmorBase(ArmorMaterial material, Type type, Properties props) {
+	public ArmorBase(Holder<ArmorMaterial> material, Type type, Properties props) {
 		super(NOTHING_MATERIAL, type, props);
 	}
 	
@@ -81,7 +89,7 @@ public class ArmorBase extends ArmorItem {
 			return;
 		
 		if (player.level().isClientSide)
-			BioMechNetwork.INSTANCE.sendToServer(new ServerboundPressHotkeyPacket(this, keysIsDown, bonusData, broadcastType));
+			BioMechNetwork.sendToServer(new ServerboundPressHotkeyPacket(this, keysIsDown, bonusData, broadcastType));
 	}
 	
 	public void onHotkeyPressed(Player player, BioMechPlayerData playerData, boolean keyIsDown, int bonusData, boolean serverOriginator) {
@@ -246,15 +254,15 @@ public class ArmorBase extends ArmorItem {
 	
 	@Override
 	public boolean isDamageable(ItemStack stack) {
-		if (FMLEnvironment.dist == Dist.CLIENT && !stack.getOrCreateTag().contains(AzureLib.ITEM_UUID_TAG)) {
+		if (FMLEnvironment.dist == Dist.CLIENT && !stack.has(AzureLib.AZ_ID.get())) {
 			//another AzureLib bug - items sometimes don't have a UUID and the library crashes
-			stack.getOrCreateTag().putUUID(AzureLib.ITEM_UUID_TAG, UUID.randomUUID());
+			stack.set(AzureLib.AZ_ID.get(), UUID.randomUUID());
 		}
 		return super.isDamageable(stack);
 	}
 	
 	@Override
-	public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
+	public boolean canEquip(ItemStack stack, EquipmentSlot armorType, net.minecraft.world.entity.LivingEntity entity) {
 		return false;
 	}
 	
@@ -311,8 +319,9 @@ public class ArmorBase extends ArmorItem {
 	}
 	
 	@Override
-	public void appendHoverText(ItemStack stack, Level level, List<Component> comp, TooltipFlag flags) {
-		super.appendHoverText(stack, level, comp, flags);
+	public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> comp, TooltipFlag flags) {
+		Level level = context.level();
+		super.appendHoverText(stack, context, comp, flags);
 		if (configDisabled) {
 			comp.add(Component.literal("Looting disabled by config!"));
 		}
@@ -345,11 +354,11 @@ public class ArmorBase extends ArmorItem {
 			comp.add(Component.literal(prefix + nf.format(suitEnergyPerSec) + " " + suitEnergyTt.getString() + "§0"));
 		}
 		comp.add(Component.empty());
-		MutableComponent t1 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip1", "");
-		MutableComponent t2 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip2", "");
-		MutableComponent t3 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip3", "");
-		MutableComponent t4 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip4", "");
-		MutableComponent t5 = Component.translatableWithFallback("item.biomech." + ForgeRegistries.ITEMS.getKey(this).getPath() + ".tooltip5", "");
+		MutableComponent t1 = Component.translatableWithFallback("item.biomech." + BuiltInRegistries.ITEM.getKey(this).getPath() + ".tooltip1", "");
+		MutableComponent t2 = Component.translatableWithFallback("item.biomech." + BuiltInRegistries.ITEM.getKey(this).getPath() + ".tooltip2", "");
+		MutableComponent t3 = Component.translatableWithFallback("item.biomech." + BuiltInRegistries.ITEM.getKey(this).getPath() + ".tooltip3", "");
+		MutableComponent t4 = Component.translatableWithFallback("item.biomech." + BuiltInRegistries.ITEM.getKey(this).getPath() + ".tooltip4", "");
+		MutableComponent t5 = Component.translatableWithFallback("item.biomech." + BuiltInRegistries.ITEM.getKey(this).getPath() + ".tooltip5", "");
 		String t1Text = this.replaceTooltips(t1.getString());
 		if (!"".equals(t1Text)) {
 			comp.add(Component.literal(t1Text));

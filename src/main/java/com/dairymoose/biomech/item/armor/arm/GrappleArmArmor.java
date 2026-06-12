@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.item.armor.arm;
 
+import com.dairymoose.biomech.ItemNbtHelper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,15 +25,16 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 public abstract class GrappleArmArmor extends ArmorBase {
 
@@ -40,7 +42,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 	
 	protected static final String USE_TICKS = "useTicks";
 	
-	public GrappleArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public GrappleArmArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
@@ -106,15 +108,16 @@ public abstract class GrappleArmArmor extends ArmorBase {
 			}
 
 			if (active) {
-				int useTicks = thirdPersonItemStack.getTag().getInt(USE_TICKS);
+				int useTicks = ItemNbtHelper.getTagOrNull(thirdPersonItemStack).getInt(USE_TICKS);
 				if (FMLEnvironment.dist == Dist.CLIENT) {
 					if (player.level().isClientSide)
 						++useTicks;
 				} else {
 					++useTicks;
 				}
-				
-				thirdPersonItemStack.getTag().putInt(USE_TICKS, useTicks);
+
+				final int useTicksF = useTicks;
+				ItemNbtHelper.update(thirdPersonItemStack, t -> t.putInt(USE_TICKS, useTicksF));
 
 				GrappleInfo grappleInfo = GrappleArmArmor.grappleInfoMap.get(player.getUUID());
 				boolean didHit = false;
@@ -164,7 +167,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 										serverResetFallDistance(player);
 									}
 									double m = 1.0;
-									double g = -player.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
+									double g = -player.getAttributeValue(Attributes.GRAVITY);
 									
 									double diffX = grappleInfo.hookPos.x - player.position().x;
 									double diffY = grappleInfo.hookPos.y - player.position().y;
@@ -260,7 +263,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 							if (!level.isClientSide && grappleInfo.grappleEntity == null) {
 								grappleInfo.justLaunchedHook = true;
 								BioMech.LOGGER.debug("launch grapple for player: " + player);
-								itemStack.getOrCreateTag().putBoolean("Launched", true);
+								ItemNbtHelper.update(itemStack, t -> t.putBoolean("Launched", true));
 								GrapplingHook launched = new GrapplingHook(level, player);
 								launched.setItem(new ItemStack(Items.ARROW));
 								launched.entityOwner = player;
@@ -272,8 +275,8 @@ public abstract class GrappleArmArmor extends ArmorBase {
 								//last 3 args: extra pitch, launch speed mult, random factor
 								launched.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, 3.0f, 0.0F);
 								level.addFreshEntity(launched);
-								itemStack.getOrCreateTag().putInt("LaunchedEntityId", launched.getId());
-								itemStack.getOrCreateTag().putLong("LaunchedTimestamp", System.currentTimeMillis());
+								ItemNbtHelper.update(itemStack, t -> t.putInt("LaunchedEntityId", launched.getId()));
+								ItemNbtHelper.update(itemStack, t -> t.putLong("LaunchedTimestamp", System.currentTimeMillis()));
 							}
 						}
 					} else if (active && useTicks > startUsingTickCount && grappleInfo != null && grappleInfo.hookPos != null) {
@@ -292,14 +295,15 @@ public abstract class GrappleArmArmor extends ArmorBase {
 					if (grappleInfo != null) {
 						if (player.level().isClientSide) {
 							if (grappleInfo.hookPos != null) {
-								CompoundTag tag = thirdPersonItemStack.getTag();
+								CompoundTag tag = ItemNbtHelper.getTagOrNull(thirdPersonItemStack);
 								if (tag != null) {
 									int useTicks = tag.getInt(USE_TICKS);
 									
 									if (useTicks > startUsingTickCount) {
 										serverResetFallDistance(player);
-										
+
 										tag.putInt(USE_TICKS, 0);
+										ItemNbtHelper.setTag(thirdPersonItemStack, tag);
 										//launch player towards hook if they are looking at it
 										player.setOnGround(false);
 										
@@ -366,7 +370,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 											double finalLaunchScale = launchVelocity;
 											Vec3 launchVec = averageVec.scale(finalLaunchScale);
 											
-											double g = player.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
+											double g = player.getAttributeValue(Attributes.GRAVITY);
 											double ySimulation = desiredY * 0.05;
 											double ySimIncrement = Math.abs(desiredY * 0.01);
 											
@@ -427,9 +431,9 @@ public abstract class GrappleArmArmor extends ArmorBase {
 							GrappleArmArmor.grappleInfoMap.remove(player.getUUID());
 						}
 					}
-					if (thirdPersonItemStack.getOrCreateTag() != null) {
+					if (ItemNbtHelper.getTag(thirdPersonItemStack) != null) {
 						BioMech.LOGGER.trace("reset useTicks to 0");
-						thirdPersonItemStack.getTag().putInt(USE_TICKS, 0);
+						ItemNbtHelper.update(thirdPersonItemStack, t -> t.putInt(USE_TICKS, 0));
 					}
 					if (player.level().isClientSide) {
 						BioMech.clientSideItemAnimation(itemStack, this.dispatcher.INERT_COMMAND.cmd);
@@ -442,7 +446,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 
 	private void serverResetFallDistance(Player player) {
 		lastResetFallDistTick = player.tickCount;
-		BioMechNetwork.INSTANCE.sendToServer(new ServerboundResetFallDamagePacket());
+		BioMechNetwork.sendToServer(new ServerboundResetFallDamagePacket());
 	}
 
 	private double computeAngleToHook(Player player, GrappleInfo grappleInfo) {
@@ -467,7 +471,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 				active = false;
 			}
 			
-			CompoundTag tag = thirdPersonItemStack.getTag();
+			CompoundTag tag = ItemNbtHelper.getTagOrNull(thirdPersonItemStack);
 			if (tag != null) {
 				int useTicks = tag.getInt(USE_TICKS);
 				//+2 is required as this doesn't execute in the expected order in single-player

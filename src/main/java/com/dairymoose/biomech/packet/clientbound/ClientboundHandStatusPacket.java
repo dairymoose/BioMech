@@ -1,24 +1,27 @@
 package com.dairymoose.biomech.packet.clientbound;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.HandActiveStatus;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ClientboundHandStatusPacket implements Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> {
+public class ClientboundHandStatusPacket implements CustomPacketPayload {
+	public static final CustomPacketPayload.Type<ClientboundHandStatusPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "hand_status_client"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundHandStatusPacket> STREAM_CODEC = StreamCodec.ofMember(ClientboundHandStatusPacket::write, ClientboundHandStatusPacket::new);
+
 	private UUID uuid;
 	private HandActiveStatus has;
 
 	public ClientboundHandStatusPacket() {
 	}
-	
+
 	public ClientboundHandStatusPacket(FriendlyByteBuf buffer) {
 		this.read(buffer);
 	}
@@ -38,28 +41,19 @@ public class ClientboundHandStatusPacket implements Packet<net.minecraft.network
 		byteBuf.writeNbt(HandActiveStatus.serialize(has));
 	}
 
-	public void handle(Supplier<NetworkEvent.Context> ctx) {
-	    ctx.get().enqueueWork(() -> {
-	        this.handle((net.minecraft.network.protocol.game.ClientGamePacketListener)ctx.get().getNetworkManager().getPacketListener());
-	    });
-	    ctx.get().setPacketHandled(true);
+	@Override
+	public CustomPacketPayload.Type<ClientboundHandStatusPacket> type() {
+		return TYPE;
 	}
-	
-	@SuppressWarnings("deprecation")
-	public void handle(net.minecraft.network.protocol.game.ClientGamePacketListener handler) {
-		BioMech.LOGGER.trace("Handle ClientboundHandStatusPacket");
-		if (handler instanceof net.minecraft.client.multiplayer.ClientPacketListener) {
-			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
-				@Override
-				public void run() {
-					if (has != null) {
-						net.minecraft.client.multiplayer.ClientPacketListener clientHandler = (net.minecraft.client.multiplayer.ClientPacketListener)handler;
-						HandActiveStatus playerHas = BioMech.handActiveMap.computeIfAbsent(uuid, (uuid) -> new HandActiveStatus());
-						playerHas.leftHandActive = has.leftHandActive;
-						playerHas.rightHandActive = has.rightHandActive;
-					}
-				}
-				};});
-		}
+
+	public void handle(IPayloadContext context) {
+		context.enqueueWork(() -> {
+			BioMech.LOGGER.trace("Handle ClientboundHandStatusPacket");
+			if (has != null) {
+				HandActiveStatus playerHas = BioMech.handActiveMap.computeIfAbsent(uuid, (u) -> new HandActiveStatus());
+				playerHas.leftHandActive = has.leftHandActive;
+				playerHas.rightHandActive = has.rightHandActive;
+			}
+		});
 	}
 }

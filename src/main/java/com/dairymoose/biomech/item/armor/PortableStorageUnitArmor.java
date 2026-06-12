@@ -3,6 +3,7 @@ package com.dairymoose.biomech.item.armor;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
@@ -16,6 +17,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +25,7 @@ import net.minecraft.world.level.Level;
 
 public class PortableStorageUnitArmor extends ArmorBase {
 
-	public PortableStorageUnitArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public PortableStorageUnitArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 20;
 		this.suitEnergyPerSec = 0.5f;
@@ -38,7 +40,7 @@ public class PortableStorageUnitArmor extends ArmorBase {
 	public void onHotkeyHeld(Player player, BioMechPlayerData playerData) {
 		int tickDiff = Minecraft.getInstance().player.tickCount - PortableStorageUnitScreen.exitTick;
 		if (tickDiff < 0 || tickDiff >= 3) {
-			BioMechNetwork.INSTANCE.sendToServer(new ServerboundOpenPortableStorageUnitPacket());
+			BioMechNetwork.sendToServer(new ServerboundOpenPortableStorageUnitPacket());
 		}
 	}
 	
@@ -56,24 +58,25 @@ public class PortableStorageUnitArmor extends ArmorBase {
 	}
 
 	public static CompoundTag serialize(BioMechPlayerData playerData) {
+		net.minecraft.core.HolderLookup.Provider provider = BioMech.registryAccess();
 		CompoundTag tag = new CompoundTag();
 		ListTag itemList = new ListTag();
 		for (int i=0; i<playerData.portableStorageUnitItems.size(); ++i) {
-			CompoundTag item = new CompoundTag();
-			playerData.portableStorageUnitItems.get(i).save(item);
+			net.minecraft.nbt.Tag item = playerData.portableStorageUnitItems.get(i).saveOptional(provider);
 			itemList.add(item);
 		}
 		tag.put(ITEM_LIST, itemList);
 		return tag;
 	}
-	
+
 	public static void deserialize(BioMechPlayerData playerData, CompoundTag tag) {
+		net.minecraft.core.HolderLookup.Provider provider = BioMech.registryAccess();
 		if (tag.contains(ITEM_LIST)) {
 			ListTag listTag = tag.getList(ITEM_LIST, CompoundTag.TAG_COMPOUND);
 			if (listTag != null) {
 				for (int i=0; i<listTag.size(); ++i) {
 					CompoundTag item = listTag.getCompound(i);
-					playerData.portableStorageUnitItems.set(i, ItemStack.of(item));
+					playerData.portableStorageUnitItems.set(i, ItemStack.parseOptional(provider, item));
 				}
 			}
 		}

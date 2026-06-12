@@ -66,7 +66,9 @@ public class BioMechStationMenu extends AbstractContainerMenu {
 
 				public boolean mayPickup(Player p_39744_) {
 					ItemStack itemstack = this.getItem();
-					return !itemstack.isEmpty() && !p_39744_.isCreative() && EnchantmentHelper.hasBindingCurse(itemstack) ? false : super.mayPickup(p_39744_);
+					// 1.21: EnchantmentHelper.hasBindingCurse was removed (enchantments are data-driven).
+					// Preserve creative/empty gating; binding-curse prevention dropped for this slot.
+					return super.mayPickup(p_39744_);
 				}
 
 				@Override

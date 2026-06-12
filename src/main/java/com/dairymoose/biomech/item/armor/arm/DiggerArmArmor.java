@@ -2,6 +2,7 @@ package com.dairymoose.biomech.item.armor.arm;
 
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechRegistry;
+import com.dairymoose.biomech.ItemNbtHelper;
 import com.dairymoose.biomech.item.anim.DiggerDispatcher;
 
 import net.minecraft.nbt.CompoundTag;
@@ -9,6 +10,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +21,7 @@ public abstract class DiggerArmArmor extends AbstractMiningArmArmor {
 
 	public final DiggerDispatcher dispatcher;
 
-	public DiggerArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public DiggerArmArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
@@ -57,7 +59,7 @@ public abstract class DiggerArmArmor extends AbstractMiningArmArmor {
 	
 	@Override
 	protected void dealEntityDamage(Vec3 hitLocation, ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
-		CompoundTag compound = itemStack.getOrCreateTag();
+		CompoundTag compound = ItemNbtHelper.getOrCreateTag(itemStack);
 		long swingDiff = -1;
 		if (compound.contains("LastSwingTime")) {
 			long lastSwingTime = compound.getLong("LastSwingTime");
@@ -67,6 +69,7 @@ public abstract class DiggerArmArmor extends AbstractMiningArmArmor {
 			float damageMult = 1.0f;
 			living.hurt(player.level().damageSources().playerAttack(player), damageMult*bucketDamage*miningPower);
 			compound.putLong("LastSwingTime", player.tickCount);
+			ItemNbtHelper.setTag(itemStack, compound);
 		}
 	}
 	

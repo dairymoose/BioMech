@@ -11,6 +11,7 @@ import com.dairymoose.biomech.item.anim.RepulsorLiftDispatcher;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -23,7 +24,7 @@ public class RepulsorLiftArmor extends ArmorBase {
 	
 	public static boolean particleEnabled = true;
 	
-	public RepulsorLiftArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public RepulsorLiftArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 20;
 		this.hidePlayerModel = true;

@@ -15,15 +15,15 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.network.PacketDistributor;
 
 public class IronMechChestArmor extends ArmorBase {
 
-	public IronMechChestArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public IronMechChestArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 40;
 		this.hidePlayerModel = true;
@@ -88,7 +88,7 @@ public class IronMechChestArmor extends ArmorBase {
 				if (consumesEnergy) {
 					playerData.spendSuitEnergy(player, energyDamage);
 					if (player instanceof ServerPlayer sp) {
-						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
+						BioMechNetwork.sendToPlayer(sp, new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
 					}
 				}
 
@@ -102,7 +102,7 @@ public class IronMechChestArmor extends ArmorBase {
 					}
 					
 					if (player instanceof ServerPlayer sp) {
-						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
+						BioMechNetwork.sendToPlayer(sp, new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
 					}
 				}
 				//BioMech.LOGGER.debug("heal amount = " + damageMitigated + " from raw damage = " + amount + " with energyDamage=" + energyDamage);

@@ -2,8 +2,8 @@ package com.dairymoose.biomech.item.renderer;
 
 import com.dairymoose.biomech.BioMech;
 
-import mod.azure.azurelib.render.item.AzItemRenderer;
-import mod.azure.azurelib.render.item.AzItemRendererConfig;
+import mod.azure.azurelib.common.render.item.AzItemRenderer;
+import mod.azure.azurelib.common.render.item.AzItemRendererConfig;
 import net.minecraft.resources.ResourceLocation;
 
 public class GrappleHookItemRenderer extends AzItemRenderer {

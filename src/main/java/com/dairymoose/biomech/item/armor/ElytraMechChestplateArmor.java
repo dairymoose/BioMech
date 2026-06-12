@@ -11,6 +11,7 @@ import com.dairymoose.biomech.item.anim.ElytraMechChestplateDispatcher;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +21,7 @@ public class ElytraMechChestplateArmor extends ArmorBase implements ElytraEnable
 
 	final ElytraMechChestplateDispatcher dispatcher;
 	
-	public ElytraMechChestplateArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public ElytraMechChestplateArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 80;
 		this.hidePlayerModel = true;

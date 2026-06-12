@@ -17,38 +17,38 @@ import com.dairymoose.biomech.item.armor.OpticsUnitArmor;
 import com.dairymoose.biomech.item.armor.RepulsorLiftArmor;
 import com.dairymoose.biomech.item.armor.arm.GatlingArmArmor;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
+import net.neoforged.bus.api.SubscribeEvent;
+import com.dairymoose.biomech.DistExec;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.config.ModConfigEvent;
 
-@EventBusSubscriber(modid = BioMech.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = BioMech.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class BioMechConfig {
 
-	public static final ForgeConfigSpec clientSpec;
+	public static final ModConfigSpec clientSpec;
 	public static final BioMechClientConfig CLIENT;
 	
-	public static final ForgeConfigSpec commonSpec;
+	public static final ModConfigSpec commonSpec;
 	public static final BioMechCommonConfig COMMON;
 	
-	public static final ForgeConfigSpec serverSpec;
+	public static final ModConfigSpec serverSpec;
 	public static final BioMechServerConfig SERVER;
 
 	static {
-	    Pair<BioMechClientConfig, ForgeConfigSpec> pair2client = (new ForgeConfigSpec.Builder()).configure(BioMechClientConfig::new);
-	    clientSpec = (ForgeConfigSpec)pair2client.getRight();
+	    Pair<BioMechClientConfig, ModConfigSpec> pair2client = (new ModConfigSpec.Builder()).configure(BioMechClientConfig::new);
+	    clientSpec = (ModConfigSpec)pair2client.getRight();
 	    CLIENT = (BioMechClientConfig)pair2client.getLeft();
 	    
-	    Pair<BioMechCommonConfig, ForgeConfigSpec> pair2common = (new ForgeConfigSpec.Builder()).configure(BioMechCommonConfig::new);
-	    commonSpec = (ForgeConfigSpec)pair2common.getRight();
+	    Pair<BioMechCommonConfig, ModConfigSpec> pair2common = (new ModConfigSpec.Builder()).configure(BioMechCommonConfig::new);
+	    commonSpec = (ModConfigSpec)pair2common.getRight();
 	    COMMON = (BioMechCommonConfig)pair2common.getLeft();
 	    
-	    Pair<BioMechServerConfig, ForgeConfigSpec> pair2server = (new ForgeConfigSpec.Builder()).configure(BioMechServerConfig::new);
-	    serverSpec = (ForgeConfigSpec)pair2server.getRight();
+	    Pair<BioMechServerConfig, ModConfigSpec> pair2server = (new ModConfigSpec.Builder()).configure(BioMechServerConfig::new);
+	    serverSpec = (ModConfigSpec)pair2server.getRight();
 	    SERVER = (BioMechServerConfig)pair2server.getLeft();
 	}
 	
@@ -82,16 +82,23 @@ public class BioMechConfig {
 			}
 			
 			BioMechStationBlock.configWalkToBioMechStation = BioMechConfig.COMMON.walkToBioMechStation.get().booleanValue();
-			BioMech.alwaysAllowMechArmUsage = !BioMechConfig.CLIENT.requireEmptyHandsToActivateBioMechHands.get().booleanValue();
-			GatlingArmArmor.gatlingDamage = BioMechConfig.SERVER.gatlingDamage.get().floatValue();
-			GatlingArmArmor.gatlingEnergyPerSec = BioMechConfig.SERVER.gatlingEnergyPerSec.get().floatValue();
-			GatlingArmArmor.gatlingMinFalloff = BioMechConfig.SERVER.gatlingMinFalloffFactor.get().floatValue();
-			
+			// NeoForge loads each config type separately, so guard cross-spec reads: this event can fire
+			// for COMMON/CLIENT before SERVER is loaded (and vice versa). reinit() re-runs per config load.
+			if (clientSpec.isLoaded()) {
+				BioMech.alwaysAllowMechArmUsage = !BioMechConfig.CLIENT.requireEmptyHandsToActivateBioMechHands.get().booleanValue();
+			}
+			if (serverSpec.isLoaded()) {
+				GatlingArmArmor.gatlingDamage = BioMechConfig.SERVER.gatlingDamage.get().floatValue();
+				GatlingArmArmor.gatlingEnergyPerSec = BioMechConfig.SERVER.gatlingEnergyPerSec.get().floatValue();
+				GatlingArmArmor.gatlingMinFalloff = BioMechConfig.SERVER.gatlingMinFalloffFactor.get().floatValue();
+			}
+
 			if (BioMechRegistry.ITEM_EMERGENCY_FORCEFIELD_UNIT.get() instanceof EmergencyForcefieldUnitArmor armor) {
 				armor.setForcefieldCooldown(BioMechConfig.COMMON.emergencyForcefieldUnitCooldown.get().floatValue());
 			}
-			
-			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
+
+			if (clientSpec.isLoaded())
+			DistExec.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
 				@Override
 				public void run() {
 					BioMech.requireModifierKeyForArmUsage = BioMechConfig.CLIENT.requireModifierKeyToActivateHands.get().booleanValue();

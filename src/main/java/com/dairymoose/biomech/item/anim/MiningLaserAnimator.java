@@ -4,9 +4,9 @@ import org.jetbrains.annotations.NotNull;
 
 import com.dairymoose.biomech.BioMech;
 
-import mod.azure.azurelib.animation.controller.AzAnimationController;
-import mod.azure.azurelib.animation.controller.AzAnimationControllerContainer;
-import mod.azure.azurelib.animation.impl.AzItemAnimator;
+import mod.azure.azurelib.common.animation.controller.AzAnimationController;
+import mod.azure.azurelib.common.animation.controller.AzAnimationControllerContainer;
+import mod.azure.azurelib.common.animation.impl.AzItemAnimator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 

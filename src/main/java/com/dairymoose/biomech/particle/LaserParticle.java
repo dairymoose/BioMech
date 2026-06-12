@@ -15,8 +15,8 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.core.particles.SimpleParticleType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 public class LaserParticle extends TextureSheetParticle {
 	public LaserParticle(ClientLevel p_105773_, double p_105774_, double p_105775_, double p_105776_, double p_105777_, double p_105778_, double p_105779_) {
@@ -51,16 +51,12 @@ public class LaserParticle extends TextureSheetParticle {
    }
 
    public static ParticleRenderType PARTICLE_SHEET_LIT_TRANSLUCENT = new ParticleRenderType() {
-	      public void begin(BufferBuilder p_107462_, TextureManager p_107463_) {
+	      public BufferBuilder begin(Tesselator p_107465_, TextureManager p_107463_) {
 	         RenderSystem.depthMask(true);
 	         RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
 	         RenderSystem.enableBlend();
 	         RenderSystem.defaultBlendFunc();
-	         p_107462_.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
-	      }
-
-	      public void end(Tesselator p_107465_) {
-	         p_107465_.end();
+	         return p_107465_.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
 	      }
 
 	      public String toString() {

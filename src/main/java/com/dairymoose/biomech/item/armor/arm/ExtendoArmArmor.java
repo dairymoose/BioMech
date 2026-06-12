@@ -19,17 +19,18 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ForgeMod;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 
 public abstract class ExtendoArmArmor extends ArmorBase {
 
 	public final ExtendoArmDispatcher dispatcher;
 	
-	public ExtendoArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public ExtendoArmArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 15;
 		this.hidePlayerModel = true;
@@ -50,8 +51,8 @@ public abstract class ExtendoArmArmor extends ArmorBase {
 		
 		Level level = player.level();
 		if (!level.isClientSide) {
-			ArmUtil.attributeBoostPerArm(BoostInstance.INST_1, player, handPart, ForgeMod.BLOCK_REACH.get(), this.bonusBlockReach, Operation.ADDITION);
-			ArmUtil.attributeBoostPerArm(BoostInstance.INST_2, player, handPart, ForgeMod.ENTITY_REACH.get(), this.bonusEntityReach, Operation.ADDITION);
+			ArmUtil.attributeBoostPerArm(BoostInstance.INST_1, player, handPart, Attributes.BLOCK_INTERACTION_RANGE, this.bonusBlockReach, Operation.ADD_VALUE);
+			ArmUtil.attributeBoostPerArm(BoostInstance.INST_2, player, handPart, Attributes.ENTITY_INTERACTION_RANGE, this.bonusEntityReach, Operation.ADD_VALUE);
 		}
 	}
 	

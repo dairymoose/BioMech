@@ -20,6 +20,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -29,15 +30,15 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 public class IlluminatorArmor extends ArmorBase {
 
 	private final IlluminatorDispatcher dispatcher;
 	
-	public IlluminatorArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public IlluminatorArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 20;
 		this.mechPart = MechPart.Head;
@@ -208,7 +209,7 @@ public class IlluminatorArmor extends ArmorBase {
 		
 		FluidState fluidState = level.getFluidState(blockPos);
 		level.setBlock(blockPos, BioMechRegistry.BLOCK_ILLUMINANT_BLOCK.get().defaultBlockState()
-				.setValue(IlluminantBlock.WATERLOGGED, fluidState.getFluidType() == ForgeMod.WATER_TYPE.get())
+				.setValue(IlluminantBlock.WATERLOGGED, fluidState.getFluidType() == NeoForgeMod.WATER_TYPE.value())
 				.setValue(IlluminantBlock.WATER_LEVEL, fluidState.isSource() ? 0 : fluidState.getAmount()), 0);
 	}
 	

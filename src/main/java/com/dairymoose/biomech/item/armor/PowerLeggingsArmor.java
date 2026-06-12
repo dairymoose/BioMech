@@ -12,12 +12,13 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 public class PowerLeggingsArmor extends ArmorBase {
 
@@ -29,7 +30,7 @@ public class PowerLeggingsArmor extends ArmorBase {
 	int lastJumpBoostLevel = 0;
 	boolean inAir = false;
 	
-	public PowerLeggingsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public PowerLeggingsArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;

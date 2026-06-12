@@ -89,18 +89,19 @@ import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 
 import mod.azure.azurelib.AzureLib;
-import mod.azure.azurelib.animation.AzAnimator;
-import mod.azure.azurelib.animation.AzAnimatorAccessor;
-import mod.azure.azurelib.animation.dispatch.AzDispatchSide;
-import mod.azure.azurelib.animation.dispatch.command.AzCommand;
-import mod.azure.azurelib.render.armor.AzArmorModel;
-import mod.azure.azurelib.render.armor.AzArmorRenderer;
-import mod.azure.azurelib.render.armor.AzArmorRendererRegistry;
+import mod.azure.azurelib.common.animation.AzAnimator;
+import mod.azure.azurelib.common.animation.AzAnimatorAccessor;
+import mod.azure.azurelib.common.animation.dispatch.AzDispatchSide;
+import mod.azure.azurelib.common.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.common.render.armor.AzArmorModel;
+import mod.azure.azurelib.common.render.armor.AzArmorRenderer;
+import mod.azure.azurelib.common.render.armor.AzArmorRendererRegistry;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ImageButton;
+import com.dairymoose.biomech.client.widget.TexturedButton;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelPart;
@@ -115,6 +116,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -124,7 +126,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.network.chat.contents.LiteralContents;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -164,58 +166,52 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCon
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ComputeFovModifierEvent;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.InputEvent.MouseScrollingEvent;
-import net.minecraftforge.client.event.MovementInputUpdateEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.event.RenderHandEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.client.event.RenderLevelStageEvent.Stage;
-import net.minecraftforge.client.event.RenderPlayerEvent;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.client.gui.overlay.GuiOverlayManager;
-import net.minecraftforge.client.gui.overlay.NamedGuiOverlay;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.LootTableLoadEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.TickEvent.ClientTickEvent;
-import net.minecraftforge.event.TickEvent.PlayerTickEvent;
-import net.minecraftforge.event.TickEvent.ServerTickEvent;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingDamageEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.MobEffectEvent;
-import net.minecraftforge.event.entity.player.CriticalHitEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerXpEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.eventbus.api.Event.Result;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.client.event.ComputeFovModifierEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.InputEvent.MouseScrollingEvent;
+import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.event.RenderHandEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent.Stage;
+import net.neoforged.neoforge.client.event.RenderPlayerEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.LootTableLoadEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent.ItemCraftedEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerXpEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import com.dairymoose.biomech.DistExec;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 /*
  * - Adding new chest/back/etc armor:
@@ -272,16 +268,19 @@ public class BioMech
 {
     public static final String MODID = "biomech";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MODID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, MODID);
+    public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, MODID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID);
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, MODID);
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(Registries.PARTICLE_TYPE, MODID);
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, MODID);
     public static final DeferredRegister<DamageType> DAMAGE_TYPES = DeferredRegister.create(Registries.DAMAGE_TYPE, MODID);
     
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, MODID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, MODID);
+
+    public static final DeferredRegister<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition>> CONDITION_CODECS = DeferredRegister.create(net.neoforged.neoforge.registries.NeoForgeRegistries.Keys.CONDITION_CODECS, MODID);
+    public static final DeferredHolder<com.mojang.serialization.MapCodec<? extends net.neoforged.neoforge.common.conditions.ICondition>, com.mojang.serialization.MapCodec<com.dairymoose.biomech.config.CraftingFlagCondition>> CRAFTING_FLAG_CONDITION = CONDITION_CODECS.register("crafting_flag", () -> com.dairymoose.biomech.config.CraftingFlagCondition.CODEC);
 
     private static BioMechCraftingFlags craftingFlags;
     
@@ -293,14 +292,12 @@ public class BioMech
     	BioMech.LOGGER.debug("[" + BioMech.MODID + "] " + toLog);
     }
     
-    public BioMech(FMLJavaModLoadingContext context)
+    public BioMech(IEventBus modEventBus, ModContainer modContainer)
     {
 		LOGGER.debug(BioMechRegistry.TAB_BIOMECH_CREATIVE.toString());
-		
-        IEventBus modEventBus = context.getModEventBus();
 
-        MinecraftForge.EVENT_BUS.register(this);
-        
+        NeoForge.EVENT_BUS.register(this);
+
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addItemsToCreativeTab);
 
@@ -313,31 +310,39 @@ public class BioMech
         PARTICLES.register(modEventBus);
         SOUNDS.register(modEventBus);
         DAMAGE_TYPES.register(modEventBus);
+        CONDITION_CODECS.register(modEventBus);
 
         craftingFlags = new BioMechCraftingFlags();
-        
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, BioMechConfig.commonSpec);
-	    ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, BioMechConfig.clientSpec);
-	    ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, BioMechConfig.serverSpec);
-	    
-	    int msgId = 0;
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundUpdateSlottedItemPacket.class, ClientboundUpdateSlottedItemPacket::write, ClientboundUpdateSlottedItemPacket::new, ClientboundUpdateSlottedItemPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundHandStatusPacket.class, ServerboundHandStatusPacket::write, ServerboundHandStatusPacket::new, ServerboundHandStatusPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundHandStatusPacket.class, ClientboundHandStatusPacket::write, ClientboundHandStatusPacket::new, ClientboundHandStatusPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundEnergySyncPacket.class, ClientboundEnergySyncPacket::write, ClientboundEnergySyncPacket::new, ClientboundEnergySyncPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMobilityTreadsPacket.class, ServerboundMobilityTreadsPacket::write, ServerboundMobilityTreadsPacket::new, ServerboundMobilityTreadsPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMiningArmEntityTargetPacket.class, ServerboundMiningArmEntityTargetPacket::write, ServerboundMiningArmEntityTargetPacket::new, ServerboundMiningArmEntityTargetPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundProjectileDodgePacket.class, ClientboundProjectileDodgePacket::write, ClientboundProjectileDodgePacket::new, ClientboundProjectileDodgePacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundMiningArmBlockTargetPacket.class, ServerboundMiningArmBlockTargetPacket::write, ServerboundMiningArmBlockTargetPacket::new, ServerboundMiningArmBlockTargetPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundOpenPortableStorageUnitPacket.class, ServerboundOpenPortableStorageUnitPacket::write, ServerboundOpenPortableStorageUnitPacket::new, ServerboundOpenPortableStorageUnitPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundTeleportationCrystalPacket.class, ServerboundTeleportationCrystalPacket::write, ServerboundTeleportationCrystalPacket::new, ServerboundTeleportationCrystalPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundPressHotkeyPacket.class, ServerboundPressHotkeyPacket::write, ServerboundPressHotkeyPacket::new, ServerboundPressHotkeyPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ClientboundPressHotkeyPacket.class, ClientboundPressHotkeyPacket::write, ClientboundPressHotkeyPacket::new, ClientboundPressHotkeyPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundUpdateVisibilityPacket.class, ServerboundUpdateVisibilityPacket::write, ServerboundUpdateVisibilityPacket::new, ServerboundUpdateVisibilityPacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundResetFallDamagePacket.class, ServerboundResetFallDamagePacket::write, ServerboundResetFallDamagePacket::new, ServerboundResetFallDamagePacket::handle);
-		BioMechNetwork.INSTANCE.registerMessage(msgId++, ServerboundHurtMePacket.class, ServerboundHurtMePacket::write, ServerboundHurtMePacket::new, ServerboundHurtMePacket::handle);
+
+        modContainer.registerConfig(ModConfig.Type.COMMON, BioMechConfig.commonSpec);
+	    modContainer.registerConfig(ModConfig.Type.CLIENT, BioMechConfig.clientSpec);
+	    modContainer.registerConfig(ModConfig.Type.SERVER, BioMechConfig.serverSpec);
+
+	    // Network payloads are registered in BioMechNetwork via RegisterPayloadHandlersEvent.
     }
     
+    /**
+     * Returns a registry lookup ({@link net.minecraft.core.HolderLookup.Provider}) for ItemStack
+     * (de)serialization, required by the 1.20.5+ codec-based ItemStack save/parse API. Uses the
+     * running server's registries when present, otherwise the connected client's level.
+     */
+    public static net.minecraft.core.HolderLookup.Provider registryAccess() {
+        net.minecraft.server.MinecraftServer server = net.neoforged.neoforge.server.ServerLifecycleHooks.getCurrentServer();
+        if (server != null) {
+            return server.registryAccess();
+        }
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+            if (mc.level != null) {
+                return mc.level.registryAccess();
+            }
+            if (mc.getConnection() != null) {
+                return mc.getConnection().registryAccess();
+            }
+        }
+        return null;
+    }
+
     public static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> inputType, BlockEntityType<E> expectedType, BlockEntityTicker<? super E> tickerInterface) {
 		return inputType == expectedType ? (BlockEntityTicker) tickerInterface : null;
 	}
@@ -366,9 +371,9 @@ public class BioMech
 		if (event.getTab() == BioMechRegistry.TAB_BIOMECH_CREATIVE.get()) {
 			Field[] allFields = BioMechRegistry.class.getDeclaredFields();
 			for (Field f : allFields) {
-				if (f.getType() == RegistryObject.class) {
+				if (f.getType() == DeferredHolder.class) {
 					try {
-						RegistryObject value = (RegistryObject) f.get(null);
+						DeferredHolder value = (DeferredHolder) f.get(null);
 						if (value != null) {
 							if (value.get() instanceof Item item) {
 								boolean shouldAdd = true;
@@ -385,7 +390,7 @@ public class BioMech
 								
 								if (shouldAdd) {
 									LOGGER.trace("Value is: " + item);
-									event.accept(value);
+									event.accept(item);
 								}
 							}
 						}
@@ -429,10 +434,8 @@ public class BioMech
     
     public static int currentServerTick = 0;
     @SubscribeEvent
-    public void onServerTick(ServerTickEvent event) {
-    	if (event.phase == TickEvent.Phase.START) {
-    		++currentServerTick;
-    	}
+    public void onServerTick(ServerTickEvent.Pre event) {
+    	++currentServerTick;
     }
     
     @SubscribeEvent
@@ -441,7 +444,7 @@ public class BioMech
     		BioMechPlayerData playerData = BioMech.globalPlayerData.get(event.getEntity().getUUID());
     		if (playerData != null) {
     			if (playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof GasMaskArmor armor) {
-    				event.setResult(Result.DENY);
+    				event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
     			}
     		}
     	}
@@ -468,7 +471,7 @@ public class BioMech
     	}
     }
     
-    private static TagKey<Item> pickaxeBlockTag = ForgeRegistries.ITEMS.tags().createTagKey(new ResourceLocation("minecraft", "pickaxes"));
+    private static TagKey<Item> pickaxeBlockTag = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("minecraft", "pickaxes"));
     @SubscribeEvent
     public void onItemCrafted(ItemCraftedEvent event) {
     	ItemStack crafted = event.getCrafting();
@@ -569,9 +572,9 @@ public class BioMech
     		List<String> disabled = BioMech.getDisabledConfigItems();
     		Field[] allFields = BioMechRegistry.class.getDeclaredFields();
 			for (Field f : allFields) {
-				if (f.getType() == RegistryObject.class) {
+				if (f.getType() == DeferredHolder.class) {
 					try {
-						RegistryObject value = (RegistryObject) f.get(null);
+						DeferredHolder value = (DeferredHolder) f.get(null);
 						if (value != null) {
 							if (value.get() instanceof ArmorBase base) {
 								if (base.shouldAddToLootTable()) {
@@ -627,7 +630,7 @@ public class BioMech
     	BioMechPlayerData playerData = globalPlayerData.computeIfAbsent(player.getUUID(), (uuid) -> new BioMechPlayerData());
 		CompoundTag playerDataTag = BioMechPlayerData.serialize(playerData);
 		ClientboundUpdateSlottedItemPacket slottedItemPacket = new ClientboundUpdateSlottedItemPacket(player.getUUID(), playerDataTag);
-		BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), slottedItemPacket);
+		BioMechNetwork.sendToAll(slottedItemPacket);
     }
     
     public static void sendAllItemSlotsToOnePlayer(Player player) {
@@ -648,7 +651,7 @@ public class BioMech
         					CompoundTag playerDataTag = BioMechPlayerData.serialize(playerDataEntrySet.getValue());
             				++playerDataCount;
             				ClientboundUpdateSlottedItemPacket slottedItemPacket = new ClientboundUpdateSlottedItemPacket(playerDataEntrySet.getKey(), playerDataTag);
-            				BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), slottedItemPacket);
+            				BioMechNetwork.sendToPlayer(sp, slottedItemPacket);
         				}
         			}
         			
@@ -675,7 +678,7 @@ public class BioMech
         		if (playerData != null) {
         			if (playerData.getForSlot(MechPart.Leggings).itemStack.getItem() instanceof SpringLoadedLeggingsArmor legs) {
         				BioMech.clientSideItemAnimation(playerData.getForSlot(MechPart.Leggings).itemStack, legs.dispatcher.INERT_COMMAND.cmd);
-        				playerData.getForSlot(MechPart.Leggings).itemStack.getOrCreateTag().putInt("BounceTicks", 10);
+        				ItemNbtHelper.update(playerData.getForSlot(MechPart.Leggings).itemStack, t -> t.putInt("BounceTicks", 10));
         				BioMech.clientSideItemAnimation(playerData.getForSlot(MechPart.Leggings).itemStack, legs.dispatcher.BOUNCE_COMMAND.cmd);
         			}
         		}
@@ -703,38 +706,38 @@ public class BioMech
     public static Map<UUID, HandActiveStatus> handActiveMap = new HashMap<>();
     @SuppressWarnings("deprecation")
 	@SubscribeEvent
-    public void onPlayerTick(final PlayerTickEvent event) {
-    	if (event.player == null) {
+    public void onPlayerTick(final PlayerTickEvent.Pre event) {
+    	if (event.getEntity() == null) {
     		return;
     	}
-    	
-    	if (event.phase == TickEvent.Phase.START) {
-    		if (!event.player.isDeadOrDying() && !event.player.isSpectator()) {
-//    			if (event.player.level().isClientSide) {
-//    				BioMech.LOGGER.info("loc=" + event.player.position() + ", deltaMov=" + event.player.getDeltaMovement());
+
+    	{
+    		if (!event.getEntity().isDeadOrDying() && !event.getEntity().isSpectator()) {
+//    			if (event.getEntity().level().isClientSide) {
+//    				BioMech.LOGGER.info("loc=" + event.getEntity().position() + ", deltaMov=" + event.getEntity().getDeltaMovement());
 //    			}
     			
-    			BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
+    			BioMechPlayerData playerData = globalPlayerData.get(event.getEntity().getUUID());
         		if (playerData != null) {
         			if (FMLEnvironment.dist == Dist.CLIENT) {
-        				if (event.player.level().isClientSide) {
+        				if (event.getEntity().level().isClientSide) {
         					++playerData.tickCount;
         				}
         			} else {
         				++playerData.tickCount;
         			}
         			
-        			playerData.tickEnergy(event.player);
-        			tickInventoryForPlayer(event.player, playerData);
-        			tickHandsForPlayer(event.player, playerData, false);
-        			removePermanentModifiers(event.player, playerData);
-        			removeIlluminantBlocksIfNoArmor(event.player, playerData);
-        			//removeInvulnerable(event.player, playerData);
+        			playerData.tickEnergy(event.getEntity());
+        			tickInventoryForPlayer(event.getEntity(), playerData);
+        			tickHandsForPlayer(event.getEntity(), playerData, false);
+        			removePermanentModifiers(event.getEntity(), playerData);
+        			removeIlluminantBlocksIfNoArmor(event.getEntity(), playerData);
+        			//removeInvulnerable(event.getEntity(), playerData);
         			
-        			HandActiveStatus has = BioMech.handActiveMap.get(event.player.getUUID());
-        			checkForMidairJump(event.player, has);
+        			HandActiveStatus has = BioMech.handActiveMap.get(event.getEntity().getUUID());
+        			checkForMidairJump(event.getEntity(), has);
         			
-        			if (event.player.level().isClientSide && event.player.isLocalPlayer()) {
+        			if (event.getEntity().level().isClientSide && event.getEntity().isLocalPlayer()) {
         				float suitEnergy = playerData.getSuitEnergy();
         				float oneTickEnergyDiff = suitEnergy - suitEnergyLast; 
     					suitEnergyDiffSum += oneTickEnergyDiff;
@@ -747,8 +750,8 @@ public class BioMech
         			}
         			
     				if (playerData.tickCount % RESYNC_ENERGY_TICK_PERIOD == 0) {
-    					if (event.player instanceof ServerPlayer sp) {
-    						BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
+    					if (event.getEntity() instanceof ServerPlayer sp) {
+    						BioMechNetwork.sendToPlayer(sp, new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
     					}
         			}
     				
@@ -758,20 +761,20 @@ public class BioMech
     				if (backItem instanceof TransformerModuleHelicopterArmor) {
 						if (playerData.helicopterModeEnabled.toggledOn) {
 							isHeli = true;
-							if (event.player.getForcedPose() != Pose.FALL_FLYING) {
-								event.player.setForcedPose(Pose.FALL_FLYING);
+							if (event.getEntity().getForcedPose() != Pose.FALL_FLYING) {
+								event.getEntity().setForcedPose(Pose.FALL_FLYING);
 							}									
 						} else {
-							event.player.setForcedPose(null);
+							event.getEntity().setForcedPose(null);
 						}
 					}
     				
     				if (chestItem instanceof ElytraEnabledArmor armor) {
-    					if (event.player.level().isClientSide) {
+    					if (event.getEntity().level().isClientSide) {
     						boolean engageElytra = false;
     						
 							if (chestItem instanceof ElytraMechChestplateArmor chest) {
-								MidAirJumpStatus majs = primedForMidAirJumpMap.get(event.player.getUUID());
+								MidAirJumpStatus majs = primedForMidAirJumpMap.get(event.getEntity().getUUID());
 								if (majs != null && majs.primedForMidAirJump) {
 									if (!isHeli) {
 										engageElytra = true;
@@ -781,20 +784,20 @@ public class BioMech
 							
 							if (engageElytra) {
 								elytraItemStackC.setDamageValue(0);
-        						tempChestItemC = event.player.getItemBySlot(EquipmentSlot.CHEST);
-        						event.player.setItemSlot(EquipmentSlot.CHEST, elytraItemStackC);
+        						tempChestItemC = event.getEntity().getItemBySlot(EquipmentSlot.CHEST);
+        						event.getEntity().setItemSlot(EquipmentSlot.CHEST, elytraItemStackC);
 							}
     					}
     					
     					if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ElytraMechChestplateArmor chest) {
-    						event.player.setTicksFrozen(0);
-    						event.player.isInPowderSnow = false;
-    						event.player.wasInPowderSnow = false;
+    						event.getEntity().setTicksFrozen(0);
+    						event.getEntity().isInPowderSnow = false;
+    						event.getEntity().wasInPowderSnow = false;
     					}
     				}
     				
     				if (!(playerData.getForSlot(MechPart.Head).itemStack.getItem() instanceof OpticsUnitArmor armor)) {
-    					if (event.player.level().isClientSide) {
+    					if (event.getEntity().level().isClientSide) {
     						if (!outlinedSpawners.isEmpty()) {
     							synchronized(outlinedSpawners) {
     								outlinedSpawners.clear();
@@ -806,15 +809,23 @@ public class BioMech
         		}
     		}
     	}
-    	if (event.phase == TickEvent.Phase.END) {
-    		BioMechPlayerData playerData = globalPlayerData.get(event.player.getUUID());
+    }
+
+    @SuppressWarnings("deprecation")
+	@SubscribeEvent
+    public void onPlayerTickPost(final PlayerTickEvent.Post event) {
+    	if (event.getEntity() == null) {
+    		return;
+    	}
+    	{
+    		BioMechPlayerData playerData = globalPlayerData.get(event.getEntity().getUUID());
     		if (playerData != null) {
-    			tickHandsForPlayer(event.player, playerData, true);
+    			tickHandsForPlayer(event.getEntity(), playerData, true);
     		}
-    		
+
     		if (tempChestItemC != null) {
-    			if (event.player.level().isClientSide) {
-    				event.player.setItemSlot(EquipmentSlot.CHEST, tempChestItemC);
+    			if (event.getEntity().level().isClientSide) {
+    				event.getEntity().setItemSlot(EquipmentSlot.CHEST, tempChestItemC);
     				tempChestItemC = null;
     			}
     		}
@@ -852,7 +863,7 @@ public class BioMech
 		ItemStackHolder ish = new ItemStackHolder();
 		ish.itemStack = itemStack;
 		final MechPart clientPart = handPart;
-		DistExecutor.runWhenOn(Dist.CLIENT, () ->
+		DistExec.runWhenOn(Dist.CLIENT, () ->
 			new Runnable() {
 				public void run() {
 					if (clientPart == MechPart.RightArm)
@@ -935,11 +946,11 @@ public class BioMech
 	private void removePermanentModifiers(final Player player, BioMechPlayerData playerData) {
 		List<SlottedItem> slottedItems = playerData.getAllSlots();
 		for (SlottedItem slotted : slottedItems) {
-			List<Attribute> supportedAttributes = new ArrayList<>();
+			List<Holder<Attribute>> supportedAttributes = new ArrayList<>();
 			supportedAttributes.add(Attributes.MAX_HEALTH);
-			supportedAttributes.add(ForgeMod.BLOCK_REACH.get());
-			supportedAttributes.add(ForgeMod.ENTITY_REACH.get());
-			for (Attribute attrib : supportedAttributes) {
+			supportedAttributes.add(Attributes.BLOCK_INTERACTION_RANGE);
+			supportedAttributes.add(Attributes.ENTITY_INTERACTION_RANGE);
+			for (Holder<Attribute> attrib : supportedAttributes) {
 				AttributeInstance inst = player.getAttribute(attrib);
 				if (inst != null) {
 					boolean keep = false;
@@ -1031,7 +1042,7 @@ public class BioMech
 
         if (modDataFile.exists()) {
         	try {
-                CompoundTag compound = NbtIo.read(modDataFile);
+                CompoundTag compound = NbtIo.read(modDataFile.toPath());
                 globalPlayerData.put(event.getEntity().getUUID(), BioMechPlayerData.deserialize(compound));
                 LOGGER.debug("Load custom player data for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath() + ": " + compound.getAsString());
             } catch (Exception e) {
@@ -1050,7 +1061,7 @@ public class BioMech
         		BioMechPlayerData playerData = globalPlayerData.get(event.getEntity().getUUID());
         		
         		if (playerData != null) {
-        			CompoundTag compound = NbtIo.read(modDataFile);
+        			CompoundTag compound = NbtIo.read(modDataFile.toPath());
                     PortableStorageUnitArmor.deserialize(playerData, compound);
                     LOGGER.debug("Load portable_storage_unit player data for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath() + ": " + compound.getAsString());
         		}
@@ -1082,7 +1093,7 @@ public class BioMech
         	playerData = globalPlayerData.get(event.getEntity().getUUID());
         	if (playerData != null) {
         		CompoundTag root = BioMechPlayerData.serialize(playerData);
-        	    NbtIo.write(root, modDataFile);
+        	    NbtIo.write(root, modDataFile.toPath());
         		LOGGER.debug("Saved custom player data for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath());
         	} else {
         		LOGGER.info("Player data was null while saving for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath());
@@ -1101,7 +1112,7 @@ public class BioMech
         	if (playerData != null) {
     			CompoundTag root = PortableStorageUnitArmor.serialize(playerData);
     			//LOGGER.debug("root is: " + NbtUtils.prettyPrint(root));
-    			NbtIo.write(root, modDataFile);
+    			NbtIo.write(root, modDataFile.toPath());
         		LOGGER.debug("Saved portable_storage_unit data for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath());
         	} else {
         		LOGGER.info("Player data was null while saving for " + event.getEntity().getDisplayName().getString() + " to " + modDataFile.getAbsolutePath());
@@ -1129,13 +1140,13 @@ public class BioMech
     	}
     	
     	try {
-	    	if (itemStack.getTag() != null && itemStack.getOrCreateTag().contains(AzureLib.ITEM_UUID_TAG)) {
+	    	if (itemStack.has(AzureLib.AZ_ID.get())) {
 	    		AzAnimator<UUID, ItemStack> anim = AzAnimatorAccessor.getOrNull(itemStack);
 	    		//AzAnimator<ItemStack> anim = AzIdentifiableItemStackAnimatorCache.getInstance().getOrNull(itemStack.getTag().getUUID(AzureLib.ITEM_UUID_TAG));
 	        	if (anim != null) {
 	        		command.actions().forEach(action -> action.handle(AzDispatchSide.CLIENT, anim));
 	        	} else {
-	        		BioMech.LOGGER.trace("anim was null for itemStack: " + itemStack + " with tag=" + itemStack.getTag().getUUID(AzureLib.ITEM_UUID_TAG));
+	        		BioMech.LOGGER.trace("anim was null for itemStack: " + itemStack + " with tag=" + itemStack.get(AzureLib.AZ_ID.get()));
 	        	}
 	    	} else {
 	    		BioMech.LOGGER.debug("missing az_id UUID tag for itemStack: " + itemStack);
@@ -1237,7 +1248,7 @@ public class BioMech
 	    			float powerCritChance = power.getCriticalStrikeBoost();
 	    			double rnd = Math.random();
 	    			if (rnd < powerCritChance) {
-	    				event.setResult(Result.ALLOW);
+	    				event.setCriticalHit(true);
 	    				BioMech.LOGGER.debug("power helmet critical proc");
 	    			}
 	    		}
@@ -1260,7 +1271,7 @@ public class BioMech
 	}
 	
 	@SubscribeEvent
-	public void onPlayerDealDamage(LivingAttackEvent event) {
+	public void onPlayerDealDamage(LivingIncomingDamageEvent event) {
 		if (event.getSource().getDirectEntity() instanceof Player player) {
 			if (!player.level().isClientSide) {
 				DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(player.getUUID());
@@ -1283,13 +1294,14 @@ public class BioMech
 		        			ItemStack itemStack = playerData.getForSlot(part).itemStack;
 			        		if (itemStack.getItem() instanceof PowerArmArmor arm) {
 			        			boolean active = false;
-			        			CompoundTag tag = itemStack.getOrCreateTag();
+			        			CompoundTag tag = ItemNbtHelper.getOrCreateTag(itemStack);
 			        			if (tag.contains("ActiveArm")) {
 			        				active = tag.getBoolean("ActiveArm");
 			        			}
 			        			if (!active) {
 			        				if (!event.getEntity().isDeadOrDying() && !event.getEntity().isInvulnerable() && event.getEntity().attackable() && BioMech.damageCanHurtEntity(event.getAmount(), event.getEntity())) {
 			        					tag.putBoolean("ActiveArm", true);
+			        					ItemNbtHelper.setTag(itemStack, tag);
 			        					BioMech.LOGGER.debug("apply bonus damage of: " + arm.getFlatDamageBoost());
 					        			//event.getEntity().hurt(player.level().damageSources().source(BioMechRegistry.BIOMECH_BONUS_DAMAGE, player), 2.0f);
 					        			//event.getEntity().invulnerableTime = 0;
@@ -1297,6 +1309,7 @@ public class BioMech
 				        				//event.getEntity().hurtTime = 0;
 				        				this.hurtEntityWithoutInvulnerableFrames(event.getEntity(), player, arm.getFlatDamageBoost());
 					        			tag.putBoolean("ActiveArm", false);
+					        			ItemNbtHelper.setTag(itemStack, tag);
 			        				}
 			        			}
 			        		}
@@ -1308,7 +1321,7 @@ public class BioMech
 		        				ItemStack itemStack = slotted.itemStack;
 				        		if (itemStack.getItem() instanceof ArmorBase base) {
 				        			if (base.getNearbyEnemyDamageBoost() > 0.0f) {
-				        				CompoundTag tag = itemStack.getTag();
+				        				CompoundTag tag = ItemNbtHelper.getTagOrNull(itemStack);
 					        			if (tag != null && tag.contains(HerosHeadpieceArmor.TAG_DAMAGE_BOOSTING)) {
 					        				if (tag.getBoolean(HerosHeadpieceArmor.TAG_DAMAGE_BOOSTING)) {
 					        					active = true;
@@ -1334,7 +1347,7 @@ public class BioMech
 	public static int holdingTeleportTicks = 0;
 	//damage avoidance is put here so that we can cancel knockbacks/etc
 	@SubscribeEvent
-	public void onPlayerDamageBeforeMitigation(final LivingAttackEvent event) {
+	public void onPlayerDamageBeforeMitigation(final LivingIncomingDamageEvent event) {
 		if (!event.getEntity().level().isClientSide) {
 			if (event.getEntity() instanceof Player player) {
 				DurationInfo info = EmergencyForcefieldUnitArmor.durationMap.get(player.getUUID());
@@ -1362,7 +1375,7 @@ public class BioMech
 									playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
 									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + PipeMechBodyArmor.getTotalDamageAvoidPct(player));
 									if (event.getEntity() instanceof ServerPlayer sp) {
-										BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
+										BioMechNetwork.sendToPlayer(sp, new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
 									}
 									event.setCanceled(true);
 									return;
@@ -1379,8 +1392,8 @@ public class BioMech
 									playerData.internalSpendSuitEnergy(player, PipeMechBodyArmor.energyLostFromAvoidAttack);
 									BioMech.LOGGER.debug("avoided damage amount = " + event.getAmount() + " with avoid chance: " + InterceptorArmsArmor.getProjectileAvoidPct(player));
 									if (event.getEntity() instanceof ServerPlayer sp) {
-										BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
-										BioMechNetwork.INSTANCE.send(PacketDistributor.ALL.noArg(), new ClientboundProjectileDodgePacket(player));
+										BioMechNetwork.sendToPlayer(sp, new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
+										BioMechNetwork.sendToAll(new ClientboundProjectileDodgePacket(player));
 									}
 									event.setCanceled(true);
 									return;
@@ -1417,12 +1430,12 @@ public class BioMech
 	//LivingDamageEvent - damage after armor/magic mitigation
 	//event incoming damage is reduced by mitigation from armor
 	@SubscribeEvent
-	public void onPlayerDamageTaken(final LivingDamageEvent event) {
+	public void onPlayerDamageTaken(final LivingDamageEvent.Pre event) {
 		if (!(event.getEntity() instanceof Player player)) {
-			//BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
+			//BioMech.LOGGER.info("damage to non-player: " + event.getEntity() + " in amount of " + event.getNewDamage() + " of type=" + event.getSource());
 		}
 		if (event.getEntity() instanceof Player player) {
-			//BioMech.LOGGER.info("damage to player: " + event.getEntity() + " in amount of " + event.getAmount() + " of type=" + event.getSource());
+			//BioMech.LOGGER.info("damage to player: " + event.getEntity() + " in amount of " + event.getNewDamage() + " of type=" + event.getSource());
 			BioMechPlayerData playerData = null;
         	playerData = globalPlayerData.get(event.getEntity().getUUID());
         	if (playerData != null) {
@@ -1433,9 +1446,9 @@ public class BioMech
 				for (SlottedItem slotted : slottedItems) {
 					if (!slotted.itemStack.isEmpty()) {
 						if (slotted.itemStack.getItem() instanceof ArmorBase base) {
-							boolean cancel = base.onPlayerDamageTaken(event.getSource(), event.getAmount(), slotted.itemStack, player, slotted.mechPart);
+							boolean cancel = base.onPlayerDamageTaken(event.getSource(), event.getNewDamage(), slotted.itemStack, player, slotted.mechPart);
 							if (cancel) {
-								event.setCanceled(true);
+								event.setNewDamage(0.0f);
 								return;
 							}
 						}
@@ -1445,13 +1458,13 @@ public class BioMech
 				float damageAbsorbEnergyHarmAverage = IronMechChestArmor.getAverageAbsorbedDamageEnergyMult(player);
 				if (dai.hasAnyDamageAbsorb) {
 					float absorbPct = IronMechChestArmor.getTotalDamageAbsorbPct(player);
-					float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, event.getAmount());
-					float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(event.getAmount(), damageMitigated);
+					float damageMitigated = IronMechChestArmor.getDamageMitigated(absorbPct, event.getNewDamage());
+					float damageAfterMitigation = IronMechChestArmor.getDamageAfterMitigation(event.getNewDamage(), damageMitigated);
 					float energyDamage = IronMechChestArmor.getEnergyDamageForAttack(damageMitigated, damageAbsorbEnergyHarmAverage);
 					if (playerData.getSuitEnergy() >= energyDamage) {
-						if (IronMechChestArmor.absorbDirectAttack(playerData, damageAbsorbEnergyHarmAverage, absorbPct, event.getSource(), event.getAmount(), player, true)) {
-							//BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getAmount() + " of type: " + event.getSource() + ", energyLeft=" + playerData.getSuitEnergy());
-							event.setCanceled(true);
+						if (IronMechChestArmor.absorbDirectAttack(playerData, damageAbsorbEnergyHarmAverage, absorbPct, event.getSource(), event.getNewDamage(), player, true)) {
+							//BioMech.LOGGER.debug("take damage: " + damageAfterMitigation + ", deal damage to energy: " + energyDamage + ", unmitigated damage was: " + event.getNewDamage() + " of type: " + event.getSource() + ", energyLeft=" + playerData.getSuitEnergy());
+							event.setNewDamage(0.0f);
 						}
 					}
 				}
@@ -1462,9 +1475,9 @@ public class BioMech
 					DamageType genericExplosion = player.level().damageSources().explosion(null, null).type();
 					DamageType playerExplosion = player.level().damageSources().explosion(player, player).type();
 					if (event.getSource().type() == genericExplosion || event.getSource().type() == playerExplosion) {
-						BioMech.LOGGER.debug("explosion damage taken: " + event.getAmount());
-						if (IronMechChestArmor.absorbDirectAttack(playerData, damageAbsorbEnergyHarmAverage, explosionDr, event.getSource(), event.getAmount(), player, false)) {
-							event.setCanceled(true);
+						BioMech.LOGGER.debug("explosion damage taken: " + event.getNewDamage());
+						if (IronMechChestArmor.absorbDirectAttack(playerData, damageAbsorbEnergyHarmAverage, explosionDr, event.getSource(), event.getNewDamage(), player, false)) {
+							event.setNewDamage(0.0f);
 						}
 					}
 				}
@@ -1529,7 +1542,7 @@ public class BioMech
     }
     
     private static boolean isDisabledByConfig(Item item, List<String> disabledList) {
-    	String registryKey = ForgeRegistries.ITEMS.getKey(item).getPath();
+    	String registryKey = BuiltInRegistries.ITEM.getKey(item).getPath();
     	String transformed = transformConfigOrRegistryKey(registryKey);
     	if (disabledList.contains(transformed)) {
     		return true;
@@ -1574,13 +1587,25 @@ public class BioMech
 	public static List<OutlinedSpawnerInfo> outlinedSpawners = new ArrayList<>();
     
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    // Mod-bus (static) handlers live here; the game-bus instance handlers live in ClientModEvents
+    // and are registered via its constructor (NeoForge.EVENT_BUS.register(this)). They must be in
+    // separate classes because NeoForge rejects static @SubscribeEvent methods on an instance registration.
+    @EventBusSubscriber(modid = MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+    public static class ClientModBusEvents
+    {
+        @SubscribeEvent public static void onRegisterParticle(RegisterParticleProvidersEvent event) { ClientModEvents.onRegisterParticle(event); }
+        @SubscribeEvent public static void registerBindings(RegisterKeyMappingsEvent event) { ClientModEvents.registerBindings(event); }
+        @SubscribeEvent public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) { ClientModEvents.registerRenderers(event); }
+        @SubscribeEvent public static void onRegisterMenuScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event) { ClientModEvents.onRegisterMenuScreens(event); }
+        @SubscribeEvent public static void onClientSetup(FMLClientSetupEvent event) { ClientModEvents.onClientSetup(event); }
+    }
+
     public static class ClientModEvents
     {
     	static ClientModEvents inst = new ClientModEvents();
 
     	public ClientModEvents() {
-    		MinecraftForge.EVENT_BUS.register(this);
+    		NeoForge.EVENT_BUS.register(this);
     		
     		
 		}
@@ -1595,8 +1620,7 @@ public class BioMech
     	
         public static final List<KeyMapping> allKeyMappings = List.of(HOTKEY_RIGHT_ARM, HOTKEY_LEFT_ARM, HOTKEY_ENABLE_ARM_FUNCTION, HOTKEY_ACTIVATE_BACK_ITEM, HOTKEY_ACTIVATE_HEAD_ITEM, HOTKEY_ACTIVATE_CHEST_ITEM, HOTKEY_ACTIVATE_LEGGINGS_ITEM);
 
-        @SubscribeEvent
-        public static void onRegisterParticle(RegisterParticleProvidersEvent event) {
+                public static void onRegisterParticle(RegisterParticleProvidersEvent event) {
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_LASER.get(), LaserParticle.Provider::new);
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_THICKER_LASER.get(), ThickerLaserParticle.Provider::new);
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_THICKEST_LASER.get(), ThickestLaserParticle.Provider::new);
@@ -1607,8 +1631,7 @@ public class BioMech
         	event.registerSpriteSet(BioMechRegistry.PARTICLE_TYPE_FORCE_FIELD.get(), ForceFieldParticle.Provider::new);
         }
         
-    	@SubscribeEvent
-        public static void registerBindings(RegisterKeyMappingsEvent event) {
+    	        public static void registerBindings(RegisterKeyMappingsEvent event) {
     		for (KeyMapping mapping : allKeyMappings) {
 				event.register(mapping);
 			}
@@ -1630,9 +1653,8 @@ public class BioMech
             		int buttonHeight = 9;
             		int texStartX = 194;
             		int texStartY = 0;
-            		ImageButton imageButton = new ImageButton(x, y,
-            				buttonWidth, buttonHeight, texStartX, texStartY,
-            				buttonHeight, GUI_LOCATION, 256, 256, new Button.OnPress() {
+            		TexturedButton imageButton = new TexturedButton(x, y,
+            				buttonWidth, buttonHeight, texStartX, texStartY, buttonHeight, GUI_LOCATION, 256, 256, new Button.OnPress() {
         						@Override
         						public void onPress(Button btn) {
         							Minecraft.getInstance().setScreen(new BioMechStationScreen(new BioMechStationMenu(-1, Minecraft.getInstance().player.getInventory()), Minecraft.getInstance().player.getInventory(), Component.literal("BioMech")));
@@ -1825,7 +1847,7 @@ public class BioMech
     			if (headStack.getItem() instanceof OpticsUnitArmor armor) {
     				if (armor.zoomIn) {
     					event.setCanceled(true);
-    					maxOpticZoom += event.getScrollDelta();
+    					maxOpticZoom += event.getScrollDeltaY();
     					if (maxOpticZoom < 0.0f) {
     						maxOpticZoom = 0.0f;
     					} else if (maxOpticZoom > 9.0f) {
@@ -1926,12 +1948,12 @@ public class BioMech
         	}
     	}
     	
-    	private ResourceLocation GUI_SUIT_ENERGY_LOCATION = new ResourceLocation(MODID, "textures/gui/suit_energy.png");
+    	private ResourceLocation GUI_SUIT_ENERGY_LOCATION = ResourceLocation.fromNamespaceAndPath(MODID, "textures/gui/suit_energy.png");
     	private int GUI_SUIT_ENERGY_TEX_SIZE = 32;
     	private int GUI_SUIT_ENERGY_BORDER_HEIGHT = 8;
 		@SubscribeEvent
-		public void renderOverlayEvent(RenderGuiOverlayEvent.Pre overlayEvent) {
-			if (overlayEvent.getOverlay() == GuiOverlayManager.findOverlay(VanillaGuiOverlay.EXPERIENCE_BAR.id())) {
+		public void renderOverlayEvent(RenderGuiLayerEvent.Pre overlayEvent) {
+			if (overlayEvent.getName().equals(VanillaGuiLayers.EXPERIENCE_BAR)) {
 				BioMechPlayerData playerData = this.getDataForLocalPlayer();
 
 				if (playerData != null) {
@@ -1940,7 +1962,7 @@ public class BioMech
 					if (hasAnyBioMechArmor) {
 						float suitEnergy = playerData.getSuitEnergy();
 						
-						Window window = overlayEvent.getWindow();
+						Window window = Minecraft.getInstance().getWindow();
 						RenderSystem.setShader(GameRenderer::getPositionTexShader);
 						float xScale = BioMechConfig.CLIENT.energySuitGuiXScale.get().floatValue();
 						float yScale = BioMechConfig.CLIENT.energySuitGuiYScale.get().floatValue();
@@ -1986,7 +2008,7 @@ public class BioMech
 									overlayEvent.getGuiGraphics().pose().translate(leftMargin, halfBarHeight, 0.0f);
 									//print suit energy
 									Component component1 = MutableComponent
-											.create(new LiteralContents(String.valueOf((int)suitEnergy)))
+											.create(net.minecraft.network.chat.contents.PlainTextContents.create(String.valueOf((int)suitEnergy)))
 											.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xFFFFFF)));
 									overlayEvent.getGuiGraphics().drawString(Minecraft.getInstance().font, component1,
 											xStart,
@@ -1998,11 +2020,11 @@ public class BioMech
 									Component component2 = null;
 									if (calcEnergyDiffOnePeriod >= 0.0f) {
 										component2 = MutableComponent
-										.create(new LiteralContents(nf.format(calcEnergyDiffOnePeriod)))
+										.create(net.minecraft.network.chat.contents.PlainTextContents.create(nf.format(calcEnergyDiffOnePeriod)))
 										.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0x00FF00)));
 									} else {
 										component2 = MutableComponent
-										.create(new LiteralContents(nf.format(calcEnergyDiffOnePeriod)))
+										.create(net.minecraft.network.chat.contents.PlainTextContents.create(nf.format(calcEnergyDiffOnePeriod)))
 										.withStyle(Style.EMPTY.withColor(TextColor.fromRgb(0xFF0000)));
 									}
 									overlayEvent.getGuiGraphics().drawString(Minecraft.getInstance().font, component2,
@@ -2025,15 +2047,10 @@ public class BioMech
 //						RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
 					}
 				}
-			} else if (overlayEvent.getOverlay() == GuiOverlayManager.findOverlay(VanillaGuiOverlay.FROSTBITE.id())) {
-				BioMechPlayerData playerData = this.getDataForLocalPlayer();
-
-				if (playerData != null) {
-					if (playerData.getForSlot(MechPart.Chest).itemStack.getItem() instanceof ElytraMechChestplateArmor elytra) {
-						overlayEvent.setCanceled(true);
-					}
-				}
 			}
+			// NOTE: 1.21 NeoForge has no dedicated FROSTBITE gui layer (it is part of CAMERA_OVERLAYS).
+			// The powder-snow freeze overlay is already suppressed for the elytra chestplate by clearing
+			// the freeze/powder-snow state each tick in onPlayerTick, so no per-layer cancel is needed here.
 		}
     	
     	public HandActiveStatus getLocalHandActiveStatus() {
@@ -2052,8 +2069,8 @@ public class BioMech
     	boolean chestKeyPriorStatus = false;
     	boolean leggingsKeyPriorStatus = false;
     	@SubscribeEvent
-        public void onClientTick(final ClientTickEvent event) {
-        	if (event.phase == TickEvent.Phase.START) {
+        public void onClientTick(final ClientTickEvent.Pre event) {
+        	{
         		++clientTick;
         		
         		HandActiveStatus has = this.getLocalHandActiveStatus();
@@ -2127,7 +2144,7 @@ public class BioMech
             		}
             		
             		if (initialRight != has.rightHandActive || initialLeft != has.leftHandActive || initialModifier != has.modifierKeyActive || initialJump != has.jumpActive) {
-            			BioMechNetwork.INSTANCE.sendToServer(new ServerboundHandStatusPacket(has));
+            			BioMechNetwork.sendToServer(new ServerboundHandStatusPacket(has));
             		}
         		}
         	}
@@ -2148,8 +2165,7 @@ public class BioMech
 			return key.isDown();
 		}
     	
-        @SubscribeEvent
-		public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
+        		public static void registerRenderers(final EntityRenderersEvent.RegisterRenderers event) {
 			event.registerBlockEntityRenderer(BioMechRegistry.BLOCK_ENTITY_BIOMECH_STATION.get(), context -> new BioMechStationRenderer());
 			event.registerEntityRenderer(BioMechRegistry.ENTITY_GRAPPLING_HOOK.get(), GrapplingHookEntityRenderer::new);
 		}
@@ -2300,7 +2316,7 @@ public class BioMech
         		doRenderLogic(event, renderEntity);
         	}
         	
-        	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
+        	AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender);
         	if (armorRenderer != null && renderEntity != null) {
         		if (!priorItems.isEmpty()) {
         			for (Map.Entry<EquipmentSlot, ItemStack> priorItem : priorItems.entrySet()) {
@@ -2312,7 +2328,7 @@ public class BioMech
 
         ItemStack priorFeetItem = null;
         private void doPreRenderLogic(RenderPlayerEvent event, Player renderEntity) {
-			AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
+			AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender);
         	//priorItem = null;
         	if (armorRenderer != null && renderEntity != null) {
         		
@@ -2343,7 +2359,7 @@ public class BioMech
         		    		
         		    		if (!slottedItem.itemStack.isEmpty() && slottedItem.visible) {
         		    			ItemStack itemStackToRender = slottedItem.itemStack;
-        		    			EquipmentSlot equipmentSlot = LivingEntity.getEquipmentSlotForItem(itemStackToRender);
+        		    			EquipmentSlot equipmentSlot = renderEntity.getEquipmentSlotForItem(itemStackToRender);
         		    			if (equipmentSlot != null) {
         		    				ItemStack priorItem = event.getEntity().getItemBySlot(equipmentSlot);
         		    				
@@ -2412,7 +2428,7 @@ public class BioMech
 		}
         
 		private void doRenderLogic(RenderPlayerEvent event, Player renderEntity) {
-			AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender.getItem());
+			AzArmorRenderer armorRenderer = AzArmorRendererRegistry.getOrNull(itemToRender);
         	//priorItem = null;
         	if (armorRenderer != null && renderEntity != null) {
         		
@@ -2455,7 +2471,7 @@ public class BioMech
     				}
         			
     				//setupRotations accounts for yaw, elytra flight, swimming, etc
-    				playerRenderer.setupRotations((AbstractClientPlayer)renderEntity, poseStack, 0.0f, f, event.getPartialTick());
+    				playerRenderer.setupRotations((AbstractClientPlayer)renderEntity, poseStack, 0.0f, f, event.getPartialTick(), 1.0f);
         			poseStack.scale(-1.0F, -1.0F, 1.0F);
         		    this.scale((AbstractClientPlayer)renderEntity, poseStack, event.getPartialTick());
         		    poseStack.translate(0.0F, -1.501F, 0.0F);
@@ -2466,7 +2482,7 @@ public class BioMech
         		    		
         		    		if (!slottedItem.itemStack.isEmpty() && slottedItem.visible) {
         		    			ItemStack itemStackToRender = slottedItem.itemStack;
-        		    			EquipmentSlot equipmentSlot = LivingEntity.getEquipmentSlotForItem(itemStackToRender);
+        		    			EquipmentSlot equipmentSlot = renderEntity.getEquipmentSlotForItem(itemStackToRender);
         		    			if (equipmentSlot != null) {
         		    				ItemStack priorItem = event.getEntity().getItemBySlot(equipmentSlot);
         		    				
@@ -2563,9 +2579,9 @@ public class BioMech
         	
         	Field[] allFields = BioMechRegistry.class.getDeclaredFields();
 			for (Field f : allFields) {
-				if (f.getType() == RegistryObject.class) {
+				if (f.getType() == DeferredHolder.class) {
 					try {
-						RegistryObject value = (RegistryObject) f.get(null);
+						DeferredHolder value = (DeferredHolder) f.get(null);
 						if (value != null) {
 							if (value.get() instanceof ArmorBase base) {
 								if (base.shouldAddToLootTable()) {
@@ -2582,9 +2598,14 @@ public class BioMech
 			}
         }
         
+                public static void onRegisterMenuScreens(net.neoforged.neoforge.client.event.RegisterMenuScreensEvent event)
+        {
+        	event.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), com.dairymoose.biomech.client.screen.BioMechStationScreen::new);
+        	event.register(BioMechRegistry.MENU_TYPE_PORTABLE_STORAGE_UNIT.get(), com.dairymoose.biomech.client.screen.PortableStorageUnitScreen::new);
+        }
+
         @SuppressWarnings("unchecked")
-		@SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
+		        public static void onClientSetup(FMLClientSetupEvent event)
         {
         	BioMechClientSetup.doClientSetup(event);
         	

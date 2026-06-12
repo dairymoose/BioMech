@@ -14,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -22,12 +23,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
+import net.neoforged.api.distmarker.Dist;
+import com.dairymoose.biomech.DistExec;
 
 public class SpiderWalkersArmor extends ArmorBase {
 	
-	public SpiderWalkersArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public SpiderWalkersArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
@@ -58,7 +59,7 @@ public class SpiderWalkersArmor extends ArmorBase {
 									Vec2 movementVec = null;
 								}
 								ImpulseChecker ic = new ImpulseChecker();
-								DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
+								DistExec.runWhenOn(Dist.CLIENT, () -> new Runnable() {
 
 									@Override
 									public void run() {

@@ -1,30 +1,28 @@
 package com.dairymoose.biomech.packet.serverbound;
 
-import java.util.function.Supplier;
-
 import com.dairymoose.biomech.BioMech;
-import com.dairymoose.biomech.BioMechNetwork;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechPlayerData.SlottedItem;
-import com.dairymoose.biomech.HandActiveStatus;
-import com.dairymoose.biomech.packet.clientbound.ClientboundHandStatusPacket;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ServerboundUpdateVisibilityPacket implements Packet<ServerGamePacketListener> {
+public class ServerboundUpdateVisibilityPacket implements CustomPacketPayload {
+	public static final CustomPacketPayload.Type<ServerboundUpdateVisibilityPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "update_visibility"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, ServerboundUpdateVisibilityPacket> STREAM_CODEC = StreamCodec.ofMember(ServerboundUpdateVisibilityPacket::write, ServerboundUpdateVisibilityPacket::new);
+
 	private CompoundTag playerDataTag;
 
 	public ServerboundUpdateVisibilityPacket() {
 	}
-	
+
 	public ServerboundUpdateVisibilityPacket(FriendlyByteBuf buffer) {
 		this.read(buffer);
 	}
@@ -41,35 +39,31 @@ public class ServerboundUpdateVisibilityPacket implements Packet<ServerGamePacke
 		byteBuf.writeNbt(playerDataTag);
 	}
 
-	public void handle(Supplier<NetworkEvent.Context> ctx) {
-	    ctx.get().enqueueWork(() -> {
-	        ServerPlayer sender = ctx.get().getSender();
-	        this.handle((ServerGamePacketListener)ctx.get().getNetworkManager().getPacketListener());
-	    });
-	    ctx.get().setPacketHandled(true);
+	@Override
+	public CustomPacketPayload.Type<ServerboundUpdateVisibilityPacket> type() {
+		return TYPE;
 	}
-	
-	public void handle(ServerGamePacketListener packetListener) {
-		BioMech.LOGGER.trace("Handle ServerboundHandStatusPacket");
-		if (packetListener instanceof ServerGamePacketListenerImpl) {
-			ServerGamePacketListenerImpl serverHandler = (ServerGamePacketListenerImpl)packetListener;
-			Level world = serverHandler.player.level();
-			if (world != null) {
-				BioMechPlayerData playerData = BioMech.globalPlayerData.get(serverHandler.player.getUUID());
-				
+
+	public void handle(IPayloadContext context) {
+		context.enqueueWork(() -> {
+			BioMech.LOGGER.trace("Handle ServerboundUpdateVisibilityPacket");
+			Player player = context.player();
+			if (player.level() != null && player instanceof ServerPlayer serverPlayer) {
+				BioMechPlayerData playerData = BioMech.globalPlayerData.get(serverPlayer.getUUID());
+
 				if (playerData != null) {
 					BioMechPlayerData incomingPlayerData = BioMechPlayerData.deserialize(playerDataTag);
-					
+
 					if (incomingPlayerData != null) {
 						for (SlottedItem slottedItem : playerData.getAllSlots()) {
 							SlottedItem incomingItem = incomingPlayerData.getForSlot(slottedItem.mechPart);
 							slottedItem.visible = incomingItem.visible;
 						}
-						
-						BioMech.sendItemSlotUpdateForPlayer(serverHandler.player);
+
+						BioMech.sendItemSlotUpdateForPlayer(serverPlayer);
 					}
 				}
 			}
-		}
+		});
 	}
 }

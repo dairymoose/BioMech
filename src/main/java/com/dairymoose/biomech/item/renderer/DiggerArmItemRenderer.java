@@ -4,8 +4,8 @@ import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.armor.renderer.arm.DiggerRightArmRenderer;
 import com.dairymoose.biomech.item.anim.DiggerAnimator;
 
-import mod.azure.azurelib.render.item.AzItemRenderer;
-import mod.azure.azurelib.render.item.AzItemRendererConfig;
+import mod.azure.azurelib.common.render.item.AzItemRenderer;
+import mod.azure.azurelib.common.render.item.AzItemRendererConfig;
 import net.minecraft.resources.ResourceLocation;
 
 public class DiggerArmItemRenderer extends AzItemRenderer {

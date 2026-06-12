@@ -10,7 +10,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.PacketDistributor;
 
 public class BioMechCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -36,7 +35,7 @@ public class BioMechCommand {
             if (playerData != null) {
             	playerData.setSuitEnergy(energyValue);
             	if (context.getSource().getEntity() instanceof ServerPlayer sp) {
-            		BioMechNetwork.INSTANCE.send(PacketDistributor.PLAYER.with(() -> sp), new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
+            		BioMechNetwork.sendToPlayer(sp, new ClientboundEnergySyncPacket(playerData.getSuitEnergy(), playerData.suitEnergyMax, playerData.remainingTicksForEnergyRegen()));
             	}
             } else {
                 context.getSource().sendSuccess(() -> Component.literal("Could not set energy for player"), true);

@@ -43,7 +43,7 @@ public class GrapplingHook extends ThrowableItemProjectile {
 
 	public static final EntityType<GrapplingHook> GRAPPLING_HOOK_ENTITY = EntityType.Builder
 			.<GrapplingHook>of(GrapplingHook::new, MobCategory.MISC).sized(0.40F, 0.40F)
-			.clientTrackingRange(30).updateInterval(20).build(new ResourceLocation(BioMech.MODID, "grappling_hook").toString());
+			.clientTrackingRange(30).updateInterval(20).build(ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "grappling_hook").toString());
 	
 	public GrapplingHook(EntityType<? extends GrapplingHook> entityType, Level level) {
 		super(entityType, level);
@@ -130,11 +130,11 @@ public class GrapplingHook extends ThrowableItemProjectile {
     	}
     }
     
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.getEntityData().define(DATA_ENTITY_OWNER_ID, -1);
-        this.getEntityData().define(DATA_IMPACT_POINT, new Vector3f(0.0f, 0.0f, 0.0f));
-        this.getEntityData().define(DATA_MECH_PART_ORDINAL, -1);
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(DATA_ENTITY_OWNER_ID, -1);
+        builder.define(DATA_IMPACT_POINT, new Vector3f(0.0f, 0.0f, 0.0f));
+        builder.define(DATA_MECH_PART_ORDINAL, -1);
      }
 
     public static int BEGIN_FALL_DIST = 60;

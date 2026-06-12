@@ -114,18 +114,20 @@ public class BioMechStationBlockEntity extends RandomizableContainerBlockEntity 
 		this.dispatcher = new BioMechStationDispatcher(this);
 	}
 
-	public void load(CompoundTag p_155588_) {
-		super.load(p_155588_);
+	@Override
+	protected void loadAdditional(CompoundTag p_155588_, net.minecraft.core.HolderLookup.Provider registries) {
+		super.loadAdditional(p_155588_, registries);
 		this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
 		if (!this.tryLoadLootTable(p_155588_)) {
-			ContainerHelper.loadAllItems(p_155588_, this.items);
+			ContainerHelper.loadAllItems(p_155588_, this.items, registries);
 		}
 	}
 
-	protected void saveAdditional(CompoundTag p_187502_) {
-		super.saveAdditional(p_187502_);
+	@Override
+	protected void saveAdditional(CompoundTag p_187502_, net.minecraft.core.HolderLookup.Provider registries) {
+		super.saveAdditional(p_187502_, registries);
 		if (!this.trySaveLootTable(p_187502_)) {
-			ContainerHelper.saveAllItems(p_187502_, this.items);
+			ContainerHelper.saveAllItems(p_187502_, this.items, registries);
 		}
 	}
 	

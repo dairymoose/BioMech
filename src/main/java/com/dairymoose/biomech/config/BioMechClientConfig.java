@@ -1,19 +1,19 @@
 package com.dairymoose.biomech.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
 
 public class BioMechClientConfig {
 
-	public final ForgeConfigSpec.BooleanValue requireModifierKeyToActivateHands;
-	public final ForgeConfigSpec.BooleanValue requireEmptyHandsToActivateBioMechHands;
-	public final ForgeConfigSpec.BooleanValue hideMainHandWhileNotInUse;
-	public final ForgeConfigSpec.BooleanValue hideOffHandWhileNotInUse;
+	public final ModConfigSpec.BooleanValue requireModifierKeyToActivateHands;
+	public final ModConfigSpec.BooleanValue requireEmptyHandsToActivateBioMechHands;
+	public final ModConfigSpec.BooleanValue hideMainHandWhileNotInUse;
+	public final ModConfigSpec.BooleanValue hideOffHandWhileNotInUse;
 	
-	public final ForgeConfigSpec.BooleanValue opticsUnitHighlightsUnopenedChestsOnly;
-	public final ForgeConfigSpec.BooleanValue opticsUnitCanEverHighlightSpawners;
-	public final ForgeConfigSpec.BooleanValue opticsUnitCanEverHighlightChests;
-	public final ForgeConfigSpec.BooleanValue opticsUnitAllowZoomIn;
+	public final ModConfigSpec.BooleanValue opticsUnitHighlightsUnopenedChestsOnly;
+	public final ModConfigSpec.BooleanValue opticsUnitCanEverHighlightSpawners;
+	public final ModConfigSpec.BooleanValue opticsUnitCanEverHighlightChests;
+	public final ModConfigSpec.BooleanValue opticsUnitAllowZoomIn;
 	
 	public final ConfigValue<Double> showEnergySuitGuiThreshold;
 	public final ConfigValue<Double> energySuitGuiXScale;
@@ -21,27 +21,27 @@ public class BioMechClientConfig {
 	public final ConfigValue<Double> energySuitGuiXPos;
 	public final ConfigValue<Double> energySuitGuiYPos;
 	
-	public final ForgeConfigSpec.BooleanValue showSuitEnergyText;
+	public final ModConfigSpec.BooleanValue showSuitEnergyText;
 	public final ConfigValue<Double> suitEnergyTextXScale;
 	public final ConfigValue<Double> suitEnergyTextYScale;
 	
-	public final ForgeConfigSpec.BooleanValue showEnergyDrainRate;
+	public final ModConfigSpec.BooleanValue showEnergyDrainRate;
 	
-	public final ForgeConfigSpec.BooleanValue showBioMechInventoryButton;
-	public final ForgeConfigSpec.IntValue bioMechInventoryButtonX;
-	public final ForgeConfigSpec.IntValue bioMechInventoryButtonY;
+	public final ModConfigSpec.BooleanValue showBioMechInventoryButton;
+	public final ModConfigSpec.IntValue bioMechInventoryButtonX;
+	public final ModConfigSpec.IntValue bioMechInventoryButtonY;
 	
-	public final ForgeConfigSpec.BooleanValue enableRepulsorLiftParticle;
+	public final ModConfigSpec.BooleanValue enableRepulsorLiftParticle;
 	
-	public final ForgeConfigSpec.BooleanValue enableJetpackFlameParticle;
-	public final ForgeConfigSpec.BooleanValue enableJetpackSmokeParticle;
-	public final ForgeConfigSpec.BooleanValue enableJetpackSound;
-	public final ForgeConfigSpec.BooleanValue enableHovertechParticle;
+	public final ModConfigSpec.BooleanValue enableJetpackFlameParticle;
+	public final ModConfigSpec.BooleanValue enableJetpackSmokeParticle;
+	public final ModConfigSpec.BooleanValue enableJetpackSound;
+	public final ModConfigSpec.BooleanValue enableHovertechParticle;
 	
-	public final ForgeConfigSpec.IntValue illuminatorUpdateLightingTickPeriod;
-	public final ForgeConfigSpec.IntValue illuminatorLightValue;
+	public final ModConfigSpec.IntValue illuminatorUpdateLightingTickPeriod;
+	public final ModConfigSpec.IntValue illuminatorLightValue;
 	
-	public BioMechClientConfig(ForgeConfigSpec.Builder builder) {
+	public BioMechClientConfig(ModConfigSpec.Builder builder) {
 		builder.push("first_person");
 		this.hideMainHandWhileNotInUse = builder.comment("hideMainHandWhileNotInUse").translation("config.biomech.hideMainHandWhileNotInUse").define("hideMainHandWhileNotInUse", false);
 		this.hideOffHandWhileNotInUse = builder.comment("hideOffHandWhileNotInUse").translation("config.biomech.hideOffHandWhileNotInUse").define("hideOffHandWhileNotInUse", false);

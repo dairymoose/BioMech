@@ -14,6 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +22,7 @@ import net.minecraft.world.level.Level;
 
 public abstract class LoadLifterArmArmor extends ArmorBase {
 	
-	public LoadLifterArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public LoadLifterArmArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
@@ -40,7 +41,7 @@ public abstract class LoadLifterArmArmor extends ArmorBase {
 		
 		Level level = player.level();
 		if (!level.isClientSide) {
-			ArmUtil.attributeBoostPerArm(BoostInstance.INST_1, player, handPart, Attributes.MAX_HEALTH, this.hpBoostAmount, Operation.ADDITION);
+			ArmUtil.attributeBoostPerArm(BoostInstance.INST_1, player, handPart, Attributes.MAX_HEALTH, this.hpBoostAmount, Operation.ADD_VALUE);
 		}
 	}
 	

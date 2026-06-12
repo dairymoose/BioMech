@@ -7,7 +7,6 @@ import com.dairymoose.biomech.block_entity.BioMechStationBlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -42,13 +41,20 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BioMechStationBlock extends HorizontalDirectionalBlock implements EntityBlock, SimpleWaterloggedBlock {
 
+	public static final com.mojang.serialization.MapCodec<BioMechStationBlock> CODEC = simpleCodec(BioMechStationBlock::new);
+
 	public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public static final BooleanProperty MULTIBLOCK = BooleanProperty.create("multiblock");
 	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-	
+
 	private static boolean instantTeleportToStation = false;
 	public static boolean configWalkToBioMechStation = true;
-	
+
+	@Override
+	protected com.mojang.serialization.MapCodec<? extends HorizontalDirectionalBlock> codec() {
+		return CODEC;
+	}
+
 	public BioMechStationBlock(Properties props) {
 		super(props);
 		this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(MULTIBLOCK, false).setValue(WATERLOGGED, Boolean.FALSE));
@@ -106,7 +112,7 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 		return super.updateShape(blockState, p_49526_, p_49527_, level, pos, p_49530_);
 	}
 	
-	public void playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
+	public BlockState playerWillDestroy(Level level, BlockPos blockPos, BlockState blockState, Player player) {
 	      if (!level.isClientSide && player.isCreative()) {
 	         Boolean multiblock = blockState.getValue(MULTIBLOCK);
 	         //if (!multiblock.booleanValue()) {
@@ -119,7 +125,7 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 	         //}
 	      }
 
-	      super.playerWillDestroy(level, blockPos, blockState, player);
+	      return super.playerWillDestroy(level, blockPos, blockState, player);
 	   }
 	
 	@Override
@@ -174,7 +180,7 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 	}
 	
 	private InteractionResult useBlock(BlockState blockState, Level level, BlockPos blockPos, Player player,
-			InteractionHand hand, BlockHitResult hitResult) {
+			BlockHitResult hitResult) {
 		BlockEntity blockEntity = level.getBlockEntity(blockPos);
 		if (blockEntity instanceof BioMechStationBlockEntity be) {
 			if (!be.canOpen(player)) {
@@ -221,16 +227,17 @@ public class BioMechStationBlock extends HorizontalDirectionalBlock implements E
 		}
 	}
 	
-	public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player,
-			InteractionHand hand, BlockHitResult hitResult) {
+	@Override
+	protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player,
+			BlockHitResult hitResult) {
 		if (blockState.is(this) && blockState.getValue(MULTIBLOCK).booleanValue()) {
 			BlockPos belowPos = blockPos.below();
 			BlockState belowState = level.getBlockState(belowPos);
 			if (belowState.is(this) && !belowState.getValue(MULTIBLOCK).booleanValue()) {
-				return this.useBlock(belowState, level, belowPos, player, hand, hitResult);
+				return this.useBlock(belowState, level, belowPos, player, hitResult);
 			}
 		} else {
-			return this.useBlock(blockState, level, blockPos, player, hand, hitResult);
+			return this.useBlock(blockState, level, blockPos, player, hitResult);
 		}
 		return InteractionResult.PASS;
 	}

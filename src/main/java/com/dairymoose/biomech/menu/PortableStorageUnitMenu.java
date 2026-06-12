@@ -203,14 +203,15 @@ public class PortableStorageUnitMenu extends AbstractContainerMenu {
 		if (!level.isClientSide) {
 			ServerPlayer serverplayer = (ServerPlayer) craftingPlayer;
 			ItemStack itemstack = ItemStack.EMPTY;
-			Optional<CraftingRecipe> optional = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, craftingContainer, level);
+			net.minecraft.world.item.crafting.CraftingInput input = craftingContainer.asCraftInput();
+			Optional<net.minecraft.world.item.crafting.RecipeHolder<CraftingRecipe>> optional = level.getServer().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level);
 			if (optional.isPresent()) {
-				CraftingRecipe craftingrecipe = optional.get();
-				if (resultContainer.setRecipeUsed(level, serverplayer, craftingrecipe)) {
-					ItemStack itemstack1 = craftingrecipe.assemble(craftingContainer, level.registryAccess());
-					if (itemstack1.isItemEnabled(level.enabledFeatures())) {
-						itemstack = itemstack1;
-					}
+				net.minecraft.world.item.crafting.RecipeHolder<CraftingRecipe> recipeHolder = optional.get();
+				CraftingRecipe craftingrecipe = recipeHolder.value();
+				resultContainer.setRecipeUsed(recipeHolder);
+				ItemStack itemstack1 = craftingrecipe.assemble(input, level.registryAccess());
+				if (itemstack1.isItemEnabled(level.enabledFeatures())) {
+					itemstack = itemstack1;
 				}
 			}
 
@@ -240,9 +241,9 @@ public class PortableStorageUnitMenu extends AbstractContainerMenu {
 		//this.resultSlots.clearContent();
 	}
 
-	public boolean recipeMatches(Recipe<? super CraftingContainer> p_39384_) {
+	public boolean recipeMatches(Recipe<net.minecraft.world.item.crafting.CraftingInput> p_39384_) {
 		if (BioMechPlayerData.storageUnitHasCraftingTable) {
-			return p_39384_.matches(this.craftSlots, this.player.level());
+			return p_39384_.matches(this.craftSlots.asCraftInput(), this.player.level());
 		}
 		return false;
 	}

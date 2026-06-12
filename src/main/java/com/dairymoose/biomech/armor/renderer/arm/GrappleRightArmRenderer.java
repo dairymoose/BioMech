@@ -4,8 +4,8 @@ import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.item.anim.BuzzsawAnimator;
 import com.dairymoose.biomech.item.anim.GrappleAnimator;
 
-import mod.azure.azurelib.render.armor.AzArmorRenderer;
-import mod.azure.azurelib.render.armor.AzArmorRendererConfig;
+import mod.azure.azurelib.common.render.armor.AzArmorRenderer;
+import mod.azure.azurelib.common.render.armor.AzArmorRendererConfig;
 import net.minecraft.resources.ResourceLocation;
 
 public class GrappleRightArmRenderer extends AzArmorRenderer {

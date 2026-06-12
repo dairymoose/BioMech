@@ -27,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.ForgeMod;
+import net.neoforged.neoforge.common.NeoForgeMod;
 
 public class IlluminantBlock extends Block implements SimpleWaterloggedBlock {
 
@@ -62,7 +62,7 @@ public class IlluminantBlock extends Block implements SimpleWaterloggedBlock {
 	}
 	
 	@Override
-	public ItemStack pickupBlock(LevelAccessor level, BlockPos blockPos, BlockState p_154562_) {
+	public ItemStack pickupBlock(net.minecraft.world.entity.player.Player player, LevelAccessor level, BlockPos blockPos, BlockState p_154562_) {
 		for (Map.Entry<UUID, List<IlluminantInfo>> entry : IlluminatorArmor.illuminantMap.entrySet()) {
 			for (IlluminantInfo info : entry.getValue()) {
 				if (info.pos != null && info.pos.equals(blockPos)) {
@@ -72,7 +72,7 @@ public class IlluminantBlock extends Block implements SimpleWaterloggedBlock {
 				}
 			}
 		}
-		return SimpleWaterloggedBlock.super.pickupBlock(level, blockPos, p_154562_);
+		return SimpleWaterloggedBlock.super.pickupBlock(player, level, blockPos, p_154562_);
 	}
 	
 	@Override
@@ -84,7 +84,7 @@ public class IlluminantBlock extends Block implements SimpleWaterloggedBlock {
 	
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
 		FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
-		return this.defaultBlockState().setValue(WATERLOGGED, fluidState.getFluidType() == ForgeMod.WATER_TYPE.get());
+		return this.defaultBlockState().setValue(WATERLOGGED, fluidState.getFluidType() == NeoForgeMod.WATER_TYPE.value());
 	}
 	
 	@Override

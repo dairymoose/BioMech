@@ -24,6 +24,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -31,16 +32,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import com.dairymoose.biomech.DistExec;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 public class TransformerModuleHelicopterArmor extends ArmorBase {
 
 	final TransformerModuleHelicopterDispatcher dispatcher;
 	
-	public TransformerModuleHelicopterArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public TransformerModuleHelicopterArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.suitEnergyPerSec = 0.5f;
@@ -132,7 +133,7 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 
 									player.setOnGround(false);
 
-									float g = (float) player.getAttributeValue(ForgeMod.ENTITY_GRAVITY.get());
+									float g = (float) player.getAttributeValue(Attributes.GRAVITY);
 									Vec3 delta = player.getDeltaMovement();
 									
 									rightArmRot -= ROT_PER_TICK;
@@ -143,7 +144,7 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 										Vec2 movementVec = null;
 									}
 									ImpulseChecker ic = new ImpulseChecker();
-									DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
+									DistExec.runWhenOn(Dist.CLIENT, () -> new Runnable() {
 
 										@Override
 										public void run() {
@@ -192,7 +193,7 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 										float horizontalSpeed = (float)Math.sqrt(this.fwdSpeed*this.fwdSpeed + this.lateralSpeed*this.lateralSpeed);
 										float calcDmg = horizontalSpeed * 8.0f;
 										if (horizontalSpeed >= 0.05f) {
-											BioMechNetwork.INSTANCE.sendToServer(new ServerboundHurtMePacket(calcDmg));
+											BioMechNetwork.sendToServer(new ServerboundHurtMePacket(calcDmg));
 										}
 										
 										xComp = 0.0;
@@ -204,7 +205,7 @@ public class TransformerModuleHelicopterArmor extends ArmorBase {
 										float verticalSpeed = this.ySpeed;
 										float calcDmg = verticalSpeed * 8.0f;
 										if (Math.abs(verticalSpeed) >= 0.05f) {
-											BioMechNetwork.INSTANCE.sendToServer(new ServerboundHurtMePacket(calcDmg));
+											BioMechNetwork.sendToServer(new ServerboundHurtMePacket(calcDmg));
 										}
 										
 										ySpeed = 0.0f;

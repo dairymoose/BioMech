@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.item.armor;
 
+import com.dairymoose.biomech.ItemNbtHelper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +23,7 @@ import net.minecraft.world.level.Level;
 
 public class PowerChestArmor extends ArmorBase {
 
-	public PowerChestArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public PowerChestArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 100;
 		this.suitEnergyPerSec = 1.0f;
@@ -39,13 +41,14 @@ public class PowerChestArmor extends ArmorBase {
 
 		if (PipeMechBodyArmor.damageSourceIsDirect(amount, damageSource, player) && amount > 0.0f && !player.level().isClientSide) {
 			int lastProc = -1;
-			CompoundTag tag = itemStack.getOrCreateTag();
+			CompoundTag tag = ItemNbtHelper.getOrCreateTag(itemStack);
 			if (tag.contains("LastProc")) {
 				lastProc = tag.getInt("LastProc");
 			}
 			int tickDiff = player.tickCount - lastProc;
 			if (lastProc == -1 || tickDiff < 0 || tickDiff >= (SECONDS_BETWEEN_PROC*TICKS_PER_SEC)) {
 				tag.putInt("LastProc", player.tickCount);
+				ItemNbtHelper.setTag(itemStack, tag);
 				float healAmount = amount * 0.5f;
 				BioMech.LOGGER.debug("power armor proc for player=" + player.getName().getString() + " at tick=" + player.tickCount + ", heal=" + healAmount);
 				player.level().playSound(null, player.blockPosition(), SoundEvents.CHAIN_BREAK, SoundSource.PLAYERS, 2.0f, 1.2f);

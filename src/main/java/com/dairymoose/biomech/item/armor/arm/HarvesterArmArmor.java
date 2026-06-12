@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.item.armor.arm;
 
+import com.dairymoose.biomech.ItemNbtHelper;
 import java.util.List;
 
 import com.dairymoose.biomech.BioMech;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -34,7 +36,7 @@ public abstract class HarvesterArmArmor extends AbstractMiningArmArmor {
 
 	public final HarvesterDispatcher dispatcher;
 
-	public HarvesterArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public HarvesterArmArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
@@ -203,7 +205,7 @@ public abstract class HarvesterArmArmor extends AbstractMiningArmArmor {
 		try {
 			player.setItemInHand(InteractionHand.MAIN_HAND, this.miningTool);
 			UseOnContext ctx = new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(blockPos.getCenter(), player.getDirection(), blockPos, false));
-			toolModifiedState = level.getBlockState(blockPos).getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.HOE_TILL, true);
+			toolModifiedState = level.getBlockState(blockPos).getToolModifiedState(ctx, net.neoforged.neoforge.common.ItemAbilities.HOE_TILL, true);
 		} finally {
 			player.setItemInHand(InteractionHand.MAIN_HAND, currentMainHand);
 		}
@@ -224,7 +226,7 @@ public abstract class HarvesterArmArmor extends AbstractMiningArmArmor {
 	
 	@Override
 	protected void dealEntityDamage(Vec3 hitLocation, ItemStack itemStack, Player player, boolean bothHandsActive, float miningPower, LivingEntity living) {
-		CompoundTag compound = itemStack.getOrCreateTag();
+		CompoundTag compound = ItemNbtHelper.getOrCreateTag(itemStack);
 		long swingDiff = -1;
 		if (compound.contains("LastSwingTime")) {
 			long lastSwingTime = compound.getLong("LastSwingTime");
@@ -234,6 +236,7 @@ public abstract class HarvesterArmArmor extends AbstractMiningArmArmor {
 			float damageMult = 1.0f;
 			living.hurt(player.level().damageSources().playerAttack(player), damageMult*hoeDamage*miningPower);
 			compound.putLong("LastSwingTime", player.tickCount);
+			ItemNbtHelper.setTag(itemStack, compound);
 		}
 	}
 	

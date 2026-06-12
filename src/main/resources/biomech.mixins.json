@@ -1,18 +1,15 @@
 {
   "minVersion": "0.8",
   "required": true,
-  "compatibilityLevel": "JAVA_17",
-  "refmap": "biomech.refmap.json",
+  "compatibilityLevel": "JAVA_21",
   "package": "com.dairymoose.biomech.mixins",
-  //only applies to client, not dedicated server
- "client": [
-  	"PlayerModelMixin" //redirect on setupAnims
+  "client": [
+    "PlayerModelMixin"
   ],
-  //applys to dedicated server and client
   "mixins": [
-	"LivingEntityUpdateFallFlyingMixin", //per-tick checks for continued elytra flight
-	"PlayerFallFlyingMixin", //when trying to initially begin elytra flight
-	"EntityMoveMixin" //avoid trigger Block stepOn effects
+    "LivingEntityUpdateFallFlyingMixin",
+    "PlayerFallFlyingMixin",
+    "EntityMoveMixin"
   ],
   "injectors": {
     "defaultRequire": 1

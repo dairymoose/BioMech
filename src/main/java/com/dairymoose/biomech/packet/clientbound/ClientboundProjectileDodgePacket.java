@@ -1,28 +1,32 @@
 package com.dairymoose.biomech.packet.clientbound;
 
-import java.util.function.Supplier;
-
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.item.armor.InterceptorArmsArmor;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ClientboundProjectileDodgePacket implements Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> {
+public class ClientboundProjectileDodgePacket implements CustomPacketPayload {
+	public static final CustomPacketPayload.Type<ClientboundProjectileDodgePacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "projectile_dodge"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundProjectileDodgePacket> STREAM_CODEC = StreamCodec.ofMember(ClientboundProjectileDodgePacket::write, ClientboundProjectileDodgePacket::new);
+
 	int playerId;
-	
+
 	public ClientboundProjectileDodgePacket() {
 	}
-	
+
 	public ClientboundProjectileDodgePacket(FriendlyByteBuf buffer) {
 		this.read(buffer);
 	}
-	
+
 	public ClientboundProjectileDodgePacket(Player player) {
 		this.playerId = player.getId();
 	}
@@ -35,27 +39,21 @@ public class ClientboundProjectileDodgePacket implements Packet<net.minecraft.ne
 		byteBuf.writeInt(playerId);
 	}
 
-	public void handle(Supplier<NetworkEvent.Context> ctx) {
-	    ctx.get().enqueueWork(() -> {
-	        this.handle((net.minecraft.network.protocol.game.ClientGamePacketListener)ctx.get().getNetworkManager().getPacketListener());
-	    });
-	    ctx.get().setPacketHandled(true);
+	@Override
+	public CustomPacketPayload.Type<ClientboundProjectileDodgePacket> type() {
+		return TYPE;
 	}
-	
-	@SuppressWarnings("deprecation")
-	public void handle(net.minecraft.network.protocol.game.ClientGamePacketListener handler) {
-		BioMech.LOGGER.trace("Handle ClientboundProjectileDodgePacket");
-		if (handler instanceof net.minecraft.client.multiplayer.ClientPacketListener) {
-			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
-				@Override
-				public void run() {
-					net.minecraft.client.multiplayer.ClientPacketListener clientHandler = (net.minecraft.client.multiplayer.ClientPacketListener)handler;
-					Entity e = clientHandler.getLevel().getEntity(playerId);
-					if (e instanceof Player p) {
-						InterceptorArmsArmor.dodgedProjectileSet.add(p);
-					}
+
+	public void handle(IPayloadContext context) {
+		context.enqueueWork(() -> {
+			BioMech.LOGGER.trace("Handle ClientboundProjectileDodgePacket");
+			Level world = Minecraft.getInstance().level;
+			if (world != null) {
+				Entity e = world.getEntity(playerId);
+				if (e instanceof Player p) {
+					InterceptorArmsArmor.dodgedProjectileSet.add(p);
 				}
-				};});
-		}
+			}
+		});
 	}
 }

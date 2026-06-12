@@ -1,25 +1,27 @@
 package com.dairymoose.biomech.packet.clientbound;
 
-import java.util.function.Supplier;
-
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.Packet;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class ClientboundEnergySyncPacket implements Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> {
+public class ClientboundEnergySyncPacket implements CustomPacketPayload {
+	public static final CustomPacketPayload.Type<ClientboundEnergySyncPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(BioMech.MODID, "energy_sync"));
+	public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundEnergySyncPacket> STREAM_CODEC = StreamCodec.ofMember(ClientboundEnergySyncPacket::write, ClientboundEnergySyncPacket::new);
+
 	private float suitEnergy;
 	private float suitEnergyMax;
 	private long remainingTicksForEnergyRegen;
 
 	public ClientboundEnergySyncPacket() {
 	}
-	
+
 	public ClientboundEnergySyncPacket(FriendlyByteBuf buffer) {
 		this.read(buffer);
 	}
@@ -42,31 +44,22 @@ public class ClientboundEnergySyncPacket implements Packet<net.minecraft.network
 		byteBuf.writeLong(remainingTicksForEnergyRegen);
 	}
 
-	public void handle(Supplier<NetworkEvent.Context> ctx) {
-	    ctx.get().enqueueWork(() -> {
-	        this.handle((net.minecraft.network.protocol.game.ClientGamePacketListener)ctx.get().getNetworkManager().getPacketListener());
-	    });
-	    ctx.get().setPacketHandled(true);
+	@Override
+	public CustomPacketPayload.Type<ClientboundEnergySyncPacket> type() {
+		return TYPE;
 	}
-	
-	@SuppressWarnings("deprecation")
-	public void handle(net.minecraft.network.protocol.game.ClientGamePacketListener handler) {
-		BioMech.LOGGER.trace("Handle ClientboundEnergySyncPacket");
-		if (handler instanceof net.minecraft.client.multiplayer.ClientPacketListener) {
-			DistExecutor.runWhenOn(Dist.CLIENT, () -> {return new Runnable() {
-				@Override
-				public void run() {
-					net.minecraft.client.multiplayer.ClientPacketListener clientHandler = (net.minecraft.client.multiplayer.ClientPacketListener)handler;
-					BioMechPlayerData playerData = BioMech.globalPlayerData.get(Minecraft.getInstance().player.getUUID());
-					if (playerData != null) {
-						playerData.suitEnergyMax = suitEnergyMax;
-						playerData.setSuitEnergy(suitEnergy);
-						if (remainingTicksForEnergyRegen > 0) {
-							playerData.lastUsedEnergyTick = playerData.tickCount - (BioMechPlayerData.ticksRequiredToRegenEnergy - remainingTicksForEnergyRegen);
-						}
-					}
+
+	public void handle(IPayloadContext context) {
+		context.enqueueWork(() -> {
+			BioMech.LOGGER.trace("Handle ClientboundEnergySyncPacket");
+			BioMechPlayerData playerData = BioMech.globalPlayerData.get(Minecraft.getInstance().player.getUUID());
+			if (playerData != null) {
+				playerData.suitEnergyMax = suitEnergyMax;
+				playerData.setSuitEnergy(suitEnergy);
+				if (remainingTicksForEnergyRegen > 0) {
+					playerData.lastUsedEnergyTick = playerData.tickCount - (BioMechPlayerData.ticksRequiredToRegenEnergy - remainingTicksForEnergyRegen);
 				}
-				};});
-		}
+			}
+		});
 	}
 }

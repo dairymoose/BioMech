@@ -1,7 +1,7 @@
 package com.dairymoose.biomech.block_entity.anim;
 
-import mod.azure.azurelib.animation.dispatch.command.AzCommand;
-import mod.azure.azurelib.animation.play_behavior.AzPlayBehaviors;
+import mod.azure.azurelib.common.animation.dispatch.command.AzCommand;
+import mod.azure.azurelib.common.animation.play_behavior.AzPlayBehaviors;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class BioMechStationDispatcher {

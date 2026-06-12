@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.item.armor;
 
+import com.dairymoose.biomech.ItemNbtHelper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,16 +16,17 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
+import net.neoforged.api.distmarker.Dist;
+import com.dairymoose.biomech.DistExec;
 
 public class MobilityTreadsArmor extends ArmorBase {
 	
-	public MobilityTreadsArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public MobilityTreadsArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 20;
 		this.hidePlayerModel = true;
@@ -53,8 +55,8 @@ public class MobilityTreadsArmor extends ArmorBase {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
 					if (level.isClientSide) {
 						int lastCollisionTick = 0;
-						if (itemStack.getTag().contains("LastCollisionTick")) {
-							lastCollisionTick = itemStack.getTag().getInt("LastCollisionTick");
+						if (ItemNbtHelper.getTagOrNull(itemStack).contains("LastCollisionTick")) {
+							lastCollisionTick = ItemNbtHelper.getTagOrNull(itemStack).getInt("LastCollisionTick");
 						}
 						
 						class InputChecker {
@@ -62,7 +64,7 @@ public class MobilityTreadsArmor extends ArmorBase {
 							boolean hasBackwardsImpulse = false;
 						}
 						InputChecker ic = new InputChecker();
-						DistExecutor.runWhenOn(Dist.CLIENT, () -> new Runnable() {
+						DistExec.runWhenOn(Dist.CLIENT, () -> new Runnable() {
 							@Override
 							public void run() {
 								ic.hasForwardImpulse = Minecraft.getInstance().player.input.hasForwardImpulse();
@@ -76,31 +78,33 @@ public class MobilityTreadsArmor extends ArmorBase {
 						if (ic.hasBackwardsImpulse) {
 							currentSpeed = -currentSpeed;
 						}
-						itemStack.getOrCreateTag().putFloat("CurrentSpeed", currentSpeed);
+						final float currentSpeedFinal = currentSpeed;
+						ItemNbtHelper.update(itemStack, t -> t.putFloat("CurrentSpeed", currentSpeedFinal));
 						
 						if (!ic.hasForwardImpulse) {
 							if (requestedSpeedBoost) {
 								localPlayerSpeedBoosting = false;
 								
 								requestedSpeedBoost = false;
-								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMobilityTreadsPacket(false));
+								BioMechNetwork.sendToServer(new ServerboundMobilityTreadsPacket(false));
 							}
 							lastCollisionTick = player.tickCount;
-							itemStack.getTag().putInt("LastCollisionTick", lastCollisionTick);
+							final int lastCollisionTickFinal = lastCollisionTick;
+							ItemNbtHelper.update(itemStack, t -> t.putInt("LastCollisionTick", lastCollisionTickFinal));
 						} else {
 							int tickDiff = player.tickCount - lastCollisionTick;
 							if (!requestedSpeedBoost && tickDiff >= (SECONDS_UNTIL_SPEED_BOOST * TICKS_PER_SEC) && player.onGround()) {
 								localPlayerSpeedBoosting = true;
 								
 								requestedSpeedBoost = true;
-								BioMechNetwork.INSTANCE.sendToServer(new ServerboundMobilityTreadsPacket(true));
+								BioMechNetwork.sendToServer(new ServerboundMobilityTreadsPacket(true));
 							}
 						}
 					} else {
-						CompoundTag tag = itemStack.getOrCreateTag();
+						CompoundTag tag = ItemNbtHelper.getOrCreateTag(itemStack);
 						boolean speedBoost = false;
 						if (tag.contains("WantSpeedBoost")) {
-							speedBoost = itemStack.getOrCreateTag().getBoolean("WantSpeedBoost");
+							speedBoost = ItemNbtHelper.getTag(itemStack).getBoolean("WantSpeedBoost");
 						}
 						
 						MobEffectInstance speedBuff = player.getEffect(MobEffects.MOVEMENT_SPEED);

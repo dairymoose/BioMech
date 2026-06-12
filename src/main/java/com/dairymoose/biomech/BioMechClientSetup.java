@@ -84,11 +84,11 @@ import com.dairymoose.biomech.item.renderer.MiningLaserItemRenderer;
 import com.dairymoose.biomech.item.renderer.PipeMechArmItemRenderer;
 import com.dairymoose.biomech.item.renderer.PowerArmItemRenderer;
 
-import mod.azure.azurelib.animation.cache.AzIdentityRegistry;
-import mod.azure.azurelib.render.armor.AzArmorRendererRegistry;
-import mod.azure.azurelib.render.item.AzItemRendererRegistry;
+import mod.azure.azurelib.common.animation.cache.AzIdentityRegistry;
+import mod.azure.azurelib.common.render.armor.AzArmorRendererRegistry;
+import mod.azure.azurelib.common.render.item.AzItemRendererRegistry;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
 public class BioMechClientSetup {
 
@@ -216,8 +216,8 @@ public class BioMechClientSetup {
     	
     	//------
     	
-    	MenuScreens.register(BioMechRegistry.MENU_TYPE_BIOMECH_STATION.get(), BioMechStationScreen::new);
-    	MenuScreens.register(BioMechRegistry.MENU_TYPE_PORTABLE_STORAGE_UNIT.get(), PortableStorageUnitScreen::new);
+    	// MenuScreens.register is internal in NeoForge 1.21; screen registration happens in
+    	// BioMech.ClientModEvents.onRegisterMenuScreens via RegisterMenuScreensEvent.
     	
     	//BioMech Station only
     	AzItemRendererRegistry.register(BioMechStationItemRenderer::new, BioMechRegistry.ITEM_BIOMECH_STATION.get());

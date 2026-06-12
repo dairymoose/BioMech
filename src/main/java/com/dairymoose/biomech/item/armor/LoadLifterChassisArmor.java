@@ -14,6 +14,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +22,7 @@ import net.minecraft.world.level.Level;
 
 public class LoadLifterChassisArmor extends ArmorBase {
 
-	public LoadLifterChassisArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public LoadLifterChassisArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 80;
 		this.hidePlayerModel = true;
@@ -43,7 +44,7 @@ public class LoadLifterChassisArmor extends ArmorBase {
 						AttributeInstance inst = living.getAttribute(Attributes.MAX_HEALTH);
 						AttributeModifier thisBoost = inst.getModifier(PermanentModifiers.chestBoost);
 						if (thisBoost == null)
-							inst.addPermanentModifier(new AttributeModifier(PermanentModifiers.chestBoost, "boost_chest", this.hpBoostAmount, Operation.ADDITION));
+							inst.addPermanentModifier(new AttributeModifier(PermanentModifiers.chestBoost, this.hpBoostAmount, Operation.ADD_VALUE));
 					}
 				}
 			}

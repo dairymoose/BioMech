@@ -1,5 +1,6 @@
 package com.dairymoose.biomech.item.armor.arm;
 
+import com.dairymoose.biomech.ItemNbtHelper;
 import com.dairymoose.biomech.BioMech;
 import com.dairymoose.biomech.BioMechPlayerData;
 import com.dairymoose.biomech.BioMechRegistry;
@@ -12,6 +13,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Holder;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +27,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 	public static float gatlingEnergyPerSec = 10.0f;
 	public static float gatlingMinFalloff = 0.5f;
 	
-	public GatlingArmArmor(ArmorMaterial p_40386_, Type p_266831_, Properties p_40388_) {
+	public GatlingArmArmor(Holder<ArmorMaterial> p_40386_, Type p_266831_, Properties p_40388_) {
 		super(p_40386_, p_266831_, p_40388_);
 		this.suitEnergy = 10;
 		this.hidePlayerModel = true;
@@ -61,7 +63,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 		this.energyPerSec = gatlingEnergyPerSec;
 		this.energyPerSecMiss = gatlingEnergyPerSec;
 		
-		CompoundTag tag = itemStack.getTag();
+		CompoundTag tag = ItemNbtHelper.getTagOrNull(itemStack);
 		if (tag != null && tag.contains(USE_TICKS)) {
 			int useTicks = tag.getInt(USE_TICKS);
 			if (useTicks > this.startUsingTickCount) {
@@ -87,7 +89,7 @@ public abstract class GatlingArmArmor extends AbstractMiningArmArmor {
 	public static float activeVolumeMod = 0.50f;
 	@Override
 	protected void notYetActiveSound(ItemStack itemStack, Player player) {
-		CompoundTag tag = itemStack.getTag();
+		CompoundTag tag = ItemNbtHelper.getTagOrNull(itemStack);
 		if (tag != null && tag.contains(USE_TICKS)) {
 			int useTicks = tag.getInt(USE_TICKS);
 			if (useTicks >= this.startUsingTickCount/3) {
