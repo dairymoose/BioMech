@@ -188,7 +188,7 @@ public class BioMechStationScreen extends AbstractContainerScreen<BioMechStation
 		int i = (this.width - this.imageWidth) / 2;
 		int j = (this.height - this.imageHeight) / 2;
 		p_281616_.blit(GUI_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
-		InventoryScreen.renderEntityInInventoryFollowsMouse(p_281616_, i + 144 - 25, j + 75 - 50, i + 144 + 25, j + 75, 30,
+		InventoryScreen.renderEntityInInventoryFollowsMouse(p_281616_, i + 144 - 25, j + 8, i + 169, j + 75 + 10, 30,
 				0.0625f, this.xMouse, this.yMouse, this.minecraft.player);
 	}
 }

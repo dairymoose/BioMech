@@ -108,7 +108,7 @@ public abstract class GrappleArmArmor extends ArmorBase {
 			}
 
 			if (active) {
-				int useTicks = ItemNbtHelper.getTagOrNull(thirdPersonItemStack).getInt(USE_TICKS);
+				int useTicks = ItemNbtHelper.getTag(thirdPersonItemStack).getInt(USE_TICKS);
 				if (FMLEnvironment.dist == Dist.CLIENT) {
 					if (player.level().isClientSide)
 						++useTicks;

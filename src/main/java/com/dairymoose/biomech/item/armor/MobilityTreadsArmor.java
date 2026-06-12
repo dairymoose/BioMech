@@ -55,8 +55,8 @@ public class MobilityTreadsArmor extends ArmorBase {
 				if (entity instanceof LivingEntity living && !living.isSpectator()) {
 					if (level.isClientSide) {
 						int lastCollisionTick = 0;
-						if (ItemNbtHelper.getTagOrNull(itemStack).contains("LastCollisionTick")) {
-							lastCollisionTick = ItemNbtHelper.getTagOrNull(itemStack).getInt("LastCollisionTick");
+						if (ItemNbtHelper.getTag(itemStack).contains("LastCollisionTick")) {
+							lastCollisionTick = ItemNbtHelper.getTag(itemStack).getInt("LastCollisionTick");
 						}
 						
 						class InputChecker {

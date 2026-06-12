@@ -47,7 +47,7 @@ public class MobilityTreadsRenderer extends AzArmorRenderer {
 	        	
 	        	int tickUpdatePeriod = 0;
 	        	if (BioMech.currentRenderItemStackContext != null) {
-	        		CompoundTag tag = ItemNbtHelper.getTagOrNull(BioMech.currentRenderItemStackContext);
+	        		CompoundTag tag = ItemNbtHelper.getTag(BioMech.currentRenderItemStackContext);
 
 	        		if (tag.contains("CurrentSpeed")) {
 						currentSpeed = tag.getFloat("CurrentSpeed");
