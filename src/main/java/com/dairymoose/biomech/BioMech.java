@@ -13,6 +13,8 @@ import java.util.OptionalDouble;
 import java.util.Set;
 import java.util.UUID;
 
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 
@@ -317,6 +319,10 @@ public class BioMech
         modContainer.registerConfig(ModConfig.Type.COMMON, BioMechConfig.commonSpec);
 	    modContainer.registerConfig(ModConfig.Type.CLIENT, BioMechConfig.clientSpec);
 	    modContainer.registerConfig(ModConfig.Type.SERVER, BioMechConfig.serverSpec);
+
+		if (FMLEnvironment.dist == Dist.CLIENT) {
+			modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+		}
 
 	    // Network payloads are registered in BioMechNetwork via RegisterPayloadHandlersEvent.
     }
